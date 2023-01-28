@@ -33,7 +33,7 @@ class User(AbstractUser):
         validators=[
             RegexValidator(   
                 regex=r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$",
-                message="Password must be an uppercase character, lowercase character and a number",
+                message="Password must contain at least one uppercase character, one lowercase character and a number",
             )
         ],
     )
