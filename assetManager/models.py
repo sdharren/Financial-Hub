@@ -23,23 +23,22 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+#minimum length instead of maximum length
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, blank=False)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
-    password = models.CharField(    
-        max_length=520,     
+    password = models.CharField(
+        max_length=520,
         validators=[
-            RegexValidator(   
+            RegexValidator(
                 regex=r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$",
                 message="Password must contain at least one uppercase character, one lowercase character and a number",
             )
         ],
     )
-    
+
     objects = UserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
-
-    
