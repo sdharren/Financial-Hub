@@ -74,6 +74,21 @@ class UserModelTestCase(TestCase):
         self.user.email = 'johndoe@@example.org'
         self._assert_user_is_invalid()
 
+    def test_password_must_contain_one_upper_case_character(self):
+        self.user.password = 'password123'
+        self._assert_user_is_invalid()
+
+    def test_password_must_contain_one_lower_case_character(self):
+        self.user.password = 'PASSWORD123'
+        self._assert_user_is_invalid()
+    
+    def test_password_must_contain_a_number(self):
+        self.user.password = 'Password'
+        self._assert_user_is_invalid()
+
+    def test_password_cannot_be_longer_than_520_characters(self):
+        self.user.password = 'Password123' * 50
+        self._assert_user_is_invalid()
 
 
     def test_valid_user(self):
