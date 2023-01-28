@@ -9,6 +9,9 @@ from plaid.model.link_token_account_filters import LinkTokenAccountFilters
 from plaid.model.depository_filter import DepositoryFilter
 from plaid.model.depository_account_subtypes import DepositoryAccountSubtypes
 from plaid.model.depository_account_subtype import DepositoryAccountSubtype
+from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
+from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
+from plaid.model.accounts_get_request import AccountsGetRequest
 
 """https://sandbox.plaid.com (Sandbox)
 https://development.plaid.com (Development)
@@ -16,7 +19,7 @@ https://production.plaid.com (Production)"""
 
 PLAID_CLIENT_ID = "63d288b343e6370012e5be86"
 PLAID_SECRET_ID = "3c1540e977fb113fe9bdbb12bf61fd"
-PLAID_REDIRECT_URI = 'http://localhost:3000/'
+PLAID_REDIRECT_URI = 'http://localhost:8000/'
 
 host = plaid.Environment.Sandbox
 
@@ -34,9 +37,9 @@ client = plaid_api.PlaidApi(api_client)
 
 request = LinkTokenCreateRequest(
     products=[Products('auth'), Products('transactions')],
-    client_name="KCL",
+    client_name="Plaid Test App",
     country_codes=[CountryCode('US')],
-    redirect_uri='http://localhost:3000/',
+    redirect_uri='http://localhost:8000',
     language='en',
     webhook='https://sample-webhook-uri.com',
     link_customization_name='default',
@@ -48,9 +51,33 @@ request = LinkTokenCreateRequest(
         )
     ),
     user=LinkTokenCreateRequestUser(
-        client_user_id=PLAID_CLIENT_ID
+        client_user_id='123-test-user-id'
     ),
 )
+
+def get_accounts():
+    response = client.link_token_create(request)
+    link_token = response['link_token'] # getting link token form API
+
+    REVOLUT_ID = 'ins_115642' # using revolut's ID (just for testing)
+    pt_request = SandboxPublicTokenCreateRequest(
+        institution_id=REVOLUT_ID,
+        initial_products=[Products('transactions')]
+    )
+    pt_response = client.sandbox_public_token_create(pt_request)
+    # The generated public_token can now be
+    # exchanged for an access_token
+    exchange_request = ItemPublicTokenExchangeRequest(
+        public_token=pt_response['public_token']
+    )
+    exchange_response = client.item_public_token_exchange(exchange_request)
+    ACCESS_TOKEN = exchange_response['access_token'] # this access token needs to be used in places
+
+    request = AccountsGetRequest(access_token=ACCESS_TOKEN)
+    response = client.accounts_get(request)
+    accounts = response['accounts']
+    print(accounts)
+
 
 def get_transactions():
     response = client.link_token_create(request)
