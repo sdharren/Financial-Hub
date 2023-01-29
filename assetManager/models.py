@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 
 # Create your models here.
-
+#test comment to associate commit on team feedback
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -28,18 +28,16 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, blank=False)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
-    password = models.CharField(    
-        max_length=520,     
+    password = models.CharField(
+        max_length=520,
         validators=[
-            RegexValidator(   
+            RegexValidator(
                 regex=r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$",
                 message="Password must contain at least one uppercase character, one lowercase character and a number",
             )
         ],
     )
-    
+
     objects = UserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
-
-    
