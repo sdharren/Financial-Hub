@@ -4,6 +4,7 @@ Get balance given a wallet address
 
 # pip3 install blockcypher
 from blockcypher import get_address_full
+import json
 import requests as re
 
 # KEY is BTC/ETH and Value is List of addresses
@@ -15,7 +16,7 @@ ADDRESSES = {"btc" : [],
 # ETH Docs available @ https://www.blockcypher.com/dev/ethereum/#address-balance-endpoint
 class getAddressData:
     def BTC_all(addr):
-        return get_address_full(address=addr, confirmations=3)
+        return json.loads(get_address_full(address=addr, confirmations=3))
 
     def ETH_all(addr):
         command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
