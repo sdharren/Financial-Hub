@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 import plaid
 from plaid.api import plaid_api
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
@@ -12,6 +13,10 @@ from plaid.model.depository_account_subtype import DepositoryAccountSubtype
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.accounts_get_request import AccountsGetRequest
+
+def home(request):
+    accounts_informations = get_accounts()
+    return render(request,'home.html',{"json_data":accounts_informations})
 
 """https://sandbox.plaid.com (Sandbox)
 https://development.plaid.com (Development)
@@ -83,4 +88,3 @@ def get_accounts():
 def get_transactions():
     response = client.link_token_create(request)
     link_token = response['link_token']
-    #print(link_token)
