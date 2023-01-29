@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connecting Investments</title>
+
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+</head>
+<body onload="handler.open()">
+    <script>
+        const handler = Plaid.create({
+            token: "{{link_token}}",
+            onSuccess: (public_token, metadata) => {
+                alert(public_token)
+            },
+            onLoad: () => {},
+            onExit: (err, metadata) => {},
+            onEvent: (eventName, metadata) => {},
+            //required for OAuth; if not using OAuth, set to null or omit:
+            receivedRedirectUri: null,
+        });
+    </script>
+</body>
+</html>
