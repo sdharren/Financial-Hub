@@ -56,27 +56,28 @@ request = LinkTokenCreateRequest(
 )
 
 def get_accounts():
+    global request
     response = client.link_token_create(request)
     link_token = response['link_token'] # getting link token form API
 
     REVOLUT_ID = 'ins_115642' # using revolut's ID (just for testing)
-    pt_request = SandboxPublicTokenCreateRequest(
+    public_token_request = SandboxPublicTokenCreateRequest(
         institution_id=REVOLUT_ID,
         initial_products=[Products('transactions')]
     )
-    pt_response = client.sandbox_public_token_create(pt_request)
+    public_token_response = client.sandbox_public_token_create(public_token_request)
     # The generated public_token can now be
     # exchanged for an access_token
     exchange_request = ItemPublicTokenExchangeRequest(
-        public_token=pt_response['public_token']
+        public_token=public_token_response['public_token']
     )
     exchange_response = client.item_public_token_exchange(exchange_request)
     ACCESS_TOKEN = exchange_response['access_token'] # this access token needs to be used in places
 
-    request = AccountsGetRequest(access_token=ACCESS_TOKEN)
-    response = client.accounts_get(request)
+    request_accounts = AccountsGetRequest(access_token=ACCESS_TOKEN)
+    response = client.accounts_get(request_accounts)
     accounts = response['accounts']
-    print(accounts)
+    return accounts
 
 
 def get_transactions():

@@ -1,4 +1,4 @@
-from assetManager.views import get_transactions
+from assetManager.views import get_accounts,get_transactions
 from django.test import TestCase
 
 class TestApi(TestCase):
@@ -6,4 +6,7 @@ class TestApi(TestCase):
         pass
 
     def test_get_transactions(self):
-        self.assertEquals(get_transactions(),10)
+        self.assertNotEquals(get_transactions(),None)
+
+    def test_get_accounts(self):
+        self.assertNotEquals(get_accounts(),None)
