@@ -18,11 +18,13 @@ from assetManager.API_wrappers.investments import Investments
 https://development.plaid.com (Development)
 https://production.plaid.com (Production)"""
 
+PUBLIC_TOKEN = "public-development-c619bf87-1395-44ae-ad2c-34d99d53bc60"
+
 PLAID_CLIENT_ID = "63d288b343e6370012e5be86"
-PLAID_SECRET_ID = "3c1540e977fb113fe9bdbb12bf61fd"
+PLAID_SECRET_ID = "e28a689e4a829a09af4969900e0e55"#sandbox key"3c1540e977fb113fe9bdbb12bf61fd"
 PLAID_REDIRECT_URI = 'http://localhost:8000/'
 
-host = plaid.Environment.Sandbox
+host = plaid.Environment.Development #Sandbox
 
 configuration = plaid.Configuration(
     host=host,
@@ -36,6 +38,7 @@ configuration = plaid.Configuration(
 api_client = plaid.ApiClient(configuration)
 client = plaid_api.PlaidApi(api_client)
 
+"""
 request = LinkTokenCreateRequest(
     products=[Products('auth'), Products('transactions')],
     client_name="Plaid Test App",
@@ -55,28 +58,31 @@ request = LinkTokenCreateRequest(
         client_user_id='123-test-user-id'
     ),
 )
+"""
 
 def get_accounts():
-    response = client.link_token_create(request)
-    link_token = response['link_token'] # getting link token form API
+    #response = client.link_token_create(request)
+    #link_token = response['link_token'] # getting link token form API
 
-    REVOLUT_ID = 'ins_115642' # using revolut's ID (just for testing)
-    pt_request = SandboxPublicTokenCreateRequest(
-        institution_id=REVOLUT_ID,
-        initial_products=[Products('transactions')]
-    )
-    pt_response = client.sandbox_public_token_create(pt_request)
-    # The generated public_token can now be
-    # exchanged for an access_token
+    #REVOLUT_ID = 'ins_115642' # using revolut's ID (just for testing)
+    #pt_request = SandboxPublicTokenCreateRequest(
+#        institution_id=REVOLUT_ID,
+#        initial_products=[Products('transactions')]
+#    )
+    #pt_response = client.sandbox_public_token_create(pt_request)
+     #The generated public_token can now be
+#     exchanged for an access_token
     exchange_request = ItemPublicTokenExchangeRequest(
-        public_token=pt_response['public_token']
+        public_token=PUBLIC_TOKEN
     )
+
     exchange_response = client.item_public_token_exchange(exchange_request)
     ACCESS_TOKEN = exchange_response['access_token'] # this access token needs to be used in places
 
     request = AccountsGetRequest(access_token=ACCESS_TOKEN)
     response = client.accounts_get(request)
     accounts = response['accounts']
+    print(response)
     print(accounts)
 
 

@@ -16,7 +16,7 @@ class Investments:
         self.DEVELOPMENT_KEY = 'e28a689e4a829a09af4969900e0e55'
         self.CLIENT_ID = '63d288b343e6370012e5be86'
 
-        
+
         configuration = plaid.Configuration(
         host=plaid.Environment.Development,
         api_key={
@@ -33,7 +33,7 @@ class Investments:
         request = LinkTokenCreateRequest(
             products=[Products('auth'), Products('transactions')],
             client_name="Plaid Test App",
-            country_codes=[CountryCode('US')],
+            country_codes=[CountryCode('GB')],
             redirect_uri='https://google.com',
             language='en',
             webhook='https://sample-webhook-uri.com',
