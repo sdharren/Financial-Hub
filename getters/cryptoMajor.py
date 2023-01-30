@@ -9,7 +9,7 @@ import requests as re
 
 # KEY is BTC/ETH and Value is List of addresses
 ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
-             "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", ]}
+             "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef"]}
 
 # All return values in JSON form
 # BTC Docs available @ https://www.blockcypher.com/dev/bitcoin/?python#address-endpoint
@@ -20,7 +20,7 @@ class getAddressData:
 
     def ETH_all(addr):
         command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
-        return re.get(command)
+        return re.get(command).json()
 
 
 def toBase(amount, type):
@@ -73,4 +73,5 @@ if __name__ == '__main__':
             value = [getAddressData.ETH_all(addr), "eth"]
             data.append(value)
 
-    print(getUsable.getBalance((data[0]), "btc"))
+    for i in range(len(data)):
+        print(getUsable.getBalance((data[i]), data[i][-1]))
