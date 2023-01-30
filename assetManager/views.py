@@ -24,7 +24,8 @@ def reformatJson(Json):
     for item in Json:
         dic = {}
         dic[item['official_name']]=item['balances']['available']
-        new_json.append(dic)
+        if(item['balances']['available']!=None):
+            new_json.append(dic)
     return new_json
 
 """https://sandbox.plaid.com (Sandbox)
