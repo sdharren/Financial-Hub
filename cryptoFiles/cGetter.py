@@ -9,7 +9,7 @@ import requests as re
 
 # KEY is BTC/ETH and Value is List of addresses
 ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
-             "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef"]}
+             "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
 
 # All return values in JSON form
 # BTC Docs available @ https://www.blockcypher.com/dev/bitcoin/?python#address-endpoint
@@ -33,13 +33,13 @@ def toBase(amount, type):
 
 
 class getUsable:
-    def getAddress(data):
+    def getAddress(data, type):
         return (data[0].get("address"))
 
     def getBalance(data, type):
         return toBase((data[0].get("final_balance")), type)
     
-    def getNoTx(data):
+    def getNoTx(data, type):
         return (data[0].get("n_tx"))
 
     def getTotalReceived(data, type):
@@ -74,4 +74,4 @@ if __name__ == '__main__':
             data.append(value)
 
     for i in range(len(data)):
-        print(getUsable.getBalance((data[i]), data[i][-1]))
+        print(getUsable.getNoTx((data[i]), data[i][-1]))
