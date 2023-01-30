@@ -58,7 +58,7 @@ class getUsable:
 
     
 if __name__ == '__main__':
-    data = [] # 2D Array where index 0 is actual data and index 1 is type of coin
+    data = [] # 2D Array where index 0 is actual data and index 1 is type (of coin)
 
     btcAddresses = ADDRESSES.get("btc", None)
     ethAddresses = ADDRESSES.get("eth", None)
