@@ -13,7 +13,15 @@
         const handler = Plaid.create({
             token: "{{link_token}}",
             onSuccess: (public_token, metadata) => {
-                alert(public_token)
+                fetch('http://localhost:8000/connect_investments', {
+                    method: 'POST',
+                    body: {
+                        public_token: public_token,
+                        accounts: metadata.accounts,
+                        institution: metadata.institution,
+                        link_session_id: metadata.link_session_id,
+                    },
+                });
             },
             onLoad: () => {},
             onExit: (err, metadata) => {},

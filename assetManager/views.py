@@ -92,6 +92,12 @@ def get_transactions():
     #print(link_token)
 
 def connect_investments(request):
-    investments = Investments()
-    link_token = investments.create_link_token()
-    return render(request, 'connect_investments.html', {'link_token': link_token})
+    if request.method == 'GET':
+        investments = Investments()
+        link_token = investments.create_link_token()
+        return render(request, 'connect_investments.html', {'link_token': link_token})
+    else:
+        investments = Investments()
+        public_token = request.POST['public_token']
+        print(investments.get_access_token(public_token))
+
