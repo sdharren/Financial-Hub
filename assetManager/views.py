@@ -16,7 +16,16 @@ from plaid.model.accounts_get_request import AccountsGetRequest
 
 def home(request):
     accounts_informations = get_accounts()
-    return render(request,'home.html',{"json_data":accounts_informations})
+    json_data = reformatJson(accounts_informations)
+    return render(request,'home.html',{"json_data":json_data})
+
+def reformatJson(Json):
+    new_json = []
+    for item in Json:
+        dic = {}
+        dic[item['official_name']]=item['balances']['available']
+        new_json.append(dic)
+    return new_json
 
 """https://sandbox.plaid.com (Sandbox)
 https://development.plaid.com (Development)

@@ -4,7 +4,7 @@
 </head>
 <body>
 <pre id="display">
-{{ json_data|safe }}
+{{json_data|safe}}
 </pre>
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </body>
@@ -12,32 +12,30 @@
 src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js">
 </script>
 <script>
-    // var json_data = document.getElementById("display").innerHTML;
-    // let balances = [];
-    // let crowding = [];
-    // for(var key in json_data){
-    //   balances.push(key.account_id)
-    //   console.log(key)
-    // }
-    // console.log(balances)
-    // window.onload = function() {
-
-//  var chart = new CanvasJS.Chart("chartContainer", {
+// window.onload = function() {
+//
+// var chart = new CanvasJS.Chart("chartContainer", {
 // 	animationEnabled: true,
 // 	title: {
-// 		text: "Bank details"
+// 		text: "Desktop Search Engine Market Share - 2016"
 // 	},
 // 	data: [{
 // 		type: "pie",
 // 		startAngle: 240,
 // 		yValueFormatString: "##0.00\"%\"",
 // 		indexLabel: "{label} {y}",
-// 		dataPoints: [json_data
+// 		dataPoints: [
+// 			{y: 79.45, label: "Google"},
+// 			{y: 7.31, label: "Bing"},
+// 			{y: 7.06, label: "Baidu"},
+// 			{y: 4.91, label: "Yahoo"},
+// 			{y: 1.26, label: "Others"}
 // 		]
 // 	}]
 // });
 // chart.render();
-//
-// }
+
+}
 </script>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
 </html>
