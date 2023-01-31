@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 
 # Create your models here.
-
+#test comment to associate commit on team feedback
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
