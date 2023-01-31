@@ -8,13 +8,13 @@ from plaid.model.depository_account_subtype import DepositoryAccountSubtype
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.link_token_account_filters import LinkTokenAccountFilters
+from plaid_wrapper import PlaidWrapper
 
-
-class Investments:
+class DevelopmentWrapper(PlaidWrapper):
     def __init__(self):
-        self.SANDBOX_KEY = '3c1540e977fb113fe9bdbb12bf61fd' # THESE SHOULD BE IN .env
         self.DEVELOPMENT_KEY = 'e28a689e4a829a09af4969900e0e55'
-        self.CLIENT_ID = '63d288b343e6370012e5be86'
+        self.ACCESS_TOKEN = ''
+        self.ITEM_ID = ''
 
 
         configuration = plaid.Configuration(
@@ -31,9 +31,9 @@ class Investments:
 
     def create_link_token(self):
         request = LinkTokenCreateRequest(
-            products=[Products('auth'), Products('transactions')],
-            client_name="Plaid Test App",
-            country_codes=[CountryCode('GB')],
+            products=[Products('auth'), Products('investments'), Products('transactions'), Products('balance')],
+            client_name="dash.",
+            country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('ES'), CountryCode('NL'), CountryCode('FR'), CountryCode('IE'), CountryCode('CA'), CountryCode('DE'), CountryCode('IT'), CountryCode('PL'), CountryCode('DK'), CountryCode('NO'), CountryCode('SE'), CountryCode('EE'), CountryCode('LT'), CountryCode('LT')],
             redirect_uri='https://google.com',
             language='en',
             webhook='https://sample-webhook-uri.com',
@@ -52,12 +52,18 @@ class Investments:
         response = self.client.link_token_create(request)
         return response['link_token']
 
-
-    def get_access_token(self, public_token):
+    def exchange_public_token(self, public_token):
         exchange_request = ItemPublicTokenExchangeRequest(
             public_token=PUBLIC_TOKEN
         )
-
         exchange_response = client.item_public_token_exchange(exchange_request)
-        return exchange_response['access_token']
+        self.ACCESS_TOKEN = exchange_response['access_token']
+        self.ITEM_ID = exchange_response['item_id']
+
+    def get_access_token(self):
+        return self.ACCESS_TOKEN
+
+    def get_item_id(self):
+        return self.ITEM_ID
+        
 
