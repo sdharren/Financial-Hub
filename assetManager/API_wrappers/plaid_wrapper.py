@@ -20,11 +20,15 @@ class PlaidWrapper():
         self.CLIENT_ID = '63d288b343e6370012e5be86'
         self.ACCESS_TOKEN = None
         self.ITEM_ID = None
+        self.LINK_TOKEN = None
 
     def get_access_token(self):
         pass
 
     def get_item_id(self):
+        pass
+
+    def get_link_token(self):
         pass
 
     def create_link_token(self):
@@ -48,7 +52,7 @@ class PlaidWrapper():
             ),
         )
         response = self.client.link_token_create(request)
-        return response['link_token']
+        self.LINK_TOKEN =  response['link_token']
 
     def exchange_public_token(self,public_token):
         exchange_request = ItemPublicTokenExchangeRequest(
