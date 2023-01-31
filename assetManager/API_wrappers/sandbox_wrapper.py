@@ -13,8 +13,8 @@ from plaid.model.depository_account_subtype import DepositoryAccountSubtype
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.accounts_get_request import AccountsGetRequest
-from assetManager.API_wrappers.investments import Investments
-from plaid_wrapper import PlaidWrapper
+from .plaid_wrapper import PlaidWrapper
 
 class SandboxWrapper(PlaidWrapper):
     def get_access_token():
+        pass

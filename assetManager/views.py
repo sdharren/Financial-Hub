@@ -1,5 +1,4 @@
 from django.shortcuts import render
-<<<<<<< HEAD
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from django.http import HttpResponse
@@ -21,11 +20,13 @@ def reformatJson(Json):
 
 def connect_investments(request):
     if request.method == 'GET':
-        investments = Investments()
-        link_token = investments.create_link_token()
+        plaid_wrapper = DevelopmentWrapper()
+        plaid_wrapper.create_link_token()
+        link_token = plaid_wrapper.get_link_token()
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
-        investments = Investments()
+        plaid_wrapper = DevelopmentWrapper()
         public_token = request.POST['public_token']
-        print(investments.get_access_token(public_token))
+        plaid_wrapper.exchange_public_token(public_token)
+        print(plaid_wrapper.get_access_token())
 

@@ -13,7 +13,6 @@ from plaid.model.depository_account_subtype import DepositoryAccountSubtype
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.accounts_get_request import AccountsGetRequest
-from assetManager.API_wrappers.investments import Investments
 
 class PlaidWrapper():
     def __init__(self):
@@ -33,9 +32,9 @@ class PlaidWrapper():
 
     def create_link_token(self):
         request = LinkTokenCreateRequest(
-            products=[Products('auth'), Products('transactions')],
-            client_name="Plaid Test App",
-            country_codes=[CountryCode('US')],
+            products=[Products('auth'), Products('investments'), Products('transactions')],
+            client_name="dash.",
+            country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('ES'), CountryCode('NL'), CountryCode('FR'), CountryCode('IE'), CountryCode('CA'), CountryCode('DE'), CountryCode('IT'), CountryCode('PL'), CountryCode('DK'), CountryCode('NO'), CountryCode('SE'), CountryCode('EE'), CountryCode('LT'), CountryCode('LT')],
             redirect_uri='https://google.com',
             language='en',
             webhook='https://sample-webhook-uri.com',
