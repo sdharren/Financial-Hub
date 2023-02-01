@@ -2,7 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
+import re
 # Create your models here.
 #test comment to associate commit on team feedback
 class UserManager(BaseUserManager):
@@ -42,3 +45,74 @@ class User(AbstractUser):
     objects = UserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
+
+
+"""
+Enum Type to represent the different types of account that are available in our application : Debit, Credit, Stock and Crypto accounts
+"""
+class AccountTypeEnum(models.TextChoices):
+    DEBIT = 'DEBIT', _('Debit Card'),
+    CREDIT = 'CREDIT', _('Credit Card'),
+    STOCK = 'STOCK', _('Brokerage or Investement Account'),
+    CRYPTO = 'CRYPTO',_('Crypto Wallet')
+
+#shoud be in modelhelpers .py
+def is_debit(account_string):
+    return AccountTypeEnum.DEBIT.value == account_string
+
+def is_credit(account_string):
+    return AccountTypeEnum.CREDIT.value == account_string
+
+def is_stock(account_string):
+    return AccountTypeEnum.STOCK.value == account_string
+
+def is_crypto(account_string):
+    return AccountTypeEnum.CRYPTO.value == account_string
+
+"""
+The AccountType model refers to the single type of account that a user may have
+Displays information related to the Account type, the date the account was linked on the financial-hub application, and the access token required to query the relevant API for that account
+"""
+class AccountType(models.Model):
+    account_type_id = models.BigAutoField(primary_key=True)
+    account_date_linked = models.DateField('Account Linked Date', default=timezone.now)
+
+    account_asset_type = models.CharField(
+        max_length = 35,
+        choices = AccountTypeEnum.choices,
+    )
+
+    access_token = models.CharField(
+        max_length=250,
+        blank=False
+    )
+
+    class Meta:
+        unique_together = (('account_type_id', 'access_token'),)
+
+    def save(self, *args,**kwargs):
+        account_type = kwargs['account_type']
+
+        if is_debit(account_type) or is_credit(account_type):
+            access_token = kwargs['access_token']
+            pattern = re.compile("^access-sandbox.[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+            if(pattern.match(access_token) is False):
+                raise ValueError("PLAID API access token format is invalid")
+
+        super(AccountType, self).save(*args, **kwargs)
+
+"""
+The Accounts model enables users to have multiple accounts of different assets or the same asset type from the same institution
+"""
+class Accounts(models.Model):
+    account_id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'client')
+    account_type_id = models.ForeignKey(AccountType, on_delete = models.CASCADE, related_name = 'account_type')
+    account_institution_name = models.CharField(blank = False, max_length = 100)
+
+    class Meta:
+        unique_together = (('account_id', 'user', 'account_type_id'),)
+
+    #users should only access account types they are linked to
+    #def valid_account_type_access(user,account_type_id):
+    #    pass
