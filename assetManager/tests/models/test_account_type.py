@@ -5,30 +5,36 @@ from datetime import datetime
 import re
 class AccountTypeCase(TestCase):
 
+    fixtures = ['assetManager/tests/fixtures/account_types.json']
     def setUp(self):
-        self.debit_card_account = AccountType.objects.create(
-            account_date_linked = datetime(2020, 10, 19,20,20,20),
-            account_asset_type = AccountTypeEnum.DEBIT,
-            access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970"
-        )
+        self.debit_card_account = AccountType.objects.get(account_type_id = 1)
+        self.credit_card_account = AccountType.objects.get(account_type_id = 2)
+        self.stock_account = AccountType.objects.get(account_type_id = 3)
+        self.crypto_account = AccountType.objects.get(account_type_id = 4)
 
-        self.credit_card_account = AccountType.objects.create(
-            account_date_linked = datetime(2020, 10, 19,20,20,20),
-            account_asset_type = AccountTypeEnum.CREDIT,
-            access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970"
-        )
+        #self.debit_card_account = AccountType.objects.create(
+        #    account_date_linked = datetime(2020, 10, 19,20,20,20),
+        #    account_asset_type = AccountTypeEnum.DEBIT,
+        #    access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970"
+        #)
 
-        self.stock_account = AccountType.objects.create(
-            account_date_linked = datetime(2020, 10, 19,20,20,20),
-            account_asset_type = AccountTypeEnum.STOCK,
-            access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970"
-        )
+        #self.credit_card_account = AccountType.objects.create(
+        #    account_date_linked = datetime(2020, 10, 19,20,20,20),
+        #    account_asset_type = AccountTypeEnum.CREDIT,
+        #    access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970"
+        #)
 
-        self.crypto_account = AccountType.objects.create(
-            account_date_linked = datetime(2020, 10, 19,20,20,20),
-            account_asset_type = AccountTypeEnum.CRYPTO,
-            access_token = "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo"
-        )
+        #self.stock_account = AccountType.objects.create(
+        #    account_date_linked = datetime(2020, 10, 19,20,20,20),
+        #    account_asset_type = AccountTypeEnum.STOCK,
+        #    access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970"
+        #)
+
+        #self.crypto_account = AccountType.objects.create(
+        #    account_date_linked = datetime(2020, 10, 19,20,20,20),
+        #    account_asset_type = AccountTypeEnum.CRYPTO,
+        #    access_token = "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo"
+        #)
 
 
     def _assert_account_type_is_valid(self,account_type):
@@ -57,6 +63,12 @@ class AccountTypeCase(TestCase):
 
     def test_credit_card_is_credit(self):
         self.assertTrue(is_credit(self.credit_card_account.account_asset_type))
+
+    def test_stock_is_stock(self):
+        self.assertTrue(is_stock(self.stock_account.account_asset_type))
+
+    def test_crypto_is_crypto(self):
+        self.assertTrue(is_crypto(self.crypto_account.account_asset_type))
 
     def test_debit_card_correct_asset_type(self):
         self.debit_card_account.account_asset_type = 'NON VALID ACCOUNT TYPE'
