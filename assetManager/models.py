@@ -69,6 +69,18 @@ def is_stock(account_string):
 def is_crypto(account_string):
     return AccountTypeEnum.CRYPTO.value == account_string
 
+class AccountTypeModelManager(models.Manager):
+    def create(self, **obj_data):
+        account_type = obj_data['account_asset_type']
+
+        if is_debit(account_type) or is_credit(account_type):
+            access_token = obj_data['access_token']
+            pattern = re.compile("^access-development.[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+            if(pattern.match(access_token) is False):
+                raise ValueError("PLAID API access token format is invalid")
+
+        # Now call the super method which does the actual creation
+        return super().create(**obj_data) # Python 3 syntax!!
 """
 The AccountType model refers to the single type of account that a user may have
 Displays information related to the Account type, the date the account was linked on the financial-hub application, and the access token required to query the relevant API for that account
@@ -80,6 +92,7 @@ class AccountType(models.Model):
     account_asset_type = models.CharField(
         max_length = 35,
         choices = AccountTypeEnum.choices,
+        blank = True
     )
 
     access_token = models.CharField(
@@ -87,19 +100,10 @@ class AccountType(models.Model):
         blank=False
     )
 
+    objects = AccountTypeModelManager()
+
     class Meta:
         unique_together = (('account_type_id', 'access_token'),)
-
-    def save(self, *args,**kwargs):
-        account_type = kwargs['account_type']
-
-        if is_debit(account_type) or is_credit(account_type):
-            access_token = kwargs['access_token']
-            pattern = re.compile("^access-sandbox.[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-            if(pattern.match(access_token) is False):
-                raise ValueError("PLAID API access token format is invalid")
-
-        super(AccountType, self).save(*args, **kwargs)
 
 """
 The Accounts model enables users to have multiple accounts of different assets or the same asset type from the same institution
