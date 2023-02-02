@@ -3,13 +3,15 @@ from assetManager.models import User
 from django.core.exceptions import ValidationError
 
 class UserModelTestCase(TestCase):
+    fixtures = ['assetManager/tests/fixtures/users.json']
     def setUp(self):
-        self.user = User.objects.create_user(
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            password='Password123',
-        )
+        #self.user = User.objects.create_user(
+        #    first_name='John',
+        #    last_name='Doe',
+        #    email='johndoe@example.org',
+        #    password='Password123',
+        #)
+        self.user = User.objects.get(email = 'johndoe@example.org')
 
     def test_first_name_cannot_be_blank(self):
         self.user.first_name = ''
@@ -81,7 +83,7 @@ class UserModelTestCase(TestCase):
     def test_password_must_contain_one_lower_case_character(self):
         self.user.password = 'PASSWORD123'
         self._assert_user_is_invalid()
-    
+
     def test_password_must_contain_a_number(self):
         self.user.password = 'Password'
         self._assert_user_is_invalid()

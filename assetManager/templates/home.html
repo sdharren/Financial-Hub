@@ -1,0 +1,38 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js">
+</script>
+<script>
+var s = {{ json_data|safe }};
+var data = []
+for(let i=0;i<s.length;i++){
+data.push({y:s[i][Object.keys(s[i])[0]],label:[Object.keys(s[i])[0]]})
+}
+console.log(data)
+  window.onload = function() {
+
+ var chart = new CanvasJS.Chart("chartContainer", {
+   animationEnabled: true,
+   title: {
+     text: "Pie Chart of all bank accounts"
+   },
+   data: [{
+     type: "pie",
+     startAngle: 240,
+     yValueFormatString: "£##0.00",
+     indexLabel: "{label} {y}",
+     dataPoints: data
+ }]
+ });
+ chart.render();
+ }
+</script>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+</html>

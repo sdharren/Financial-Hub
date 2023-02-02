@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from assetManager import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',views.home,name='home_page'),
+    path('connect_investments/', views.connect_investments, name='connect_investments')
 ]
