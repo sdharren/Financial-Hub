@@ -5,7 +5,10 @@ from django.http import HttpResponse
 
 
 def home(request):
-    accounts_informations = get_accounts()
+    plaid_wrapper = SandboxWrapper()
+    plaid_wrapper.create_public_token()
+    plaid_wrapper.exchange_public_token(plaid_wrapper.create_public_token())
+    accounts_informations = plaid_wrapper.get_accounts()
     json_data = reformatJson(accounts_informations)
     return render(request,'home.html',{"json_data":json_data})
 

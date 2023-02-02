@@ -22,7 +22,7 @@ class SandboxWrapper(PlaidWrapper):
         self.PUBLIC_TOKEN = None
 
         configuration = plaid.Configuration(
-        host=plaid.Environment.Development,
+        host=plaid.Environment.Sandbox,
         api_key={
             'clientId': self.CLIENT_ID,
             'secret': self.SANDBOX_KEY,
@@ -41,10 +41,15 @@ class SandboxWrapper(PlaidWrapper):
     def get_link_token(self):
         return self.LINK_TOKEN
 
-    def create_public_token(self):
-        REVOLUT_ID = 'ins_115642' # revolut's ID
+    def create_public_token(self, bank_id='ins_115642'):
         public_token_request = SandboxPublicTokenCreateRequest(
-            institution_id=REVOLUT_ID,
-            initial_products=[Products('transactions')]
+            institution_id = bank_id,
+            initial_products = [Products('transactions')]
         )
-        return self.client.sandbox_public_token_create(public_token_request)
+        response = self.client.sandbox_public_token_create(public_token_request)
+        return response['public_token']
+
+    def get_accounts(self):
+        request_accounts = AccountsGetRequest(access_token=self.ACCESS_TOKEN)
+        response = self.client.accounts_get(request_accounts)
+        return response['accounts']

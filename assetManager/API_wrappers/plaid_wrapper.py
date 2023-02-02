@@ -53,10 +53,10 @@ class PlaidWrapper():
         response = self.client.link_token_create(request)
         self.LINK_TOKEN =  response['link_token']
 
-    def exchange_public_token(self,public_token):
+    def exchange_public_token(self, public_token):
         exchange_request = ItemPublicTokenExchangeRequest(
-            public_token=public_token_response['public_token']
+            public_token = public_token
         )
-        exchange_response = client.item_public_token_exchange(exchange_request)
+        exchange_response = self.client.item_public_token_exchange(exchange_request)
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
