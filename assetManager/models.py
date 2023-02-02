@@ -69,15 +69,17 @@ def is_stock(account_string):
 def is_crypto(account_string):
     return AccountTypeEnum.CRYPTO.value == account_string
 
+def check_access_token(access_token):
+    if(re.match(r"^access-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",access_token) is None):
+        raise ValueError("PLAID API access token format is invalid")
+
+
 class AccountTypeModelManager(models.Manager):
     def create(self, **obj_data):
         account_type = obj_data['account_asset_type']
-
-        if is_debit(account_type) or is_credit(account_type):
+        if is_crypto(account_type) is False:
             access_token = obj_data['access_token']
-            pattern = re.compile("^access-development.[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-            if(pattern.match(access_token) is False):
-                raise ValueError("PLAID API access token format is invalid")
+            check_access_token(access_token)
 
         # Now call the super method which does the actual creation
         return super().create(**obj_data) # Python 3 syntax!!
@@ -104,6 +106,12 @@ class AccountType(models.Model):
 
     class Meta:
         unique_together = (('account_type_id', 'access_token'),)
+
+    def save(self, *args, **kwargs):
+        if is_crypto(self.account_asset_type) is False:
+            check_access_token(self.access_token)
+
+        super(AccountType, self).save(*args, **kwargs)
 
 """
 The Accounts model enables users to have multiple accounts of different assets or the same asset type from the same institution
