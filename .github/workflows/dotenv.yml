@@ -1,9 +1,21 @@
-name: 'Create .env file'
-on: push
-jobs: | 
-    run: |
-        touch .env
-        echo CLIEND_ID=${{ secrets.CLIENT_ID }} >> .env
-        echo DEVELOPMENT_KEY=${{ secrets.DEVELOPMENT_KEY }} >> .env
-        echo SANDBOX_KEY=${{ secrets.SANDBOX_KEY }} >> .env
+name: Create envfile
 
+on: [ push ]
+
+jobs:
+
+  create-envfile:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_DEBUG: false
+        envkey_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        envkey_DEVELOPMENT_KEY: ${{ secrets.DEVELOPMENT_KEY }}
+        envkey_SANDBOX_KEY: ${{ secrets.SANDBOX_KEY }}
+        directory: ../..
+        file_name: .env
+        fail_on_empty: false
