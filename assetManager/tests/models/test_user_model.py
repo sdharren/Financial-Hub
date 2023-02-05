@@ -5,12 +5,6 @@ from django.core.exceptions import ValidationError
 class UserModelTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     def setUp(self):
-        #self.user = User.objects.create_user(
-        #    first_name='John',
-        #    last_name='Doe',
-        #    email='johndoe@example.org',
-        #    password='Password123',
-        #)
         self.user = User.objects.get(email = 'johndoe@example.org')
 
     def test_first_name_cannot_be_blank(self):

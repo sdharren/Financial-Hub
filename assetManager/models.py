@@ -88,7 +88,12 @@ The AccountType model refers to the single type of account that a user may have
 Displays information related to the Account type, the date the account was linked on the financial-hub application, and the access token required to query the relevant API for that account
 """
 class AccountType(models.Model):
+    class Meta:
+        unique_together = (('account_type_id', 'access_token', 'user'),)
+
+
     account_type_id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'client')
     account_date_linked = models.DateField('Account Linked Date', default=timezone.now)
 
     account_asset_type = models.CharField(
@@ -99,32 +104,15 @@ class AccountType(models.Model):
 
     access_token = models.CharField(
         max_length=250,
-        blank=False
+        blank=False,
+        unique = True
     )
 
+    account_institution_name = models.CharField(blank = False, max_length = 100)
     objects = AccountTypeModelManager()
-
-    class Meta:
-        unique_together = (('account_type_id', 'access_token'),)
 
     def save(self, *args, **kwargs):
         if is_crypto(self.account_asset_type) is False:
             check_access_token(self.access_token)
 
         super(AccountType, self).save(*args, **kwargs)
-
-"""
-The Accounts model enables users to have multiple accounts of different assets or the same asset type from the same institution
-"""
-class Accounts(models.Model):
-    account_id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'client')
-    account_type_id = models.ForeignKey(AccountType, on_delete = models.CASCADE, related_name = 'account_type')
-    account_institution_name = models.CharField(blank = False, max_length = 100)
-
-    class Meta:
-        unique_together = (('account_id', 'user', 'account_type_id'),)
-
-    #users should only access account types they are linked to
-    #def valid_account_type_access(user,account_type_id):
-    #    pass
