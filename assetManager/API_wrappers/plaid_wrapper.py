@@ -13,10 +13,15 @@ from plaid.model.depository_account_subtype import DepositoryAccountSubtype
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.accounts_get_request import AccountsGetRequest
+import os
+from dotenv import dotenv_values
 
 class PlaidWrapper():
     def __init__(self):
-        self.CLIENT_ID = '63d288b343e6370012e5be86'
+        env_vars = dotenv_values('.env')
+        self.CLIENT_ID = env_vars['CLIENT_ID']
+        self.DEVELOPMENT_KEY = env_vars['DEVELOPMENT_KEY']
+        self.SANDBOX_KEY = env_vars['SANDBOX_KEY']
         self.ACCESS_TOKEN = None
         self.ITEM_ID = None
         self.LINK_TOKEN = None

@@ -1,6 +1,10 @@
 name: Create envfile
 
-on: [ push ]
+on: 
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
 
@@ -16,6 +20,5 @@ jobs:
         envkey_CLIENT_ID: ${{ secrets.CLIENT_ID }}
         envkey_DEVELOPMENT_KEY: ${{ secrets.DEVELOPMENT_KEY }}
         envkey_SANDBOX_KEY: ${{ secrets.SANDBOX_KEY }}
-        directory: ../..
         file_name: .env
         fail_on_empty: false
