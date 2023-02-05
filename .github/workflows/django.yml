@@ -1,14 +1,24 @@
 name: Django CI
 
-on:
-  workflow_run:
-    workflows: ["Create envfile"]
-    types:
-      - completed
+on: ["push"]
 
 jobs:
-  build:
+  create-envfile:
 
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_DEBUG: false
+        envkey_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        envkey_DEVELOPMENT_KEY: ${{ secrets.DEVELOPMENT_KEY }}
+        envkey_SANDBOX_KEY: ${{ secrets.SANDBOX_KEY }}
+        file_name: .env
+        fail_on_empty: false
+  build:
+    needs: create-envfile
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
