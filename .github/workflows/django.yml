@@ -1,10 +1,10 @@
 name: Django CI
 
 on:
-  workflow_run:
-    workflows: ["Create envfile"]
-    types:
-      - completed
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
