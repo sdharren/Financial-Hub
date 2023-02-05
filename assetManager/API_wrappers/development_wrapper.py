@@ -10,11 +10,16 @@ from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUse
 from plaid.model.link_token_account_filters import LinkTokenAccountFilters
 from .plaid_wrapper import PlaidWrapper
 
+class PublicTokenNotExchanged(Exception):
+    pass
+
+class LinkTokenNotCreated(Exception):
+    pass
+
 class DevelopmentWrapper(PlaidWrapper):
     def __init__(self):
         super().__init__()
-        self.DEVELOPMENT_KEY = 'e28a689e4a829a09af4969900e0e55'
-        
+
         configuration = plaid.Configuration(
         host=plaid.Environment.Development,
         api_key={
@@ -27,12 +32,20 @@ class DevelopmentWrapper(PlaidWrapper):
         self.client = plaid_api.PlaidApi(api_client)
 
     def get_access_token(self):
+        if self.ACCESS_TOKEN is None:
+            raise PublicTokenNotExchanged
         return self.ACCESS_TOKEN
 
     def get_item_id(self):
+        if self.ITEM_ID is None:
+            raise PublicTokenNotExchanged
         return self.ITEM_ID
 
     def get_link_token(self):
+        if self.LINK_TOKEN is None:
+            raise LinkTokenNotCreated
         return self.LINK_TOKEN
+
+
         
 

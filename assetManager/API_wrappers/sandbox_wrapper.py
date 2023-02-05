@@ -18,7 +18,6 @@ from .plaid_wrapper import PlaidWrapper
 class SandboxWrapper(PlaidWrapper):
     def __init__(self):
         super().__init__()
-        self.SANDBOX_KEY = '3c1540e977fb113fe9bdbb12bf61fd'
         self.PUBLIC_TOKEN = None
 
         configuration = plaid.Configuration(
