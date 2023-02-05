@@ -1,8 +1,9 @@
 name: 'Create .env file'
 on: push
 jobs: | 
-    touch .env
-    echo CLIEND_ID=${{ secrets.CLIENT_ID }} >> .env
-    echo DEVELOPMENT_KEY=${{ secrets.DEVELOPMENT_KEY }} >> .env
-    echo SANDBOX_KEY=${{ secrets.SANDBOX_KEY }} >> .env
+    run: |
+        touch .env
+        echo CLIEND_ID=${{ secrets.CLIENT_ID }} >> .env
+        echo DEVELOPMENT_KEY=${{ secrets.DEVELOPMENT_KEY }} >> .env
+        echo SANDBOX_KEY=${{ secrets.SANDBOX_KEY }} >> .env
 
