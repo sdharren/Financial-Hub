@@ -19,6 +19,7 @@ class LinkTokenNotCreated(Exception):
 class DevelopmentWrapper(PlaidWrapper):
     def __init__(self):
         super().__init__()
+        self.DEVELOPMENT_KEY = 'e28a689e4a829a09af4969900e0e55'
 
         configuration = plaid.Configuration(
         host=plaid.Environment.Development,
