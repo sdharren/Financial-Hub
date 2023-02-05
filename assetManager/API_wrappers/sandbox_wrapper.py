@@ -19,6 +19,7 @@ class SandboxWrapper(PlaidWrapper):
     def __init__(self):
         super().__init__()
         self.PUBLIC_TOKEN = None
+        self.SANDBOX_KEY = '3c1540e977fb113fe9bdbb12bf61fd'
 
         configuration = plaid.Configuration(
         host=plaid.Environment.Sandbox,

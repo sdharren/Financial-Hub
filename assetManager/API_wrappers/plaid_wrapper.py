@@ -18,10 +18,7 @@ from dotenv import dotenv_values
 
 class PlaidWrapper():
     def __init__(self):
-        env_vars = dotenv_values('.env')
-        self.CLIENT_ID = env_vars['CLIENT_ID']
-        self.DEVELOPMENT_KEY = env_vars['DEVELOPMENT_KEY']
-        self.SANDBOX_KEY = env_vars['SANDBOX_KEY']
+        self.CLIENT_ID = '63d288b343e6370012e5be86'
         self.ACCESS_TOKEN = None
         self.ITEM_ID = None
         self.LINK_TOKEN = None
