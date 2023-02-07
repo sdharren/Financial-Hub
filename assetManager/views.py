@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+from assetManager.forms import SignUpForm
 from django.http import HttpResponse
 
 
@@ -32,7 +33,7 @@ def sign_up(request):
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
-    
+
 # add @login_required
 def connect_investments(request):
     if request.method == 'GET':
