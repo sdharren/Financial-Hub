@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.contrib.auth import login, authenicate
+from django.contrib import messages
+from django.contrib.auth import login, authenticate
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from assetManager.forms import SignUpForm
+from assetManager.forms import SignUpForm, LogInForm
 
 
 def home(request):
@@ -48,8 +49,7 @@ def log_in(request):
                 # home page for now CHANGE LATER
                 return redirect('home_page')
         messages.add_message(request, messages.ERROR, 'The credentials provided are incorrect.')
-    else:
-        form = LogInForm()
+    form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
 # add @login_required
