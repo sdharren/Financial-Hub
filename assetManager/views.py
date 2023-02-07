@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.contrib.auth import login
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm
-from django.http import HttpResponse
 
 
 def home(request):
@@ -29,7 +30,7 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')
+            return redirect('home_page')
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
