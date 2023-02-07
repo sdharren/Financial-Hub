@@ -20,5 +20,6 @@ from assetManager import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.home,name='home_page'),
-    path('connect_investments/', views.connect_investments, name='connect_investments')
+    path('connect_investments/', views.connect_investments, name='connect_investments'),
+    path('sign_up/', views.sign_up, name='sign_up'),
 ]

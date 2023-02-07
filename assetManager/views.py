@@ -21,6 +21,19 @@ def reformatJson(Json):
             new_json.append(dic)
     return new_json
 
+# add @login_prohibited
+def sign_up(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'sign_up.html', {'form': form})
+    
+# add @login_required
 def connect_investments(request):
     if request.method == 'GET':
         plaid_wrapper = DevelopmentWrapper()
