@@ -9,6 +9,10 @@ from plaid.model.link_token_create_request import LinkTokenCreateRequest
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.link_token_account_filters import LinkTokenAccountFilters
 from .plaid_wrapper import PlaidWrapper
+from assetManager.models import AccountType, AccountTypeEnum
+from assetManager.helpers import make_aware_date
+from datetime import datetime
+from django.db import IntegrityError
 
 class PublicTokenNotExchanged(Exception):
     pass
@@ -46,6 +50,24 @@ class DevelopmentWrapper(PlaidWrapper):
         if self.LINK_TOKEN is None:
             raise LinkTokenNotCreated
         return self.LINK_TOKEN
+
+    def save_access_token(self, user):
+        if self.ACCESS_TOKEN is None:
+            raise PublicTokenNotExchanged
+        try:
+            AccountType.objects.create(
+                user = user,
+                account_type_id = 1, #???
+                account_asset_type = AccountTypeEnum.DEBIT,
+                account_date_linked = make_aware_date(datetime.now()),
+                access_token = self.ACCESS_TOKEN
+            )
+        except IntegrityError:
+            return
+
+        
+        
+        
 
 
         
