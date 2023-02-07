@@ -39,3 +39,9 @@ class SignUpForm(forms.ModelForm):
             password=self.cleaned_data.get('password'),
         )
         return user
+
+class LogInForm(forms.Form):
+    """Form enabling registered users to log in."""
+
+    email = forms.CharField(label='Email')
+    password = forms.CharField(label='Password', widget=forms.PasswordInput())
