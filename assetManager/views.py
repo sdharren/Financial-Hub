@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth import login, authenticate
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from django.http import HttpResponse
+from assetManager.forms import SignUpForm, LogInForm
 
 
 def home(request):
@@ -21,6 +24,35 @@ def reformatJson(Json):
             new_json.append(dic)
     return new_json
 
+# add @login_prohibited
+def sign_up(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home_page')
+    else:
+        form = SignUpForm()
+    return render(request, 'sign_up.html', {'form': form})
+
+# add @login_prohibited
+def log_in(request):
+    if request.method == 'POST':
+        form = LogInForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(email=email, password=password)
+            if user is not None:
+                login(request, user)
+                # home page for now CHANGE LATER
+                return redirect('home_page')
+        messages.add_message(request, messages.ERROR, 'The credentials provided are incorrect.')
+    form = LogInForm()
+    return render(request, 'log_in.html', {'form': form})
+
+# add @login_required
 def connect_investments(request):
     if request.method == 'GET':
         plaid_wrapper = DevelopmentWrapper()
