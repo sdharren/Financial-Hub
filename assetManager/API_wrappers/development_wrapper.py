@@ -58,7 +58,7 @@ class DevelopmentWrapper(PlaidWrapper):
             try:
                 AccountType.objects.create(
                     user = user,
-                    account_asset_type = AccountTypeEnum(_transform_product_to_enum_value(product_name)),
+                    account_asset_type = AccountTypeEnum(self._transform_product_to_enum_value(product_name)),
                     account_date_linked = make_aware_date(datetime.now()),
                     access_token = self.ACCESS_TOKEN
                 )
@@ -66,7 +66,7 @@ class DevelopmentWrapper(PlaidWrapper):
                 return
 
 
-    def _transform_product_to_enum_value(product):
+    def _transform_product_to_enum_value(self, product):
         if product == 'investments' or product == 'assets':
             return 'STOCK'
         if product == 'transactions':
