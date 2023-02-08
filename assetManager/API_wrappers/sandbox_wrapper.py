@@ -15,6 +15,7 @@ from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchan
 from plaid.model.accounts_get_request import AccountsGetRequest
 from .plaid_wrapper import PlaidWrapper
 
+
 class SandboxWrapper(PlaidWrapper):
     def __init__(self):
         super().__init__()

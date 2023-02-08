@@ -54,16 +54,23 @@ class DevelopmentWrapper(PlaidWrapper):
     def save_access_token(self, user):
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
-        try:
-            AccountType.objects.create(
-                user = user,
-                account_type_id = 1, #???
-                account_asset_type = AccountTypeEnum.DEBIT,
-                account_date_linked = make_aware_date(datetime.now()),
-                access_token = self.ACCESS_TOKEN
-            )
-        except IntegrityError:
-            return
+        for product_name in self.products_requested:
+            try:
+                AccountType.objects.create(
+                    user = user,
+                    account_asset_type = AccountTypeEnum(_transform_product_to_enum_value(product_name)),
+                    account_date_linked = make_aware_date(datetime.now()),
+                    access_token = self.ACCESS_TOKEN
+                )
+            except IntegrityError:
+                return
+
+
+    def _transform_product_to_enum_value(product):
+        if product == 'investments' or product == 'assets':
+            return 'STOCK'
+        if product == 'transactions':
+            return 'DEBIT'
 
         
         

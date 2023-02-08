@@ -57,6 +57,7 @@ class AccountTypeEnum(models.TextChoices):
     CRYPTO = 'CRYPTO',_('Crypto Wallet')
 
 #shoud be in modelhelpers .py
+# btw augosto i made a file called helpers.py in assetManager folder so could put it there
 def is_debit(account_string):
     return AccountTypeEnum.DEBIT.value == account_string
 
