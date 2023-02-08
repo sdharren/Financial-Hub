@@ -45,4 +45,4 @@ class DevelopmentWrapperTestCase(TestCase):
         self.wrapper.ACCESS_TOKEN = 'access-development-c619bf87-1395-44ae-ad2c-34d99d53bc60'
         self.wrapper.save_access_token(self.user)
         account_count_after = AccountType.objects.all().count()
-        self.assertEqual(account_count_before, account_count_after)
+        self.assertEqual(account_count_before + 2, account_count_after)
