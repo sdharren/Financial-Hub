@@ -57,6 +57,7 @@ class AccountTypeEnum(models.TextChoices):
     CRYPTO = 'CRYPTO',_('Crypto Wallet')
 
 #shoud be in modelhelpers .py
+# btw augosto i made a file called helpers.py in assetManager folder so could put it there
 def is_debit(account_string):
     return AccountTypeEnum.DEBIT.value == account_string
 
@@ -89,7 +90,7 @@ Displays information related to the Account type, the date the account was linke
 """
 class AccountType(models.Model):
     class Meta:
-        unique_together = (('account_type_id', 'access_token', 'user'),)
+        unique_together = (('account_type_id', 'access_token','user'),)
 
 
     account_type_id = models.BigAutoField(primary_key=True)
@@ -105,7 +106,6 @@ class AccountType(models.Model):
     access_token = models.CharField(
         max_length=250,
         blank=False,
-        unique = True
     )
 
     account_institution_name = models.CharField(blank = False, max_length = 100)

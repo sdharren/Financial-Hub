@@ -105,13 +105,3 @@ class AccountTypeCase(TestCase):
                 account_date_linked = datetime(2020,10,10),
                 access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349999"
                 )
-
-    def test_violate_access_token_uniqueness(self):
-        with self.assertRaises(IntegrityError):
-            self.accountCopy = AccountType.objects.create(
-                user = User.objects.get(email = 'johndoe@example.org'),
-                account_type_id = 10,
-                account_asset_type = AccountTypeEnum.DEBIT,
-                account_date_linked = datetime(2020,10,10),
-                access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349971"
-                )

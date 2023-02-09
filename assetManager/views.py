@@ -63,8 +63,11 @@ def log_in(request):
 # add @login_required
 def connect_investments(request):
     if request.method == 'GET':
+        # here we will have arguments that denote what products the user has chosen
+        products_chosen = ['transactions']
+        # for now i've hardcoded them
         plaid_wrapper = DevelopmentWrapper()
-        plaid_wrapper.create_link_token()
+        plaid_wrapper.create_link_token(products_chosen)
         link_token = plaid_wrapper.get_link_token()
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
