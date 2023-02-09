@@ -6,11 +6,19 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
 
+from assetManager.bankcards.debit_card import DebitCard
+
+def transaction_reports():
+    plaid_wrapper = SandboxWrapper()
+    debit_card = DebitCard(plaid_wrapper)
+    debit_card.get_transactions()
+
+
 
 def home(request):
     plaid_wrapper = SandboxWrapper()
-    plaid_wrapper.create_public_token()
-    plaid_wrapper.exchange_public_token(plaid_wrapper.create_public_token())
+    public_token = plaid_wrapper.create_public_token()
+    plaid_wrapper.exchange_public_token(public_token)
     accounts_informations = plaid_wrapper.get_accounts()
     json_data = reformatJson(accounts_informations)
     return render(request,'home.html',{"json_data":json_data})
@@ -64,4 +72,3 @@ def connect_investments(request):
         public_token = request.POST['public_token']
         plaid_wrapper.exchange_public_token(public_token)
         print(plaid_wrapper.get_access_token())
-

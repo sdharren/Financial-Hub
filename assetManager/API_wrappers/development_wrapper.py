@@ -46,7 +46,3 @@ class DevelopmentWrapper(PlaidWrapper):
         if self.LINK_TOKEN is None:
             raise LinkTokenNotCreated
         return self.LINK_TOKEN
-
-
-        
-

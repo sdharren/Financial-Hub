@@ -54,11 +54,11 @@ class AccountTypeCase(TestCase):
     def test_crypto_is_crypto(self):
         self.assertTrue(is_crypto(self.crypto_account.account_asset_type))
 
-    def test_debit_card_correct_asset_type(self):
+    def test_debit_card_non_correct_asset_type(self):
         self.debit_card_account.account_asset_type = 'NON VALID ACCOUNT TYPE'
         self._assert_account_type_is_invalid(self.debit_card_account)
 
-    def test_credit_card_correct_asset_type(self):
+    def test_credit_card_non_correct_asset_type(self):
         self.credit_card_account.account_asset_type = 'NON VALID ACCOUNT TYPE'
         self._assert_account_type_is_invalid(self.credit_card_account)
 
