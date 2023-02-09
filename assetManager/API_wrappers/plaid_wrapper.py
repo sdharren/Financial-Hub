@@ -16,6 +16,9 @@ from plaid.model.accounts_get_request import AccountsGetRequest
 import os
 from dotenv import dotenv_values
 
+
+
+
 class PlaidWrapper():
     def __init__(self):
         self.CLIENT_ID = '63d288b343e6370012e5be86'
@@ -62,3 +65,5 @@ class PlaidWrapper():
         exchange_response = self.client.item_public_token_exchange(exchange_request)
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
+
+    

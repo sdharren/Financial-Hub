@@ -5,7 +5,7 @@ from django.contrib.auth import login, authenticate
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
-
+import json
 
 def home(request):
     plaid_wrapper = SandboxWrapper()
@@ -64,7 +64,9 @@ def connect_investments(request):
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
         plaid_wrapper = DevelopmentWrapper()
-        public_token = request.POST['public_token']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        public_token = body['public_token']
         plaid_wrapper.exchange_public_token(public_token)
-        print(plaid_wrapper.get_access_token())
+        return redirect('home_page')
 
