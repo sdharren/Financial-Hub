@@ -56,8 +56,9 @@ class getUsable:
         
         return value
 
-# On initialisation collect data for all addresses listed
+# When run collect data for all addresses listed
 if __name__ == '__main__':
+    # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = [] # 2D Array where index 0 is actual data and index 1 is type (of coin)
 
     btcAddresses = ADDRESSES.get("btc", None)
