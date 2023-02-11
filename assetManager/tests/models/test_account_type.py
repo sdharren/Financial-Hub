@@ -54,11 +54,11 @@ class AccountTypeCase(TestCase):
     def test_crypto_is_crypto(self):
         self.assertTrue(is_crypto(self.crypto_account.account_asset_type))
 
-    def test_debit_card_correct_asset_type(self):
+    def test_debit_card_non_correct_asset_type(self):
         self.debit_card_account.account_asset_type = 'NON VALID ACCOUNT TYPE'
         self._assert_account_type_is_invalid(self.debit_card_account)
 
-    def test_credit_card_correct_asset_type(self):
+    def test_credit_card_non_correct_asset_type(self):
         self.credit_card_account.account_asset_type = 'NON VALID ACCOUNT TYPE'
         self._assert_account_type_is_invalid(self.credit_card_account)
 
@@ -104,14 +104,4 @@ class AccountTypeCase(TestCase):
                 account_asset_type = AccountTypeEnum.DEBIT,
                 account_date_linked = datetime(2020,10,10),
                 access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349999"
-                )
-
-    def test_violate_access_token_uniqueness(self):
-        with self.assertRaises(IntegrityError):
-            self.accountCopy = AccountType.objects.create(
-                user = User.objects.get(email = 'johndoe@example.org'),
-                account_type_id = 10,
-                account_asset_type = AccountTypeEnum.DEBIT,
-                account_date_linked = datetime(2020,10,10),
-                access_token = "access-development-8ab976e6-64bc-4b38-98f7-731e7a349971"
                 )

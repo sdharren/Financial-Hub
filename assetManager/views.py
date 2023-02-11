@@ -5,12 +5,21 @@ from django.contrib.auth import login, authenticate
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
+import json
+
+#from assetManager.bankcards.debit_card import DebitCard
+
+def transaction_reports():
+    plaid_wrapper = SandboxWrapper()
+    debit_card = DebitCard(plaid_wrapper)
+    debit_card.get_transactions()
+
 
 
 def home(request):
     plaid_wrapper = SandboxWrapper()
-    plaid_wrapper.create_public_token()
-    plaid_wrapper.exchange_public_token(plaid_wrapper.create_public_token())
+    public_token = plaid_wrapper.create_public_token()
+    plaid_wrapper.exchange_public_token(public_token)
     accounts_informations = plaid_wrapper.get_accounts()
     json_data = reformatJson(accounts_informations)
     return render(request,'home.html',{"json_data":json_data})
@@ -55,13 +64,18 @@ def log_in(request):
 # add @login_required
 def connect_investments(request):
     if request.method == 'GET':
+        # here we will have arguments that denote what products the user has chosen
+        products_chosen = ['transactions']
+        # for now i've hardcoded them
         plaid_wrapper = DevelopmentWrapper()
-        plaid_wrapper.create_link_token()
+        plaid_wrapper.create_link_token(products_chosen)
         link_token = plaid_wrapper.get_link_token()
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
         plaid_wrapper = DevelopmentWrapper()
-        public_token = request.POST['public_token']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        public_token = body['public_token']
         plaid_wrapper.exchange_public_token(public_token)
-        print(plaid_wrapper.get_access_token())
-
+        #print(plaid_wrapper.get_access_token())
+        return redirect('home_page')

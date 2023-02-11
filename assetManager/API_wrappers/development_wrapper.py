@@ -9,6 +9,14 @@ from plaid.model.link_token_create_request import LinkTokenCreateRequest
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.link_token_account_filters import LinkTokenAccountFilters
 from .plaid_wrapper import PlaidWrapper
+from assetManager.models import AccountType, AccountTypeEnum
+from assetManager.helpers import make_aware_date
+from datetime import datetime
+from django.db import IntegrityError
+
+from datetime import date
+from plaid.model.transactions_get_request import TransactionsGetRequest
+from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
 
 class PublicTokenNotExchanged(Exception):
     pass
@@ -47,6 +55,34 @@ class DevelopmentWrapper(PlaidWrapper):
             raise LinkTokenNotCreated
         return self.LINK_TOKEN
 
+    def save_access_token(self, user):
+        if self.ACCESS_TOKEN is None:
+            raise PublicTokenNotExchanged
+        for product_name in self.products_requested:
+            try:
+                AccountType.objects.create(
+                    user = user,
+                    account_asset_type = AccountTypeEnum(self._transform_product_to_enum_value(product_name)),
+                    account_date_linked = make_aware_date(datetime.now()),
+                    access_token = self.ACCESS_TOKEN
+                )
+            except IntegrityError:
+                return
 
-        
 
+    def _transform_product_to_enum_value(self, product):
+        if product == 'investments' or product == 'assets':
+            return 'STOCK'
+        if product == 'transactions':
+            return 'DEBIT'
+
+    def get_transactions(self):
+        request = TransactionsGetRequest(
+            access_token=self.ACCESS_TOKEN,
+            start_date=date.fromisoformat("2022-01-01"),
+            end_date=date.fromisoformat("2023-01-01"),
+            options=TransactionsGetRequestOptions()
+        )
+        response = self.client.transactions_get(request)
+        transactions = response['transactions']
+        return transactions

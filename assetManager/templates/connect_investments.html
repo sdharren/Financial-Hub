@@ -10,17 +10,22 @@
 </head>
 <body onload="handler.open()">
     <script>
+        var csrf_django_token = '{{ csrf_token }}';
         const handler = Plaid.create({
             token: "{{link_token}}",
             onSuccess: (public_token, metadata) => {
-                fetch('http://localhost:8000/connect_investments', {
+                fetch('http://localhost:8000/connect_investments/', {
                     method: 'POST',
-                    body: {
+                    headers: {
+                        'X-CSRFToken': csrf_django_token,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
                         public_token: public_token,
                         accounts: metadata.accounts,
                         institution: metadata.institution,
                         link_session_id: metadata.link_session_id,
-                    },
+                    }),
                 });
             },
             onLoad: () => {},

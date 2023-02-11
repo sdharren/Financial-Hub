@@ -16,12 +16,16 @@ from plaid.model.accounts_get_request import AccountsGetRequest
 import os
 from dotenv import dotenv_values
 
+
+
+
 class PlaidWrapper():
     def __init__(self):
         self.CLIENT_ID = '63d288b343e6370012e5be86'
         self.ACCESS_TOKEN = None
         self.ITEM_ID = None
         self.LINK_TOKEN = None
+        self.products_requested = None
 
     def get_access_token(self):
         pass
@@ -32,28 +36,27 @@ class PlaidWrapper():
     def get_link_token(self):
         pass
 
-    def create_link_token(self):
+    def create_link_token(self, products_chosen=[]):
+        product_list = []
+        for product_name in products_chosen:
+            product_list.append(Products(product_name))
+        product_list.append(Products('auth'))
+        self.products_requested = products_chosen
+        
         request = LinkTokenCreateRequest(
-            products=[Products('auth'), Products('investments'), Products('transactions')],
+            products=product_list,
             client_name="dash.",
             country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('ES'), CountryCode('NL'), CountryCode('FR'), CountryCode('IE'), CountryCode('CA'), CountryCode('DE'), CountryCode('IT'), CountryCode('PL'), CountryCode('DK'), CountryCode('NO'), CountryCode('SE'), CountryCode('EE'), CountryCode('LT'), CountryCode('LT')],
             redirect_uri='https://google.com',
             language='en',
             webhook='https://sample-webhook-uri.com',
             link_customization_name='default',
-            account_filters=LinkTokenAccountFilters(
-                depository=DepositoryFilter(
-                    account_subtypes=DepositoryAccountSubtypes(
-                        [DepositoryAccountSubtype('checking'), DepositoryAccountSubtype('savings')]
-                    )
-                )
-            ),
             user=LinkTokenCreateRequestUser(
-                client_user_id='123-test-user-id'
+                client_user_id='123-test-user-id' # FIGURE OUT WHAT TO DO HERE
             ),
         )
         response = self.client.link_token_create(request)
-        self.LINK_TOKEN =  response['link_token']
+        self.LINK_TOKEN = response['link_token']
 
     def exchange_public_token(self, public_token):
         exchange_request = ItemPublicTokenExchangeRequest(
@@ -62,3 +65,5 @@ class PlaidWrapper():
         exchange_response = self.client.item_public_token_exchange(exchange_request)
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
+
+    
