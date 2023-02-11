@@ -86,12 +86,3 @@ class DevelopmentWrapper(PlaidWrapper):
         response = self.client.transactions_get(request)
         transactions = response['transactions']
         return transactions
-
-
-
-
-
-
-
-
->>>>>>> plaid-error-handling
