@@ -14,6 +14,10 @@ from assetManager.helpers import make_aware_date
 from datetime import datetime
 from django.db import IntegrityError
 
+from datetime import date
+from plaid.model.transactions_get_request import TransactionsGetRequest
+from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
+
 class PublicTokenNotExchanged(Exception):
     pass
 
@@ -71,3 +75,23 @@ class DevelopmentWrapper(PlaidWrapper):
             return 'STOCK'
         if product == 'transactions':
             return 'DEBIT'
+
+    def get_transactions(self):
+        request = TransactionsGetRequest(
+            access_token=self.ACCESS_TOKEN,
+            start_date=date.fromisoformat("2022-01-01"),
+            end_date=date.fromisoformat("2023-01-01"),
+            options=TransactionsGetRequestOptions()
+        )
+        response = self.client.transactions_get(request)
+        transactions = response['transactions']
+        return transactions
+
+
+
+
+
+
+
+
+>>>>>>> plaid-error-handling
