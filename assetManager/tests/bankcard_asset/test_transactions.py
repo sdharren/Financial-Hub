@@ -1,6 +1,6 @@
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.bankcards.debit_card import DebitCard
+from assetManager.assets.debit_card import DebitCard
 from django.test import TestCase
 
 class DebitCardSandBoxWrapperTestCase(TestCase):

@@ -7,7 +7,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
 import json
 
-from assetManager.bankcards.debit_card import DebitCard
+#from assetManager.bankcards.debit_card import DebitCard
 
 def transaction_reports():
     plaid_wrapper = SandboxWrapper()
