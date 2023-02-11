@@ -15,6 +15,8 @@ from plaid.model.country_code import CountryCode
 from plaid.model.products import Products
 from datetime import date
 
+from pprint import pprint
+
 #response = client.sandbox_item_fire_webhook(request)
 #GqQalvm5JrCAaQ8lPjq7tdjXVK7wpyt1jexyg
 
@@ -113,29 +115,39 @@ class DebitCard():
             account_ids=account_ids,
         )
         response = client.transactions_recurring_get(request)
-    """
+
+    def print_class(self):
+        obj = TransactionsGetRequestOptions()
+        print(dir(obj))
+
     def get_transactions(self):
         request1 = TransactionsRefreshRequest(access_token=self.plaid_wrapper.ACCESS_TOKEN)
         response1 = self.plaid_wrapper.client.transactions_refresh(request1)
 
         request = TransactionsGetRequest(
             access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            start_date=date.fromisoformat('2020-01-01'),
-            end_date=date.fromisoformat('2021-02-01'),
-            options =TransactionsGetRequestOptions()
+            start_date=date.fromisoformat('2023-01-02'),
+            end_date=date.fromisoformat('2023-02-09'),
+            options =TransactionsGetRequestOptions(
+            username = "John Smith",
+            )
             )
         response = self.plaid_wrapper.client.transactions_get(request)
         transactions = response['transactions']
-
+        print(transactions)
+        print(len(transactions))
+        """
         while len(transactions) < response['total_transactions']:
             request = TransactionsGetRequest(
-            access_token=access_token,
+            access_token=self.plaid_wrapper.ACCESS_TOKEN,
             start_date=datetime.date('2018-01-01'),
             end_date=datetime.date('2018-02-01'),
             options=TransactionsGetRequestOptions(
                 offset=len(transactions)
+                )
             )
-      )
-      response = client.transactions_get(request)
-      transactions.extend(response['transactions'])
-    """
+
+        response = self.plaid_wrapper.client.transactions_get(request)
+        transactions.extend(response['transactions'])
+        print(transactions)
+        """
