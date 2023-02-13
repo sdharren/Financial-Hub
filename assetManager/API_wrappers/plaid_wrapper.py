@@ -54,7 +54,6 @@ class PlaidWrapper():
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
-        product_list.append(Products('auth'))
         self.products_requested = products_chosen
         
         request = LinkTokenCreateRequest(

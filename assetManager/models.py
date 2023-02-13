@@ -85,7 +85,7 @@ def is_crypto(account_string):
     return AccountTypeEnum.CRYPTO.value == account_string
 
 def check_access_token(access_token):
-    if(re.match(r"^access-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",access_token) is None):
+    if(re.match(r"^access-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",access_token) is None and re.match(r"^access-sandbox-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",access_token) is None):
         raise ValueError("PLAID API access token format is invalid")
 
 

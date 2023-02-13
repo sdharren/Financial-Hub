@@ -42,10 +42,15 @@ class SandboxWrapper(PlaidWrapper):
     def get_link_token(self):
         return self.LINK_TOKEN
 
-    def create_public_token(self, bank_id='ins_115642'):
+    def create_public_token(self, bank_id='ins_115642', products_chosen=['transactions']):
+        product_list = []
+        for product_name in products_chosen:
+            product_list.append(Products(product_name))
+        self.products_requested = products_chosen
+
         public_token_request = SandboxPublicTokenCreateRequest(
             institution_id = bank_id,
-            initial_products = [Products('transactions')]
+            initial_products = product_list
         )
         response = self.client.sandbox_public_token_create(public_token_request)
         return response['public_token']
