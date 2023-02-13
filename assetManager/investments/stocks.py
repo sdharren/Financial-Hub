@@ -1,6 +1,7 @@
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetRequest
 from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
+import json
 
 class StocksGetter():
     def __init__(self, concrete_wrapper):
@@ -13,7 +14,7 @@ class StocksGetter():
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
             self.investments.append(response)
-    
+
     def get_holdings(self):
         holdings = []
         for investment in self.investments:
@@ -32,5 +33,10 @@ class StocksGetter():
             holdings.append(investment['accounts'])
         return holdings
 
-
-    
+    def get_total_investment_sum(self):
+        accounts = self.get_accounts()
+        aggregate_investment = 0
+        for account in accounts:
+            for x in range(len(account)):
+                aggregate_investment += accounts[0][x]['balances']['current']
+        return aggregate_investment

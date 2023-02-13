@@ -24,6 +24,7 @@ class DebitCard():
     def __init__(self,concrete_wrapper):
         self.plaid_wrapper = concrete_wrapper
         public_token = self.plaid_wrapper.create_public_token()
+        self.plaid_wrapper.products_requested = 'transactions'
         self.plaid_wrapper.exchange_public_token(public_token)
 
 
@@ -128,9 +129,9 @@ class DebitCard():
             access_token=self.plaid_wrapper.ACCESS_TOKEN,
             start_date=date.fromisoformat('2023-01-02'),
             end_date=date.fromisoformat('2023-02-09'),
-            options =TransactionsGetRequestOptions(
-            username = "John Smith",
-            )
+            #options =TransactionsGetRequestOptions(
+            #username = "John Smith",
+            #)
             )
         response = self.plaid_wrapper.client.transactions_get(request)
         transactions = response['transactions']
