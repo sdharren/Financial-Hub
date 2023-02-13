@@ -101,12 +101,14 @@ class PlaidWrapper():
             return 'DEBIT'
 
     def _retrieve_access_token(self, user, product):
-        account = AccountType.objects.get(user = user, account_asset_type = self._transform_product_to_enum_value(product))
-        if account is not None:
-            self.access_token = account.access_token
-            return self.access_token
-        else:
+        try:
+            account = AccountType.objects.get(user = user, account_asset_type = self._transform_product_to_enum_value(product))
+        except AccountType.DoesNotExist:
             raise PublicTokenNotExchanged
+        else:
+            self.ACCESS_TOKEN = account.access_token
+        
+            
         
 
         
