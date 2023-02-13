@@ -33,15 +33,6 @@ class SandboxWrapper(PlaidWrapper):
         api_client = plaid.ApiClient(configuration)
         self.client = plaid_api.PlaidApi(api_client)
 
-    def get_access_token(self):
-        return self.ACCESS_TOKEN
-
-    def get_item_id(self):
-        return self.ITEM_ID
-
-    def get_link_token(self):
-        return self.LINK_TOKEN
-
     def create_public_token(self, bank_id='ins_115642', products_chosen=['transactions']):
         product_list = []
         for product_name in products_chosen:

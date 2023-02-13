@@ -50,7 +50,7 @@ class PlaidWrapper():
             raise LinkTokenNotCreated
         return self.LINK_TOKEN
 
-    def create_link_token(self, products_chosen=[]):
+    def create_link_token(self, products_chosen=['auth']):
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
@@ -93,13 +93,19 @@ class PlaidWrapper():
             except IntegrityError:
                 return
 
-    def retrieve_access_token(self, user, product):
-        try:
-            account = AccountType.objects.get(user = user, account_asset_type = self._transform_product_to_enum_value(product))
-        except AccountType.DoesNotExist:
+    '''
+    Retrieves the access tokens matching specified paramters. If a user has more than one access for the same product
+    - the self.access_token attribute is set to a LIST of tokens
+    '''
+    def retrieve_access_tokens(self, user, product):
+        accounts = AccountType.objects.filter(user = user, account_asset_type = self._transform_product_to_enum_value(product))
+        if len(accounts) == 0:
             raise PublicTokenNotExchanged
         else:
-            self.ACCESS_TOKEN = account.access_token
+            tokens = []
+            for account in accounts:
+                tokens.append(account.access_token)
+            return tokens
 
     def _transform_product_to_enum_value(self, product):
         if product == 'investments' or product == 'assets':

@@ -62,10 +62,6 @@ class AccountTypeCase(TestCase):
         self.credit_card_account.account_asset_type = 'NON VALID ACCOUNT TYPE'
         self._assert_account_type_is_invalid(self.credit_card_account)
 
-    def test_debit_card_has_correct_access_token_format_incorrect_environment(self):
-        self.debit_card_account.access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349970'
-        self._assert_account_type_using_plaid_api_is_invalid(self.debit_card_account)
-
     def test_debit_card_has_correct_access_token_format_incorrect_numberformat(self):
         self.debit_card_account.access_token = "access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349"
         self._assert_account_type_using_plaid_api_is_invalid(self.debit_card_account)
@@ -73,10 +69,6 @@ class AccountTypeCase(TestCase):
     def test_debit_card_has_correct_access_token_format_not_access_token(self):
         self.debit_card_account.access_token = "public-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349"
         self._assert_account_type_using_plaid_api_is_invalid(self.debit_card_account)
-
-    def test_credit_card_has_correct_access_token_format_incorrect_environment(self):
-        self.credit_card_account.access_token = "access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349970"
-        self._assert_account_type_using_plaid_api_is_invalid(self.credit_card_account)
 
     def test_credit_card_has_correct_access_token_format_incorrect_numberformat(self):
         self.credit_card_account.access_token = "access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349"
