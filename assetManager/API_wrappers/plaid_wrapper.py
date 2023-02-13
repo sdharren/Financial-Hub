@@ -94,19 +94,20 @@ class PlaidWrapper():
             except IntegrityError:
                 return
 
-    def _transform_product_to_enum_value(self, product):
-        if product == 'investments' or product == 'assets':
-            return 'STOCK'
-        if product == 'transactions':
-            return 'DEBIT'
-
-    def _retrieve_access_token(self, user, product):
+    def retrieve_access_token(self, user, product):
         try:
             account = AccountType.objects.get(user = user, account_asset_type = self._transform_product_to_enum_value(product))
         except AccountType.DoesNotExist:
             raise PublicTokenNotExchanged
         else:
             self.ACCESS_TOKEN = account.access_token
+
+    def _transform_product_to_enum_value(self, product):
+        if product == 'investments' or product == 'assets':
+            return 'STOCK'
+        if product == 'transactions':
+            return 'DEBIT'
+    
         
             
         
