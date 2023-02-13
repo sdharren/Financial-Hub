@@ -1,6 +1,7 @@
 import re
 from django.test import TestCase
-from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper, PublicTokenNotExchanged, LinkTokenNotCreated
+from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated
 from assetManager.models import User, AccountType, AccountTypeEnum
 
 class DevelopmentWrapperTestCase(TestCase):

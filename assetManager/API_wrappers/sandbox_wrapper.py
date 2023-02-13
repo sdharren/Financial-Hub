@@ -33,19 +33,15 @@ class SandboxWrapper(PlaidWrapper):
         api_client = plaid.ApiClient(configuration)
         self.client = plaid_api.PlaidApi(api_client)
 
-    def get_access_token(self):
-        return self.ACCESS_TOKEN
+    def create_public_token(self, bank_id='ins_115642', products_chosen=['transactions']):
+        product_list = []
+        for product_name in products_chosen:
+            product_list.append(Products(product_name))
+        self.products_requested = products_chosen
 
-    def get_item_id(self):
-        return self.ITEM_ID
-
-    def get_link_token(self):
-        return self.LINK_TOKEN
-
-    def create_public_token(self, bank_id='ins_115642'):
         public_token_request = SandboxPublicTokenCreateRequest(
             institution_id = bank_id,
-            initial_products = [Products('transactions')]
+            initial_products = product_list
         )
         response = self.client.sandbox_public_token_create(public_token_request)
         return response['public_token']
@@ -54,3 +50,4 @@ class SandboxWrapper(PlaidWrapper):
         request_accounts = AccountsGetRequest(access_token=self.ACCESS_TOKEN)
         response = self.client.accounts_get(request_accounts)
         return response['accounts']
+        

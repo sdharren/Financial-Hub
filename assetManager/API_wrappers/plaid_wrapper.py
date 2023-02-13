@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.db import IntegrityError
 import plaid
 from plaid.api import plaid_api
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
@@ -15,8 +16,15 @@ from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchan
 from plaid.model.accounts_get_request import AccountsGetRequest
 import os
 from dotenv import dotenv_values
+from assetManager.models import AccountType, AccountTypeEnum
+from assetManager.helpers import make_aware_date
+from datetime import datetime
 
+class PublicTokenNotExchanged(Exception):
+    pass
 
+class LinkTokenNotCreated(Exception):
+    pass
 
 
 class PlaidWrapper():
@@ -28,19 +36,24 @@ class PlaidWrapper():
         self.products_requested = None
 
     def get_access_token(self):
-        pass
+        if self.ACCESS_TOKEN is None:
+            raise PublicTokenNotExchanged
+        return self.ACCESS_TOKEN
 
     def get_item_id(self):
-        pass
+        if self.ITEM_ID is None:
+            raise PublicTokenNotExchanged
+        return self.ITEM_ID
 
     def get_link_token(self):
-        pass
+        if self.LINK_TOKEN is None:
+            raise LinkTokenNotCreated
+        return self.LINK_TOKEN
 
-    def create_link_token(self, products_chosen=[]):
+    def create_link_token(self, products_chosen=['auth']):
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
-        product_list.append(Products('auth'))
         self.products_requested = products_chosen
         
         request = LinkTokenCreateRequest(
@@ -65,5 +78,45 @@ class PlaidWrapper():
         exchange_response = self.client.item_public_token_exchange(exchange_request)
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
+
+    def save_access_token(self, user):
+        if self.ACCESS_TOKEN is None:
+            raise PublicTokenNotExchanged
+        for product_name in self.products_requested:
+            try:
+                AccountType.objects.create(
+                    user = user,
+                    account_asset_type = AccountTypeEnum(self._transform_product_to_enum_value(product_name)),
+                    account_date_linked = make_aware_date(datetime.now()),
+                    access_token = self.ACCESS_TOKEN
+                )
+            except IntegrityError:
+                return
+
+    '''
+    Retrieves the access tokens matching specified paramters. If a user has more than one access for the same product
+    - the self.access_token attribute is set to a LIST of tokens
+    '''
+    def retrieve_access_tokens(self, user, product):
+        accounts = AccountType.objects.filter(user = user, account_asset_type = self._transform_product_to_enum_value(product))
+        if len(accounts) == 0:
+            raise PublicTokenNotExchanged
+        else:
+            tokens = []
+            for account in accounts:
+                tokens.append(account.access_token)
+            return tokens
+
+    def _transform_product_to_enum_value(self, product):
+        if product == 'investments' or product == 'assets':
+            return 'STOCK'
+        if product == 'transactions':
+            return 'DEBIT'
+    
+        
+            
+        
+
+        
 
     
