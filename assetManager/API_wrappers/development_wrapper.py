@@ -34,12 +34,6 @@ class DevelopmentWrapper(PlaidWrapper):
         self.client = plaid_api.PlaidApi(api_client)
 
     
-
-    
-
-
-    
-
     def get_transactions(self):
         request = TransactionsGetRequest(
             access_token=self.ACCESS_TOKEN,
@@ -50,3 +44,5 @@ class DevelopmentWrapper(PlaidWrapper):
         response = self.client.transactions_get(request)
         transactions = response['transactions']
         return transactions
+
+    

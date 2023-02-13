@@ -54,3 +54,4 @@ class SandboxWrapper(PlaidWrapper):
         request_accounts = AccountsGetRequest(access_token=self.ACCESS_TOKEN)
         response = self.client.accounts_get(request_accounts)
         return response['accounts']
+        
