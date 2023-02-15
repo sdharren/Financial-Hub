@@ -12,3 +12,43 @@ class CategoriseTransactionsTestCase(TestCase):
     def test_get_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
         self.assertEqual(transactions.getTransactionHistory(), self.transaction_history)
+
+    def test_get_empty_transactions(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getTransactionHistory(), "")
+
+    def test_get_yearly_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getTotalSpending(), 41.28)
+
+    def test_get_no_yearly_spending(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getTotalSpending(), 0)
+
+    def test_get_november_monthly_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getMonthlySpending(11), 41.28)
+
+    def test_get_december_monthly_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getMonthlySpending(12), 0)
+
+    def test_get_no_monthly_spending(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getMonthlySpending(11), 0)
+
+    def test_get_mcdonalds_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getSpendingForCompany("McDonald's"), 1.99)
+
+    def test_get_mcdonalds_spending_for_empty_json(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getSpendingForCompany("McDonald's"), 0)
+
+    def test_get_no_company_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getSpendingForCompany(""), 0)
+
+    def test_get_no_company_spending_for_empty_json(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getSpendingForCompany(""), 0)
