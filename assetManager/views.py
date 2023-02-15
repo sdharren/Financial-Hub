@@ -80,7 +80,10 @@ def connect_investments(request):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(request.user)
         #print(plaid_wrapper.get_access_token())
-        return redirect('home_page')
+
+        #commented out for demo
+        #return redirect('home_page')
+        return redirect('investments_demo')
 
 def connect_demo_investments(request):
     sandbox = True
