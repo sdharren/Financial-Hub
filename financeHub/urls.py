@@ -23,4 +23,6 @@ urlpatterns = [
     path('connect_investments/', views.connect_investments, name='connect_investments'),
     path('sign_up/', views.sign_up, name='sign_up'),
     path('log_in/', views.log_in, name='log_in'),
+    path('connect_demo_investments/', views.connect_demo_investments),
+    path('investments_demo/', views.investments_demo, name='investments_demo'),
 ]

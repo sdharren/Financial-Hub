@@ -32,5 +32,20 @@ class StocksGetter():
             holdings.append(investment['accounts'])
         return holdings
 
+    # return a list of dictionaries of form {stock_name: stock_price}
+    def get_prepared_data(self):
+        stocks = []
+        for investment in self.investments:
+            for holding in investment['holdings']:
+                security_id = holding['security_id']
+                stock_dict = {}
+                for security in investment['securities']:
+                    if security['security_id'] == security_id:
+                        name = security['name']
+                        break
+                stock_dict[name] = holding['institution_value']
+                stocks.append(stock_dict)
+        return stocks
+
 
     
