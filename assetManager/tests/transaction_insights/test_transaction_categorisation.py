@@ -72,3 +72,27 @@ class CategoriseTransactionsTestCase(TestCase):
     def test_get_categories_of_spending(self):
         transactions = CategoriseTransactions("")
         self.assertEqual(transactions.getCategorisedSpending(), {})
+
+    def test_get_november_monthly_transactions(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertNotEqual(transactions.getMonthlyTransactions(11), [])
+
+    def test_get_december_monthly_transactions(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getMonthlyTransactions(12), [])
+
+    def test_get_no_monthly_transactions(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getMonthlyTransactions(11), [])
+
+    def test_get_november_weekly_transactions(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertNotEqual(transactions.getWeeklyTransactions(3,11), [])
+
+    def test_get_december_weekly_transactions(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getWeeklyTransactions(1,12), [])
+
+    def test_get_no_weekly_transactions(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getWeeklyTransactions(3,11), [])
