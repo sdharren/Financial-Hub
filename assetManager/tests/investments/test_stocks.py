@@ -42,7 +42,6 @@ class StocksTestCase(TestCase):
         self.assertEqual(len(self.stock_getter.investments), 2)
 
     def test_get_sum_investments_returns_total(self):
-        self.stock_getter.query_investments(self.user)
+        accounts = self.stock_getter.query_investments(self.user)
         total_sum = self.stock_getter.get_total_investment_sum()
-        print(total_sum)
         self.assertEqual(total_sum, 190446.8005)

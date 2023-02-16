@@ -33,10 +33,12 @@ class StocksGetter():
             holdings.append(investment['accounts'])
         return holdings
 
+
+    #Returns total investment sum within the account
     def get_total_investment_sum(self):
         accounts = self.get_accounts()
         aggregate_investment = 0
         for account in accounts:
-            for x in range(len(account)):
-                aggregate_investment += accounts[0][x]['balances']['current']
+            for idx in range(len(account)):
+                aggregate_investment += accounts[idx][0]['balances']['current']
         return aggregate_investment
