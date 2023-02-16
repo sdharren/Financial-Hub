@@ -73,6 +73,3 @@ def getAllData():
         for addr in ethAddresses:
             value = [getAddressData.ETH_all(addr), "eth"]
             data.append(value)
-
-    for i in range(len(data)):
-        print(getUsable.getNoTx((data[i]), data[i][-1]))
