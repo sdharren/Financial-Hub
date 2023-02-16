@@ -79,27 +79,4 @@ def connect_investments(request):
         public_token = body['public_token']
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(request.user)
-        #print(plaid_wrapper.get_access_token())
-
-        #commented out for demo
-        #return redirect('home_page')
-        return redirect('investments_demo')
-
-def connect_demo_investments(request):
-    sandbox = True
-    if sandbox:
-        wrapper = SandboxWrapper()
-        # Sandbox data for Vanguard investments
-        public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments']) 
-        wrapper.exchange_public_token(public_token)
-        wrapper.save_access_token(request.user)
-        return redirect('investments_demo')
-    else:
-        return redirect('connect_investments')
-
-def investments_demo(request):
-    wrapper = SandboxWrapper()
-    stocks_getter = StocksGetter(wrapper)
-    stocks_getter.query_investments(request.user)
-    json_data = stocks_getter.get_prepared_data()
-    return render(request,'home.html',{"json_data":json_data})
+        return redirect('home_page')
