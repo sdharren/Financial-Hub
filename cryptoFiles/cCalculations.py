@@ -1,1 +1,0 @@
-import cGetter as cg
