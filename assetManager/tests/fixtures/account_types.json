@@ -1,0 +1,46 @@
+[
+{
+    "model": "assetManager.accounttype",
+    "pk":1,
+    "fields": {
+        "user":1,
+        "account_asset_type": "DEBIT",
+        "account_date_linked": "2020-10-19",
+        "access_token": "access-development-8ab976e6-64bc-4b38-98f7-731e7a349970",
+        "account_institution_name" : "HSBC"
+    }
+},
+{
+    "model": "assetManager.accounttype",
+    "pk":2,
+    "fields": {
+        "user":1,
+        "account_asset_type": "CREDIT",
+        "account_date_linked": "2020-10-19",
+        "access_token": "access-development-8ab976e6-64bc-4b38-98f7-731e7a349971",
+        "account_institution_name" : "City Bank"
+    }
+},
+{
+    "model": "assetManager.accounttype",
+    "pk":3,
+    "fields": {
+        "user":2,
+        "account_asset_type": "STOCK",
+        "account_date_linked": "2020-10-19",
+        "access_token": "access-development-8ab976e6-64bc-4b38-98f7-731e7a349972",
+        "account_institution_name" : "Plus 500"
+    }
+},
+{
+    "model": "assetManager.accounttype",
+    "pk":4,
+    "fields": {
+        "user":2,
+        "account_asset_type": "CRYPTO",
+        "account_date_linked": "2020-10-19",
+        "access_token": "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo",
+        "account_institution_name" : "Meta Mask"
+    }
+}
+]
