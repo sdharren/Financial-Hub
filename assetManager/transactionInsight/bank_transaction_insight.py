@@ -32,3 +32,11 @@ class CategoriseTransactions():
             if item['amount'] > 0 and item['name'] == company:
                 amount = amount + item['amount']
         return amount
+
+    def getCategorisedSpending(self):
+        spenditurePerCategory = {}
+        for item in self.transaction_history:
+            if item['amount'] > 0:
+                currentValue = spenditurePerCategory.get(item['category'][0]) or 0
+                spenditurePerCategory[item['category'][0]] = currentValue + item['amount']
+        return spenditurePerCategory

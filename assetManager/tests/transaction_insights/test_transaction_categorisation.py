@@ -64,3 +64,11 @@ class CategoriseTransactionsTestCase(TestCase):
     def test_get_no_weekly_spending(self):
         transactions = CategoriseTransactions("")
         self.assertEqual(transactions.getWeeklySpending(1,11), 0)
+
+    def test_get_categories_of_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getCategorisedSpending(), {'Travel': 3.3, 'Food and Drink': 21.99, 'Service': 15.99})
+
+    def test_get_categories_of_spending(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getCategorisedSpending(), {})
