@@ -57,7 +57,7 @@ class getUsable:
         return value
 
 # When run collect data for all addresses listed
-def main():
+def getAllData():
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = [] # 2D Array where index 0 is actual data and index 1 is type (of coin)
 
