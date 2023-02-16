@@ -96,3 +96,11 @@ class CategoriseTransactionsTestCase(TestCase):
     def test_get_no_weekly_transactions(self):
         transactions = CategoriseTransactions("")
         self.assertEqual(transactions.getWeeklyTransactions(3,11), [])
+
+    def test_get_ordered_categories_of_transactions(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getOrderCategories(), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
+
+    def test_get_no_ordered_categories_of_transactions(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getOrderCategories(), [])

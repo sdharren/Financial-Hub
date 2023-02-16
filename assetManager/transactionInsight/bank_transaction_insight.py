@@ -9,7 +9,15 @@ class CategoriseTransactions():
     def getTransactionHistory(self):
         return self.transaction_history
 
-    #TODO add merge sort algorithm to order category spending
+    # returns an ordered array of tuples of categories and their spenditure
+    def getOrderCategories(self):
+        categories = self.getCategorisedSpending()
+        orderedListOfCategories = sorted(categories)
+        orderedDictionaryOfCategories = []
+        for item in orderedListOfCategories:
+            category = (item,categories.get(item))
+            orderedDictionaryOfCategories.append(category)
+        return orderedDictionaryOfCategories
 
     # return that total spending for all transactions
     def getTotalSpending(self):
@@ -43,7 +51,7 @@ class CategoriseTransactions():
                 amount = amount + item['amount']
         return amount
 
-    # return an array of categories of where money was spent as well as total spent
+    # return an dictionary of categories of where money was spent as well as total spent
     def getCategorisedSpending(self):
         spenditurePerCategory = {}
         for item in self.transaction_history:
