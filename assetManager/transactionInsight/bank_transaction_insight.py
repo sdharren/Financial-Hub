@@ -19,6 +19,13 @@ class CategoriseTransactions():
                 amount = amount + item['amount']
         return amount
 
+    def getWeeklySpending(self,week,month):
+        amount = 0
+        for item in self.transaction_history:
+            if item['amount'] > 0 and item['date'].day <= week*7 and item['date'].month == month:
+                amount = amount + item['amount']
+        return amount
+
     def getSpendingForCompany(self,company):
         amount = 0
         for item in self.transaction_history:
