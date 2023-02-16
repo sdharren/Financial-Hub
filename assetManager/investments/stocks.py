@@ -40,5 +40,5 @@ class StocksGetter():
         aggregate_investment = 0
         for account in accounts:
             for idx in range(len(account)):
-                aggregate_investment += accounts[idx][0]['balances']['current']
+                aggregate_investment += accounts[0][idx]['balances']['current']
         return aggregate_investment
