@@ -52,3 +52,15 @@ class CategoriseTransactionsTestCase(TestCase):
     def test_get_no_company_spending_for_empty_json(self):
         transactions = CategoriseTransactions("")
         self.assertEqual(transactions.getSpendingForCompany(""), 0)
+
+    def test_get_november_third_week_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getWeeklySpending(3,11), 41.28)
+
+    def test_get_december_first_week_monthly_spending(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertEqual(transactions.getWeeklySpending(1,12), 0)
+
+    def test_get_no_weekly_spending(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getWeeklySpending(1,11), 0)
