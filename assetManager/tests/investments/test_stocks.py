@@ -18,19 +18,17 @@ class StocksTestCase(TestCase):
         self.wrapper.save_access_token(self.user)
         self.access_token = self.wrapper.get_access_token()
         self.stock_getter = StocksGetter(self.wrapper)
+        self.stock_getter.query_investments(self.user)
 
     def test_get_holdings_returns_stocks(self):
-        self.stock_getter.query_investments(self.user)
         holdings = self.stock_getter.get_holdings()
         self.assertIsNotNone(holdings[0][0]['account_id'])
 
     def test_get_securities_returns_securities(self):
-        self.stock_getter.query_investments(self.user)
         securities = self.stock_getter.get_securities()
         self.assertIsNotNone(securities[0][0]['close_price'])
 
     def test_get_accounts_returns_accounts(self):
-        self.stock_getter.query_investments(self.user)
         accounts = self.stock_getter.get_accounts()
         self.assertIsNotNone(accounts[0][0]['account_id'])
 
@@ -42,6 +40,8 @@ class StocksTestCase(TestCase):
         self.assertEqual(len(self.stock_getter.investments), 2)
 
     def test_get_sum_investments_returns_total(self):
-        accounts = self.stock_getter.query_investments(self.user)
         total_sum = self.stock_getter.get_total_investment_sum()
+        # these tests might fail at some point if plaid's sandbox changes the values
         self.assertEqual(total_sum, 190446.8005)
+
+    

@@ -9,6 +9,7 @@ class StocksGetter():
         self.investments = []
 
     def query_investments(self, user):
+        self.investments = []
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
         for token in access_tokens:
             request = InvestmentsHoldingsGetRequest(access_token=token)
