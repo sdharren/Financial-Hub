@@ -16,7 +16,6 @@ class StocksTestCase(TestCase):
         public_token = self.wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
         self.wrapper.exchange_public_token(public_token)
         self.wrapper.save_access_token(self.user)
-        self.access_token = self.wrapper.get_access_token()
         self.stock_getter = StocksGetter(self.wrapper)
         self.stock_getter.query_investments(self.user)
 
@@ -44,4 +43,7 @@ class StocksTestCase(TestCase):
         # these tests might fail at some point if plaid's sandbox changes the values
         self.assertEqual(total_sum, 190446.8005)
 
+    def test_get_prepared_data(self):
+        prepared_data = self.stock_getter.get_prepared_data()
+        self.assertEqual(len(prepared_data), 12)
     
