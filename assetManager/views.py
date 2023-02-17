@@ -5,6 +5,7 @@ from django.contrib.auth import login, authenticate
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
+from assetManager.investments.stocks import StocksGetter
 import json
 
 #from assetManager.bankcards.debit_card import DebitCard
@@ -65,7 +66,7 @@ def log_in(request):
 def connect_investments(request):
     if request.method == 'GET':
         # here we will have arguments that denote what products the user has chosen
-        products_chosen = ['transactions']
+        products_chosen = ['investments']
         # for now i've hardcoded them
         plaid_wrapper = DevelopmentWrapper()
         plaid_wrapper.create_link_token(products_chosen)
@@ -77,5 +78,5 @@ def connect_investments(request):
         body = json.loads(body_unicode)
         public_token = body['public_token']
         plaid_wrapper.exchange_public_token(public_token)
-        #print(plaid_wrapper.get_access_token())
+        plaid_wrapper.save_access_token(request.user)
         return redirect('home_page')
