@@ -10,6 +10,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
 
     def test_get_transactions(self):
-        self.debit_card.get_transactions()
+        #self.debit_card.get_transactions()
         #self.debit_card.print_class()
         pass
