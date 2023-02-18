@@ -30,12 +30,12 @@ class DevelopmentWrapperTestCase(TestCase):
 
     def test_cannot_save_undefined_access_token(self):
         with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.save_access_token(self.user)
+            self.wrapper.save_access_token(self.user, ['transactions'])
 
     def test_wrapper_saves_correct_access_token(self):
         self.wrapper.products_requested = ['transactions']
         self.wrapper.ACCESS_TOKEN = 'access-development-c619bf87-1395-44ae-ad2c-34d99d53bc60'
-        self.wrapper.save_access_token(self.user)
+        self.wrapper.save_access_token(self.user, ['transactions'])
         account_type = AccountType.objects.get(user=self.user)
         self.assertEqual(account_type.access_token, self.wrapper.ACCESS_TOKEN)
         self.assertEqual(account_type.account_asset_type, 'DEBIT')
@@ -44,6 +44,6 @@ class DevelopmentWrapperTestCase(TestCase):
         self.wrapper.products_requested = ['transactions', 'assets']
         account_count_before = AccountType.objects.all().count()
         self.wrapper.ACCESS_TOKEN = 'access-development-c619bf87-1395-44ae-ad2c-34d99d53bc60'
-        self.wrapper.save_access_token(self.user)
+        self.wrapper.save_access_token(self.user, ['transactions', 'assets'])
         account_count_after = AccountType.objects.all().count()
         self.assertEqual(account_count_before + 2, account_count_after)

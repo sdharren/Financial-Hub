@@ -33,7 +33,6 @@ class PlaidWrapper():
         self.ACCESS_TOKEN = None
         self.ITEM_ID = None
         self.LINK_TOKEN = None
-        self.products_requested = None
 
     def get_access_token(self):
         if self.ACCESS_TOKEN is None:
@@ -54,7 +53,6 @@ class PlaidWrapper():
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
-        self.products_requested = products_chosen
         
         request = LinkTokenCreateRequest(
             products=product_list,
@@ -79,10 +77,10 @@ class PlaidWrapper():
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
 
-    def save_access_token(self, user):
+    def save_access_token(self, user, products_chosen):
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
-        for product_name in self.products_requested:
+        for product_name in products_chosen:
             try:
                 AccountType.objects.create(
                     user = user,
