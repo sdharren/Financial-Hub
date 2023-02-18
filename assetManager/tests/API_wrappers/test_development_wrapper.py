@@ -38,12 +38,12 @@ class DevelopmentWrapperTestCase(TestCase):
         self.wrapper.save_access_token(self.user, ['transactions'])
         account_type = AccountType.objects.get(user=self.user)
         self.assertEqual(account_type.access_token, self.wrapper.ACCESS_TOKEN)
-        self.assertEqual(account_type.account_asset_type, 'DEBIT')
+        self.assertEqual(account_type.account_asset_type, 'transactions')
 
     def test_wrapper_saves_correct_access_token_for_several_products(self):
-        self.wrapper.products_requested = ['transactions', 'assets']
+        self.wrapper.products_requested = ['transactions', 'investments']
         account_count_before = AccountType.objects.all().count()
         self.wrapper.ACCESS_TOKEN = 'access-development-c619bf87-1395-44ae-ad2c-34d99d53bc60'
-        self.wrapper.save_access_token(self.user, ['transactions', 'assets'])
+        self.wrapper.save_access_token(self.user, ['transactions', 'investments'])
         account_count_after = AccountType.objects.all().count()
         self.assertEqual(account_count_before + 2, account_count_after)

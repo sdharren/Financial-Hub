@@ -84,7 +84,7 @@ class PlaidWrapper():
             try:
                 AccountType.objects.create(
                     user = user,
-                    account_asset_type = AccountTypeEnum(self._transform_product_to_enum_value(product_name)),
+                    account_asset_type = AccountTypeEnum(product_name),
                     account_date_linked = make_aware_date(datetime.now()),
                     access_token = self.ACCESS_TOKEN
                 )
@@ -96,7 +96,7 @@ class PlaidWrapper():
     - the self.access_token attribute is set to a LIST of tokens
     '''
     def retrieve_access_tokens(self, user, product):
-        accounts = AccountType.objects.filter(user = user, account_asset_type = self._transform_product_to_enum_value(product))
+        accounts = AccountType.objects.filter(user = user, account_asset_type = product)
         if len(accounts) == 0:
             raise PublicTokenNotExchanged
         else:
@@ -104,12 +104,6 @@ class PlaidWrapper():
             for account in accounts:
                 tokens.append(account.access_token)
             return tokens
-
-    def _transform_product_to_enum_value(self, product):
-        if product == 'investments' or product == 'assets':
-            return 'STOCK'
-        if product == 'transactions':
-            return 'DEBIT'
     
         
             

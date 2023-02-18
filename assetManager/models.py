@@ -65,18 +65,14 @@ class User(AbstractUser):
 Enum Type to represent the different types of account that are available in our application : Debit, Credit, Stock and Crypto accounts
 """
 class AccountTypeEnum(models.TextChoices):
-    DEBIT = 'DEBIT', _('Debit Card'),
-    CREDIT = 'CREDIT', _('Credit Card'),
-    STOCK = 'STOCK', _('Brokerage or Investement Account'),
+    DEBIT = 'transactions', _('Debit Card'),
+    STOCK = 'investments', _('Brokerage or Investement Account'),
     CRYPTO = 'CRYPTO',_('Crypto Wallet')
 
 #shoud be in modelhelpers .py
 # btw augosto i made a file called helpers.py in assetManager folder so could put it there
 def is_debit(account_string):
     return AccountTypeEnum.DEBIT.value == account_string
-
-def is_credit(account_string):
-    return AccountTypeEnum.CREDIT.value == account_string
 
 def is_stock(account_string):
     return AccountTypeEnum.STOCK.value == account_string
