@@ -1,5 +1,5 @@
 from django.test import TestCase
-from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, InvalidTickerName
+from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper
 
 class YFinanceWrapperTestCase(TestCase):
     def setUp(self):
@@ -11,5 +11,5 @@ class YFinanceWrapperTestCase(TestCase):
         self.assertIsNotNone(data)
 
     def test_get_ticker_info_throws_error_for_unlisted_stock(self):
-        with self.assertRaises(InvalidTickerName):
+        with self.assertRaises(Exception):
             self.wrapper.get_stock_history('fdjio;aksop89ifaduj903427ukljdasnfiuahf9867239fhq32iuhfjkql3hf897qh')

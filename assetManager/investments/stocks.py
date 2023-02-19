@@ -27,7 +27,7 @@ class StocksGetter():
         securities = []
         for investment in self.investments:
             securities.append(investment['securities'])
-        return securties
+        return securities
 
     def get_accounts(self):
         accounts = []
