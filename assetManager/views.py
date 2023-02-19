@@ -66,11 +66,13 @@ def log_in(request):
 def connect_investments(request):
     if request.method == 'GET':
         # here we will have arguments that denote what products the user has chosen
-        products_chosen = ['investments']
+        products_chosen = ['transactions']
         # for now i've hardcoded them
         plaid_wrapper = DevelopmentWrapper()
         plaid_wrapper.create_link_token(products_chosen)
         link_token = plaid_wrapper.get_link_token()
+        # attach products_chosen to session so they can be used in POST request
+        request.session['products_chosen'] = products_chosen
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
         plaid_wrapper = DevelopmentWrapper()
@@ -78,5 +80,13 @@ def connect_investments(request):
         body = json.loads(body_unicode)
         public_token = body['public_token']
         plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(request.user)
+
+        products_chosen = request.session.get('products_chosen', None)
+        # if POST request recieved before GET
+        if products_chosen is None:
+            return redirect('connect_investments')
+        plaid_wrapper.save_access_token(request.user, products_chosen)
+        del request.session['products_chosen']
         return redirect('home_page')
+        
+
