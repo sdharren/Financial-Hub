@@ -8,6 +8,7 @@ class StocksGetter():
         self.wrapper = concrete_wrapper
         self.investments = []
 
+    # Sends API calls to plaid requesting investment info for each access token associated with user
     def query_investments(self, user):
         self.investments = []
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
@@ -23,18 +24,18 @@ class StocksGetter():
         return holdings
 
     def get_securities(self):
-        holdings = []
+        securities = []
         for investment in self.investments:
-            holdings.append(investment['securities'])
-        return holdings
+            securities.append(investment['securities'])
+        return securties
 
     def get_accounts(self):
-        holdings = []
+        accounts = []
         for investment in self.investments:
-            holdings.append(investment['accounts'])
-        return holdings
+            accounts.append(investment['accounts'])
+        return accounts
 
-    # return a list of dictionaries of form {stock_name: stock_price}
+    # Returns a list of dictionaries of the form {stock_name: stock_price}
     def get_prepared_data(self):
         stocks = []
         for investment in self.investments:
