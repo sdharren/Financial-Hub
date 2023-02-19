@@ -1,6 +1,6 @@
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetRequest
-from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
+from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
 
 class StocksGetter():
