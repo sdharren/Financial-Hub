@@ -51,11 +51,12 @@ class PlaidWrapper():
         return self.LINK_TOKEN
 
     def create_link_token(self, products_chosen=['auth']):
+        print(products_chosen)
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
         self.products_requested = products_chosen
-        
+
         request = LinkTokenCreateRequest(
             products=product_list,
             client_name="dash.",
@@ -79,7 +80,7 @@ class PlaidWrapper():
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
 
-    def save_access_token(self, user):
+    def save_access_token(self, user, institution):
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
         for product_name in self.products_requested:
@@ -88,10 +89,18 @@ class PlaidWrapper():
                     user = user,
                     account_asset_type = AccountTypeEnum(self._transform_product_to_enum_value(product_name)),
                     account_date_linked = make_aware_date(datetime.now()),
-                    access_token = self.ACCESS_TOKEN
+                    access_token = self.ACCESS_TOKEN,
+                    account_institution_name = institution
                 )
             except IntegrityError:
                 return
+
+
+    def _transform_product_to_enum_value(self, product):
+        if product == 'investments' or product == 'assets':
+            return 'STOCK'
+        if product == 'transactions':
+            return 'DEBIT'
 
     '''
     Retrieves the access tokens matching specified paramters. If a user has more than one access for the same product
@@ -106,17 +115,3 @@ class PlaidWrapper():
             for account in accounts:
                 tokens.append(account.access_token)
             return tokens
-
-    def _transform_product_to_enum_value(self, product):
-        if product == 'investments' or product == 'assets':
-            return 'STOCK'
-        if product == 'transactions':
-            return 'DEBIT'
-    
-        
-            
-        
-
-        
-
-    

@@ -8,6 +8,9 @@ from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
 
+#remove after testing purposes are finished
+from assetManager.models import User
+
 #from assetManager.bankcards.debit_card import DebitCard
 
 def transaction_reports():
@@ -66,7 +69,8 @@ def log_in(request):
 def connect_investments(request):
     if request.method == 'GET':
         # here we will have arguments that denote what products the user has chosen
-        products_chosen = ['investments']
+        #products_chosen = ['investments']
+        products_chosen = ['transactions']
         # for now i've hardcoded them
         plaid_wrapper = DevelopmentWrapper()
         plaid_wrapper.create_link_token(products_chosen)
@@ -74,9 +78,14 @@ def connect_investments(request):
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
         plaid_wrapper = DevelopmentWrapper()
+        plaid_wrapper.products_requested = ['transactions']
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
+
         public_token = body['public_token']
+        institution_name = body['institution']
+
         plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(request.user)
+        plaid_wrapper.save_access_token(request.user,institution_name)
+        #plaid_wrapper.save_access_token(request.user)
         return redirect('home_page')

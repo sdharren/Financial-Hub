@@ -22,4 +22,3 @@ class PlaidWrapperTestCase(TestCase):
         product = 'transactions'
         tokens = self.wrapper.retrieve_access_tokens(user, product)
         self.assertEqual(tokens[0], 'access-development-8ab976e6-64bc-4b38-98f7-731e7a349970')
-
