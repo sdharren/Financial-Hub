@@ -11,44 +11,44 @@ class CreateBankGraphDataTestCase(TestCase):
 
     def test_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41.28, 0])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41.28, 0])
 
     def test_no_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     def test_weekly_spending_in_month(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11), [0, 0, 41.28, 0, 0])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [0, 0, 41.28, 0, 0])
 
     def test_no_weekly_spending_in_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11), [0, 0, 0, 0, 0])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [0, 0, 0, 0, 0])
 
     def test_weekly_spending_in_invalid_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(13), [0, 0, 0, 0, 0])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(13,2022), [0, 0, 0, 0, 0])
 
     def test_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(11), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(11,2022), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
 
     def test_ordered_categorised_weekly_spending(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.orderedCategorisedWeeklySpending(3,11), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedWeeklySpending(3,11,2022), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
 
     def test_no_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(11), [])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(11,2022), [])
 
     def test_no_ordered_categorised_weekly_spending(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.orderedCategorisedWeeklySpending(3,11), [])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedWeeklySpending(3,11,2022), [])
 
     def test_ordered_categorised_monthly_spending_for_invalid_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(13), [])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(13,2022), [])
 
     def test_no_ordered_categorised_weekly_spending_for_invalid_week(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.orderedCategorisedWeeklySpending(6,11), [])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedWeeklySpending(6,11,2022), [])

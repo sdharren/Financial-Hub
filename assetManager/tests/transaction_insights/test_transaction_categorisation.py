@@ -27,15 +27,15 @@ class CategoriseTransactionsTestCase(TestCase):
 
     def test_get_november_monthly_spending(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getMonthlySpending(11), 41.28)
+        self.assertEqual(transactions.getMonthlySpending(11,2022), 41.28)
 
     def test_get_december_monthly_spending(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getMonthlySpending(12), 0)
+        self.assertEqual(transactions.getMonthlySpending(12,2022), 0)
 
     def test_get_no_monthly_spending(self):
         transactions = CategoriseTransactions("")
-        self.assertEqual(transactions.getMonthlySpending(11), 0)
+        self.assertEqual(transactions.getMonthlySpending(11,2022), 0)
 
     def test_get_mcdonalds_spending(self):
         transactions = CategoriseTransactions(self.transaction_history)
@@ -55,15 +55,15 @@ class CategoriseTransactionsTestCase(TestCase):
 
     def test_get_november_third_week_spending(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getWeeklySpending(3,11), 41.28)
+        self.assertEqual(transactions.getWeeklySpending(3,11,2022), 41.28)
 
     def test_get_december_first_week_monthly_spending(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getWeeklySpending(1,12), 0)
+        self.assertEqual(transactions.getWeeklySpending(1,12,2022), 0)
 
     def test_get_no_weekly_spending(self):
         transactions = CategoriseTransactions("")
-        self.assertEqual(transactions.getWeeklySpending(1,11), 0)
+        self.assertEqual(transactions.getWeeklySpending(1,11,2022), 0)
 
     def test_get_categories_of_spending(self):
         transactions = CategoriseTransactions(self.transaction_history)
@@ -75,27 +75,27 @@ class CategoriseTransactionsTestCase(TestCase):
 
     def test_get_november_monthly_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertNotEqual(transactions.getMonthlyTransactions(11), [])
+        self.assertNotEqual(transactions.getMonthlyTransactions(11,2022), [])
 
     def test_get_december_monthly_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getMonthlyTransactions(12), [])
+        self.assertEqual(transactions.getMonthlyTransactions(12,2022), [])
 
     def test_get_no_monthly_transactions(self):
         transactions = CategoriseTransactions("")
-        self.assertEqual(transactions.getMonthlyTransactions(11), [])
+        self.assertEqual(transactions.getMonthlyTransactions(11,2022), [])
 
     def test_get_november_weekly_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertNotEqual(transactions.getWeeklyTransactions(3,11), [])
+        self.assertNotEqual(transactions.getWeeklyTransactions(3,11,2022), [])
 
     def test_get_december_weekly_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getWeeklyTransactions(1,12), [])
+        self.assertEqual(transactions.getWeeklyTransactions(1,12,2022), [])
 
     def test_get_no_weekly_transactions(self):
         transactions = CategoriseTransactions("")
-        self.assertEqual(transactions.getWeeklyTransactions(3,11), [])
+        self.assertEqual(transactions.getWeeklyTransactions(3,11,2022), [])
 
     def test_get_ordered_categories_of_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)

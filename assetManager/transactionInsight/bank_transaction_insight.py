@@ -28,18 +28,18 @@ class CategoriseTransactions():
         return amount
 
     # return that total spending for a month, month variable is an integer
-    def getMonthlySpending(self,month):
+    def getMonthlySpending(self,month,year):
         amount = 0
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].month == month:
+            if item['amount'] > 0 and item['date'].month == month and item['date'].year == year:
                 amount = amount + item['amount']
         return amount
 
     # return that total spending for a week, week & month variables are an integer
-    def getWeeklySpending(self,week,month):
+    def getWeeklySpending(self,week,month,year):
         amount = 0
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].day//7 == week and item['date'].month == month:
+            if item['amount'] > 0 and item['date'].day//7 == week and item['date'].month == month and item['date'].year == year:
                 amount = amount + item['amount']
         return amount
 
@@ -61,17 +61,17 @@ class CategoriseTransactions():
         return spenditurePerCategory
 
     # return an json of transactions within a month, month variable is an integer
-    def getMonthlyTransactions(self,month):
+    def getMonthlyTransactions(self,month,year):
         monthlyTransactions = []
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].month == month:
+            if item['amount'] > 0 and item['date'].month == month and item['date'].year == year:
                 monthlyTransactions.append(item)
         return monthlyTransactions
 
     # return an json of transactions within a week, week & month variables are an integer
-    def getWeeklyTransactions(self,week,month):
+    def getWeeklyTransactions(self,week,month,year):
         weeklyTransactions = []
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].day <= week*7 and item['date'].month == month:
+            if item['amount'] > 0 and item['date'].day <= week*7 and item['date'].month == month and item['date'].year == year:
                 weeklyTransactions.append(item)
         return weeklyTransactions
