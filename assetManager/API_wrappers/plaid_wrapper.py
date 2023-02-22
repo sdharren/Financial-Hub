@@ -35,7 +35,6 @@ class PlaidWrapper():
         self.ACCESS_TOKEN = None
         self.ITEM_ID = None
         self.LINK_TOKEN = None
-        self.products_requested = None
 
     def get_access_token(self):
         if self.ACCESS_TOKEN is None:
@@ -56,7 +55,6 @@ class PlaidWrapper():
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
-        self.products_requested = products_chosen
 
         request = LinkTokenCreateRequest(
             products=product_list,
@@ -112,16 +110,17 @@ class PlaidWrapper():
         response = self.client.institutions_get_by_id(request)
         return response['institution']['name']
 
-    def save_access_token(self, user):
+
+    def save_access_token(self, user, products_chosen):
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
 
         institution_name = self.get_institution_name()
-        for product_name in self.products_requested:
+        for product_name in products_chosen:
             try:
                 AccountType.objects.create(
                     user = user,
-                    account_asset_type = AccountTypeEnum(self._transform_product_to_enum_value(product_name)),
+                    account_asset_type = AccountTypeEnum(product_name),
                     account_date_linked = make_aware_date(datetime.now()),
                     access_token = self.ACCESS_TOKEN,
                     account_institution_name = institution_name
@@ -141,7 +140,7 @@ class PlaidWrapper():
     - the self.access_token attribute is set to a LIST of tokens
     '''
     def retrieve_access_tokens(self, user, product):
-        accounts = AccountType.objects.filter(user = user, account_asset_type = self._transform_product_to_enum_value(product))
+        accounts = AccountType.objects.filter(user = user, account_asset_type = product)
         if len(accounts) == 0:
             raise PublicTokenNotExchanged
         else:

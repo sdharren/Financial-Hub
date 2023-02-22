@@ -13,7 +13,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
         public_token = self.plaid_wrapper.create_public_token_custom_user()
         self.plaid_wrapper.exchange_public_token(public_token)
-        self.plaid_wrapper.save_access_token(self.user)
+        self.plaid_wrapper.save_access_token(self.user, ['transactions'])
         self.debit_card = DebitCard(self.plaid_wrapper, self.user)
 
 
