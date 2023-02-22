@@ -83,9 +83,8 @@ def connect_investments(request):
         body = json.loads(body_unicode)
 
         public_token = body['public_token']
-        institution_name = body['institution']
 
         plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(request.user,institution_name)
+        plaid_wrapper.save_access_token(request.user)
         #plaid_wrapper.save_access_token(request.user)
         return redirect('home_page')

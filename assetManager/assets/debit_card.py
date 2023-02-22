@@ -4,6 +4,7 @@ from plaid.model.transactions_sync_request import TransactionsSyncRequest
 from plaid.model.transactions_get_request import TransactionsGetRequest
 from plaid.model.institutions_get_request import InstitutionsGetRequest
 from plaid.model.institutions_get_by_id_request import InstitutionsGetByIdRequest
+from plaid.model.accounts_get_request import AccountsGetRequest
 
 from plaid.model.sandbox_public_token_create_request_options import SandboxPublicTokenCreateRequestOptions
 from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
@@ -16,56 +17,78 @@ from plaid.model.country_code import CountryCode
 from plaid.model.products import Products
 from datetime import date
 
-from pprint import pprint
+from assetManager.models import AccountType, AccountTypeEnum
 
-#response = client.sandbox_item_fire_webhook(request)
-#GqQalvm5JrCAaQ8lPjq7tdjXVK7wpyt1jexyg
-
+"""
+DebitCard class to represent a Bank Card asset with relevant methods to access transactions and account specific data
+"""
 class DebitCard():
     def __init__(self,concrete_wrapper,user):
-        products = 'transactions'
         self.plaid_wrapper = concrete_wrapper
-        self.access_token = self.plaid_wrapper.retrieve_access_tokens(user,products)
+        self.user = user
+        self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
+
+    #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly
+    def refresh_api(self,token):
+        refresh_request = TransactionsRefreshRequest(access_token=token)
+        refresh_response = self.plaid_wrapper.client.transactions_refresh(refresh_request)
+
+    def get_institution_name_from_db(self):
+        institution_name = AccountType.objects.get(user = self.user, access_token = self.access_tokens[0], account_asset_type = AccountTypeEnum.DEBIT).account_institution_name
+        return institution_name
+
+    #returns a dictionary containing account balances for all DEBIT account types stored in the database for a specific user
+    def get_account_balances(self):
+        balances = {}
+
+        for token in self.access_tokens:
+            request_accounts = AccountsGetRequest(access_token=token)
+            response = self.plaid_wrapper.client.accounts_get(request_accounts)
+            balances[self.get_institution(response['item']['institution_id'])] =  response['accounts'][0]['balances']['available']
+
+        print(balances)
 
     def get_transactions(self,start_date_input,end_date_input):
-        request1 = TransactionsRefreshRequest(access_token=self.plaid_wrapper.ACCESS_TOKEN)
-        response1 = self.plaid_wrapper.client.transactions_refresh(request1)
+        transaction_dict = {}
+        for token in self.access_tokens:
+            self.refresh_api(token)
 
-        request = TransactionsGetRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            start_date=start_date_input,#date.fromisoformat('2023-01-02'),
-            end_date=end_date_input,#date.fromisoformat('2023-02-09'),
-            #options =TransactionsGetRequestOptions(
-            #username = "John Smith",
-            #)
+            transaction_request = TransactionsGetRequest(
+                access_token=token,
+                start_date=start_date_input,
+                end_date=end_date_input,
             )
-        response = self.plaid_wrapper.client.transactions_get(request)
-        transactions = response['transactions']
-        print(transactions)
-        print(len(transactions))
+
+            transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+            print(transaction_response)
+
+            #institution_id = transaction_response['item']['institution_id']
+            #currency = transaction_response['accounts'][0]['balances']['iso_currency_code']
+            #transactions = transaction_response['transactions']#
+
+        #    single_transaction_case = {'transactions':transactions, 'currency':currency} # instituion id here
+
+        #    transaction_dict[institution_id] = single_transaction_case
+
+        #print(transaction_dict)
+        #return transaction_dict
+
         """
-        while len(transactions) < response['total_transactions']:
-            request = TransactionsGetRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            start_date=datetime.date('2018-01-01'),
-            end_date=datetime.date('2018-02-01'),
-            options=TransactionsGetRequestOptions(
-                offset=len(transactions)
+        while len(transactions) < transaction_response['total_transactions']:
+                print('here')
+                self.refresh_api()
+                request = TransactionsGetRequest(
+                access_token=self.access_tokens,
+                start_date=start_date_input,
+                end_date=end_date_input,
+                options=TransactionsGetRequestOptions(
+                    offset=len(transactions)
+                    )
                 )
-            )
 
-        response = self.plaid_wrapper.client.transactions_get(request)
-        transactions.extend(response['transactions'])
-        print(transactions)
+                response = self.plaid_wrapper.client.transactions_get(request)
+                transactions.extend(response['transactions'])
         """
-
-    def get_institution(self,institution_id):
-        request = InstitutionsGetByIdRequest(
-            institution_id=institution_id,
-            country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('ES'), CountryCode('NL'), CountryCode('FR'), CountryCode('IE'), CountryCode('CA'), CountryCode('DE'), CountryCode('IT'), CountryCode('PL'), CountryCode('DK'), CountryCode('NO'), CountryCode('SE'), CountryCode('EE'), CountryCode('LT'), CountryCode('LT')]
-        )
-        response = self.plaid_wrapper.client.institutions_get_by_id(request)
-        print(response)
 
 """
     def get_item(self):

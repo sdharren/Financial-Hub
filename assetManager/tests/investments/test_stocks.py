@@ -1,6 +1,6 @@
 from django.test import TestCase
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from assetManager.models import User, AccountType
+from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from assetManager.investments.stocks import StocksGetter
 
@@ -15,9 +15,14 @@ class StocksTestCase(TestCase):
         # creating a sandbox public token for vanguard
         public_token = self.wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
         self.wrapper.exchange_public_token(public_token)
-        self.wrapper.save_access_token(self.user,'Vanguard')
+        self.wrapper.save_access_token(self.user)
         self.access_token = self.wrapper.get_access_token()
         self.stock_getter = StocksGetter(self.wrapper)
+
+    def test_institution_name_for_stock_account_type(self):
+        account_type_object = AccountType.objects.get(user = self.user)
+        self.assertEqual(account_type_object.account_institution_name, 'Vanguard')
+        self.assertEqual(account_type_object.account_asset_type, AccountTypeEnum.STOCK)
 
     def test_get_holdings_returns_stocks(self):
         self.stock_getter.query_investments(self.user)
@@ -37,9 +42,14 @@ class StocksTestCase(TestCase):
     def test_can_query_multiple_investment_accounts_from_different_banks(self):
         public_token = self.wrapper.create_public_token(bank_id='ins_12', products_chosen=['investments']) # public token for Fidelity
         self.wrapper.exchange_public_token(public_token)
-        self.wrapper.save_access_token(self.user,'Fidelity')
+        self.wrapper.save_access_token(self.user)
         self.stock_getter.query_investments(self.user)
         self.assertEqual(len(self.stock_getter.investments), 2)
+
+        accounts = AccountType.objects.filter(user = self.user)
+        for account in accounts:
+            self.assertTrue(account.account_institution_name == "Vanguard" or account.account_institution_name , "Fidelity")
+            self.assertEqual(account.account_asset_type , AccountTypeEnum.STOCK)
 
     def test_get_sum_investments_returns_total(self):
         accounts = self.stock_getter.query_investments(self.user)
