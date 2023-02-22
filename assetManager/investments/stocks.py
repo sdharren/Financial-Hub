@@ -18,41 +18,41 @@ class StocksGetter():
             response = self.wrapper.client.investments_holdings_get(request)
             self.investments.append(response)
 
+    # Retruns the user's holdings - List[holding]
+    # These represent a collection of securities
     def get_holdings(self):
         holdings = []
         for investment in self.investments:
-            holdings.append(investment['holdings'])
+            holdings = holdings + investment['holdings']
         return holdings
 
-    # Returns the users securities
+    # Returns the user's securities - List[security]
     # These represent specific stocks/bonds/... a user has
     def get_securities(self):
         securities = []
         for investment in self.investments:
-            securities.append(investment['securities'])
+            securities = securities + investment['securities']
         return securities
 
-    # Returns the user's investment accounts
-    # These only represent how much value a user's account has
+    # Returns the user's accounts - List[account]
     def get_accounts(self):
         accounts = []
         for investment in self.investments:
-            accounts.append(investment['accounts'])
+            accounts = accounts + investment['accounts']
         return accounts
 
     # Returns a list of dictionaries of the form {stock_name: stock_price}
     def get_prepared_data(self):
         stocks = []
-        for investment in self.investments:
-            for holding in investment['holdings']:
-                security_id = holding['security_id']
-                stock_dict = {}
-                for security in investment['securities']:
-                    if security['security_id'] == security_id:
-                        name = security['name'] # maybe we can use ticker instead of name?
-                        break
-                stock_dict[name] = holding['institution_value']
-                stocks.append(stock_dict)
+        for holding in self.get_holdings():
+            security_id = holding['security_id']
+            stock_dict = {}
+            for security in self.get_securities():
+                if security['security_id'] == security_id:
+                    name = security['name'] # maybe we can use ticker instead of name?
+                    break
+            stock_dict[name] = holding['institution_value']
+            stocks.append(stock_dict)
         return stocks
 
     #Returns total investment sum within the account
@@ -60,29 +60,28 @@ class StocksGetter():
         accounts = self.get_accounts()
         aggregate_investment = 0
         for account in accounts:
-            for idx in range(len(account)):
-                aggregate_investment += accounts[0][idx]['balances']['current']
+            aggregate_investment += account['balances']['current']
         return aggregate_investment
 
-    def categorized_securities(self):
+    # Returns security ids categorized by their resprective type - Dictionary[str -> int]
+    def _categorized_security_ids(self):
         categories = defaultdict(list)
-        for securities in self.get_securities():
-            for security in securities:
-                categories[security['type']].append(security['security_id'])
+        for security in self.get_securities():
+            categories[security['type']].append(security['security_id'])
         return categories
 
+    # Returns the monetary total of investments categorised by their type - Dictionary[str -> int]
     def get_investment_categories(self):
-        categories = self.categorized_securities()
+        categories = self._categorized_security_ids()
         all_holdings = self.get_holdings()
         for category_key in categories:
-            sum = 0
+            current_sum = 0
             for security_id in categories[category_key]:
-                for holdings in all_holdings:
-                    for holding in holdings:
-                        if holding['security_id'] == security_id:
-                            sum += holding['institution_value']
-                            break
-            categories[category_key] = sum
+                for holding in self.get_holdings():
+                    if holding['security_id'] == security_id:
+                        current_sum += holding['institution_value']
+                        break
+            categories[category_key] = current_sum
         return categories
 
 
