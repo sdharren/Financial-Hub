@@ -3,6 +3,7 @@ from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetR
 from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
 from collections import defaultdict
+from assetManager.investments.investment import Investment
 
 class StocksGetter():
     def __init__(self, concrete_wrapper):
@@ -11,77 +12,49 @@ class StocksGetter():
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
     def query_investments(self, user):
-        self.investments = []
+        unformatted_investments = []
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
         for token in access_tokens:
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
-            self.investments.append(response)
+            unformatted_investments.append(response)
+        self.format_investments(unformatted_investments)
 
-    # Retruns the user's holdings - List[holding]
-    # These represent a collection of securities
-    def get_holdings(self):
-        holdings = []
-        for investment in self.investments:
-            holdings = holdings + investment['holdings']
-        return holdings
-
-    # Returns the user's securities - List[security]
-    # These represent specific stocks/bonds/... a user has
-    def get_securities(self):
-        securities = []
-        for investment in self.investments:
-            securities = securities + investment['securities']
-        return securities
-
-    # Returns the user's accounts - List[account]
-    def get_accounts(self):
-        accounts = []
-        for investment in self.investments:
-            accounts = accounts + investment['accounts']
-        return accounts
+    def format_investments(self, unformatted_investments):
+        for current_investment in unformatted_investments:
+            for holding in current_investment['holdings']:
+                security_id = holding['security_id']
+                for security in current_investment['securities']:
+                    if security['security_id'] == security_id:
+                        self.investments.append(Investment(holding, security))
+                        break
 
     # Returns a list of dictionaries of the form {stock_name: stock_price}
     def get_prepared_data(self):
-        stocks = []
-        for holding in self.get_holdings():
-            security_id = holding['security_id']
-            stock_dict = {}
-            for security in self.get_securities():
-                if security['security_id'] == security_id:
-                    name = security['name'] # maybe we can use ticker instead of name?
-                    break
-            stock_dict[name] = holding['institution_value']
-            stocks.append(stock_dict)
-        return stocks
+        stock_dict = defaultdict(int)
+        for investment in self.investments:
+            stock_dict[investment.get_name()]+=investment.get_total_price()
+        return stock_dict
 
     #Returns total investment sum within the account
     def get_total_investment_sum(self):
-        accounts = self.get_accounts()
-        aggregate_investment = 0
-        for account in accounts:
-            aggregate_investment += account['balances']['current']
-        return aggregate_investment
+        total = 0
+        for investment in self.investments:
+            total += investment.get_total_price()
+        return total
 
-    # Returns security ids categorized by their resprective type - Dictionary[str -> int]
+    # Returns security ids categorized by their resprective type - {type: security_id}
     def _categorized_security_ids(self):
         categories = defaultdict(list)
         for security in self.get_securities():
             categories[security['type']].append(security['security_id'])
         return categories
 
-    # Returns the monetary total of investments categorised by their type - Dictionary[str -> int]
+    # Returns the monetary total of investments categorised by their type - {'type: total_sum'}
     def get_investment_categories(self):
-        categories = self._categorized_security_ids()
-        all_holdings = self.get_holdings()
-        for category_key in categories:
-            current_sum = 0
-            for security_id in categories[category_key]:
-                for holding in self.get_holdings():
-                    if holding['security_id'] == security_id:
-                        current_sum += holding['institution_value']
-                        break
-            categories[category_key] = current_sum
+        categories = defaultdict(int)
+        for investment in self.investments:
+            categories[investment.get_category()] += investment.get_total_price()
         return categories
 
 
