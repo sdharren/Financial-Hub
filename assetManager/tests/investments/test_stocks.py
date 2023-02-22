@@ -47,3 +47,7 @@ class StocksTestCase(TestCase):
         prepared_data = self.stock_getter.get_prepared_data()
         self.assertEqual(len(prepared_data), 12)
     
+    def test_get_investment_categories(self):
+        categories = self.stock_getter.get_investment_categories()
+        print(categories)
+        self.assertIsNotNone(categories)

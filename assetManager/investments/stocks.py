@@ -2,6 +2,7 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetRequest
 from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
+from collections import defaultdict
 
 class StocksGetter():
     def __init__(self, concrete_wrapper):
@@ -23,12 +24,16 @@ class StocksGetter():
             holdings.append(investment['holdings'])
         return holdings
 
+    # Returns the users securities
+    # These represent specific stocks/bonds/... a user has
     def get_securities(self):
         securities = []
         for investment in self.investments:
             securities.append(investment['securities'])
         return securities
 
+    # Returns the user's investment accounts
+    # These only represent how much value a user's account has
     def get_accounts(self):
         accounts = []
         for investment in self.investments:
@@ -44,12 +49,11 @@ class StocksGetter():
                 stock_dict = {}
                 for security in investment['securities']:
                     if security['security_id'] == security_id:
-                        name = security['name']
+                        name = security['name'] # maybe we can use ticker instead of name?
                         break
                 stock_dict[name] = holding['institution_value']
                 stocks.append(stock_dict)
         return stocks
-
 
     #Returns total investment sum within the account
     def get_total_investment_sum(self):
@@ -59,3 +63,26 @@ class StocksGetter():
             for idx in range(len(account)):
                 aggregate_investment += accounts[0][idx]['balances']['current']
         return aggregate_investment
+
+    def categorized_securities(self):
+        categories = defaultdict(list)
+        for securities in self.get_securities():
+            for security in securities:
+                categories[security['type']].append(security['security_id'])
+        return categories
+
+    def get_investment_categories(self):
+        categories = self.categorized_securities()
+        all_holdings = self.get_holdings()
+        for category_key in categories:
+            sum = 0
+            for security_id in categories[category_key]:
+                for holdings in all_holdings:
+                    for holding in holdings:
+                        if holding['security_id'] == security_id:
+                            sum += holding['institution_value']
+                            break
+            categories[category_key] = sum
+        return categories
+
+
