@@ -4,11 +4,16 @@ from plaid.model.investments_transactions_get_request import InvestmentsTransact
 import json
 from collections import defaultdict
 from assetManager.investments.investment import Investment
+from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper
+
+class CannotGetStockHistoryException(Exception):
+    pass
 
 class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
         self.investments = []
+        self.yfinance_wrapper = YFinanceWrapper()
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
     def query_investments(self, user):
@@ -43,18 +48,28 @@ class StocksGetter():
             total += investment.get_total_price()
         return total
 
-    # Returns security ids categorized by their resprective type - {type: security_id}
-    def _categorized_security_ids(self):
-        categories = defaultdict(list)
-        for security in self.get_securities():
-            categories[security['type']].append(security['security_id'])
-        return categories
-
-    # Returns the monetary total of investments categorised by their type - {'type: total_sum'}
+    # Returns the monetary total of investments categorised by their type - {type: total_sum}
     def get_investment_categories(self):
         categories = defaultdict(int)
         for investment in self.investments:
             categories[investment.get_category()] += investment.get_total_price()
         return categories
 
+    # Returns a dictionary - {stock_ticker: total_price}
+    def get_stocks(self):
+        stocks = defaultdict(int)
+        for investment in self.investments:
+            category = investment.get_category()
+            # only equity and ETFs are considered stocks (i.e. ignoring derivatives)
+            if category == 'equity' or category == 'etf':
+                stocks[investment.get_ticker()] = investment.get_total_price()
+        return stocks
+
+    # Returns a dictionary - {date: close_price}
+    def get_stock_history(self, ticker):
+        try:
+            data = self.yfinance_wrapper.get_stock_history(ticker)
+        except Exception:
+            raise CannotGetStockHistoryException('YFinance API could not provide information for: ' + ticker)
+        return data
 
