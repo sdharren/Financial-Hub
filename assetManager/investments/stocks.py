@@ -2,8 +2,10 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetRequest
 from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
+from datetime import date
 from collections import defaultdict
 from assetManager.investments.investment import Investment
+from assetManager.investments.transaction import Transaction
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper
 
 class CannotGetStockHistoryException(Exception):
@@ -13,6 +15,7 @@ class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
         self.investments = []
+        self.buy_orders = []
         self.yfinance_wrapper = YFinanceWrapper()
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
@@ -24,6 +27,30 @@ class StocksGetter():
             response = self.wrapper.client.investments_holdings_get(request)
             unformatted_investments.append(response)
         self.format_investments(unformatted_investments)
+
+    def query_transactions(self, user, start_date, end_date):
+        access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
+        for token in access_tokens:
+            request = InvestmentsTransactionsGetRequest(
+                access_token=token,
+                start_date=date.fromisoformat(start_date),
+                end_date=date.fromisoformat(end_date),
+            )
+            response = self.wrapper.client.investments_transactions_get(request)
+            self.get_buy_orders(response)
+
+    def get_buy_orders(self, unformatted_transactions):
+        for transaction in unformatted_transactions['investment_transactions']:
+            shouldSkip = False
+            if str(transaction['type']) == 'buy':
+                for security in unformatted_transactions['securities']:
+                    if security['security_id'] == transaction['security_id']:
+                        ticker = security['ticker_symbol']
+                        if security['type'] != 'equity' and security['type'] != 'etf':
+                            shouldSkip = True
+                        break
+                if not shouldSkip:
+                    self.buy_orders.append(Transaction(transaction, ticker))
 
     def format_investments(self, unformatted_investments):
         for current_investment in unformatted_investments:

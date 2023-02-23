@@ -57,3 +57,8 @@ class StocksTestCase(TestCase):
     def test_get_stock_history_works_for_listed_stock(self):
         history = self.stock_getter.get_stock_history('NFLX')
         self.assertIsNotNone(history)
+
+    def test_query_transactions(self):
+        self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
+        buy_orders = self.stock_getter.buy_orders
+        self.assertEqual(len(buy_orders), 4)

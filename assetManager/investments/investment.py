@@ -5,6 +5,7 @@ class Investment():
         self.category = security['type']
         self.quantity = holding['quantity']
         self.total_price = holding['institution_value']
+        self.security_id = holding['security_id']
 
     def get_name(self):
         return self.name
