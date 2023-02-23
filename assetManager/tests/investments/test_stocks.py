@@ -2,7 +2,7 @@ from django.test import TestCase
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import User, AccountType
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from assetManager.investments.stocks import StocksGetter, CannotGetStockHistoryException
+from assetManager.investments.stocks import StocksGetter, CannotGetStockHistoryException, TransactionsNotDefined
 
 class StocksTestCase(TestCase):
     fixtures = [
@@ -62,3 +62,12 @@ class StocksTestCase(TestCase):
         self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
         buy_orders = self.stock_getter.buy_orders
         self.assertEqual(len(buy_orders), 4)
+
+    def test_get_return_on_buy_orders_raises_error_if_transactions_are_undefined(self):
+        with self.assertRaises(TransactionsNotDefined):
+            self.stock_getter.get_return_on_buy_orders()
+        
+    def test_get_return_on_buy_orders(self):
+        self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
+        data = self.stock_getter.get_return_on_buy_orders()
+        self.assertEqual(len(data), 0)

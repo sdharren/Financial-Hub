@@ -6,9 +6,12 @@ from datetime import date
 from collections import defaultdict
 from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
-from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper
+from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
 
 class CannotGetStockHistoryException(Exception):
+    pass
+
+class TransactionsNotDefined(Exception):
     pass
 
 class StocksGetter():
@@ -37,9 +40,9 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
-            self.get_buy_orders(response)
+            self.make_buy_orders(response)
 
-    def get_buy_orders(self, unformatted_transactions):
+    def make_buy_orders(self, unformatted_transactions):
         for transaction in unformatted_transactions['investment_transactions']:
             shouldSkip = False
             if str(transaction['type']) == 'buy':
@@ -100,4 +103,18 @@ class StocksGetter():
         except Exception:
             raise CannotGetStockHistoryException('YFinance API could not provide information for: ' + ticker)
         return data
+
+    # Returns a dictionary - {ticker: price_diff} where price_diff represents the difference between current price and price bought at
+    def get_return_on_buy_orders(self):
+        if not bool(self.buy_orders):
+            raise TransactionsNotDefined()
+        returns = defaultdict(int)
+        for order in self.buy_orders:
+            if order.ticker is not None:
+                try:
+                    price_today = self.yfinance_wrapper.get_most_recent_stock_price(order.ticker)
+                    returns[order.ticker] = price_today - order.price
+                except TickerNotSupported:
+                    continue
+        return returns
 
