@@ -56,6 +56,7 @@ class StocksGetter():
         return categories
 
     # Returns a dictionary - {stock_ticker: total_price}
+    # The total for all stocks can be calculated by the front-end by summing up all the prices in the returned dict
     def get_stocks(self):
         stocks = defaultdict(int)
         for investment in self.investments:
@@ -65,7 +66,7 @@ class StocksGetter():
                 stocks[investment.get_ticker()] = investment.get_total_price()
         return stocks
 
-    # Returns a dictionary - {date: close_price}
+    # Returns a dictionary - {date: close_price} for a specific stock
     def get_stock_history(self, ticker):
         try:
             data = self.yfinance_wrapper.get_stock_history(ticker)
