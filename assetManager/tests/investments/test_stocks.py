@@ -57,4 +57,3 @@ class StocksTestCase(TestCase):
     def test_get_stock_history_works_for_listed_stock(self):
         history = self.stock_getter.get_stock_history('NFLX')
         self.assertIsNotNone(history)
-        self.assertEqual(len(history), 22) # if this line ever fails - remove it. it depends on the yfinance api
