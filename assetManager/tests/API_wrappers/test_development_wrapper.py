@@ -1,8 +1,9 @@
 import re
 from django.test import TestCase
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated,AccessTokenInvalid
 from assetManager.models import User, AccountType, AccountTypeEnum
+
 
 class DevelopmentWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
@@ -30,20 +31,35 @@ class DevelopmentWrapperTestCase(TestCase):
 
     def test_cannot_save_undefined_access_token(self):
         with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.save_access_token(self.user)
+            self.wrapper.save_access_token(self.user, ['transactions'])
 
     def test_wrapper_saves_correct_access_token(self):
         self.wrapper.products_requested = ['transactions']
-        self.wrapper.ACCESS_TOKEN = 'access-development-c619bf87-1395-44ae-ad2c-34d99d53bc60'
-        self.wrapper.save_access_token(self.user)
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f0a'
+        self.wrapper.save_access_token(self.user, ['transactions'])
         account_type = AccountType.objects.get(user=self.user)
         self.assertEqual(account_type.access_token, self.wrapper.ACCESS_TOKEN)
-        self.assertEqual(account_type.account_asset_type, 'DEBIT')
+        self.assertEqual(account_type.account_asset_type, 'transactions')
+        self.assertEqual(account_type.account_institution_name, "HSBC (UK) - Personal")
 
     def test_wrapper_saves_correct_access_token_for_several_products(self):
-        self.wrapper.products_requested = ['transactions', 'assets']
+        self.wrapper.products_requested = ['transactions', 'investments']
         account_count_before = AccountType.objects.all().count()
-        self.wrapper.ACCESS_TOKEN = 'access-development-c619bf87-1395-44ae-ad2c-34d99d53bc60'
-        self.wrapper.save_access_token(self.user)
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f0a'
+
+        self.wrapper.save_access_token(self.user, ['transactions', 'investments'])
         account_count_after = AccountType.objects.all().count()
         self.assertEqual(account_count_before + 2, account_count_after)
+
+        all_account_types = AccountType.objects.all()
+        for account in all_account_types:
+            self.assertEqual(account.account_institution_name,"HSBC (UK) - Personal")
+
+    def test_get_accounts_with_no_access_token(self):
+        with self.assertRaises(PublicTokenNotExchanged):
+            self.wrapper.get_accounts()
+
+    def test_get_accounts_with_incorrect_access_token(self):
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
+        with self.assertRaises(AccessTokenInvalid):
+            self.wrapper.get_accounts()

@@ -32,17 +32,3 @@ class DevelopmentWrapper(PlaidWrapper):
 
         api_client = plaid.ApiClient(configuration)
         self.client = plaid_api.PlaidApi(api_client)
-
-    
-    def get_transactions(self):
-        request = TransactionsGetRequest(
-            access_token=self.ACCESS_TOKEN,
-            start_date=date.fromisoformat("2022-01-01"),
-            end_date=date.fromisoformat("2023-01-01"),
-            options=TransactionsGetRequestOptions()
-        )
-        response = self.client.transactions_get(request)
-        transactions = response['transactions']
-        return transactions
-
-    

@@ -1,8 +1,8 @@
 from django.test import TestCase
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from assetManager.models import User, AccountType
+from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from assetManager.investments.stocks import StocksGetter
+from assetManager.investments.stocks import StocksGetter, CannotGetStockHistoryException, TransactionsNotDefined
 
 class StocksTestCase(TestCase):
     fixtures = [
@@ -15,33 +15,69 @@ class StocksTestCase(TestCase):
         # creating a sandbox public token for vanguard
         public_token = self.wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
         self.wrapper.exchange_public_token(public_token)
-        self.wrapper.save_access_token(self.user)
-        self.access_token = self.wrapper.get_access_token()
+        self.wrapper.save_access_token(self.user, ['investments'])
         self.stock_getter = StocksGetter(self.wrapper)
-
-    def test_get_holdings_returns_stocks(self):
         self.stock_getter.query_investments(self.user)
-        holdings = self.stock_getter.get_holdings()
-        self.assertIsNotNone(holdings[0][0]['account_id'])
 
-    def test_get_securities_returns_securities(self):
-        self.stock_getter.query_investments(self.user)
-        securities = self.stock_getter.get_securities()
-        self.assertIsNotNone(securities[0][0]['close_price'])
-
-    def test_get_accounts_returns_accounts(self):
-        self.stock_getter.query_investments(self.user)
-        accounts = self.stock_getter.get_accounts()
-        self.assertIsNotNone(accounts[0][0]['account_id'])
+    def test_institution_name_for_stock_account_type(self):
+        account_type_object = AccountType.objects.get(user = self.user)
+        self.assertEqual(account_type_object.account_institution_name, 'Vanguard')
+        self.assertEqual(account_type_object.account_asset_type, AccountTypeEnum.STOCK)
 
     def test_can_query_multiple_investment_accounts_from_different_banks(self):
         public_token = self.wrapper.create_public_token(bank_id='ins_12', products_chosen=['investments']) # public token for Fidelity
         self.wrapper.exchange_public_token(public_token)
-        self.wrapper.save_access_token(self.user)
+        self.wrapper.save_access_token(self.user, ['investments'])
         self.stock_getter.query_investments(self.user)
-        self.assertEqual(len(self.stock_getter.investments), 2)
+        self.assertEqual(len(self.stock_getter.investments), 36)
+
+        accounts = AccountType.objects.filter(user = self.user)
+        for account in accounts:
+            self.assertTrue(account.account_institution_name == "Vanguard" or account.account_institution_name , "Fidelity")
+            self.assertEqual(account.account_asset_type , AccountTypeEnum.STOCK)
 
     def test_get_sum_investments_returns_total(self):
-        accounts = self.stock_getter.query_investments(self.user)
         total_sum = self.stock_getter.get_total_investment_sum()
-        self.assertEqual(total_sum, 190446.8005)
+        # these tests might fail at some point if plaid's sandbox changes the values
+        self.assertEqual(total_sum, 24498.313179999997)
+
+    def test_get_prepared_data(self):
+        prepared_data = self.stock_getter.get_prepared_data()
+        self.assertEqual(len(prepared_data), 11)
+    
+    def test_get_investment_categories(self):
+        categories = self.stock_getter.get_investment_categories()
+        self.assertTrue('derivative' in categories)
+        self.assertTrue('cash' in categories)
+        self.assertTrue('mutual fund' in categories)
+        self.assertTrue('equity' in categories)
+        self.assertTrue('etf' in categories)
+
+    def test_get_stocks(self):
+        stocks = self.stock_getter.get_stocks()
+        self.assertTrue('ACHN' in stocks)
+        self.assertTrue('EWZ' in stocks)
+        self.assertTrue('NHX105509' in stocks)
+        self.assertTrue('SBSI' in stocks)
+
+    def test_get_stock_history_raises_exception_when_etf_is_delisted(self):
+        with self.assertRaises(CannotGetStockHistoryException):
+            history = self.stock_getter.get_stock_history('NHX105509')
+
+    def test_get_stock_history_works_for_listed_stock(self):
+        history = self.stock_getter.get_stock_history('NFLX')
+        self.assertIsNotNone(history)
+
+    def test_query_transactions(self):
+        self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
+        buy_orders = self.stock_getter.buy_orders
+        self.assertEqual(len(buy_orders), 4)
+
+    def test_get_return_on_buy_orders_raises_error_if_transactions_are_undefined(self):
+        with self.assertRaises(TransactionsNotDefined):
+            self.stock_getter.get_return_on_buy_orders()
+        
+    def test_get_return_on_buy_orders(self):
+        self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
+        data = self.stock_getter.get_return_on_buy_orders()
+        self.assertEqual(len(data), 0)
