@@ -99,7 +99,11 @@ class PlaidWrapper():
     def get_item(self):
         access_token = self.get_access_token()
         request = ItemGetRequest(access_token=access_token)
-        response = self.client.item_get(request)
+        try:
+            response = self.client.item_get(request)
+        except ApiException:
+            raise AccessTokenInvalid
+
         item = response['item']
         return item
 

@@ -16,8 +16,13 @@ from plaid.model.sandbox_public_token_create_request_options import SandboxPubli
 from plaid.model.accounts_get_request import AccountsGetRequest
 from .plaid_wrapper import PlaidWrapper
 
+from plaid.exceptions import ApiException
+
+class IncorrectBankIdOrProduct(Exception):
+    pass
 
 class SandboxWrapper(PlaidWrapper):
+
     def __init__(self):
         super().__init__()
         self.PUBLIC_TOKEN = None
@@ -44,7 +49,12 @@ class SandboxWrapper(PlaidWrapper):
             institution_id = bank_id,
             initial_products = product_list
         )
-        response = self.client.sandbox_public_token_create(public_token_request)
+
+        try:
+            response = self.client.sandbox_public_token_create(public_token_request)
+        except ApiException:
+            raise IncorrectBankIdOrProduct("Product provided or insitution is invalid")
+
         return response['public_token']
 
     #write tests for this method
@@ -59,5 +69,6 @@ class SandboxWrapper(PlaidWrapper):
             initial_products = product_list,
             options = SandboxPublicTokenCreateRequestOptions( override_username = 'custom_another_user', override_password = 'nonempty', )
         )
+        
         response = self.client.sandbox_public_token_create(public_token_request)
         return response['public_token']

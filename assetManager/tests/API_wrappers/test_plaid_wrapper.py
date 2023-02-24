@@ -11,6 +11,12 @@ class PlaidWrapperTestCase(TestCase):
     def setUp(self):
         self.wrapper = PlaidWrapper()
 
+    def test_plaid_wrapper_correctly_initialised(self):
+        self.assertEqual(self.wrapper.CLIENT_ID, '63d288b343e6370012e5be86')
+        self.assertEqual(self.wrapper.ACCESS_TOKEN, None)
+        self.assertEqual(self.wrapper.ITEM_ID, None)
+        self.assertEqual(self.wrapper.LINK_TOKEN, None)
+
     def test_cannot_retrieve_non_existent_access_token(self):
         user = User.objects.get(email='johndoe@example.org')
         product = 'investments'
