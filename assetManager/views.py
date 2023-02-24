@@ -8,6 +8,9 @@ from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
 
+from django.http import JsonResponse
+from assetManager.investments.reactstuff import NumberShow
+
 #from assetManager.bankcards.debit_card import DebitCard
 
 def transaction_reports():
@@ -80,3 +83,7 @@ def connect_investments(request):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(request.user)
         return redirect('home_page')
+
+def number_view(request):
+    data = {'number': NumberShow.getNumber()}
+    return HttpResponse(json.dumps(data), content_type='application/json')
