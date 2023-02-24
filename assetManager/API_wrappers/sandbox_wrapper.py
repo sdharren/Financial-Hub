@@ -12,10 +12,11 @@ from plaid.model.depository_account_subtypes import DepositoryAccountSubtypes
 from plaid.model.depository_account_subtype import DepositoryAccountSubtype
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
+from plaid.model.sandbox_public_token_create_request_options import SandboxPublicTokenCreateRequestOptions
 from plaid.model.accounts_get_request import AccountsGetRequest
 from .plaid_wrapper import PlaidWrapper
 
-    
+
 class SandboxWrapper(PlaidWrapper):
     def __init__(self):
         super().__init__()
@@ -46,8 +47,17 @@ class SandboxWrapper(PlaidWrapper):
         response = self.client.sandbox_public_token_create(public_token_request)
         return response['public_token']
 
-    def get_accounts(self):
-        request_accounts = AccountsGetRequest(access_token=self.ACCESS_TOKEN)
-        response = self.client.accounts_get(request_accounts)
-        return response['accounts']
-        
+    #write tests for this method
+    def create_public_token_custom_user(self, bank_id='ins_115642', products_chosen=['transactions']):
+        product_list = []
+        for product_name in products_chosen:
+            product_list.append(Products(product_name))
+        self.products_requested = products_chosen
+
+        public_token_request = SandboxPublicTokenCreateRequest(
+            institution_id = bank_id,
+            initial_products = product_list,
+            options = SandboxPublicTokenCreateRequestOptions( override_username = 'custom_another_user', override_password = 'nonempty', )
+        )
+        response = self.client.sandbox_public_token_create(public_token_request)
+        return response['public_token']

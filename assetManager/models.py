@@ -19,12 +19,14 @@ class UserManager(BaseUserManager):
             raise ValueError("Users must have an email address")
         if not password:
             raise ValueError("Users must have a password")
+
         email = self.normalize_email(email)
         user = self.model(email=email, first_name=first_name, last_name=last_name)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
+    #write tests for this 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -38,7 +40,24 @@ class UserManager(BaseUserManager):
                 'Superuser must have is_superuser=True.'
             )
 
-        return self._create_user(email, password, **extra_fields)
+        first_name = extra_fields.get('first_name')
+        last_name = extra_fields.get('last_name')
+
+        if not first_name:
+            raise ValueError("Users must have a first name")
+        if not last_name:
+            raise ValueError("Users must have a last name")
+        if not email:
+            print(email)
+            raise ValueError("Users must have an email address")
+        if not password:
+            raise ValueError("Users must have a password")
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, first_name=first_name, last_name=last_name, is_superuser = extra_fields.get('is_superuser'),is_staff = extra_fields.get('is_staff'))
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 #minimum length instead of maximum length
 class User(AbstractUser):

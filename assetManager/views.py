@@ -8,6 +8,9 @@ from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
 
+#remove after testing purposes are finished
+from assetManager.models import User
+
 #from assetManager.bankcards.debit_card import DebitCard
 
 def transaction_reports():
@@ -76,9 +79,12 @@ def connect_investments(request):
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
         plaid_wrapper = DevelopmentWrapper()
+        plaid_wrapper.products_requested = ['transactions']
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
+
         public_token = body['public_token']
+
         plaid_wrapper.exchange_public_token(public_token)
 
         products_chosen = request.session.get('products_chosen', None)
@@ -88,5 +94,3 @@ def connect_investments(request):
         plaid_wrapper.save_access_token(request.user, products_chosen)
         del request.session['products_chosen']
         return redirect('home_page')
-        
-

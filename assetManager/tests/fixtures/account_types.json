@@ -42,5 +42,16 @@
         "access_token": "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo",
         "account_institution_name" : "Meta Mask"
     }
-}
+},
+{
+    "model": "assetManager.accounttype",
+    "pk":5,
+    "fields": {
+        "user":3,
+        "account_asset_type": "DEBIT",
+        "account_date_linked": "2020-10-19",
+        "access_token": "access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f0a",
+        "account_institution_name" : "HSBC (Personal)"
+    }
+  }
 ]
