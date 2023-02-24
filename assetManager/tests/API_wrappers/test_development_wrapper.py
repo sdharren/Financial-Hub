@@ -1,8 +1,9 @@
 import re
 from django.test import TestCase
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated,AccessTokenInvalid
 from assetManager.models import User, AccountType, AccountTypeEnum
+
 
 class DevelopmentWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
@@ -53,3 +54,12 @@ class DevelopmentWrapperTestCase(TestCase):
         all_account_types = AccountType.objects.all()
         for account in all_account_types:
             self.assertEqual(account.account_institution_name,"HSBC (UK) - Personal")
+
+    def test_get_accounts_with_no_access_token(self):
+        with self.assertRaises(PublicTokenNotExchanged):
+            self.wrapper.get_accounts()
+
+    def test_get_accounts_with_incorrect_access_token(self):
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
+        with self.assertRaises(AccessTokenInvalid):
+            self.wrapper.get_accounts()

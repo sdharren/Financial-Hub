@@ -22,10 +22,15 @@ from assetManager.models import AccountType, AccountTypeEnum
 from assetManager.helpers import make_aware_date
 from datetime import datetime
 
+from plaid.exceptions import ApiException
+
 class PublicTokenNotExchanged(Exception):
     pass
 
 class LinkTokenNotCreated(Exception):
+    pass
+
+class AccessTokenInvalid(Exception):
     pass
 
 
@@ -81,13 +86,19 @@ class PlaidWrapper():
 
     #write tests for this
     def get_accounts(self):
-        request_accounts = AccountsGetRequest(access_token=self.ACCESS_TOKEN)
-        response = self.client.accounts_get(request_accounts)
+        access_token = self.get_access_token()
+        request_accounts = AccountsGetRequest(access_token=access_token)
+        try:
+            response = self.client.accounts_get(request_accounts)
+        except ApiException:
+            raise AccessTokenInvalid
+
         return response['accounts']
 
     #write tests for this method
     def get_item(self):
-        request = ItemGetRequest(access_token=self.ACCESS_TOKEN)
+        access_token = self.get_access_token()
+        request = ItemGetRequest(access_token=access_token)
         response = self.client.item_get(request)
         item = response['item']
         return item

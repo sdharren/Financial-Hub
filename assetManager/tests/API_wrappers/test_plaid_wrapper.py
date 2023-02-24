@@ -1,6 +1,6 @@
 from django.test import TestCase
 from assetManager.models import User
-from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, PublicTokenNotExchanged
+from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, PublicTokenNotExchanged, LinkTokenNotCreated
 
 class PlaidWrapperTestCase(TestCase):
     fixtures = [
