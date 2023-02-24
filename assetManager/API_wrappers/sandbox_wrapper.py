@@ -48,7 +48,7 @@ class SandboxWrapper(PlaidWrapper):
         return response['public_token']
 
     #write tests for this method
-    def create_public_token_custom_user(self, bank_id='ins_115642', products_chosen=['transactions']):
+    def create_public_token_custom_user(self, bank_id='ins_115642', products_chosen=['transactions'], override_username='custom_another_user'):
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
@@ -57,7 +57,7 @@ class SandboxWrapper(PlaidWrapper):
         public_token_request = SandboxPublicTokenCreateRequest(
             institution_id = bank_id,
             initial_products = product_list,
-            options = SandboxPublicTokenCreateRequestOptions( override_username = 'custom_another_user', override_password = 'nonempty', )
+            options = SandboxPublicTokenCreateRequestOptions( override_username = override_username, override_password = 'nonempty', )
         )
         response = self.client.sandbox_public_token_create(public_token_request)
         return response['public_token']
