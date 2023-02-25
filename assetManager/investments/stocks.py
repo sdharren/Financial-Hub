@@ -91,16 +91,16 @@ class StocksGetter():
         data = self.yfinance_wrapper.get_stock_history(ticker)
         return data
 
-    # Returns a dictionary - {ticker: price_diff} where price_diff represents the difference between current price and price bought at
+    # Returns a dictionary - {ticker: price_diff} where price_diff is diff * number of stocks
     def get_return_on_buy_orders(self):
         if not bool(self.buy_orders):
             raise TransactionsNotDefined()
-        returns = defaultdict(int)
+        returns = defaultdict(float)
         for order in self.buy_orders:
             if order.ticker is not None:
                 try:
                     price_today = self.yfinance_wrapper.get_most_recent_stock_price(order.ticker)
-                    returns[order.ticker] = price_today - order.price
+                    returns[order.ticker] = (price_today - order.price) * order.quantity
                 except TickerNotSupported:
                     continue
         return returns
