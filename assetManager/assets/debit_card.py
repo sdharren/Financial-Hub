@@ -42,8 +42,9 @@ class DebitCard():
         balances = {}
 
         for token in self.access_tokens:
-            request_accounts = AccountsGetRequest(access_token=token)
-            response = self.plaid_wrapper.client.accounts_get(request_accounts)
+            request_accounts = self.plaid_wrapper.get_accounts()
+            print(request_accounts)
+            
             balances[self.get_institution(response['item']['institution_id'])] =  response['accounts'][0]['balances']['available']
 
         print(balances)
@@ -72,109 +73,3 @@ class DebitCard():
 
         #print(transaction_dict)
         #return transaction_dict
-
-        """
-        while len(transactions) < transaction_response['total_transactions']:
-                print('here')
-                self.refresh_api()
-                request = TransactionsGetRequest(
-                access_token=self.access_tokens,
-                start_date=start_date_input,
-                end_date=end_date_input,
-                options=TransactionsGetRequestOptions(
-                    offset=len(transactions)
-                    )
-                )
-
-                response = self.plaid_wrapper.client.transactions_get(request)
-                transactions.extend(response['transactions'])
-        """
-
-"""
-    def get_item(self):
-        pt_request = SandboxPublicTokenCreateRequest(
-            institution_id='ins_115642',
-            initial_products=[Products('transactions')],
-            options = SandboxPublicTokenCreateRequestOptions(
-                override_username = 'custom_john_smith',
-            )
-
-        )
-        pt_response = self.plaid_wrapper.client.sandbox_public_token_create(pt_request)
-        # The generated public_token can now be
-        # exchanged for an access_token
-        exchange_request = ItemPublicTokenExchangeRequest(
-            public_token=pt_response['public_token']
-        )
-        exchange_response = self.plaid_wrapper.client.item_public_token_exchange(exchange_request)
-
-        access_token = exchange_response['access_token']
-
-        self.get_transactions(access_token)
-        #request = SandboxItemFireWebhookRequest(
-        #access_token=access_token,
-        #webhook_code='DEFAULT_UPDATE'
-        #)
-        #response = client.sandbox_item_fire_webhook(request)
-
-    def get_institutions(self):
-        request = InstitutionsGetRequest(
-            country_codes=[CountryCode('GB')],
-            count=10,
-            offset=1,
-            )
-        response = self.plaid_wrapper.client.institutions_get(request)
-        institutions = response['institutions']
-        print(institutions)
-
-    def create_new_item():
-        request = SandboxProcessorTokenCreate(institution_id=INSTITUTION_ID)
-        response = client.sandbox_processor_token_create(request)
-        processor_token = response['processor_token']
-        print(processor_token)
-
-    def get_item():
-        request = ItemGetRequest(access_token=self.plaid_wrapper.ACCESS_TOKEN)
-        response = self.plaid_wrapper.client.item_get(request)
-        item = response['item']
-        status = response['status']
-
-    def get_synch_transactions(self):
-        cursor = ""
-        # New transaction updates since "cursor"
-        added = []
-        modified = []
-        removed = [] # Removed transaction ids
-        has_more = True
-# Iterate through each page of new transaction updates for item
-        while has_more:
-            request = TransactionsSyncRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            cursor=cursor,
-            )
-            response = self.plaid_wrapper.client.transactions_sync(request)
-            print(response)
-            # Add this page of results
-            added.extend(response['added'])
-            modified.extend(response['modified'])
-            removed.extend(response['removed'])
-            has_more = response['has_more']
-
-
-
-    def fire_webhook(self):
-        print(self.plaid_wrapper.get_item_id())
-        request = SandboxItemFireWebhookRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            webhook_code='DEFAULT_UPDATE',
-            )
-        response = self.plaid_wrapper.client.sandbox_item_fire_webhook(request)
-        print(response)
-
-    def get_recurring_transactions():
-        request = TransactionsRecurringGetRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            account_ids=account_ids,
-        )
-        response = client.transactions_recurring_get(request)
-"""
