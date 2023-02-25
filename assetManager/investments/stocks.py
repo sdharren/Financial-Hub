@@ -8,9 +8,6 @@ from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
 
-class CannotGetStockHistoryException(Exception):
-    pass
-
 class TransactionsNotDefined(Exception):
     pass
 
@@ -64,13 +61,6 @@ class StocksGetter():
                         self.investments.append(Investment(holding, security))
                         break
 
-    # Returns a list of dictionaries of the form {stock_name: stock_price}
-    def get_prepared_data(self):
-        stock_dict = defaultdict(int)
-        for investment in self.investments:
-            stock_dict[investment.get_name()]+=investment.get_total_price()
-        return stock_dict
-
     #Returns total investment sum within the account
     def get_total_investment_sum(self):
         total = 0
@@ -98,10 +88,7 @@ class StocksGetter():
 
     # Returns a dictionary - {date: close_price} for a specific stock
     def get_stock_history(self, ticker):
-        try:
-            data = self.yfinance_wrapper.get_stock_history(ticker)
-        except Exception:
-            raise CannotGetStockHistoryException('YFinance API could not provide information for: ' + ticker)
+        data = self.yfinance_wrapper.get_stock_history(ticker)
         return data
 
     # Returns a dictionary - {ticker: price_diff} where price_diff represents the difference between current price and price bought at
@@ -117,4 +104,9 @@ class StocksGetter():
                 except TickerNotSupported:
                     continue
         return returns
+
+    #debuggining function
+    def print_buy_orders(self):
+        for order in self.buy_orders:
+            print("Buy order for " + order.ticker + " at " + str(order.price) + " quantity - " + str(order.quantity))
 
