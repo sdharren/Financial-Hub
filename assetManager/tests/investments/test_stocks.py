@@ -48,7 +48,6 @@ class StocksTestCase(TestCase):
     def test_get_sum_investments_returns_total(self):
         self._create_stock_getter_with_fake_data()
         total_sum = self.stock_getter.get_total_investment_sum()
-        # these tests might fail at some point if plaid's sandbox changes the values
         self.assertEqual(total_sum, 10580.3)
     
     def test_get_investment_categories(self):
@@ -106,6 +105,20 @@ class StocksTestCase(TestCase):
         returns = self.stock_getter.get_return_on_buy_orders()
         for key in returns:
             self.assertTrue(returns[key] < 0)
+
+    def test_get_return_on_buy_orders_returns_nothing_for_unsupported_ticker(self):
+        transaction_dict = {
+            'quantity': 10,
+            'price': 1000000,
+            'amount': 10000000,
+            'security_id': 1,
+            'type': 'buy'
+        }
+        transactions = [Transaction(transaction_dict, "UNSUPPORTED_TICKER938428u9jiokefnm")]
+        self.stock_getter = StocksGetter(None)
+        self.stock_getter.buy_orders = transactions
+        data = self.stock_getter.get_return_on_buy_orders()
+        self.assertEqual(len(data), 0)
 
     def _create_stock_getter_with_fake_data(self):
         self.stock_getter = StocksGetter(None)
