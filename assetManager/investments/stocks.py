@@ -15,7 +15,7 @@ class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
         self.investments = []
-        self.buy_orders = []
+        self.transactions = defaultdict(list)
         self.yfinance_wrapper = YFinanceWrapper()
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
@@ -37,9 +37,9 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
-            self.make_buy_orders(response)
+            self.format_transactions(response)
 
-    def make_buy_orders(self, unformatted_transactions):
+    def format_transactions(self, unformatted_transactions):
         for transaction in unformatted_transactions['investment_transactions']:
             shouldSkip = False
             if str(transaction['type']) == 'buy':
@@ -48,9 +48,10 @@ class StocksGetter():
                         ticker = security['ticker_symbol']
                         if security['type'] != 'equity' and security['type'] != 'etf':
                             shouldSkip = True
+                        security_id = transaction['security_id']
                         break
                 if not shouldSkip:
-                    self.buy_orders.append(Transaction(transaction, ticker))
+                    self.transactions[security_id].append(Transaction(transaction, ticker))
 
     def format_investments(self, unformatted_investments):
         for current_investment in unformatted_investments:
@@ -93,20 +94,14 @@ class StocksGetter():
 
     # Returns a dictionary - {ticker: price_diff} where price_diff is diff * number of stocks
     def get_return_on_buy_orders(self):
-        if not bool(self.buy_orders):
+        if not bool(self.transactions):
             raise TransactionsNotDefined()
         returns = defaultdict(float)
-        for order in self.buy_orders:
-            if order.ticker is not None:
+        for order in self.transactions:
+            if order.ticker is not None and order.type == 'buy':
                 try:
                     price_today = self.yfinance_wrapper.get_most_recent_stock_price(order.ticker)
                     returns[order.ticker] = (price_today - order.price) * order.quantity
                 except TickerNotSupported:
                     continue
         return returns
-
-    #debuggining function
-    def print_buy_orders(self):
-        for order in self.buy_orders:
-            print("Buy order for " + order.ticker + " at " + str(order.price) + " quantity - " + str(order.quantity))
-

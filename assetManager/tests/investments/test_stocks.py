@@ -42,8 +42,11 @@ class StocksTestCase(TestCase):
     def test_query_transactions(self):
         self.stock_getter = self._create_stock_getter_with_sandbox()
         self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
-        buy_orders = self.stock_getter.buy_orders
-        self.assertEqual(len(buy_orders), 4)
+        transactions = self.stock_getter.transactions
+        transactions_length = 0
+        for key in transactions:
+            transactions_length += len(transactions[key])
+        self.assertEqual(transactions_length, 4)
 
     def test_get_sum_investments_returns_total(self):
         self._create_stock_getter_with_fake_data()
@@ -101,7 +104,7 @@ class StocksTestCase(TestCase):
         transactions.append(Transaction(transaction_dict, 'GOOG'))
         transactions.append(Transaction(transaction_dict, 'NFLX'))
         self.stock_getter = StocksGetter(None)
-        self.stock_getter.buy_orders = transactions
+        self.stock_getter.transactions = transactions
         returns = self.stock_getter.get_return_on_buy_orders()
         for key in returns:
             self.assertTrue(returns[key] < 0)
@@ -116,14 +119,14 @@ class StocksTestCase(TestCase):
         }
         transactions = [Transaction(transaction_dict, "UNSUPPORTED_TICKER938428u9jiokefnm")]
         self.stock_getter = StocksGetter(None)
-        self.stock_getter.buy_orders = transactions
+        self.stock_getter.transactions = transactions
         data = self.stock_getter.get_return_on_buy_orders()
         self.assertEqual(len(data), 0)
 
     def _create_stock_getter_with_fake_data(self):
         self.stock_getter = StocksGetter(None)
         self.stock_getter.investments = self._get_fake_investments()
-        self.stock_getter.buy_orders = self._get_fake_transactions()
+        self.stock_getter.transactions = self._get_fake_transactions()
 
     def _get_fake_investments(self):
         current_dir = os.path.dirname(__file__)
