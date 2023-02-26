@@ -16,6 +16,7 @@ from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchan
 from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.item_get_request import ItemGetRequest
 from plaid.model.institutions_get_by_id_request import InstitutionsGetByIdRequest
+import re
 import os
 from dotenv import dotenv_values
 from assetManager.models import AccountType, AccountTypeEnum
@@ -36,6 +37,9 @@ class InvalidProductSelection(Exception):
     pass
 
 class PlaidWrapperIsAnAbstractClass(Exception):
+    pass
+
+class InvalidPublicToken(Exception):
     pass
 
 class PlaidWrapper():
@@ -65,10 +69,18 @@ class PlaidWrapper():
     def exchange_public_token(self, public_token):
         if not hasattr(self, 'client'):
             raise PlaidWrapperIsAnAbstractClass()
+        if public_token is None:
+            raise InvalidPublicToken('Public token cannot be None')
+        if re.match(r"^public-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",public_token) is None and re.match(r"^public-sandbox-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$", public_token) is None:
+            raise InvalidPublicToken("Public token: " + public_token + " has invalid format")
+        
         exchange_request = ItemPublicTokenExchangeRequest(
             public_token = public_token
         )
-        exchange_response = self.client.item_public_token_exchange(exchange_request)
+        try:
+            exchange_response = self.client.item_public_token_exchange(exchange_request)
+        except ApiException as plaid_exception:
+            raise InvalidPublicToken('The public token provided is invalid. See plaid message:\n' + str(plaid_exception))
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
 
