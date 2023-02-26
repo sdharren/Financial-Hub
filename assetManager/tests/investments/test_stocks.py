@@ -123,6 +123,12 @@ class StocksTestCase(TestCase):
         data = self.stock_getter.get_return_on_buy_orders()
         self.assertEqual(len(data), 0)
 
+    # def test_temp(self):
+    #     self.stock_getter = self._create_stock_getter_with_custom_user()
+    #     self.stock_getter.query_investments(self.user)
+    #     self.stock_getter.query_transactions(self.user, '2022-06-29', '2022-07-08')
+    #     self.assertEqual(2,2)
+
     def _create_stock_getter_with_fake_data(self):
         self.stock_getter = StocksGetter(None)
         self.stock_getter.investments = self._get_fake_investments()

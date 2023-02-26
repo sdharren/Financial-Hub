@@ -11,6 +11,9 @@ from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNo
 class TransactionsNotDefined(Exception):
     pass
 
+class InvestmentsNotDefined(Exception):
+    pass
+
 class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
@@ -26,6 +29,7 @@ class StocksGetter():
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
             unformatted_investments.append(response)
+            print(response)
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
@@ -37,6 +41,7 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
+            print(response)
             self.format_transactions(response)
 
     def format_transactions(self, unformatted_transactions):
@@ -102,6 +107,22 @@ class StocksGetter():
                 try:
                     price_today = self.yfinance_wrapper.get_most_recent_stock_price(order.ticker)
                     returns[order.ticker] = (price_today - order.price) * order.quantity
+                except TickerNotSupported:
+                    continue
+        return returns
+    
+    # Returns a dictionary - {ticker: total diff} where total diff is current total value - original total value
+    # Stocks with the same ticker share a return sum e.g. 2 shares AAPL @ $20 and 3 shares AAPL @ $10 
+    # with current price $40 will have a shared return of $140
+    def get_return_on_current_holdings(self):
+        if not bool(self.investments):
+            raise InvestmentsNotDefined()
+        returns = defaultdict(float)
+        for investment in self.investments:
+            if investment.get_ticker() is not None:
+                try:
+                    price_today = self.yfinance_wrapper.get_most_recent_stock_price(investment.ticker)
+                    returns[investment.get_ticker()] += price_today * investment.get_quantity() - investment.get_total_price()
                 except TickerNotSupported:
                     continue
         return returns
