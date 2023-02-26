@@ -35,6 +35,9 @@ class AccessTokenInvalid(Exception):
 class InvalidProductSelection(Exception):
     pass
 
+class PlaidWrapperIsAnAbstractClass(Exception):
+    pass
+
 class PlaidWrapper():
     def __init__(self):
         self.CLIENT_ID = '63d288b343e6370012e5be86'
@@ -58,6 +61,8 @@ class PlaidWrapper():
         return self.LINK_TOKEN
 
     def create_link_token(self, products_chosen=['auth']):
+        if not hasattr(self, 'client'):
+            raise PlaidWrapperIsAnAbstractClass()
         if products_chosen is None or len(products_chosen) == 0:
             raise InvalidProductSelection('Cannot create link token for the following products: ' + str(products_chosen))
         product_list = []
@@ -83,6 +88,8 @@ class PlaidWrapper():
         self.LINK_TOKEN = response['link_token']
 
     def exchange_public_token(self, public_token):
+        if not hasattr(self, 'client'):
+            raise PlaidWrapperIsAnAbstractClass()
         exchange_request = ItemPublicTokenExchangeRequest(
             public_token = public_token
         )

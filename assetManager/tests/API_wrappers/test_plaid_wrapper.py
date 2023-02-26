@@ -1,6 +1,6 @@
 from django.test import TestCase
 from assetManager.models import User
-from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, InvalidProductSelection, PublicTokenNotExchanged
+from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, InvalidProductSelection, PublicTokenNotExchanged, PlaidWrapperIsAnAbstractClass
 
 class PlaidWrapperTestCase(TestCase):
     fixtures = [
@@ -23,10 +23,11 @@ class PlaidWrapperTestCase(TestCase):
         tokens = self.wrapper.retrieve_access_tokens(user, product)
         self.assertEqual(tokens[0], 'access-development-8ab976e6-64bc-4b38-98f7-731e7a349970')
 
-    def test_create_link_token_with_no_products_throws_error(self):
-        with self.assertRaises(InvalidProductSelection):
-            self.wrapper.create_link_token(products_chosen=None)
+    # PlaidWrapper is not a concrete class so this should never work
+    def test_cannot_user_create_link_token_with_plaid_wrapper(self):
+        with self.assertRaises(PlaidWrapperIsAnAbstractClass):
+            self.wrapper.create_link_token(products_chosen=['transactions'])
 
-    def test_create_link_token_with_empty_products_throws_error(self):
-        with self.assertRaises(InvalidProductSelection):
-            self.wrapper.create_link_token(products_chosen=[])
+    def test_cannot_exchange_public_token_with_plaid_wrapper(self):
+        with self.assertRaises(PlaidWrapperIsAnAbstractClass):
+            self.wrapper.exchange_public_token('access-development-8ab976e6-64bc-4b38-98f7-731e7a349970')

@@ -1,7 +1,7 @@
 import re
 from django.test import TestCase
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated, AccessTokenInvalid
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated, AccessTokenInvalid, InvalidProductSelection
 from assetManager.models import User, AccountType
 
 
@@ -67,3 +67,11 @@ class DevelopmentWrapperTestCase(TestCase):
     def test_create_link_token_with_invalid_products_throws_error(self):
         with self.assertRaises(LinkTokenNotCreated):
             self.wrapper.create_link_token(products_chosen=['not a product for sure'])
+
+    def test_create_link_token_with_no_products_throws_error(self):
+        with self.assertRaises(InvalidProductSelection):
+            self.wrapper.create_link_token(products_chosen=None)
+
+    def test_create_link_token_with_empty_products_throws_error(self):
+        with self.assertRaises(InvalidProductSelection):
+            self.wrapper.create_link_token(products_chosen=[])
