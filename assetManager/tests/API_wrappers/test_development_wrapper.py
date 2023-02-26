@@ -1,8 +1,8 @@
 import re
 from django.test import TestCase
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated,AccessTokenInvalid
-from assetManager.models import User, AccountType, AccountTypeEnum
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated, AccessTokenInvalid
+from assetManager.models import User, AccountType
 
 
 class DevelopmentWrapperTestCase(TestCase):
@@ -63,3 +63,7 @@ class DevelopmentWrapperTestCase(TestCase):
         self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
         with self.assertRaises(AccessTokenInvalid):
             self.wrapper.get_accounts()
+
+    def test_create_link_token_with_invalid_products_throws_error(self):
+        with self.assertRaises(LinkTokenNotCreated):
+            self.wrapper.create_link_token(products_chosen=['not a product for sure'])

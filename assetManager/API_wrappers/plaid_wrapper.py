@@ -21,7 +21,6 @@ from dotenv import dotenv_values
 from assetManager.models import AccountType, AccountTypeEnum
 from assetManager.helpers import make_aware_date
 from datetime import datetime
-
 from plaid.exceptions import ApiException
 
 class PublicTokenNotExchanged(Exception):
@@ -33,6 +32,8 @@ class LinkTokenNotCreated(Exception):
 class AccessTokenInvalid(Exception):
     pass
 
+class InvalidProductSelection(Exception):
+    pass
 
 class PlaidWrapper():
     def __init__(self):
@@ -57,6 +58,8 @@ class PlaidWrapper():
         return self.LINK_TOKEN
 
     def create_link_token(self, products_chosen=['auth']):
+        if products_chosen is None or len(products_chosen) == 0:
+            raise InvalidProductSelection('Cannot create link token for the following products: ' + str(products_chosen))
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
@@ -73,7 +76,10 @@ class PlaidWrapper():
                 client_user_id='123-test-user-id' # FIGURE OUT WHAT TO DO HERE
             ),
         )
-        response = self.client.link_token_create(request)
+        try:
+            response = self.client.link_token_create(request)
+        except ApiException as plaid_exception:
+            raise LinkTokenNotCreated("Something went wrong while creating the link token. See plaid message:\n" + str(plaid_exception))
         self.LINK_TOKEN = response['link_token']
 
     def exchange_public_token(self, public_token):

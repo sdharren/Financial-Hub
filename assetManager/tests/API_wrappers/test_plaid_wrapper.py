@@ -1,6 +1,6 @@
 from django.test import TestCase
 from assetManager.models import User
-from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, PublicTokenNotExchanged, LinkTokenNotCreated
+from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, InvalidProductSelection, PublicTokenNotExchanged
 
 class PlaidWrapperTestCase(TestCase):
     fixtures = [
@@ -22,3 +22,11 @@ class PlaidWrapperTestCase(TestCase):
         product = 'transactions'
         tokens = self.wrapper.retrieve_access_tokens(user, product)
         self.assertEqual(tokens[0], 'access-development-8ab976e6-64bc-4b38-98f7-731e7a349970')
+
+    def test_create_link_token_with_no_products_throws_error(self):
+        with self.assertRaises(InvalidProductSelection):
+            self.wrapper.create_link_token(products_chosen=None)
+
+    def test_create_link_token_with_empty_products_throws_error(self):
+        with self.assertRaises(InvalidProductSelection):
+            self.wrapper.create_link_token(products_chosen=[])
