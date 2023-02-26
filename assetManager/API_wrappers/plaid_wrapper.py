@@ -60,33 +60,8 @@ class PlaidWrapper():
             raise LinkTokenNotCreated
         return self.LINK_TOKEN
 
-    def create_link_token(self, products_chosen=['auth']):
-        if not hasattr(self, 'client'):
-            raise PlaidWrapperIsAnAbstractClass()
-        if products_chosen is None or len(products_chosen) == 0:
-            raise InvalidProductSelection('Cannot create link token for the following products: ' + str(products_chosen))
-        product_list = []
-        for product_name in products_chosen:
-            product_list.append(Products(product_name))
-
-        request = LinkTokenCreateRequest(
-            products=product_list,
-            client_name="dash.",
-            country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('ES'), CountryCode('NL'), CountryCode('FR'), CountryCode('IE'), CountryCode('CA'), CountryCode('DE'), CountryCode('IT'), CountryCode('PL'), CountryCode('DK'), CountryCode('NO'), CountryCode('SE'), CountryCode('EE'), CountryCode('LT'), CountryCode('LT')],
-            redirect_uri='https://google.com',
-            language='en',
-            webhook='https://sample-webhook-uri.com',
-            link_customization_name='default',
-            user=LinkTokenCreateRequestUser(
-                client_user_id='123-test-user-id' # FIGURE OUT WHAT TO DO HERE
-            ),
-        )
-        try:
-            response = self.client.link_token_create(request)
-        except ApiException as plaid_exception:
-            raise LinkTokenNotCreated("Something went wrong while creating the link token. See plaid message:\n" + str(plaid_exception))
-        self.LINK_TOKEN = response['link_token']
-
+    # Exchanges public token for access token and item id and saves them as class variables
+    # Cannot be used with a PlaidWrapper object (only subclasses of it)
     def exchange_public_token(self, public_token):
         if not hasattr(self, 'client'):
             raise PlaidWrapperIsAnAbstractClass()
@@ -105,7 +80,6 @@ class PlaidWrapper():
             response = self.client.accounts_get(request_accounts)
         except ApiException:
             raise AccessTokenInvalid
-
         return response['accounts']
 
     #write tests for this method
@@ -134,7 +108,6 @@ class PlaidWrapper():
         response = self.client.institutions_get_by_id(request)
         return response['institution']['name']
 
-
     def save_access_token(self, user, products_chosen):
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
@@ -151,8 +124,7 @@ class PlaidWrapper():
                 )
             except IntegrityError:
                 return
-
-
+            
     def _transform_product_to_enum_value(self, product):
         if product == 'investments' or product == 'assets':
             return 'STOCK'
