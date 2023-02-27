@@ -29,7 +29,6 @@ class StocksGetter():
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
             unformatted_investments.append(response)
-            print(response)
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
@@ -41,7 +40,6 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
-            print(response)
             self.format_transactions(response)
 
     def format_transactions(self, unformatted_transactions):
@@ -126,3 +124,15 @@ class StocksGetter():
                 except TickerNotSupported:
                     continue
         return returns
+
+    # Returns the total return on a holding with a specified ticker
+    # Raises TickerNotSupported if YFinance cannot get ticker data
+    # Returns 0 if the ticker is not contained within investments
+    def get_return_on_holding(self, ticker):
+        total_return = 0
+        for investment in self.investments:
+            if investment.get_ticker() == ticker:
+                price_today = self.yfinance_wrapper.get_most_recent_stock_price(investment.ticker)
+                total_return += price_today * investment.get_quantity() - investment.get_total_price()
+        return total_return
+                    
