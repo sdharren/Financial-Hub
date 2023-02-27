@@ -18,7 +18,8 @@ from plaid.model.products import Products
 from datetime import date
 
 from assetManager.models import AccountType, AccountTypeEnum
-
+from plaid.exceptions import ApiException
+from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
 """
 DebitCard class to represent a Bank Card asset with relevant methods to access transactions and account specific data
 """
@@ -31,7 +32,11 @@ class DebitCard():
     #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly
     def refresh_api(self,token):
         refresh_request = TransactionsRefreshRequest(access_token=token)
-        refresh_response = self.plaid_wrapper.client.transactions_refresh(refresh_request)
+        try:
+            refresh_response = self.plaid_wrapper.client.transactions_refresh(refresh_request)
+        except ApiException:
+            raise AccessTokenInvalid
+
 
     def get_institution_name_from_db(self):
         institution_name = AccountType.objects.get(user = self.user, access_token = self.access_tokens[0], account_asset_type = AccountTypeEnum.DEBIT).account_institution_name
@@ -40,18 +45,25 @@ class DebitCard():
     #returns a dictionary containing account balances for all DEBIT account types stored in the database for a specific user
     def get_account_balances(self):
         balances = {}
-
         for token in self.access_tokens:
-            request_accounts = self.plaid_wrapper.get_accounts()
-            print(request_accounts)
-            
-            balances[self.get_institution(response['item']['institution_id'])] =  response['accounts'][0]['balances']['available']
+            self.plaid_wrapper.ACCESS_TOKEN = token
 
-        print(balances)
+            request_accounts = self.plaid_wrapper.get_accounts()
+            accounts = {}
+            for account in request_accounts:
+                case = {'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':account['type'],'currency':account['balances']['iso_currency_code']}
+                accounts[account['account_id']] = case
+
+            balances[self.plaid_wrapper.get_institution_name()] = accounts
+
+        return balances
+
+
 
     def get_transactions(self,start_date_input,end_date_input):
         transaction_dict = {}
         for token in self.access_tokens:
+
             self.refresh_api(token)
 
             transaction_request = TransactionsGetRequest(
