@@ -30,8 +30,8 @@ class DebitCard():
         self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
 
     #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly
-    def refresh_api(self,token):
-        refresh_request = TransactionsRefreshRequest(access_token=token)
+    def refresh_api(self):
+        refresh_request = TransactionsRefreshRequest(access_token=self.plaid_wrapper.ACCESS_TOKEN)
         try:
             refresh_response = self.plaid_wrapper.client.transactions_refresh(refresh_request)
         except ApiException:
@@ -60,14 +60,15 @@ class DebitCard():
 
 
 
-    def get_transactions(self,start_date_input,end_date_input):
+    def get_transactions_by_date(self,start_date_input,end_date_input):
         transaction_dict = {}
         for token in self.access_tokens:
-
+            self.plaid_wrapper.ACCESS_TOKEN = token
+            
             self.refresh_api(token)
 
             transaction_request = TransactionsGetRequest(
-                access_token=token,
+                access_token=SELF.plaid_wrapper.ACCESS_TOKEN,
                 start_date=start_date_input,
                 end_date=end_date_input,
             )

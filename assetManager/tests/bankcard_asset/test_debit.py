@@ -65,12 +65,16 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         same_accounts['Royal Bank of Scotland - Current Accounts'][account_ids[0]]['currency'] = 'GBP'
         self.assertFalse(self.are_dicts_same(accounts,same_accounts))
 
-    """
+    def test_refresh_api_with_incorrect_access_token(self):
+        self.debit_card.plaid_wrapper.ACCESS_TOKEN = 'wrongaccesstokenstring'
+        with self.assertRaises(AccessTokenInvalid):
+            self.debit_card.refresh_api()
+
     def test_get_transactions(self):
+        pass
         #start_date = date.fromisoformat('2022-09-01') #change dates to within two years
         #end_date = date.fromisoformat('2022-09-03')
         #self.debit_card.get_transactions(start_date,end_date)
 
-        self.debit_card.get_institution_name_from_db()
+        #self.debit_card.get_institution_name_from_db()
         #self.debit_card.get_account_balances()
-   """
