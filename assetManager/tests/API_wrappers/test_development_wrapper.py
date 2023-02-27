@@ -1,8 +1,8 @@
 import re
 from django.test import TestCase
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated,AccessTokenInvalid
-from assetManager.models import User, AccountType, AccountTypeEnum
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated, AccessTokenInvalid, InvalidProductSelection, InvalidPublicToken
+from assetManager.models import User, AccountType
 
 
 class DevelopmentWrapperTestCase(TestCase):
@@ -40,3 +40,59 @@ class DevelopmentWrapperTestCase(TestCase):
     def test_cannot_save_undefined_access_token(self):
         with self.assertRaises(PublicTokenNotExchanged):
             self.wrapper.save_access_token(self.user, ['transactions'])
+
+    def test_wrapper_saves_correct_access_token(self):
+        self.wrapper.products_requested = ['transactions']
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f0a'
+        self.wrapper.save_access_token(self.user, ['transactions'])
+        account_type = AccountType.objects.get(user=self.user)
+        self.assertEqual(account_type.access_token, self.wrapper.ACCESS_TOKEN)
+        self.assertEqual(account_type.account_asset_type, 'transactions')
+        self.assertEqual(account_type.account_institution_name, "HSBC (UK) - Personal")
+
+    def test_wrapper_saves_correct_access_token_for_several_products(self):
+        self.wrapper.products_requested = ['transactions', 'investments']
+        account_count_before = AccountType.objects.all().count()
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f0a'
+
+        self.wrapper.save_access_token(self.user, ['transactions', 'investments'])
+        account_count_after = AccountType.objects.all().count()
+        self.assertEqual(account_count_before + 2, account_count_after)
+
+        all_account_types = AccountType.objects.all()
+        for account in all_account_types:
+            self.assertEqual(account.account_institution_name,"HSBC (UK) - Personal")
+
+    def test_get_accounts_with_no_access_token(self):
+        with self.assertRaises(PublicTokenNotExchanged):
+            self.wrapper.get_accounts()
+
+    def test_get_accounts_with_incorrect_access_token(self):
+        self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
+        with self.assertRaises(AccessTokenInvalid):
+            self.wrapper.get_accounts()
+
+    def test_create_link_token_with_invalid_products_throws_error(self):
+        with self.assertRaises(LinkTokenNotCreated):
+            self.wrapper.create_link_token(products_chosen=['not a product for sure'])
+
+    def test_create_link_token_with_no_products_throws_error(self):
+        with self.assertRaises(InvalidProductSelection):
+            self.wrapper.create_link_token(products_chosen=None)
+
+    def test_create_link_token_with_empty_products_throws_error(self):
+        with self.assertRaises(InvalidProductSelection):
+            self.wrapper.create_link_token(products_chosen=[])
+
+    def test_exchange_public_token_throws_error_with_incorrect_format(self):
+        with self.assertRaises(InvalidPublicToken):
+            self.wrapper.exchange_public_token(public_token='invalid format')
+
+    def test_exchange_public_token_throws_error_if_no_token_provided(self):
+        with self.assertRaises(InvalidPublicToken):
+            self.wrapper.exchange_public_token(public_token=None)
+
+    def test_exchange_public_token_throws_error_when_plaid_deems_public_token_invalid(self):
+        with self.assertRaises(InvalidPublicToken):
+            self.wrapper.exchange_public_token(public_token='public-sandbox-ee8278ff-cf33-45df-b495-a8545ed61f6e')
+            # this test could fail if the public token somehow matches one provided by plaid but very unlikely

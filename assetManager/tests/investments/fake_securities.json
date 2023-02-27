@@ -1,0 +1,37 @@
+[
+    {
+        "name": "Achillion Pharmaceuticals Inc.",
+        "ticker_symbol": "ACHN",
+        "type": "equity"
+    },
+    {
+        "name": "iShares Inc MSCI Brazil",
+        "ticker_symbol": "EWZ",
+        "type": "etf"
+    },
+    {
+        "name": "NH PORTFOLIO 1055 (FIDELITY INDEX)",
+        "ticker_symbol": "NHX105509",
+        "type": "etf"
+    },
+    {
+        "name": "Southside Bancshares Inc.",
+        "ticker_symbol": "SBSI",
+        "type": "equity"
+    },
+    {
+        "name": "Nflx Feb 0118 355 Call",
+        "ticker_symbol": "NFLX180201C00355000",
+        "type": "derivative"
+    },
+    {
+        "name": "Bitcoin",
+        "ticker_symbol": "CUR:BTC",
+        "type": "cash"
+    },
+    {
+        "name": "Matthews Pacific Tiger Fund Insti Class",
+        "ticker_symbol": "MIPTX",
+        "type": "mutual fund"
+    }
+]
