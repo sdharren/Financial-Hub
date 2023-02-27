@@ -16,12 +16,12 @@ from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchan
 from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.item_get_request import ItemGetRequest
 from plaid.model.institutions_get_by_id_request import InstitutionsGetByIdRequest
+import re
 import os
 from dotenv import dotenv_values
 from assetManager.models import AccountType, AccountTypeEnum
 from assetManager.helpers import make_aware_date
 from datetime import datetime
-
 from plaid.exceptions import ApiException
 
 class PublicTokenNotExchanged(Exception):
@@ -33,6 +33,14 @@ class LinkTokenNotCreated(Exception):
 class AccessTokenInvalid(Exception):
     pass
 
+class InvalidProductSelection(Exception):
+    pass
+
+class PlaidWrapperIsAnAbstractClass(Exception):
+    pass
+
+class InvalidPublicToken(Exception):
+    pass
 
 class PlaidWrapper():
     def __init__(self):
@@ -56,31 +64,23 @@ class PlaidWrapper():
             raise LinkTokenNotCreated
         return self.LINK_TOKEN
 
-    def create_link_token(self, products_chosen=['auth']):
-        product_list = []
-        for product_name in products_chosen:
-            product_list.append(Products(product_name))
-
-        request = LinkTokenCreateRequest(
-            products=product_list,
-            client_name="dash.",
-            country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('ES'), CountryCode('NL'), CountryCode('FR'), CountryCode('IE'), CountryCode('CA'), CountryCode('DE'), CountryCode('IT'), CountryCode('PL'), CountryCode('DK'), CountryCode('NO'), CountryCode('SE'), CountryCode('EE'), CountryCode('LT'), CountryCode('LT')],
-            redirect_uri='https://google.com',
-            language='en',
-            webhook='https://sample-webhook-uri.com',
-            link_customization_name='default',
-            user=LinkTokenCreateRequestUser(
-                client_user_id='123-test-user-id' # FIGURE OUT WHAT TO DO HERE
-            ),
-        )
-        response = self.client.link_token_create(request)
-        self.LINK_TOKEN = response['link_token']
-
+    # Exchanges public token for access token and item id and saves them as class variables
+    # Cannot be used with a PlaidWrapper object (only subclasses of it)
     def exchange_public_token(self, public_token):
+        if not hasattr(self, 'client'):
+            raise PlaidWrapperIsAnAbstractClass()
+        if public_token is None:
+            raise InvalidPublicToken('Public token cannot be None')
+        if re.match(r"^public-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",public_token) is None and re.match(r"^public-sandbox-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$", public_token) is None:
+            raise InvalidPublicToken("Public token: " + public_token + " has invalid format")
+        
         exchange_request = ItemPublicTokenExchangeRequest(
             public_token = public_token
         )
-        exchange_response = self.client.item_public_token_exchange(exchange_request)
+        try:
+            exchange_response = self.client.item_public_token_exchange(exchange_request)
+        except ApiException as plaid_exception:
+            raise InvalidPublicToken('The public token provided is invalid. See plaid message:\n' + str(plaid_exception))
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
 
@@ -92,7 +92,6 @@ class PlaidWrapper():
             response = self.client.accounts_get(request_accounts)
         except ApiException:
             raise AccessTokenInvalid
-
         return response['accounts']
 
     #write tests for this method
@@ -121,7 +120,6 @@ class PlaidWrapper():
         response = self.client.institutions_get_by_id(request)
         return response['institution']['name']
 
-
     def save_access_token(self, user, products_chosen):
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
@@ -138,8 +136,7 @@ class PlaidWrapper():
                 )
             except IntegrityError:
                 return
-
-
+            
     def _transform_product_to_enum_value(self, product):
         if product == 'investments' or product == 'assets':
             return 'STOCK'
