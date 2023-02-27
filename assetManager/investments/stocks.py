@@ -8,17 +8,17 @@ from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
 
-class CannotGetStockHistoryException(Exception):
+class TransactionsNotDefined(Exception):
     pass
 
-class TransactionsNotDefined(Exception):
+class InvestmentsNotDefined(Exception):
     pass
 
 class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
         self.investments = []
-        self.buy_orders = []
+        self.transactions = defaultdict(list)
         self.yfinance_wrapper = YFinanceWrapper()
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
@@ -29,6 +29,7 @@ class StocksGetter():
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
             unformatted_investments.append(response)
+            print(response)
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
@@ -40,9 +41,10 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
-            self.make_buy_orders(response)
+            print(response)
+            self.format_transactions(response)
 
-    def make_buy_orders(self, unformatted_transactions):
+    def format_transactions(self, unformatted_transactions):
         for transaction in unformatted_transactions['investment_transactions']:
             shouldSkip = False
             if str(transaction['type']) == 'buy':
@@ -51,9 +53,10 @@ class StocksGetter():
                         ticker = security['ticker_symbol']
                         if security['type'] != 'equity' and security['type'] != 'etf':
                             shouldSkip = True
+                        security_id = transaction['security_id']
                         break
                 if not shouldSkip:
-                    self.buy_orders.append(Transaction(transaction, ticker))
+                    self.transactions[security_id].append(Transaction(transaction, ticker))
 
     def format_investments(self, unformatted_investments):
         for current_investment in unformatted_investments:
@@ -63,13 +66,6 @@ class StocksGetter():
                     if security['security_id'] == security_id:
                         self.investments.append(Investment(holding, security))
                         break
-
-    # Returns a list of dictionaries of the form {stock_name: stock_price}
-    def get_prepared_data(self):
-        stock_dict = defaultdict(int)
-        for investment in self.investments:
-            stock_dict[investment.get_name()]+=investment.get_total_price()
-        return stock_dict
 
     #Returns total investment sum within the account
     def get_total_investment_sum(self):
@@ -98,23 +94,35 @@ class StocksGetter():
 
     # Returns a dictionary - {date: close_price} for a specific stock
     def get_stock_history(self, ticker):
-        try:
-            data = self.yfinance_wrapper.get_stock_history(ticker)
-        except Exception:
-            raise CannotGetStockHistoryException('YFinance API could not provide information for: ' + ticker)
+        data = self.yfinance_wrapper.get_stock_history(ticker)
         return data
 
-    # Returns a dictionary - {ticker: price_diff} where price_diff represents the difference between current price and price bought at
+    # Returns a dictionary - {ticker: price_diff} where price_diff is diff * number of stocks
     def get_return_on_buy_orders(self):
-        if not bool(self.buy_orders):
+        if not bool(self.transactions):
             raise TransactionsNotDefined()
-        returns = defaultdict(int)
-        for order in self.buy_orders:
-            if order.ticker is not None:
+        returns = defaultdict(float)
+        for order in self.transactions:
+            if order.ticker is not None and order.type == 'buy':
                 try:
                     price_today = self.yfinance_wrapper.get_most_recent_stock_price(order.ticker)
-                    returns[order.ticker] = price_today - order.price
+                    returns[order.ticker] = (price_today - order.price) * order.quantity
                 except TickerNotSupported:
                     continue
         return returns
-
+    
+    # Returns a dictionary - {ticker: total diff} where total diff is current total value - original total value
+    # Stocks with the same ticker share a return sum e.g. 2 shares AAPL @ $20 and 3 shares AAPL @ $10 
+    # with current price $40 will have a shared return of $140
+    def get_return_on_current_holdings(self):
+        if not bool(self.investments):
+            raise InvestmentsNotDefined()
+        returns = defaultdict(float)
+        for investment in self.investments:
+            if investment.get_ticker() is not None:
+                try:
+                    price_today = self.yfinance_wrapper.get_most_recent_stock_price(investment.ticker)
+                    returns[investment.get_ticker()] += price_today * investment.get_quantity() - investment.get_total_price()
+                except TickerNotSupported:
+                    continue
+        return returns
