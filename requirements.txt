@@ -1,12 +1,19 @@
+
+asgiref==3.6.0
+backports.zoneinfo==0.2.1
 chartjs==1.2
 coverage==7.1.0
 Django==4.1.5
+django-cors-headers==3.13.0
+django-widget-tweaks==1.4.12
+nulltype==2.3.1
 plaid-python==9.1.0
 python-dateutil==2.8.2
 python-dotenv==0.15.0
+six==1.16.0
 sqlparse==0.4.3
 urllib3==1.26.14
-django-widget-tweaks==1.4.12
+
 # yfinance and packages required for it
 # \/ \/ \/ \/
 appdirs==1.4.4 
@@ -29,3 +36,4 @@ soupsieve==2.4
 webencodings==0.5.1 
 yfinance==0.2.12
 # /\ /\ /\ /\
+

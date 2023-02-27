@@ -8,6 +8,8 @@ from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
 
+from django.http import JsonResponse
+from assetManager.investments.reactstuff import NumberShow
 #remove after testing purposes are finished
 from assetManager.models import User
 
@@ -94,3 +96,7 @@ def connect_investments(request):
         plaid_wrapper.save_access_token(request.user, products_chosen)
         del request.session['products_chosen']
         return redirect('home_page')
+
+def number_view(request):
+    data = {'number': NumberShow.getNumber()}
+    return HttpResponse(json.dumps(data), content_type='application/json')
