@@ -22,6 +22,9 @@ from dotenv import dotenv_values
 from assetManager.models import AccountType, AccountTypeEnum
 from assetManager.helpers import make_aware_date
 from datetime import datetime
+from plaid.model.identity_get_request import IdentityGetRequest
+
+
 from plaid.exceptions import ApiException
 
 class PublicTokenNotExchanged(Exception):
@@ -73,7 +76,7 @@ class PlaidWrapper():
             raise InvalidPublicToken('Public token cannot be None')
         if re.match(r"^public-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",public_token) is None and re.match(r"^public-sandbox-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$", public_token) is None:
             raise InvalidPublicToken("Public token: " + public_token + " has invalid format")
-        
+
         exchange_request = ItemPublicTokenExchangeRequest(
             public_token = public_token
         )
@@ -84,7 +87,17 @@ class PlaidWrapper():
         self.ACCESS_TOKEN = exchange_response['access_token']
         self.ITEM_ID = exchange_response['item_id']
 
-    #write tests for this
+
+    def get_identity(self):
+        request = IdentityGetRequest(access_token=self.get_access_token())
+        try:
+            response = self.client.identity_get(request)
+        except ApiException:
+            raise AccessTokenInvalid
+
+        return response['accounts'][0]['owners'][0]
+
+
     def get_accounts(self):
         access_token = self.get_access_token()
         request_accounts = AccountsGetRequest(access_token=access_token)
@@ -94,11 +107,15 @@ class PlaidWrapper():
             raise AccessTokenInvalid
         return response['accounts']
 
-    #write tests for this method
+
     def get_item(self):
         access_token = self.get_access_token()
         request = ItemGetRequest(access_token=access_token)
-        response = self.client.item_get(request)
+        try:
+            response = self.client.item_get(request)
+        except ApiException:
+            raise AccessTokenInvalid
+
         item = response['item']
         return item
 
@@ -136,7 +153,7 @@ class PlaidWrapper():
                 )
             except IntegrityError:
                 return
-            
+
     def _transform_product_to_enum_value(self, product):
         if product == 'investments' or product == 'assets':
             return 'STOCK'

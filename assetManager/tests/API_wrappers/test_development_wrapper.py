@@ -12,7 +12,15 @@ class DevelopmentWrapperTestCase(TestCase):
         self.wrapper = DevelopmentWrapper()
         self.user = User.objects.get(email='johndoe@example.org')
 
-    def test_wrapper_creates_link_token(self):
+    def test_development_wrapper_set_up_correctly(self):
+        self.assertEqual(self.wrapper.CLIENT_ID, '63d288b343e6370012e5be86')
+        self.assertEqual(self.wrapper.DEVELOPMENT_KEY,'e28a689e4a829a09af4969900e0e55')
+        self.assertEqual(self.wrapper.ACCESS_TOKEN, None)
+        self.assertEqual(self.wrapper.ITEM_ID, None)
+        self.assertEqual(self.wrapper.LINK_TOKEN, None)
+        self.assertTrue(self.wrapper.client is not None)
+
+    def test_wrapper_creates_development_link_token(self):
         self.wrapper.create_link_token()
         regex_match = re.match(r"^link-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$", self.wrapper.get_link_token())
         self.assertIsNotNone(regex_match)
@@ -87,4 +95,4 @@ class DevelopmentWrapperTestCase(TestCase):
     def test_exchange_public_token_throws_error_when_plaid_deems_public_token_invalid(self):
         with self.assertRaises(InvalidPublicToken):
             self.wrapper.exchange_public_token(public_token='public-sandbox-ee8278ff-cf33-45df-b495-a8545ed61f6e')
-            # this test could fail if the public token somehow matches one provided by plaid but very unlikely 
+            # this test could fail if the public token somehow matches one provided by plaid but very unlikely
