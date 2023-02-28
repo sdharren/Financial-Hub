@@ -100,3 +100,7 @@ def connect_investments(request):
 def number_view(request):
     data = {'number': NumberShow.getNumber()}
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+def graphs(request):
+    data = {'number': 5}
+    return HttpResponse(json.dumps(data), content_type='application/json')
