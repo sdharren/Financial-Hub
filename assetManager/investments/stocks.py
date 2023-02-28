@@ -95,7 +95,10 @@ class StocksGetter():
     # Returns a dictionary - {date: close_price} for a specific stock
     def get_stock_history(self, ticker):
         data = self.yfinance_wrapper.get_stock_history(ticker)
-        return data
+        serialized_data = {}
+        for key in data:
+            serialized_data[key.isoformat()] = data[key]
+        return serialized_data
 
     # Returns a dictionary - {ticker: price_diff} where price_diff is diff * number of stocks
     def get_return_on_buy_orders(self):
