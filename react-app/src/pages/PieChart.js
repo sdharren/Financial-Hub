@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useRef } from 'react';
+
 import {
     Chart as ChartJS,
     ArcElement,
@@ -6,8 +8,8 @@ import {
 } from 'chart.js'
 
 import axios from 'axios';
-import { Pie } from 'react-chartjs-2';
-import React, { useState, useEffect } from 'react';
+import { Pie, getElementsAtEvent } from 'react-chartjs-2';
+
 
 ChartJS.register(
     ArcElement,
@@ -40,13 +42,22 @@ function PieChart({endpoint}) {
                 label: '$$$',
                 data: pie_data,
                 borderColor: 'black',
-                backgroundColor: ['red', 'aqua', 'purple']
+                backgroundColor: ['red', 'aqua', 'purple'],
+                link: pie_labels
             }
         ]
     };
     const options = {};
+    const chartRef = useRef();
+    const onClick = (event) => {
+        if (getElementsAtEvent(chartRef.current, event).length > 0) {
+            const datasetIndex = getElementsAtEvent(chartRef.current, event)[0].datasetIndex;
+            const dataIndex = getElementsAtEvent(chartRef.current, event)[0].index;
+            console.log(data.datasets[datasetIndex].link[dataIndex])
+        }
+    };
 
-    return <Pie data= {data} options = {options}></Pie>
+    return <Pie data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
 }
 
 export default PieChart;
