@@ -16,17 +16,22 @@ ChartJS.register(
     Tooltip,
     Legend
 )
-function PieChart({endpoint}) {
+function PieChart({endpoint, endpoint_parameter, loadNext}) {
     const [pieChartData, setPieChartData] = useState(null);
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/' + String(endpoint) + '/')
+        axios.get(
+            'http://127.0.0.1:8000/api/' + String(endpoint) + '/',
+            { params: {
+                param: endpoint_parameter
+            }}
+        )
           .then(response => {
             setPieChartData(response.data);
           })
           .catch(error => {
             console.log(error);
           });
-      }, []);
+      }, [endpoint]);
 
     let pie_data = new Array();
     let pie_labels = new Array();
@@ -53,7 +58,10 @@ function PieChart({endpoint}) {
         if (getElementsAtEvent(chartRef.current, event).length > 0) {
             const datasetIndex = getElementsAtEvent(chartRef.current, event)[0].datasetIndex;
             const dataIndex = getElementsAtEvent(chartRef.current, event)[0].index;
-            console.log(data.datasets[datasetIndex].link[dataIndex])
+            loadNext({
+                'next': data.datasets[datasetIndex].link[dataIndex],
+                'current': endpoint
+            });
         }
     };
 

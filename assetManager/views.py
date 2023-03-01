@@ -101,9 +101,24 @@ def number_view(request):
     data = {'number': NumberShow.getNumber()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
-#These are for testing purposes
+def investment_categories(request):
+    stock_getter = make_fake_stock_getter()
+    categories = stock_getter.get_investment_categories()
+    return HttpResponse(json.dumps(categories, default=str), content_type='application/json')
+
+def investment_category_breakdown(request):
+    stock_getter = make_fake_stock_getter()
+    if request.GET.get('param'):
+        category = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    data = stock_getter.get_investment_category(category)
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+#This method is for testing purposes
 from assetManager.investments.investment import Investment
-def stock_history(request):
+def make_fake_stock_getter():
     stock_getter = StocksGetter(None)
     holdings = [
     {
@@ -183,5 +198,4 @@ def stock_history(request):
     for i in range (0, len(holdings)):
         investments.append(Investment(holdings[i], securities[i]))
     stock_getter.investments = investments
-    categories = stock_getter.get_investment_categories()
-    return HttpResponse(json.dumps(categories, default=str), content_type='application/json')
+    return stock_getter
