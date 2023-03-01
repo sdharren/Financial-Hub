@@ -29,7 +29,6 @@ class StocksGetter():
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
             unformatted_investments.append(response)
-            print(response)
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
@@ -41,7 +40,6 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
-            print(response)
             self.format_transactions(response)
 
     def format_transactions(self, unformatted_transactions):
@@ -110,9 +108,9 @@ class StocksGetter():
                 except TickerNotSupported:
                     continue
         return returns
-    
+
     # Returns a dictionary - {ticker: total diff} where total diff is current total value - original total value
-    # Stocks with the same ticker share a return sum e.g. 2 shares AAPL @ $20 and 3 shares AAPL @ $10 
+    # Stocks with the same ticker share a return sum e.g. 2 shares AAPL @ $20 and 3 shares AAPL @ $10
     # with current price $40 will have a shared return of $140
     def get_return_on_current_holdings(self):
         if not bool(self.investments):
