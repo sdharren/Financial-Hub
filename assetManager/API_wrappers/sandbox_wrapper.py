@@ -71,12 +71,11 @@ class SandboxWrapper(PlaidWrapper):
         product_list = []
         for product_name in products_chosen:
             product_list.append(Products(product_name))
-        self.products_requested = products_chosen
 
         public_token_request = SandboxPublicTokenCreateRequest(
             institution_id = bank_id,
             initial_products = product_list,
-            options = SandboxPublicTokenCreateRequestOptions(override_username = override_username, override_password = "nonempty", )
+            options = SandboxPublicTokenCreateRequestOptions(override_username = override_username, override_password = "nonempty")
         )
 
         try:
