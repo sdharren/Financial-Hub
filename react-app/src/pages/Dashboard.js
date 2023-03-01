@@ -5,7 +5,7 @@ function Dashboard() {
   const [number, setNumber] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/number/')
+    axios.get('http://127.0.0.1:8000/api/number/')
       .then(response => {
         setNumber(response.data.number);
       })
