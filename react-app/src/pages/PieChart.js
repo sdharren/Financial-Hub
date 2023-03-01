@@ -42,7 +42,7 @@ function PieChart({endpoint}) {
                 label: '$$$',
                 data: pie_data,
                 borderColor: 'black',
-                backgroundColor: ['red', 'aqua', 'purple'],
+                backgroundColor: ['white', 'purple'],
                 link: pie_labels
             }
         ]

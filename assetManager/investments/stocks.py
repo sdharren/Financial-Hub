@@ -29,7 +29,6 @@ class StocksGetter():
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
             unformatted_investments.append(response)
-            print(response)
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
@@ -41,7 +40,6 @@ class StocksGetter():
                 end_date=date.fromisoformat(end_date),
             )
             response = self.wrapper.client.investments_transactions_get(request)
-            print(response)
             self.format_transactions(response)
 
     def format_transactions(self, unformatted_transactions):
