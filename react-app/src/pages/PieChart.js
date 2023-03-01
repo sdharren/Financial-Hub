@@ -4,7 +4,8 @@ import {
     Chart as ChartJS,
     ArcElement,
     Tooltip,
-    Legend
+    Legend,
+    Colors
 } from 'chart.js'
 
 import axios from 'axios';
@@ -14,10 +15,12 @@ import { Pie, getElementsAtEvent } from 'react-chartjs-2';
 ChartJS.register(
     ArcElement,
     Tooltip,
-    Legend
+    Legend,
+    Colors
 )
 function PieChart({endpoint, endpoint_parameter, loadNext}) {
     const [pieChartData, setPieChartData] = useState(null);
+
     useEffect(() => {
         axios.get(
             'http://127.0.0.1:8000/api/' + String(endpoint) + '/',
@@ -47,12 +50,24 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
                 label: '$$$',
                 data: pie_data,
                 borderColor: 'black',
-                backgroundColor: ['white', 'purple'],
                 link: pie_labels
             }
         ]
     };
-    const options = {};
+    // using built-in colors for now as otherwise they need to be hardcoded
+    // make a selection of colors that match the UI theme later and replace
+    const options = {
+        plugins: {
+            colors: {
+                forceOverride: true
+            },
+            legend: {
+                labels: {
+                    color: "white"
+                }
+            }
+        }
+    };
     const chartRef = useRef();
     const onClick = (event) => {
         if (getElementsAtEvent(chartRef.current, event).length > 0) {
