@@ -20,7 +20,7 @@ function GraphDisplay() {
 
 
     return (
-        <div style={{width: '50rem'}}>
+        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
             {graph}
         </div>
     );
