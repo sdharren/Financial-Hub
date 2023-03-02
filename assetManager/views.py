@@ -116,6 +116,11 @@ def investment_category_breakdown(request):
     data = stock_getter.get_investment_category(category)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+def stocks_json(request):
+    stock_getter = make_fake_stock_getter()
+    return HttpResponse(json.dumps(stock_getter.serialize()), content_type='application/json')
+
+
 #This method is for testing purposes
 from assetManager.investments.investment import Investment
 def make_fake_stock_getter():

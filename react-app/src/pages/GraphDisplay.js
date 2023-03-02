@@ -1,8 +1,22 @@
 import PieChart from "./PieChart";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from 'axios';
 
 function GraphDisplay() {
     const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/>);
+    const [json_data, setJsonData] = useState();
+
+    useEffect(() => {
+        axios.get('http://127.0.0.1:8000/api/stocks_json/')
+          .then(response => {
+            setJsonData(response.data)
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }, []);
+
+    console.log(json_data);
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
