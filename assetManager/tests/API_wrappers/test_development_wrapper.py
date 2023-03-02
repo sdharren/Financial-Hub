@@ -63,14 +63,10 @@ class DevelopmentWrapperTestCase(TestCase):
         for account in all_account_types:
             self.assertEqual(account.account_institution_name,"HSBC (UK) - Personal")
 
-    def test_get_accounts_with_no_access_token(self):
-        with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.get_accounts()
-
     def test_get_accounts_with_incorrect_access_token(self):
         self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
         with self.assertRaises(AccessTokenInvalid):
-            self.wrapper.get_accounts()
+            self.wrapper.get_accounts(self.wrapper.ACCESS_TOKEN)
 
     def test_create_link_token_with_invalid_products_throws_error(self):
         with self.assertRaises(LinkTokenNotCreated):

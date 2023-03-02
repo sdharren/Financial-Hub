@@ -119,76 +119,60 @@ class SandboxWrapperTestCase(TestCase):
             self.assertEqual(account.account_institution_name,"Vanguard")
             self.assertTrue(account.account_asset_type == AccountTypeEnum.STOCK or account.account_asset_type == AccountTypeEnum.DEBIT)
 
-    def test_get_accounts_with_no_access_token(self):
-        with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.get_accounts()
-
     def test_get_accounts_with_incorrect_access_token(self):
         self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
         with self.assertRaises(AccessTokenInvalid):
-            self.wrapper.get_accounts()
+            self.wrapper.get_accounts(self.wrapper.ACCESS_TOKEN)
 
     def test_get_accounts_with_correct_access_token(self):
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115642', products_chosen = ['transactions'],override_username="custom_sixth")
         self.wrapper.exchange_public_token(public_token)
-        accounts = self.wrapper.get_accounts()
-        same_accounts = self.wrapper.get_accounts()
+        accounts = self.wrapper.get_accounts(self.wrapper.ACCESS_TOKEN)
+        same_accounts = self.wrapper.get_accounts(self.wrapper.ACCESS_TOKEN)
         self.compare_accounts_dict(accounts,same_accounts)
-
-    def test_get_item_with_no_access_token(self):
-        with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.get_item()
 
     def test_get_item_with_incorrect_access_token(self):
         self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
         with self.assertRaises(AccessTokenInvalid):
-            self.wrapper.get_item()
+            self.wrapper.get_item(self.wrapper.ACCESS_TOKEN)
 
     def test_get_item_with_correct_access_token(self):
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115616', products_chosen = ['transactions'])
         self.wrapper.exchange_public_token(public_token)
-        item = self.wrapper.get_item()
-        same_item = self.wrapper.get_item()
+        item = self.wrapper.get_item(self.wrapper.ACCESS_TOKEN)
+        same_item = self.wrapper.get_item(self.wrapper.ACCESS_TOKEN)
         self.compare_items_dict(item,same_item)
-
-    def test_get_institution_id_no_access_token(self):
-        with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.get_institution_id()
 
     def test_get_insitution_id_with_incorrect_access_token(self):
         self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
         with self.assertRaises(AccessTokenInvalid):
-            self.wrapper.get_institution_id()
+            self.wrapper.get_institution_id(self.wrapper.ACCESS_TOKEN)
 
     def test_get_correct_institution_id(self):
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115616', products_chosen = ['transactions'])
         self.wrapper.exchange_public_token(public_token)
-        institution_id = self.wrapper.get_institution_id()
+        institution_id = self.wrapper.get_institution_id(self.wrapper.ACCESS_TOKEN)
         self.assertEqual(institution_id,'ins_115616')
 
     def test_get_correct_institution_id_different_bank(self):
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_1', products_chosen = ['transactions'])
         self.wrapper.exchange_public_token(public_token)
-        institution_id = self.wrapper.get_institution_id()
+        institution_id = self.wrapper.get_institution_id(self.wrapper.ACCESS_TOKEN)
         self.assertEqual(institution_id,'ins_1')
-
-    def test_get_institution_name_no_access_token(self):
-        with self.assertRaises(PublicTokenNotExchanged):
-            self.wrapper.get_institution_name()
 
     def test_get_instituion_name_with_incorrect_access_token(self):
         self.wrapper.ACCESS_TOKEN = 'access-development-999f84d1-aa93-4fd9-90f0-6af8867a4f12'
         with self.assertRaises(AccessTokenInvalid):
-            self.wrapper.get_institution_name()
+            self.wrapper.get_institution_name(self.wrapper.ACCESS_TOKEN)
 
     def test_get_correct_institution_name(self):
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115616', products_chosen = ['transactions'])
         self.wrapper.exchange_public_token(public_token)
-        institution_name = self.wrapper.get_institution_name()
+        institution_name = self.wrapper.get_institution_name(self.wrapper.ACCESS_TOKEN)
         self.assertEqual(institution_name,'Vanguard')
 
     def test_get_correct_institution_name_with_differnt_id(self):
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_1', products_chosen = ['transactions'])
         self.wrapper.exchange_public_token(public_token)
-        institution_name = self.wrapper.get_institution_name()
+        institution_name = self.wrapper.get_institution_name(self.wrapper.ACCESS_TOKEN)
         self.assertEqual(institution_name,'Bank of America')
