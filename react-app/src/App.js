@@ -1,7 +1,7 @@
 
 import './App.css';
 import React from 'react';
-import './styles.css'
+import './styles.css';
 import Navbar from './Navbar';
 import About from './pages/About';
 import Login from './pages/Login';
@@ -9,9 +9,9 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Graphs from './pages/Graphs';
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes } from "react-router-dom";
 import PieChart from './pages/PieChart';
-import { Route, Routes, useNavigate } from "react-router-dom"
+// import { Route, Routes, useNavigate } from "react-router-dom";
 import GraphDisplay from './pages/GraphDisplay';
 
 

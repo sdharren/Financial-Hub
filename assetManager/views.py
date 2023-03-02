@@ -105,6 +105,7 @@ def number_view(request):
 def graphs(request):
     data = {'number': 5}
     return HttpResponse(json.dumps(data), content_type='application/json')
+    
 def investment_categories(request):
     stock_getter = make_fake_stock_getter()
     categories = stock_getter.get_investment_categories()
