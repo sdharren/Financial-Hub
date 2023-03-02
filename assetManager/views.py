@@ -12,13 +12,34 @@ from django.http import JsonResponse
 from assetManager.investments.reactstuff import NumberShow
 #remove after testing purposes are finished
 from assetManager.models import User
+from assetManager.assets.debit_card import DebitCard
 
 #from assetManager.bankcards.debit_card import DebitCard
 
-def transaction_reports():
-    plaid_wrapper = DevelopmentWrapper()
-    debit_card = DebitCard(plaid_wrapper)
-    debit_card.get_transactions()
+def get_balances_data(request):
+    if request.method == "GET":
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(request.user, ['transactions'])
+        debit_card = DebitCard(plaid_wrapper,request.user)
+        account_balances = debit_card.get_account_balances()
+        balances = {}
+
+        for institution_name in account_balances.keys():
+            total = 0
+            for account_id in account_balances[institution_name].keys():
+
+                total += account_balances[institution_name][account_id]['available_amount']
+
+            balances[institution_name] = total
+
+        return HttpResponse(json.dumps(balances), content_type='application/json')
+    else:
+        messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
+        return redirect('home_page')
+
+
 
 
 
@@ -81,7 +102,7 @@ def connect_investments(request):
         return render(request, 'connect_investments.html', {'link_token': link_token})
     else:
         plaid_wrapper = DevelopmentWrapper()
-        plaid_wrapper.products_requested = ['transactions']
+        #plaid_wrapper.products_requested = ['transactions']
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
 

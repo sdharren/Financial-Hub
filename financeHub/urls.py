@@ -25,5 +25,6 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('api/number/', views.number_view, name='number'),
     path('api/investment_categories/', views.investment_categories, name='investment_categories'),
-    path('api/investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown')
+    path('api/investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown'),
+    path('api/balances/', views.get_balances_data, name='get_balances_data'),
 ]
