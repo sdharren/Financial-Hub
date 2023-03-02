@@ -135,3 +135,15 @@ class StocksGetter():
                 # maybe get quantity and multiply by current price? need to know if plaid updates data freqeuntly or at all
                 category_dict[investment.get_ticker()] += investment.get_total_price()
         return category_dict
+
+    def serialize(self):
+        serialized_json = defaultdict(str)
+        if len(self.investments) > 0:
+            serialized_json['investments'] = []
+            for investment in self.investments:
+                serialized_json['investments'].append(investment.serialize())
+        if len(self.transactions) > 0:
+            serialized_json['transactions'] = []
+            for transaction in self.transactions:
+                serialized_json['transactions'].append(transaction.serialize())
+        return serialized_json

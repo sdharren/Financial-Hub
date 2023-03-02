@@ -21,3 +21,13 @@ class Investment():
 
     def get_category(self):
         return self.category
+    
+    def serialize(self):
+        serialized_data = {}
+        serialized_data['name'] = self.name
+        serialized_data['ticker_symbol'] = self.ticker
+        serialized_data['type'] = self.category
+        serialized_data['quantity'] = self.quantity
+        serialized_data['total_price'] = self.total_price
+        serialized_data['security_id'] = self.security_id
+        return serialized_data
