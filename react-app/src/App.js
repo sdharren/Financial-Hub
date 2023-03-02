@@ -9,7 +9,8 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import PieChart from './pages/PieChart';
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useNavigate } from "react-router-dom"
+import GraphDisplay from './pages/GraphDisplay';
 
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/stock_history" element={<PieChart endpoint={"stock_history"}/>} />
+          <Route path="/graph_display" element={<GraphDisplay />} />
         </Routes>
       </div>
     </>
