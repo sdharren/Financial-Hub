@@ -138,11 +138,11 @@ class StocksGetter():
 
     def serialize(self):
         serialized_json = defaultdict(str)
-        if len(self.investments) > 0:
+        if self.investments is not None and len(self.investments) > 0:
             serialized_json['investments'] = []
             for investment in self.investments:
                 serialized_json['investments'].append(investment.serialize())
-        if len(self.transactions) > 0:
+        if self.transactions is not None and len(self.transactions) > 0:
             serialized_json['transactions'] = []
             for transaction in self.transactions:
                 serialized_json['transactions'].append(transaction.serialize())

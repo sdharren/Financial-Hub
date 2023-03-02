@@ -126,8 +126,20 @@ class StocksTestCase(TestCase):
     def test_serialize(self):
         self._create_stock_getter_with_fake_data()
         data = self.stock_getter.serialize()
-        print(data)
-        self.assertEqual(2,2)
+        self.assertEqual(data, {'investments': [{'name': 'Achillion Pharmaceuticals Inc.', 'ticker_symbol': 'ACHN', 'type': 'equity', 'quantity': 10, 'total_price': 100, 'security_id': 'fdgjklsa83'}, {'name': 'iShares Inc MSCI Brazil', 'ticker_symbol': 'EWZ', 'type': 'etf', 'quantity': 1, 'total_price': 2.3, 'security_id': 'fjkad8973'}, {'name': 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'ticker_symbol': 'NHX105509', 'type': 'etf', 'quantity': 15, 'total_price': 150, 'security_id': 'fadjhkis45'}, {'name': 'Southside Bancshares Inc.', 'ticker_symbol': 'SBSI', 'type': 'equity', 'quantity': 10, 'total_price': 100, 'security_id': 'iu432hj'}, {'name': 'Nflx Feb 0118 355 Call', 'ticker_symbol': 'NFLX180201C00355000', 'type': 'derivative', 'quantity': 5, 'total_price': 15, 'security_id': 'dsaadfs'}, {'name': 'Bitcoin', 'ticker_symbol': 'CUR:BTC', 'type': 'cash', 'quantity': 1, 'total_price': 10000, 'security_id': 'F5432'}, {'name': 'Matthews Pacific Tiger Fund Insti Class', 'ticker_symbol': 'MIPTX', 'type': 'mutual fund', 'quantity': 55, 'total_price': 213, 'security_id': 'FADS3254'}], 'transactions': [{'type': 'buy', 'quantity': 3, 'price': 10, 'amount': 30, 'security_id': 'NFLKSJ92', 'ticker_symbol': 'NFLX'}, {'type': 'buy', 'quantity': 100, 'price': 1, 'amount': 100, 'security_id': 'jifda87y', 'ticker_symbol': 'GOOG'}]})
+
+    def test_serialize_works_without_investments(self):
+        self._create_stock_getter_with_fake_data()
+        self.stock_getter.investments = None
+        data = self.stock_getter.serialize()
+        self.assertEqual(data,{'transactions': [{'type': 'buy', 'quantity': 3, 'price': 10, 'amount': 30, 'security_id': 'NFLKSJ92', 'ticker_symbol': 'NFLX'}, {'type': 'buy', 'quantity': 100, 'price': 1, 'amount': 100, 'security_id': 'jifda87y', 'ticker_symbol': 'GOOG'}]}    )
+
+    def test_serialize_works_without_transactions(self):
+        self._create_stock_getter_with_fake_data()
+        self.stock_getter.transactions = None
+        data = self.stock_getter.serialize()
+        self.assertEqual(data, {'investments': [{'name': 'Achillion Pharmaceuticals Inc.', 'ticker_symbol': 'ACHN', 'type': 'equity', 'quantity': 10, 'total_price': 
+100, 'security_id': 'fdgjklsa83'}, {'name': 'iShares Inc MSCI Brazil', 'ticker_symbol': 'EWZ', 'type': 'etf', 'quantity': 1, 'total_price': 2.3, 'security_id': 'fjkad8973'}, {'name': 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'ticker_symbol': 'NHX105509', 'type': 'etf', 'quantity': 15, 'total_price': 150, 'security_id': 'fadjhkis45'}, {'name': 'Southside Bancshares Inc.', 'ticker_symbol': 'SBSI', 'type': 'equity', 'quantity': 10, 'total_price': 100, 'security_id': 'iu432hj'}, {'name': 'Nflx Feb 0118 355 Call', 'ticker_symbol': 'NFLX180201C00355000', 'type': 'derivative', 'quantity': 5, 'total_price': 15, 'security_id': 'dsaadfs'}, {'name': 'Bitcoin', 'ticker_symbol': 'CUR:BTC', 'type': 'cash', 'quantity': 1, 'total_price': 10000, 'security_id': 'F5432'}, {'name': 'Matthews Pacific Tiger Fund Insti Class', 'ticker_symbol': 'MIPTX', 'type': 'mutual fund', 'quantity': 55, 'total_price': 213, 'security_id': 'FADS3254'}]})
 
     # def test_temp(self):
     #     self.stock_getter = self._create_stock_getter_with_custom_user()
