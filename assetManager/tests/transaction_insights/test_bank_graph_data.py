@@ -11,23 +11,23 @@ class CreateBankGraphDataTestCase(TestCase):
 
     def test_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41.28, 0])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'Jan': 0},{'Feb': 0},{'Mar': 0},{'Apr': 0},{'May': 0},{'Jun': 0},{'Jul': 0},{'Aug': 0},{'Sep': 0},{'Oct': 0},{'Nov': 41.28},{'Dec': 0}])
 
     def test_no_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'Jan': 0},{'Feb': 0},{'Mar': 0},{'Apr': 0},{'May': 0},{'Jun': 0},{'Jul': 0},{'Aug': 0},{'Sep': 0},{'Oct': 0},{'Nov': 0},{'Dec': 0}])
 
     def test_weekly_spending_in_month(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [0, 0, 41.28, 0, 0])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [{'Week 1': 0}, {'Week 2': 0}, {'Week 3': 41.28}, {'Week 4': 0}, {'Week 5': 0}])
 
     def test_no_weekly_spending_in_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [0, 0, 0, 0, 0])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [{'Week 1': 0}, {'Week 2': 0}, {'Week 3': 0}, {'Week 4': 0}, {'Week 5': 0}])
 
     def test_weekly_spending_in_invalid_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(13,2022), [0, 0, 0, 0, 0])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(13,2022), [{'Week 1': 0}, {'Week 2': 0}, {'Week 3': 0}, {'Week 4': 0}, {'Week 5': 0}])
 
     def test_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)

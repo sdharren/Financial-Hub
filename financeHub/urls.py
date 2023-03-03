@@ -24,7 +24,8 @@ urlpatterns = [
     path('sign_up/', views.sign_up, name='sign_up'),
     path('log_in/', views.log_in, name='log_in'),
     path('api/number/', views.number_view, name='number'),
-    path('graphs/', views.graphs, name='graphs'),
+    path('monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
+    path('weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
     path('api/investment_categories/', views.investment_categories, name='investment_categories'),
     path('api/investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown')
 ]

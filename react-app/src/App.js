@@ -9,6 +9,7 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Graphs from './pages/Graphs';
+import BarChartDisplay from './pages/BarChartDisplay';
 import { Route, Routes } from "react-router-dom";
 import PieChart from './pages/PieChart';
 // import { Route, Routes, useNavigate } from "react-router-dom";
@@ -26,7 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/graphs" element={<Graphs />} />
+          <Route path="/bar_graph" element={<BarChartDisplay />} />
           <Route path="/graph_display" element={<GraphDisplay />} />
         </Routes>
       </div>
