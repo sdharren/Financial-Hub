@@ -11,23 +11,23 @@ class CreateBankGraphDataTestCase(TestCase):
 
     def test_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'Jan': 0},{'Feb': 0},{'Mar': 0},{'Apr': 0},{'May': 0},{'Jun': 0},{'Jul': 0},{'Aug': 0},{'Sep': 0},{'Oct': 0},{'Nov': 41.28},{'Dec': 0}])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'name': 'Jan', 'value': 0},{'name': 'Feb', 'value': 0},{'name': 'Mar', 'value': 0},{'name': 'Apr', 'value': 0},{'name': 'May', 'value': 0},{'name': 'Jun', 'value': 0},{'name': 'Jul', 'value': 0},{'name': 'Aug', 'value': 0},{'name': 'Sep', 'value': 0},{'name': 'Oct', 'value': 0},{'name': 'Nov', 'value': 41.28},{'name': 'Dec', 'value': 0}])
 
     def test_no_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'Jan': 0},{'Feb': 0},{'Mar': 0},{'Apr': 0},{'May': 0},{'Jun': 0},{'Jul': 0},{'Aug': 0},{'Sep': 0},{'Oct': 0},{'Nov': 0},{'Dec': 0}])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'name': 'Jan', 'value': 0},{'name': 'Feb', 'value': 0},{'name': 'Mar', 'value': 0},{'name': 'Apr', 'value': 0},{'name': 'May', 'value': 0},{'name': 'Jun', 'value': 0},{'name': 'Jul', 'value': 0},{'name': 'Aug', 'value': 0},{'name': 'Sep', 'value': 0},{'name': 'Oct', 'value': 0},{'name': 'Nov', 'value': 0},{'name': 'Dec', 'value': 0}])
 
     def test_weekly_spending_in_month(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [{'Week 1': 0}, {'Week 2': 0}, {'Week 3': 41.28}, {'Week 4': 0}, {'Week 5': 0}])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 41.28},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
 
     def test_no_weekly_spending_in_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [{'Week 1': 0}, {'Week 2': 0}, {'Week 3': 0}, {'Week 4': 0}, {'Week 5': 0}])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(11,2022), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 0},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
 
     def test_weekly_spending_in_invalid_month(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(13,2022), [{'Week 1': 0}, {'Week 2': 0}, {'Week 3': 0}, {'Week 4': 0}, {'Week 5': 0}])
+        self.assertEqual(annualMonthlySpending.weeklySpendingInYear(13,2022), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 0},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
 
     def test_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
