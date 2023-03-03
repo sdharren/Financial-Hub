@@ -2,14 +2,15 @@
 import './App.css';
 import React from 'react';
 import './styles.css'
-import Navbar from './Navbar';
+import Navbar from './components/Navbar';
 import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import PieChart from './pages/PieChart';
-import { Route, Routes, useNavigate } from "react-router-dom"
+import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
 import GraphDisplay from './pages/GraphDisplay';
 
 
