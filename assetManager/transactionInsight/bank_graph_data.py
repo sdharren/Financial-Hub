@@ -14,13 +14,13 @@ class BankGraphData():
         monthlySpending = []
         months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         for i in range(1,13):
-            monthlySpending.append({months[i]: self.transactionInsight.getMonthlySpending(i,year)})
+            monthlySpending.append({'name':months[i],'value': self.transactionInsight.getMonthlySpending(i,year)})
         return monthlySpending
 
     def weeklySpendingInYear(self,month,year):
         weeklySpending = []
         for i in range(1,6):
-            weeklySpending.append({"Week " +str(i): self.transactionInsight.getWeeklySpending(i,month,year)})
+            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,month,year)})
         return weeklySpending
 
     def orderedCategorisedMonthlySpending(self,month,year):
@@ -30,3 +30,20 @@ class BankGraphData():
     def orderedCategorisedWeeklySpending(self,week,month,year):
         weeklyTransactions = self.transactionInsight.getWeeklyTransactions(week,month,year)
         return self.transactionInsight.getOrderCategories(weeklyTransactions)
+
+    def getMonth(self,monthName):
+        month_dict = {
+        "Jan": 1,
+        "Feb": 2,
+        "Mar": 3,
+        "Apr": 4,
+        "May": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Aug": 8,
+        "Sep": 9,
+        "Oct": 10,
+        "Nov": 11,
+        "Dec": 12
+        }   
+        return month_dict[monthName]

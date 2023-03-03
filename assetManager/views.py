@@ -7,7 +7,8 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
-
+from dateutil.tz import tzlocal
+import datetime
 from django.http import JsonResponse
 from assetManager.investments.reactstuff import NumberShow
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
@@ -103,8 +104,8 @@ def number_view(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def monthlyGraph(request):
-    stock_getter = make_fake_stock_getter()
-    data = stock_getter.monthlySpendingInYear(2022)
+    trans = make_fake_transaction_getter()
+    data = trans.monthlySpendingInYear(2022)
     return HttpResponse(json.dumps(data, default=str), content_type='application/json')
 
 def weeklyGraph(request):
@@ -114,6 +115,8 @@ def weeklyGraph(request):
     else:
         raise Exception
         # should return bad request
+    print(month)
+    month = data.getMonth(month)
     data = data.weeklySpendingInYear(month,2022)
     return HttpResponse(json.dumps(data), content_type='application/json')
 

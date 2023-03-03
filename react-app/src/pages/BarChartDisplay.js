@@ -7,7 +7,7 @@ function BarChartDisplay() {
     // JSON to know which API endpoint to query next
     const nextRoute = {
         'monthly_graphs': 'weekly_graphs',
-        'weekly_graphs': ''
+        'weekly_graphs': 'weekly_graphs'
     }
 
     // passed as a parameter to the pie chart to update this page once a section of the pie chart is clicked

@@ -24,7 +24,7 @@ function Graphs({endpoint, endpoint_parameter, loadNext}) {
 
   useEffect(() => {
       axios.get(
-          'http://127.0.0.1:8000/' + String(endpoint) + '/',
+          'http://127.0.0.1:8000/api/' + String(endpoint) + '/',
           { params: {
               param: endpoint_parameter
           }}
@@ -37,12 +37,15 @@ function Graphs({endpoint, endpoint_parameter, loadNext}) {
         });
     }, [endpoint]);
 
-  let bar_data = new Array();
-  let bar_labels = new Array();
+  let bar_data = [];
+  let bar_labels = [];
   for (let key in barChartData) {
-      bar_labels.push(key);
-      bar_data.push(barChartData[key]);
+      bar_labels.push(barChartData[key].name);
+      bar_data.push(barChartData[key].value);
   }
+  // console.log(bar_labels);
+  console.log(bar_data);
+
 
   const options = {
       plugins: {
