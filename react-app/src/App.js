@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
-import Graphs from './pages/Graphs';
+import BarGraph from './pages/BarGraph';
 import BarChartDisplay from './pages/BarChartDisplay';
 import { Route, Routes } from "react-router-dom";
 import PieChart from './pages/PieChart';

@@ -104,21 +104,20 @@ def number_view(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def monthlyGraph(request):
-    trans = make_fake_transaction_getter()
-    data = trans.monthlySpendingInYear(2022)
-    return HttpResponse(json.dumps(data, default=str), content_type='application/json')
+    transactions = make_fake_transaction_getter()
+    graphData = transactions.monthlySpendingInYear(2022)
+    return HttpResponse(json.dumps(graphData, default=str), content_type='application/json')
 
 def weeklyGraph(request):
-    data = make_fake_transaction_getter()
+    transactions = make_fake_transaction_getter()
     if request.GET.get('param'):
-        month = request.GET.get('param')
+        monthName = request.GET.get('param')
     else:
         raise Exception
         # should return bad request
-    print(month)
-    month = data.getMonth(month)
-    data = data.weeklySpendingInYear(month,2022)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    monthNumber = transactions.getMonth(monthName)
+    graphData = transactions.weeklySpendingInYear(monthNumber,2022)
+    return HttpResponse(json.dumps(graphData), content_type='application/json')
 
 # method for test purposes for the method above
 def make_fake_transaction_getter():

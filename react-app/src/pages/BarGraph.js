@@ -19,7 +19,7 @@ ChartJS.register(
   Legend
 );
 
-function Graphs({endpoint, endpoint_parameter, loadNext}) {
+function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   const [barChartData, setBarChartData] = useState(null);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function Graphs({endpoint, endpoint_parameter, loadNext}) {
                   color: "white"
               }
           }
-      }
+        }
   };
   const data = {
     labels : bar_labels,
@@ -91,4 +91,4 @@ function Graphs({endpoint, endpoint_parameter, loadNext}) {
   );
 }
 
-export default Graphs;
+export default BarGraph;

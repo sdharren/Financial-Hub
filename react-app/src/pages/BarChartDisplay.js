@@ -1,4 +1,4 @@
-import PieChart from "./Graphs";
+import PieChart from "./BarGraph";
 import { useState } from "react";
 
 function BarChartDisplay() {
