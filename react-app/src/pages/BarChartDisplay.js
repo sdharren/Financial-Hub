@@ -2,10 +2,11 @@ import PieChart from "./BarGraph";
 import { useState } from "react";
 
 function BarChartDisplay() {
-    const [graph, setGraph] = useState(<PieChart endpoint={"monthly_graphs"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(<PieChart endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>);
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
+        'yearly_graphs': 'monthly_graphs',
         'monthly_graphs': 'weekly_graphs',
         'weekly_graphs': 'weekly_graphs'
     }

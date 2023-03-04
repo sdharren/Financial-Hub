@@ -10,6 +10,14 @@ class BankGraphData():
         self.transaction_history = transaction_history
         self.transactionInsight = CategoriseTransactions(self.transaction_history)
 
+    def yearlySpending(self):
+        yearlySpending = []
+        rangeOfYears = self.transactionInsight.getRangeOfYears()
+        if len(rangeOfYears) != 0:
+            for year in range(rangeOfYears[0],rangeOfYears[1]+1):
+                yearlySpending.append({'name':str(year),'value': self.transactionInsight.getYearlySpending(year)})
+        return yearlySpending
+
     def monthlySpendingInYear(self,year):
         monthlySpending = []
         months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -45,5 +53,5 @@ class BankGraphData():
         "Oct": 10,
         "Nov": 11,
         "Dec": 12
-        }   
+        }
         return month_dict[monthName]

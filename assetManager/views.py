@@ -103,9 +103,19 @@ def number_view(request):
     data = {'number': NumberShow.getNumber()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+def yearlyGraph(request):
+    transactions = make_fake_transaction_getter()
+    graphData = transactions.yearlySpending()
+    return HttpResponse(json.dumps(graphData, default=str), content_type='application/json')
+
 def monthlyGraph(request):
     transactions = make_fake_transaction_getter()
-    graphData = transactions.monthlySpendingInYear(2022)
+    if request.GET.get('param'):
+        yearName = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.monthlySpendingInYear(int(yearName))
     return HttpResponse(json.dumps(graphData, default=str), content_type='application/json')
 
 def weeklyGraph(request):

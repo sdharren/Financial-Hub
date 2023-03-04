@@ -43,7 +43,7 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
       bar_labels.push(barChartData[key].name);
       bar_data.push(barChartData[key].value);
   }
-  // console.log(bar_labels);
+  console.log(bar_labels);
   console.log(bar_data);
 
 
