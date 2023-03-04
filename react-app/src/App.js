@@ -49,6 +49,7 @@ function App() {
                 <Route element={<HomePage/>} path = "/" exact />
               </Route>
               <Route element={<Login/>} path="/login"/>
+              <Route path="/graph_display" element={<GraphDisplay />} />
             </Routes>
           </div>
         </AuthProvider>

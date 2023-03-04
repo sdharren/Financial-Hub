@@ -68,12 +68,11 @@ def log_in(request):
     return render(request, 'log_in.html', {'form': form})
 
 def setup_asset_data(request):
-    # get user out of request
-    # wrapper = SandboxWrapper() # for now
-    # stock_getter = StocksGetter(wrapper)
-    # stock_getter.query_investments(user)
-    stock_getter = make_fake_stock_getter()
-    cache.set('test_cache', stock_getter.investments)
+    user = request.user
+    wrapper = SandboxWrapper() # for now
+    stock_getter = StocksGetter(wrapper)
+    stock_getter.query_investments(user)
+    cache.set('investments' + user.email, stock_getter.investments)
 
 # add @login_required
 def connect_investments(request):
@@ -106,26 +105,7 @@ def connect_investments(request):
         return redirect('home_page')
 
 def number_view(request):
-    # data = {'number': NumberShow.getNumber()}
-    # return HttpResponse(json.dumps(data), content_type='application/json')
-    print("\n\n\n")
-    investments = cache.get('test_cache')
-    print(investments)
-    print("\n\n\n")
-
-def investment_categories(request):
-    stock_getter = make_fake_stock_getter()
-    categories = stock_getter.get_investment_categories()
-    return HttpResponse(json.dumps(categories, default=str), content_type='application/json')
-
-def investment_category_breakdown(request):
-    stock_getter = make_fake_stock_getter()
-    if request.GET.get('param'):
-        category = request.GET.get('param')
-    else:
-        raise Exception
-        # should return bad request
-    data = stock_getter.get_investment_category(category)
+    data = {'number': NumberShow.getNumber()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 #This method is for testing purposes
@@ -211,3 +191,10 @@ def make_fake_stock_getter():
         investments.append(Investment(holdings[i], securities[i]))
     stock_getter.investments = investments
     return stock_getter
+
+def link_sandbox_investments(request):
+    user = request.user
+    wrapper = SandboxWrapper()
+    public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
+    wrapper.exchange_public_token(public_token)
+    wrapper.save_access_token(user, ['investments'])
