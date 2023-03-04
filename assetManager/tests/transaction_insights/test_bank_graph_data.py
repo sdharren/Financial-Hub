@@ -19,23 +19,19 @@ class CreateBankGraphDataTestCase(TestCase):
 
     def test_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'name': 'Jan', 'value': 0},{'name': 'Feb', 'value': 0},{'name': 'Mar', 'value': 0},{'name': 'Apr', 'value': 0},{'name': 'May', 'value': 0},{'name': 'Jun', 'value': 0},{'name': 'Jul', 'value': 0},{'name': 'Aug', 'value': 0},{'name': 'Sep', 'value': 0},{'name': 'Oct', 'value': 0},{'name': 'Nov', 'value': 41.28},{'name': 'Dec', 'value': 0}])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'name': 'Jan 2022', 'value': 0},{'name': 'Feb 2022', 'value': 0},{'name': 'Mar 2022', 'value': 0},{'name': 'Apr 2022', 'value': 0},{'name': 'May 2022', 'value': 0},{'name': 'Jun 2022', 'value': 0},{'name': 'Jul 2022', 'value': 0},{'name': 'Aug 2022', 'value': 0},{'name': 'Sep 2022', 'value': 0},{'name': 'Oct 2022', 'value': 0},{'name': 'Nov 2022', 'value': 41.28},{'name': 'Dec 2022', 'value': 0}])
 
     def test_no_monthly_spending_in_year(self):
         annualMonthlySpending = BankGraphData("")
-        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'name': 'Jan', 'value': 0},{'name': 'Feb', 'value': 0},{'name': 'Mar', 'value': 0},{'name': 'Apr', 'value': 0},{'name': 'May', 'value': 0},{'name': 'Jun', 'value': 0},{'name': 'Jul', 'value': 0},{'name': 'Aug', 'value': 0},{'name': 'Sep', 'value': 0},{'name': 'Oct', 'value': 0},{'name': 'Nov', 'value': 0},{'name': 'Dec', 'value': 0}])
+        self.assertEqual(annualMonthlySpending.monthlySpendingInYear(2022), [{'name': 'Jan 2022', 'value': 0},{'name': 'Feb 2022', 'value': 0},{'name': 'Mar 2022', 'value': 0},{'name': 'Apr 2022', 'value': 0},{'name': 'May 2022', 'value': 0},{'name': 'Jun 2022', 'value': 0},{'name': 'Jul 2022', 'value': 0},{'name': 'Aug 2022', 'value': 0},{'name': 'Sep 2022', 'value': 0},{'name': 'Oct 2022', 'value': 0},{'name': 'Nov 2022', 'value': 0},{'name': 'Dec 2022', 'value': 0}])
 
     def test_weekly_spending_in_month(self):
         annualWeeklySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualWeeklySpending.weeklySpendingInYear(11,2022), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 41.28},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
+        self.assertEqual(annualWeeklySpending.weeklySpendingInYear("Nov 2022"), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 41.28},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
 
     def test_no_weekly_spending_in_month(self):
         annualWeeklySpending = BankGraphData("")
-        self.assertEqual(annualWeeklySpending.weeklySpendingInYear(11,2022), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 0},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
-
-    def test_weekly_spending_in_invalid_month(self):
-        annualWeeklySpending = BankGraphData("")
-        self.assertEqual(annualWeeklySpending.weeklySpendingInYear(13,2022), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 0},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
+        self.assertEqual(annualWeeklySpending.weeklySpendingInYear("Jan 2022"), [{'name': 'Week 1', 'value': 0},{'name': 'Week 2', 'value': 0},{'name': 'Week 3', 'value': 0},{'name': 'Week 4', 'value': 0},{'name': 'Week 5', 'value': 0}])
 
     def test_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
@@ -60,3 +56,7 @@ class CreateBankGraphDataTestCase(TestCase):
     def test_no_ordered_categorised_weekly_spending_for_invalid_week(self):
         annualWeeklySpending = BankGraphData("")
         self.assertEqual(annualWeeklySpending.orderedCategorisedWeeklySpending(6,11,2022), [])
+
+    def test_get_month(self):
+        testObject = BankGraphData("")
+        self.assertEqual(testObject.getMonth("Jan"), 1)

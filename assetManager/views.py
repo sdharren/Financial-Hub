@@ -121,12 +121,11 @@ def monthlyGraph(request):
 def weeklyGraph(request):
     transactions = make_fake_transaction_getter()
     if request.GET.get('param'):
-        monthName = request.GET.get('param')
+        date = request.GET.get('param')
     else:
         raise Exception
         # should return bad request
-    monthNumber = transactions.getMonth(monthName)
-    graphData = transactions.weeklySpendingInYear(monthNumber,2022)
+    graphData = transactions.weeklySpendingInYear(date)
     return HttpResponse(json.dumps(graphData), content_type='application/json')
 
 # method for test purposes for the method above

@@ -22,13 +22,15 @@ class BankGraphData():
         monthlySpending = []
         months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         for i in range(1,13):
-            monthlySpending.append({'name':months[i],'value': self.transactionInsight.getMonthlySpending(i,year)})
+            monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.getMonthlySpending(i,year)})
         return monthlySpending
 
-    def weeklySpendingInYear(self,month,year):
+    def weeklySpendingInYear(self,date):
         weeklySpending = []
+        month, year = date.split()
+        year = int(year)
         for i in range(1,6):
-            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,month,year)})
+            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
         return weeklySpending
 
     def orderedCategorisedMonthlySpending(self,month,year):
