@@ -35,20 +35,23 @@ import GraphDisplay from './pages/GraphDisplay';
 // }
 
 import PrivateRoutes from './utils/PrivateRoute';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
     <div>
       <Router>
-        <Navbar />
-        <div className="container">
-          <Routes>
-            <Route element={<PrivateRoutes/>}>
-              <Route element={<Home/>} path = "/" exact />
-            </Route>
-            <Route element={<Login/>} path="/login"/>
-          </Routes>
-        </div>
+        <AuthProvider>
+          <Navbar />
+          <div className="container">
+            <Routes>
+              <Route element={<PrivateRoutes/>}>
+                <Route element={<Home/>} path = "/" exact />
+              </Route>
+              <Route element={<Login/>} path="/login"/>
+            </Routes>
+          </div>
+        </AuthProvider>
       </Router>
     </div>
   );
