@@ -14,21 +14,39 @@ import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-route
 import GraphDisplay from './pages/GraphDisplay';
 
 
+// function App() {
+//   return (
+//     <div>
+//       <Router>
+//         <Navbar />
+//         <div className="container">
+//           <Routes>
+//             <Route path="/" element={<Home />} />
+//             <Route path="/about" element={<About />} />
+//             <Route path="/login" element={<Login />} />
+//             <Route path="/signup" element={<Signup />} />
+//             <Route path="/dashboard" element={<Dashboard />} />
+//             <Route path="/graph_display" element={<GraphDisplay />} />
+//           </Routes>
+//         </div>
+//       </Router>
+//     </div>
+//   );
+// }
+
 function App() {
   return (
-    <>
-      <Navbar />
-      <div className="container">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/graph_display" element={<GraphDisplay />} />
-        </Routes>
-      </div>
-    </>
+    <div>
+      <Router>
+        <Navbar />
+        <div className="container">
+          <Routes>
+            <Route element={<HomePage />} path="/" exact/>
+            <Route element={<Login/>} path="/login"/>
+          </Routes>
+        </div>
+      </Router>
+    </div>
   );
 }
 
