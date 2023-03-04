@@ -34,7 +34,7 @@ import GraphDisplay from './pages/GraphDisplay';
 //   );
 // }
 
-import PrivateRoute from './utils/PrivateRoute';
+import PrivateRoutes from './utils/PrivateRoute';
 
 function App() {
   return (
@@ -43,12 +43,9 @@ function App() {
         <Navbar />
         <div className="container">
           <Routes>
-            <Route
-              path = "/"
-              element = {
-                <PrivateRoute><Home /></PrivateRoute>
-              }
-            />
+            <Route element={<PrivateRoutes/>}>
+              <Route element={<Home/>} path = "/" exact />
+            </Route>
             <Route element={<Login/>} path="/login"/>
           </Routes>
         </div>
