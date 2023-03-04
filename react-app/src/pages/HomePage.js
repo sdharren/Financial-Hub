@@ -3,7 +3,7 @@ import AuthContext from '../context/AuthContext'
 
 const HomePage = () => {
 
-    let {authTokens} = useContext(AuthContext)
+    let {authTokens, logoutUser} = useContext(AuthContext)
     let [firstName, setFirstName] = useState([])
     useEffect(() => {
         getFirstName()
@@ -18,7 +18,13 @@ const HomePage = () => {
             }
         })
         let data = await response.json()
-        setFirstName(data["first_name"])
+
+        if (response.status === 200) {
+            setFirstName(data["first_name"])
+        }
+        else if (response.statusText === 'Unauthorized') {
+            logoutUser()
+        }
     }
 
     return (

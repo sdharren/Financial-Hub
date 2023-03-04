@@ -33,10 +33,6 @@ def getRoutes(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getFirstName(request):
-    print(1)
     user = request.user
-    print(2)
     serializer = UserSerializer(user)
-    print(3)
-    print(serializer.data)
     return Response(serializer.data)
