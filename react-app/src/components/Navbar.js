@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import AuthContext from '../context/AuthContext';
 
 export default function Navbar() {
-    let {user} = useContext(AuthContext);
+    let {user, logoutUser} = useContext(AuthContext);
     return <nav className="nav"> 
         <Link to = "/" className="site-title">Financial Hub</Link>
         <ul>
@@ -15,7 +15,7 @@ export default function Navbar() {
                 <Link to="/signup">Sign Up</Link>
             </li>
             <li>
-                {user ? (<p>Logout</p>): (<Link to ="/login">Login</Link>)}
+                {user ? (<p onClick = {logoutUser}>Logout</p>): (<Link to ="/login">Login</Link>)}
             </li>
         </ul>
     </nav>
