@@ -46,7 +46,7 @@ function App() {
           <div className="container">
             <Routes>
               <Route element={<PrivateRoutes/>}>
-                <Route element={<Home/>} path = "/" exact />
+                <Route element={<HomePage/>} path = "/" exact />
               </Route>
               <Route element={<Login/>} path="/login"/>
             </Routes>
