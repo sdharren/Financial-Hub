@@ -20,8 +20,6 @@ def transaction_reports():
     debit_card = DebitCard(plaid_wrapper)
     debit_card.get_transactions()
 
-
-
 def home(request):
     plaid_wrapper = SandboxWrapper()
     public_token = plaid_wrapper.create_public_token()
