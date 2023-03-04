@@ -7,7 +7,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
-
+from django.core.cache import cache
 from django.http import JsonResponse
 from assetManager.investments.reactstuff import NumberShow
 #remove after testing purposes are finished
@@ -67,6 +67,14 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
+def setup_asset_data(request):
+    # get user out of request
+    # wrapper = SandboxWrapper() # for now
+    # stock_getter = StocksGetter(wrapper)
+    # stock_getter.query_investments(user)
+    stock_getter = make_fake_stock_getter()
+    cache.set('test_cache', stock_getter.investments)
+
 # add @login_required
 def connect_investments(request):
     if request.method == 'GET':
@@ -98,8 +106,12 @@ def connect_investments(request):
         return redirect('home_page')
 
 def number_view(request):
-    data = {'number': NumberShow.getNumber()}
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    # data = {'number': NumberShow.getNumber()}
+    # return HttpResponse(json.dumps(data), content_type='application/json')
+    print("\n\n\n")
+    investments = cache.get('test_cache')
+    print(investments)
+    print("\n\n\n")
 
 def investment_categories(request):
     stock_getter = make_fake_stock_getter()
