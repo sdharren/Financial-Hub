@@ -135,3 +135,9 @@ class StocksGetter():
                 # maybe get quantity and multiply by current price? need to know if plaid updates data freqeuntly or at all
                 category_dict[investment.get_name()] += investment.get_total_price()
         return category_dict
+    
+    def get_stock_ticker(self, stock_name):
+        for investment in self.investments:
+            if investment.get_name() == stock_name:
+                return investment.get_ticker()
+        return 'Cannot get stock ticker for ' + stock_name

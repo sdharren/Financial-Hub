@@ -62,6 +62,19 @@ def investment_category_breakdown(request):
     data = stock_getter.get_investment_category(category)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def stock_history(request):
+    stock_getter = retrieve_stock_getter(request.user)
+    if request.GET.get('param'):
+        stock_name = request.GET.get('stock_name')
+        stock_ticker = stock_getter.get_stock_ticker(stock_name)
+    else:
+        raise Exception
+        #return bad request
+    data = stock_getter.get_stock_history(stock_ticker)
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
 def retrieve_stock_getter(user):
     stock_getter = StocksGetter(None)
     data = cache.get('investments' + user.email)
