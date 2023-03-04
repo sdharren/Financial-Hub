@@ -136,8 +136,17 @@ class StocksTestCase(TestCase):
     def test_get_investment_category_returns_category(self):
         self._create_stock_getter_with_fake_data()
         data = self.stock_getter.get_investment_category('equity')
-        self.assertEqual(data, {'ACHN': 100.0, 'SBSI': 100.0})
+        self.assertEqual(data, {'Achillion Pharmaceuticals Inc.': 100.0, 'Southside Bancshares Inc.': 100.0})
 
+    def test_get_stock_ticker_works_for_existing_stock(self):
+        self._create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_stock_ticker('Achillion Pharmaceuticals Inc.')
+        self.assertEqual(data, 'ACHN')
+
+    def test_get_stock_ticker_returns_error_string_for_undefined_stock(self):
+        self._create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_stock_ticker('Netflix but not real')
+        self.assertEqual(data, 'Cannot get stock ticker for Netflix but not real')
 
     def _create_stock_getter_with_fake_data(self):
         self.stock_getter = StocksGetter(None)
