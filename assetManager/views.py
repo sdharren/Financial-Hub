@@ -21,8 +21,8 @@ def get_balances_data(request):
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(request.user, ['transactions'])
-        debit_card = DebitCard(plaid_wrapper,request.user)
+        plaid_wrapper.save_access_token(User.objects.get(email = "augusto_uk@yahoo.co.uk"), ['transactions'])
+        debit_card = DebitCard(plaid_wrapper,User.objects.get(email = "augusto_uk@yahoo.co.uk"))
         account_balances = debit_card.get_account_balances()
         balances = {}
 
@@ -39,7 +39,8 @@ def get_balances_data(request):
         messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
         return redirect('home_page')
 
-
+def select_account(request):
+    pass
 
 
 
@@ -82,6 +83,7 @@ def log_in(request):
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
+                #setup method
                 # home page for now CHANGE LATER
                 return redirect('home_page')
         messages.add_message(request, messages.ERROR, 'The credentials provided are incorrect.')

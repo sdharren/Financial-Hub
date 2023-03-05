@@ -2,7 +2,7 @@ import PieChart from "./PieChart";
 import { useState } from "react";
 
 function BalancesDisplay() {
-    const [graph, setGraph] = useState(<PieChart endpoint={"get_balance_data"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(<PieChart endpoint={"get_balances_data"} loadNext={handleLoadNext}/>);
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
