@@ -78,6 +78,7 @@ def stock_history(request):
 from django.conf import settings
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def create_link_token(request):
@@ -91,6 +92,22 @@ def create_link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
     
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def exchange_public_token(request):
+    products_selected = cache.get('product_link' + request.user.email)
+    cache.delete('product_link' + request.user.email)
+    if settings.PLAID_DEVELOPMENT:
+        wrapper = DevelopmentWrapper()
+    else:
+        wrapper = SandboxWrapper()
+    try:
+        wrapper.exchange_public_token(request.POST['public_token'])
+    except InvalidPublicToken as e:
+        print(str(e)) # for debugging
+        return Response({'error': 'Bad request. Invalid public token.'}, status=500)
+    wrapper.save_access_token(request.user, products_selected)
+    return Response(status=200)
 
 # handle error if investments aren't cached
 def retrieve_stock_getter(user):

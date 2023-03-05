@@ -8,7 +8,7 @@ function Link({ linkToken }) {
 
     async function onSuccess(public_token, metadata) {
             // exchange public token
-            fetch('//yourserver.com/exchange-public-token', {
+            fetch('http://127.0.0.1:8000/api/exchange_public_token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
