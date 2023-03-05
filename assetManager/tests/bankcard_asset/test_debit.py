@@ -47,7 +47,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
 
     def test_correct_instution_for_access_token(self):
-        self.assertEqual(self.debit_card.plaid_wrapper.get_institution_name(),'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(self.debit_card.plaid_wrapper.get_institution_name(self.debit_card.plaid_wrapper.ACCESS_TOKEN),'Royal Bank of Scotland - Current Accounts')
 
     def test_get_balances_with_incorrect_access_token(self):
         self.debit_card.access_tokens = ['wrongaccesstokenstring']
@@ -73,13 +73,14 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
     def test_get_balances_for_multiple_access_tokens(self):
         user_lilly = User.objects.get(email='lillydoe@example.org')
         plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token_custom_user()
+        public_token = plaid_wrapper.create_public_token_custom_user(bank_id='ins_115642', products_chosen=['transactions'], override_username="custom_sixth")
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user_lilly, ['transactions'])
 
-        public_token_2 = plaid_wrapper.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
-        plaid_wrapper.exchange_public_token(public_token_2)
-        plaid_wrapper.save_access_token(user_lilly, ['transactions'])
+        plaid_wrapper_2 = SandboxWrapper()
+        public_token_2 = plaid_wrapper_2.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
+        plaid_wrapper_2.exchange_public_token(public_token_2)
+        plaid_wrapper_2.save_access_token(user_lilly, ['transactions'])
 
         debit_card_lilly = DebitCard(plaid_wrapper, user_lilly)
 
@@ -149,6 +150,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
     def test_get_empty_insight_data_dict(self):
         self.assertEqual(self.debit_card.get_insight_data(), None)
+
 
     def test_make_transaction_data_insight_with_one_access_token(self):
         user = User.objects.get(email='lillydoe@example.org')

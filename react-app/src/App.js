@@ -1,37 +1,44 @@
 
 import './App.css';
 import React from 'react';
-import './styles.css';
-import Navbar from './Navbar';
+import './styles.css'
+import Navbar from './components/Navbar';
 import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import BarGraph from './pages/BarGraph';
 import BarChartDisplay from './pages/BarChartDisplay';
-import { Route, Routes } from "react-router-dom";
 import PieChart from './pages/PieChart';
-// import { Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
 import GraphDisplay from './pages/GraphDisplay';
-
+import PrivateRoutes from './utils/PrivateRoute';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <div className="container">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/bar_graph" element={<BarChartDisplay />} />
-          <Route path="/graph_display" element={<GraphDisplay />} />
-        </Routes>
-      </div>
-    </>
+    <div>
+      <Router>
+        <AuthProvider>
+          <Navbar />
+          <div className="container">
+            <Routes>
+              <Route element={<PrivateRoutes/>}>
+                <Route element={<HomePage/>} path = "/homepage" exact />
+              </Route>
+              <Route element={<Login/>} path="/login"/>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/graph_display" element={<GraphDisplay />} />
+            </Routes>
+          </div>
+        </AuthProvider>
+      </Router>
+    </div>
   );
 }
 

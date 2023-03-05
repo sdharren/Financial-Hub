@@ -98,9 +98,8 @@ class PlaidWrapper():
         return response['accounts'][0]['owners'][0]
 
 
-    def get_accounts(self):
-        access_token = self.get_access_token()
-        request_accounts = AccountsGetRequest(access_token=access_token)
+    def get_accounts(self,token):
+        request_accounts = AccountsGetRequest(access_token=token)
         try:
             response = self.client.accounts_get(request_accounts)
         except ApiException:
@@ -108,9 +107,8 @@ class PlaidWrapper():
         return response['accounts']
 
 
-    def get_item(self):
-        access_token = self.get_access_token()
-        request = ItemGetRequest(access_token=access_token)
+    def get_item(self,token):
+        request = ItemGetRequest(access_token=token)
         try:
             response = self.client.item_get(request)
         except ApiException:
@@ -120,15 +118,15 @@ class PlaidWrapper():
         return item
 
     #write tests for this method
-    def get_institution_id(self):
-        item = self.get_item()
+    def get_institution_id(self,token):
+        item = self.get_item(token)
         institution_id = item['institution_id']
         return institution_id
 
     #Returns the name of an institution given the institution_id passed as a parameter
     #write tests for this method as well
-    def get_institution_name(self):
-        institution_id = self.get_institution_id()
+    def get_institution_name(self,token):
+        institution_id = self.get_institution_id(token)
 
         request = InstitutionsGetByIdRequest(
             institution_id=institution_id,
@@ -141,7 +139,7 @@ class PlaidWrapper():
         if self.ACCESS_TOKEN is None:
             raise PublicTokenNotExchanged
 
-        institution_name = self.get_institution_name()
+        institution_name = self.get_institution_name(self.ACCESS_TOKEN)
         for product_name in products_chosen:
             try:
                 AccountType.objects.create(

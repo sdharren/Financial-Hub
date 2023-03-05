@@ -18,7 +18,7 @@ from assetManager.models import User
 #from assetManager.bankcards.debit_card import DebitCard
 
 def transaction_reports():
-    plaid_wrapper = SandboxWrapper()
+    plaid_wrapper = DevelopmentWrapper()
     debit_card = DebitCard(plaid_wrapper)
     debit_card.get_transactions()
 
@@ -28,7 +28,7 @@ def home(request):
     plaid_wrapper = SandboxWrapper()
     public_token = plaid_wrapper.create_public_token()
     plaid_wrapper.exchange_public_token(public_token)
-    accounts_informations = plaid_wrapper.get_accounts()
+    accounts_informations = plaid_wrapper.get_accounts(plaid_wrapper.ACCESS_TOKEN)
     json_data = reformatJson(accounts_informations)
     return render(request,'home.html',{"json_data":json_data})
 

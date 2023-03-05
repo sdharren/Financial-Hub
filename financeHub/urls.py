@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from assetManager import views
 
 urlpatterns = [
@@ -28,5 +28,6 @@ urlpatterns = [
     path('api/monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
     path('api/weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
     path('api/investment_categories/', views.investment_categories, name='investment_categories'),
-    path('api/investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown')
+    path('api/investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown'),
+    path('api/', include('assetManager.api.urls'))
 ]
