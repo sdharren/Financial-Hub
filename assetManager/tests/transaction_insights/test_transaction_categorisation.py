@@ -77,6 +77,14 @@ class CategoriseTransactionsTestCase(TestCase):
         transactions = CategoriseTransactions(self.transaction_history)
         self.assertNotEqual(transactions.getMonthlyTransactions(11,2022), [])
 
+    def test_get_yearly_transactions(self):
+        transactions = CategoriseTransactions(self.transaction_history)
+        self.assertNotEqual(transactions.getYearlyTransactions(2022), [])
+
+    def test_get_no_yearly_transactions(self):
+        transactions = CategoriseTransactions("")
+        self.assertEqual(transactions.getYearlyTransactions(2022), [])
+
     def test_get_december_monthly_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
         self.assertEqual(transactions.getMonthlyTransactions(12,2022), [])

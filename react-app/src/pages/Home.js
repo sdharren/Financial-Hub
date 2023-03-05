@@ -8,7 +8,7 @@ export default function Home() {
                 <div class = "home__box">
                     <div class = "image-container">
                         <img class= "box__image"
-                            src = {cards}
+                            src = {cards} alt = "#"
                             ></img>
                     </div>
                     <div class = "home__wrapper">

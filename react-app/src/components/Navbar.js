@@ -4,7 +4,7 @@ import AuthContext from '../context/AuthContext';
 
 export default function Navbar() {
     let {user, logoutUser} = useContext(AuthContext);
-    return <nav className="nav"> 
+    return <nav className="nav">
         <Link to = "/" className="site-title">Financial Hub</Link>
         <ul>
             {user && <li><p>Hello, {user.email}</p></li>}

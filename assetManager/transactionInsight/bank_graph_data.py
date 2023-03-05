@@ -10,16 +10,27 @@ class BankGraphData():
         self.transaction_history = transaction_history
         self.transactionInsight = CategoriseTransactions(self.transaction_history)
 
+    def yearlySpending(self):
+        yearlySpending = []
+        rangeOfYears = self.transactionInsight.getRangeOfYears()
+        if len(rangeOfYears) != 0:
+            for year in range(rangeOfYears[0],rangeOfYears[1]+1):
+                yearlySpending.append({'name':str(year),'value': self.transactionInsight.getYearlySpending(year)})
+        return yearlySpending
+
     def monthlySpendingInYear(self,year):
         monthlySpending = []
+        months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         for i in range(1,13):
-            monthlySpending.append(self.transactionInsight.getMonthlySpending(i,year))
+            monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.getMonthlySpending(i,year)})
         return monthlySpending
 
-    def weeklySpendingInYear(self,month,year):
+    def weeklySpendingInYear(self,date):
         weeklySpending = []
+        month, year = date.split()
+        year = int(year)
         for i in range(1,6):
-            weeklySpending.append(self.transactionInsight.getWeeklySpending(i,month,year))
+            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
         return weeklySpending
 
     def orderedCategorisedMonthlySpending(self,month,year):
@@ -29,3 +40,20 @@ class BankGraphData():
     def orderedCategorisedWeeklySpending(self,week,month,year):
         weeklyTransactions = self.transactionInsight.getWeeklyTransactions(week,month,year)
         return self.transactionInsight.getOrderCategories(weeklyTransactions)
+
+    def getMonth(self,monthName):
+        month_dict = {
+        "Jan": 1,
+        "Feb": 2,
+        "Mar": 3,
+        "Apr": 4,
+        "May": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Aug": 8,
+        "Sep": 9,
+        "Oct": 10,
+        "Nov": 11,
+        "Dec": 12
+        }
+        return month_dict[monthName]
