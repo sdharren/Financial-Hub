@@ -41,7 +41,6 @@ def reformatBalancesData(account_balances):
 
     return balances
 
-
 #User.objects.get(email = "augusto_uk@yahoo.co.uk")
 def get_balances_data(request):
     if request.user.is_authenticated:
@@ -77,7 +76,10 @@ def select_account(request):
 
                 account_balances = debit_card.get_account_balances()
 
-                accounts = reformatAccountBalancesData(account_balances)
+                if institution_name not in list(account_balances.keys()):
+                    raise Exception("Provided institution name does not exist in the requested accounts")
+
+                accounts = reformatAccountBalancesData(account_balances,institution_name)
 
                 return HttpResponse(json.dumps(accounts), content_type='application/json')
 
@@ -85,7 +87,7 @@ def select_account(request):
                 raise Exception("No param field supplied to select_account url")
         else:
             messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
-            return redirect('get_balances_data')
+            return redirect('home_page')
 
     else:
         messages.add_message(request, messages.ERROR, 'Not Logged In')
