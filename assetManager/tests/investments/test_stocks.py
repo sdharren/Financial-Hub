@@ -2,7 +2,7 @@ from django.test import TestCase
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from assetManager.investments.stocks import StocksGetter, TransactionsNotDefined
+from assetManager.investments.stocks import StocksGetter, TransactionsNotDefined, InvestmentsNotDefined
 from assetManager.investments.transaction import Transaction
 from assetManager.investments.investment import Investment
 from assetManager.API_wrappers.yfinance_wrapper import TickerNotSupported
@@ -123,11 +123,30 @@ class StocksTestCase(TestCase):
         data = self.stock_getter.get_return_on_buy_orders()
         self.assertEqual(len(data), 0)
 
-    # def test_temp(self):
-    #     self.stock_getter = self._create_stock_getter_with_custom_user()
-    #     self.stock_getter.query_investments(self.user)
-    #     self.stock_getter.query_transactions(self.user, '2022-06-29', '2022-07-08')
-    #     self.assertEqual(2,2)
+    def test_get_return_on_current_holdings_raises_error_if_investments_are_undefined(self):
+        self.stock_getter = StocksGetter(None)
+        with self.assertRaises(InvestmentsNotDefined):
+            self.stock_getter.get_return_on_current_holdings()
+
+    def test_get_return_on_current_holdings(self):
+        self._create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_return_on_current_holdings()
+        self.assertEqual(data, {'ACHN': -98.80000002682209, 'EWZ': 24.95, 'SBSI': 280.99998474121094, 'MIPTX': 949.6999664306641})
+
+    def test_get_investment_category_returns_category(self):
+        self._create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_investment_category('equity')
+        self.assertEqual(data, {'Achillion Pharmaceuticals Inc.': 100.0, 'Southside Bancshares Inc.': 100.0})
+
+    def test_get_stock_ticker_works_for_existing_stock(self):
+        self._create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_stock_ticker('Achillion Pharmaceuticals Inc.')
+        self.assertEqual(data, 'ACHN')
+
+    def test_get_stock_ticker_returns_error_string_for_undefined_stock(self):
+        self._create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_stock_ticker('Netflix but not real')
+        self.assertEqual(data, 'Cannot get stock ticker for Netflix but not real')
 
     def _create_stock_getter_with_fake_data(self):
         self.stock_getter = StocksGetter(None)
