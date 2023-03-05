@@ -7,6 +7,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.forms import SignUpForm, LogInForm
 from assetManager.investments.stocks import StocksGetter
 import json
+from django.core.cache import cache
 from dateutil.tz import tzlocal
 import datetime
 from django.http import JsonResponse
@@ -21,8 +22,6 @@ def transaction_reports():
     plaid_wrapper = DevelopmentWrapper()
     debit_card = DebitCard(plaid_wrapper)
     debit_card.get_transactions()
-
-
 
 def home(request):
     plaid_wrapper = SandboxWrapper()
@@ -69,6 +68,13 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
+def setup_asset_data(request):
+    user = request.user
+    wrapper = SandboxWrapper() # for now
+    stock_getter = StocksGetter(wrapper)
+    stock_getter.query_investments(user)
+    cache.set('investments' + user.email, stock_getter.investments)
+
 # add @login_required
 def connect_investments(request):
     if request.method == 'GET':
@@ -102,6 +108,13 @@ def connect_investments(request):
 def number_view(request):
     data = {'number': NumberShow.getNumber()}
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+def link_sandbox_investments(request):
+    user = request.user
+    wrapper = SandboxWrapper()
+    public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
+    wrapper.exchange_public_token(public_token)
+    wrapper.save_access_token(user, ['investments'])
 
 def yearlyGraph(request):
     transactions = make_fake_transaction_getter()
@@ -239,102 +252,3 @@ def make_fake_transaction_getter():
      'transaction_id': '0v5yyomk0PFL44oxNk9xt8Y3A0PwxwfBgjbz1P',
      'transaction_type': 'place',
      'unofficial_currency_code': None}])
-
-def investment_categories(request):
-    stock_getter = make_fake_stock_getter()
-    categories = stock_getter.get_investment_categories()
-    return HttpResponse(json.dumps(categories, default=str), content_type='application/json')
-
-def investment_category_breakdown(request):
-    stock_getter = make_fake_stock_getter()
-    if request.GET.get('param'):
-        category = request.GET.get('param')
-    else:
-        raise Exception
-        # should return bad request
-    data = stock_getter.get_investment_category(category)
-    return HttpResponse(json.dumps(data), content_type='application/json')
-
-#This method is for testing purposes
-from assetManager.investments.investment import Investment
-def make_fake_stock_getter():
-    stock_getter = StocksGetter(None)
-    holdings = [
-    {
-        "quantity": 10,
-        "institution_value": 100,
-        "security_id": "fdgjklsa83"
-    },
-    {
-        "quantity": 1,
-        "institution_value": 2.3,
-        "security_id": "fjkad8973"
-    },
-    {
-        "quantity": 15,
-        "institution_value": 150,
-        "security_id": "fadjhkis45"
-    },
-    {
-        "quantity": 10,
-        "institution_value": 100,
-        "security_id": "iu432hj"
-    },
-    {
-        "quantity": 5,
-        "institution_value": 15,
-        "security_id": "dsaadfs"
-    },
-    {
-        "quantity": 1,
-        "institution_value": 10000,
-        "security_id": "F5432"
-    },
-    {
-        "quantity": 55,
-        "institution_value": 213,
-        "security_id": "FADS3254"
-    }
-]
-    securities = [
-    {
-        "name": "Achillion Pharmaceuticals Inc.",
-        "ticker_symbol": "ACHN",
-        "type": "equity"
-    },
-    {
-        "name": "iShares Inc MSCI Brazil",
-        "ticker_symbol": "EWZ",
-        "type": "etf"
-    },
-    {
-        "name": "NH PORTFOLIO 1055 (FIDELITY INDEX)",
-        "ticker_symbol": "NHX105509",
-        "type": "etf"
-    },
-    {
-        "name": "Southside Bancshares Inc.",
-        "ticker_symbol": "SBSI",
-        "type": "equity"
-    },
-    {
-        "name": "Nflx Feb 0118 355 Call",
-        "ticker_symbol": "NFLX180201C00355000",
-        "type": "derivative"
-    },
-    {
-        "name": "Bitcoin",
-        "ticker_symbol": "CUR:BTC",
-        "type": "cash"
-    },
-    {
-        "name": "Matthews Pacific Tiger Fund Insti Class",
-        "ticker_symbol": "MIPTX",
-        "type": "mutual fund"
-    }
-]
-    investments = []
-    for i in range (0, len(holdings)):
-        investments.append(Investment(holdings[i], securities[i]))
-    stock_getter.investments = investments
-    return stock_getter

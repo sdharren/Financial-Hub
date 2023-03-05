@@ -23,11 +23,11 @@ urlpatterns = [
     path('connect_investments/', views.connect_investments, name='connect_investments'),
     path('sign_up/', views.sign_up, name='sign_up'),
     path('log_in/', views.log_in, name='log_in'),
+    path('link_sandbox_investments/', views.link_sandbox_investments),
     path('api/number/', views.number_view, name='number'),
+    path('api/cache_assets/', views.setup_asset_data),
     path('api/yearly_graphs/', views.yearlyGraph, name='yearlyGraph'),
     path('api/monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
     path('api/weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
-    path('api/investment_categories/', views.investment_categories, name='investment_categories'),
-    path('api/investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown'),
     path('api/', include('assetManager.api.urls'))
 ]
