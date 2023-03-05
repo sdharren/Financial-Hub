@@ -20,7 +20,7 @@ ChartJS.register(
     Colors
 )
 function PieChart({endpoint, endpoint_parameter, loadNext}) {
-    let {authTokens, logoutUser} = useContext(AuthContext)
+    let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, setPieChartData] = useState(null);
 
     let get_data = async() =>  {

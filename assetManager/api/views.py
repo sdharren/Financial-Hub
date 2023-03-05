@@ -83,6 +83,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 def create_link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')
+        cache.set('product_link' + request.user.email, [product])
     else:
         return Response({'error': 'Bad request. Product not specified.'}, status=500)
     wrapper = DevelopmentWrapper()
