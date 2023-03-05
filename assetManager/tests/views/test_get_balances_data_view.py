@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib import messages
 from assetManager.models import User
 import json
+from assetManager.views import reformatBalancesData
 
 class GetBalancesDataViewTestCase(TestCase):
     """Tests of the log in view."""
@@ -16,6 +17,15 @@ class GetBalancesDataViewTestCase(TestCase):
 
     def test_balances_url(self):
         self.assertEqual(self.url,'/api/get_balances_data/')
+
+    def test_reformatBalancesData_incorrect_param_type(self):
+        incorrect_account_balances = ['account1', 'account2']
+        with self.assertRaises(TypeError) as cm:
+            reformatBalancesData(incorrect_account_balances)
+
+    def test_get_reformatted_balances_data_correctly(self):
+        account_balances = {'Royal Bank of Scotland - Current Accounts': {'PzyM1jbyMzcekEDJlQzjcR6ZM4oRAPfQ4eJk1': {'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'NKeQZMReQKHnjBDKWRX7CEB3WbAE84tn1Gxjv': {'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
+        balances = reformatBalancesData(account_balances)
 
     def test_make_post_request_to_url(self):
         self.client.login(email=self.user.email, password="Password123")

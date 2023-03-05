@@ -108,13 +108,14 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
     def test_get_transactions_with_one_and_multiple_access_token(self):
         user_lilly = User.objects.get(email='lillydoe@example.org')
         plaid_wrapper = SandboxWrapper()
+        plaid_wrapper_2 = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user_lilly, ['transactions'])
 
-        public_token_2 = plaid_wrapper.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
-        plaid_wrapper.exchange_public_token(public_token_2)
-        plaid_wrapper.save_access_token(user_lilly, ['transactions'])
+        public_token_2 = plaid_wrapper_2.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
+        plaid_wrapper_2.exchange_public_token(public_token_2)
+        plaid_wrapper_2.save_access_token(user_lilly, ['transactions'])
 
         debit_card_lilly = DebitCard(plaid_wrapper, user_lilly)
 
