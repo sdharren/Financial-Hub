@@ -13,34 +13,69 @@ from assetManager.investments.reactstuff import NumberShow
 #remove after testing purposes are finished
 from assetManager.models import User
 from assetManager.assets.debit_card import DebitCard
-
+from django.contrib.auth.decorators import login_required
 #from assetManager.bankcards.debit_card import DebitCard
 
+#User.objects.get(email = "augusto_uk@yahoo.co.uk")
 def get_balances_data(request):
+    #if request.user.is_authenticated:
     if request.method == "GET":
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(User.objects.get(email = "augusto_uk@yahoo.co.uk"), ['transactions'])
         debit_card = DebitCard(plaid_wrapper,User.objects.get(email = "augusto_uk@yahoo.co.uk"))
+
         account_balances = debit_card.get_account_balances()
+        #print(account_balances)
         balances = {}
 
         for institution_name in account_balances.keys():
             total = 0
             for account_id in account_balances[institution_name].keys():
-
                 total += account_balances[institution_name][account_id]['available_amount']
+
 
             balances[institution_name] = total
 
+        #print(balances)
         return HttpResponse(json.dumps(balances), content_type='application/json')
     else:
         messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
         return redirect('home_page')
+    #else:
+        #messages.add_message(request, messages.ERROR, 'Not Logged In')
+        #return redirect('home_page')
+
 
 def select_account(request):
-    pass
+    if request.method == "GET":
+        if request.GET.get('param'):
+            institution_name = request.GET.get('param')
+            plaid_wrapper = SandboxWrapper()
+            public_token = plaid_wrapper.create_public_token_custom_user()
+            plaid_wrapper.exchange_public_token(public_token)
+            plaid_wrapper.save_access_token(User.objects.get(email = "augusto_uk@yahoo.co.uk"), ['transactions'])
+            debit_card = DebitCard(plaid_wrapper,User.objects.get(email = "augusto_uk@yahoo.co.uk"))
+
+            account_balances = debit_card.get_account_balances()
+
+
+            accounts = {}
+
+            for account in account_balances[institution_name].keys():
+                total = 0
+                total += account_balances[institution_name][account]['available_amount']
+                accounts[account] = total
+
+            print(accounts)
+            return HttpResponse(json.dumps(accounts), content_type='application/json')
+
+        else:
+            raise Exception
+    else:
+        messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
+        return redirect('get_balances_data')
 
 
 

@@ -6,7 +6,8 @@ function BalancesDisplay() {
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
-        'get_balances_data': 'balances',
+        'get_balances_data': 'select_account',
+        'select_account': 'get_balances_data',
     }
 
     // passed as a parameter to the pie chart to update this page once a section of the pie chart is clicked
