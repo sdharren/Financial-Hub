@@ -48,7 +48,7 @@ import json
 def investment_categories(request):
     stock_getter = retrieve_stock_getter(request.user)
     categories = stock_getter.get_investment_categories()
-    return HttpResponse(json.dumps(categories, default=str), content_type='application/json')
+    return Response(categories, content_type='application/json', status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -60,7 +60,7 @@ def investment_category_breakdown(request):
         raise Exception
         # should return bad request
     data = stock_getter.get_investment_category(category)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -70,11 +70,28 @@ def stock_history(request):
         stock_name = request.GET.get('stock_name')
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
     else:
-        raise Exception
+        return Response({'error': 'Bad request. Param not specified.'}, status=500)
         #return bad request
     data = stock_getter.get_stock_history(stock_ticker)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    return Response(data, content_type='application/json', status=200)
 
+from django.conf import settings
+from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
+from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def create_link_token(request):
+    if request.GET.get('product'):
+        product = request.GET.get('product')
+    else:
+        return Response({'error': 'Bad request. Product not specified.'}, status=500)
+    wrapper = DevelopmentWrapper()
+    link_token = wrapper.create_link_token([product])
+    response_data = {'link_token': link_token}
+    return Response(response_data, content_type='application/json', status=200)
+    
+
+# handle error if investments aren't cached
 def retrieve_stock_getter(user):
     stock_getter = StocksGetter(None)
     data = cache.get('investments' + user.email)
