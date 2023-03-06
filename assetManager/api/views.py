@@ -88,7 +88,8 @@ def create_link_token(request):
     else:
         return Response({'error': 'Bad request. Product not specified.'}, status=500)
     wrapper = DevelopmentWrapper()
-    link_token = wrapper.create_link_token([product])
+    wrapper.create_link_token([product])
+    link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
     
@@ -107,6 +108,7 @@ def exchange_public_token(request):
         print(str(e)) # for debugging
         return Response({'error': 'Bad request. Invalid public token.'}, status=500)
     wrapper.save_access_token(request.user, products_selected)
+    print(wrapper.ACCESS_TOKEN)
     return Response(status=200)
 
 # handle error if investments aren't cached
