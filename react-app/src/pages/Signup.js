@@ -20,6 +20,10 @@ const Signup = () => {
 
         let data = await response.json()
         console.log(data)
+        // response 400: email : "user with this email already exists."
+        // response 400: password: 
+
+        // response 200:
 
     }
     
