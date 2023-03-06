@@ -108,3 +108,70 @@ class UserModelTestCase(TestCase):
             password='Password123',
         )
         return user
+
+    def test_super_user_is_valid(self):
+        try:
+            super_user = User.objects.create_superuser(
+                email = "mikedoe@gmail.com",
+                first_name = "Mike",
+                last_name = "Doe",
+                password = "Password123"
+            )
+            super_user.full_clean()
+        except (ValidationError):
+            self.fail('Test user should be valid')
+
+    def test_super_user_super_user_flag_must_be_true(self):
+        with self.assertRaises(ValueError):
+            super_user = User.objects.create_superuser(
+                email = "mikedoe@gmail.com",
+                first_name = "Mike",
+                last_name = "Doe",
+                password = "Password123",
+                is_superuser = False
+            )
+
+    def test_super_user_staff_flag_must_be_true(self):
+        with self.assertRaises(ValueError):
+            super_user = User.objects.create_superuser(
+                email = "mikedoe@gmail.com",
+                first_name = "Mike",
+                last_name = "Doe",
+                password = "Password123",
+                is_staff = False
+            )
+
+
+    def test_super_user_super_must_have_name(self):
+        with self.assertRaises(ValueError):
+            super_user = User.objects.create_superuser(
+                email = "mikedoe@gmail.com",
+                last_name = "Doe",
+                password = "Password123",
+            )
+
+    def test_super_user_super_must_have_last_name(self):
+        with self.assertRaises(ValueError):
+            super_user = User.objects.create_superuser(
+                email = "mikedoe@gmail.com",
+                first_name = "Mike",
+                password = "Password123",
+            )
+
+    def test_super_user_super_must_have_valid_email(self):
+        with self.assertRaises(ValueError):
+            super_user = User.objects.create_superuser(
+                email = "",
+                first_name = "Mike",
+                last_name = "Doe",
+                password = "Password123",
+            )
+
+    def test_super_user_must_have_valid_password(self):
+        with self.assertRaises(ValueError):
+            super_user = User.objects.create_superuser(
+                email = "mikedoe@gmail.com",
+                first_name = "Mike",
+                last_name = "Doe",
+                password = "",
+            )

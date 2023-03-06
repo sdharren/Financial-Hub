@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import BarGraph from './pages/BarGraph';
 import BarChartDisplay from './pages/BarChartDisplay';
 import PieChart from './pages/PieChart';
+import BalancesDisplay from './pages/Balances';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
 import GraphDisplay from './pages/GraphDisplay';
 import PrivateRoutes from './utils/PrivateRoute';
@@ -36,6 +37,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/graph_display" element={<GraphDisplay />} />
               <Route path="/plaid_link" element={<Link linkToken="link-development-c4af2a33-1891-4f1f-807d-b6de0550326d"/>}/>
+              <Route path="/balances" element={<BalancesDisplay />} />
             </Routes>
           </div>
         </AuthProvider>

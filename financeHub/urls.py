@@ -25,6 +25,8 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('link_sandbox_investments/', views.link_sandbox_investments),
     path('api/number/', views.number_view, name='number'),
+    path('api/get_balances_data/', views.get_balances_data, name='get_balances_data'),
+    path('api/select_account/', views.select_account, name='select_account'),
     path('api/cache_assets/', views.setup_asset_data),
     path('api/yearly_graphs/', views.yearlyGraph, name='yearlyGraph'),
     path('api/monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
