@@ -14,9 +14,7 @@ function Link({ linkToken }) {
             'Content-Type': 'application/json',
             'Authorization':'Bearer ' + String(authTokens.access),
         },
-        body: {
-            public_token,
-        },
+        body: JSON.stringify({'public_token': public_token})
         });
         // at this point the token is exchanged and the access token is saved
         // need to now redirect/ tell parent component to render next thing

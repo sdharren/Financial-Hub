@@ -96,19 +96,16 @@ def create_link_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
-    products_selected = cache.get('product_link' + request.user.email)
+    products_selected = ['transactions'] # for now this is here uncomment for prod!!!
+    #products_selected = cache.get('product_link' + request.user.email)
     cache.delete('product_link' + request.user.email)
-    if settings.PLAID_DEVELOPMENT:
-        wrapper = DevelopmentWrapper()
-    else:
-        wrapper = SandboxWrapper()
+    wrapper = DevelopmentWrapper()
     try:
-        wrapper.exchange_public_token(request.POST['public_token'])
+        wrapper.exchange_public_token(request.data['public_token'])
     except InvalidPublicToken as e:
         print(str(e)) # for debugging
         return Response({'error': 'Bad request. Invalid public token.'}, status=500)
     wrapper.save_access_token(request.user, products_selected)
-    print(wrapper.ACCESS_TOKEN)
     return Response(status=200)
 
 # handle error if investments aren't cached
