@@ -62,7 +62,7 @@ class DebitCard():
 
             balances[self.plaid_wrapper.get_institution_name(token)] = accounts
 
-        
+
         return balances
 
 
@@ -76,11 +76,10 @@ class DebitCard():
                 start_date=start_date_input,
                 end_date=end_date_input,
             )
-            try:
-                transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
-                transactions.append(transaction_response['transactions'])
-            except ApiException:
-                raise AccessTokenInvalid
+
+            transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+            transactions.append(transaction_response['transactions'])
+
 
         return transactions
 

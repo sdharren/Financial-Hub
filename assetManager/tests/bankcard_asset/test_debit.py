@@ -105,29 +105,17 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
             end_date = date.fromisoformat('2022-12-19')
             transactions = self.debit_card.get_transactions_by_date(start_date,end_date)
 
-    def test_get_transactions_with_one_access_token(self):
-        start_date = date.fromisoformat('2022-12-16')
-        end_date = date.fromisoformat('2022-12-19')
-        transactions = self.debit_card.get_transactions_by_date(start_date,end_date)
-        self.assertEqual(len(transactions),1)
-        self.assertEqual(len(transactions[0]),4)
-
-        self.assertEqual(transactions[0][0]['amount'], 896.65)
-        self.assertEqual(transactions[0][1]['amount'], 398.34)
-        self.assertEqual(transactions[0][2]['amount'], 1708.12)
-        self.assertEqual(transactions[0][3]['amount'], 1109.01)
-
-
-    def test_get_transactions_with_multiple_tokens(self):
+    def test_get_transactions_with_one_and_multiple_access_token(self):
         user_lilly = User.objects.get(email='lillydoe@example.org')
         plaid_wrapper = SandboxWrapper()
+        plaid_wrapper_2 = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user_lilly, ['transactions'])
 
-        public_token_2 = plaid_wrapper.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
-        plaid_wrapper.exchange_public_token(public_token_2)
-        plaid_wrapper.save_access_token(user_lilly, ['transactions'])
+        public_token_2 = plaid_wrapper_2.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
+        plaid_wrapper_2.exchange_public_token(public_token_2)
+        plaid_wrapper_2.save_access_token(user_lilly, ['transactions'])
 
         debit_card_lilly = DebitCard(plaid_wrapper, user_lilly)
 
@@ -142,6 +130,18 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(len(transactions[1]),4)
 
         self.assertFalse(self.are_dicts_same(transactions[0], transactions[1]))
+
+        start_date = date.fromisoformat('2022-12-16')
+        end_date = date.fromisoformat('2022-12-19')
+        transactions = self.debit_card.get_transactions_by_date(start_date,end_date)
+        self.assertEqual(len(transactions),1)
+        self.assertEqual(len(transactions[0]),4)
+
+        self.assertEqual(transactions[0][0]['amount'], 896.65)
+        self.assertEqual(transactions[0][1]['amount'], 398.34)
+        self.assertEqual(transactions[0][2]['amount'], 1708.12)
+        self.assertEqual(transactions[0][3]['amount'], 1109.01)
+
 
     def test_get_non_existent_institution_name_from_db(self):
         access_tokens = 'wrongaccesstokenstring'
