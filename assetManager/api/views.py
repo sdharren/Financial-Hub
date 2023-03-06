@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
 from assetManager.models import User
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -36,3 +37,10 @@ def getFirstName(request):
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
+
+class SignupView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
