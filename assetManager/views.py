@@ -143,6 +143,7 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
+# NOTE: this method is not needed - real one in api/views, leave for now for manual testing
 def setup_asset_data(request):
     user = request.user
     wrapper = SandboxWrapper() # for now

@@ -1,4 +1,7 @@
+import json
 from django.http import JsonResponse
+from django.conf import settings
+from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from assetManager.models import User
@@ -9,6 +12,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import UserSerializer
 from assetManager.models import User
+from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
+from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken
+from assetManager.investments.stocks import StocksGetter
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -36,12 +44,6 @@ def getFirstName(request):
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
-
-# the following imports are needed for the below view - leaving them here for now
-from assetManager.investments.stocks import StocksGetter
-from django.core.cache import cache
-from django.http import HttpResponse
-import json
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -75,10 +77,6 @@ def stock_history(request):
     data = stock_getter.get_stock_history(stock_ticker)
     return Response(data, content_type='application/json', status=200)
 
-from django.conf import settings
-from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def create_link_token(request):
@@ -96,7 +94,8 @@ def create_link_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
-    products_selected = ['transactions'] # for now this is here uncomment for prod!!!
+    products_selected = ['transactions'] #NOTE: hardcoded for now
+    #TODO: uncomment line below for prod
     #products_selected = cache.get('product_link' + request.user.email)
     cache.delete('product_link' + request.user.email)
     wrapper = DevelopmentWrapper()
@@ -108,7 +107,23 @@ def exchange_public_token(request):
     wrapper.save_access_token(request.user, products_selected)
     return Response(status=200)
 
-# handle error if investments aren't cached
+@api_view(['GET']) #NOTE: Is GET appropriate for this type of request?
+@permission_classes([IsAuthenticated])
+def cache_assets(request):
+    user = request.user
+    if settings.PLAID_DEVELOPMENT:
+        wrapper = DevelopmentWrapper()
+    else:
+        wrapper = SandboxWrapper()
+    #TODO: same thing for bank stuff
+    #NOTE: do we need this for crypto? 
+    stock_getter = StocksGetter(wrapper)
+    stock_getter.query_investments(user)
+    cache.set('investments' + user.email, stock_getter.investments)
+    return Response(status=200)
+    
+
+#TODO: handle error if investments aren't cached
 def retrieve_stock_getter(user):
     stock_getter = StocksGetter(None)
     data = cache.get('investments' + user.email)
