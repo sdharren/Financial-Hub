@@ -59,8 +59,7 @@ def investment_category_breakdown(request):
     if request.GET.get('param'):
         category = request.GET.get('param')
     else:
-        raise Exception
-        # should return bad request
+        return Response({'error': 'Bad request. Param not specified.'})
     data = stock_getter.get_investment_category(category)
     return Response(data, content_type='application/json', status=200)
 
