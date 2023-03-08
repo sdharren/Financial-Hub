@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import{ Chart as ChartJS, Tooltip, Legend, Colors } from 'chart.js';
+import 'chart.js/auto';
 import { Line } from "react-chartjs-2";
+import AuthContext from '../context/AuthContext';
+
 
 const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
     let {authTokens, logoutUser} = useContext(AuthContext);
