@@ -120,12 +120,10 @@ def cache_assets(request):
         stock_getter = StocksGetter(wrapper)
         stock_getter.query_investments(user)
         cache.set('investments' + user.email, stock_getter.investments)
-    else if request.method == 'DELETE':
+    elif request.method == 'DELETE':
         user = request.user
         if cache.has_key('investments' + user.email):
             cache.delete('investments' + user.email)
-    else:
-        return Response(status=500)
     return Response(status=200)
 
 #TODO: handle error if investments aren't cached
