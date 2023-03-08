@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.test import TestCase
 from django.core.cache import cache
@@ -77,4 +78,18 @@ class APIViewsTestCase(TestCase):
         response = self.client.delete('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
         self.assertFalse(cache.has_key('investments' + self.user.email))
-        
+
+    def test_get_stock_history_work(self):
+        response = self.client.get('/api/stock_history/?param=iShares%20Inc%20MSCI%20Brazil')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.data) > 10)        
+
+    def test_get_link_token_returns_error_for_wrong_product(self):
+        response = self.client.get('/api/link_token/?product=thisdoesntexit')
+        self.assertEqual(response.status_code, 500)
+
+    def test_get_link_token_works(self):
+        response = self.client.get('/api/link_token/?product=investments')
+        self.assertEqual(response.status_code, 200)
+        link_token = response.data['link_token']
+        self.assertIsNotNone(re.match(r"^link-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$", link_token))

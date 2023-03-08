@@ -14,7 +14,7 @@ from .serializers import UserSerializer
 from assetManager.models import User
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken
+from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter
 
 
@@ -78,14 +78,19 @@ def stock_history(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def create_link_token(request):
+def link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')
         cache.set('product_link' + request.user.email, [product])
     else:
         return Response({'error': 'Bad request. Product not specified.'}, status=500)
     wrapper = DevelopmentWrapper()
-    wrapper.create_link_token([product])
+
+    try:
+        wrapper.create_link_token([product])
+    except LinkTokenNotCreated:
+        return Response({'error': 'Bad request. Product not specified.'}, status=500)
+
     link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
@@ -101,7 +106,6 @@ def exchange_public_token(request):
     try:
         wrapper.exchange_public_token(request.data['public_token'])
     except InvalidPublicToken as e:
-        print(str(e)) # for debugging
         return Response({'error': 'Bad request. Invalid public token.'}, status=500)
     wrapper.save_access_token(request.user, products_selected)
     return Response(status=200)
