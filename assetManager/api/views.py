@@ -68,7 +68,7 @@ def investment_category_breakdown(request):
 def stock_history(request):
     stock_getter = retrieve_stock_getter(request.user)
     if request.GET.get('param'):
-        stock_name = request.GET.get('stock_name')
+        stock_name = request.GET.get('param')
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
     else:
         return Response({'error': 'Bad request. Param not specified.'}, status=500)
