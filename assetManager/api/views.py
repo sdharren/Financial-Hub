@@ -106,21 +106,27 @@ def exchange_public_token(request):
     wrapper.save_access_token(request.user, products_selected)
     return Response(status=200)
 
-@api_view(['GET']) #NOTE: Is GET appropriate for this type of request?
+@api_view(['PUT', 'DELETE']) #NOTE: Is GET appropriate for this type of request?
 @permission_classes([IsAuthenticated])
 def cache_assets(request):
-    user = request.user
-    if settings.PLAID_DEVELOPMENT:
-        wrapper = DevelopmentWrapper()
+    if request.method == 'PUT':
+        user = request.user
+        if settings.PLAID_DEVELOPMENT:
+            wrapper = DevelopmentWrapper()
+        else:
+            wrapper = SandboxWrapper()
+        #TODO: same thing for bank stuff
+        #NOTE: do we need this for crypto? 
+        stock_getter = StocksGetter(wrapper)
+        stock_getter.query_investments(user)
+        cache.set('investments' + user.email, stock_getter.investments)
+    else if request.method == 'DELETE':
+        user = request.user
+        if cache.has_key('investments' + user.email):
+            cache.delete('investments' + user.email)
     else:
-        wrapper = SandboxWrapper()
-    #TODO: same thing for bank stuff
-    #NOTE: do we need this for crypto? 
-    stock_getter = StocksGetter(wrapper)
-    stock_getter.query_investments(user)
-    cache.set('investments' + user.email, stock_getter.investments)
+        return Response(status=500)
     return Response(status=200)
-    
 
 #TODO: handle error if investments aren't cached
 def retrieve_stock_getter(user):
