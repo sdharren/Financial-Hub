@@ -12,6 +12,8 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name = 'token_refresh'),
     path('investment_categories/', views.investment_categories, name='investment_categories'),
     path('investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown'),
+    path('stock_history/', views.stock_history, name='stock_history'),
     path('exchange_public_token/', views.exchange_public_token, name='exchange_public_token'),
+    path('link_token/', views.link_token, name='link_token'),
     path('cache_assets/', views.cache_assets),
 ]

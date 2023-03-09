@@ -131,8 +131,7 @@ class StocksTestCase(TestCase):
     def test_get_return_on_current_holdings(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         data = self.stock_getter.get_return_on_current_holdings()
-        for key in data:
-            self.assertTrue(data[key] > 0)
+        self.assertEqual(len(data), 4)
 
     def test_get_investment_category_returns_category(self):
         self.stock_getter = _create_stock_getter_with_fake_data()

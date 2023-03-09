@@ -1,4 +1,5 @@
 import PieChart from "./PieChart";
+import LineGraph from "./LineGraph";
 import { useState } from "react";
 
 function GraphDisplay() {
@@ -12,10 +13,17 @@ function GraphDisplay() {
 
     // passed as a parameter to the pie chart to update this page once a section of the pie chart is clicked
     function handleLoadNext(event) {
-        console.log(nextRoute[event.current]);
-        setGraph(
-                <PieChart endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
-        );
+        let next = nextRoute[event.current];
+        if (next == 'stock_history') {
+            setGraph(
+                <LineGraph endpoint={next} endpoint_parameter={event.next} />
+            );
+        }
+        else {
+            setGraph(
+                <PieChart endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext} />
+            );
+        }
     }
 
 
