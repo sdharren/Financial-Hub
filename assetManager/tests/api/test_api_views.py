@@ -43,10 +43,30 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 401)
 
+    def test_investment_categories_returns_see_other_with_no_investments_linked(self):
+        client = APIClient()
+        user = User.objects.get(email='lillydoe@example.org')
+        client.login(email=user.email, password='Password123')
+        response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+        response = client.get('/api/investment_categories/')
+        self.assertEqual(response.status_code, 303)        
+
     def test_investment_category_breakdown_returns_breakdown(self):
         response = self.client.get('/api/investment_category_breakdown/?param=equity')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'Achillion Pharmaceuticals Inc.': 100.0, 'Southside Bancshares Inc.': 100.0})
+
+    def test_investment_categoriy_breakdown_returns_see_other_with_no_investments_linked(self):
+        client = APIClient()
+        user = User.objects.get(email='lillydoe@example.org')
+        client.login(email=user.email, password='Password123')
+        response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+        response = client.get('/api/investment_category_breakdown/?param=equity')
+        self.assertEqual(response.status_code, 303) 
 
     def test_cache_assets_returns_method_not_allowed_wrong_request(self):
         response = self.client.get('/api/cache_assets/')
@@ -83,6 +103,16 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/stock_history/?param=iShares%20Inc%20MSCI%20Brazil')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.data) > 10)        
+
+    def test_stock_history_returns_see_other_with_no_investments_linked(self):
+        client = APIClient()
+        user = User.objects.get(email='lillydoe@example.org')
+        client.login(email=user.email, password='Password123')
+        response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+        response = client.get('/api/investment_category_breakdown/?param=NFLX')
+        self.assertEqual(response.status_code, 303) 
 
     def test_get_link_token_returns_error_for_wrong_product(self):
         response = self.client.get('/api/link_token/?product=thisdoesntexit')

@@ -61,7 +61,7 @@ def investment_category_breakdown(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
     except InvestmentsNotLinked:
-        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=400)
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     if request.GET.get('param'):
         category = request.GET.get('param')
     else:
@@ -75,7 +75,7 @@ def stock_history(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
     except InvestmentsNotLinked:
-        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=400)
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     if request.GET.get('param'):
         stock_name = request.GET.get('param')
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
