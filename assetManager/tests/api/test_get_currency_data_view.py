@@ -42,7 +42,7 @@ class GetCurrencyDataViewTestCase(TestCase):
         balances = reformat_balances_into_currency(account_balances)
         self.assertEqual(len(balances),1)
         self.assertEqual(list(balances.keys())[0], 'USD')
-        self.assertEqual(balances[list(balances.keys())[0]], 1)
+        self.assertEqual(balances[list(balances.keys())[0]], 100)
 
     def test_get_currency_multiple_institutions(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}},'HSBC':{'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'EUR'}}}
@@ -51,8 +51,8 @@ class GetCurrencyDataViewTestCase(TestCase):
         self.assertEqual(list(balances.keys())[0], 'USD')
         self.assertEqual(list(balances.keys())[1], 'EUR')
 
-        self.assertEqual(balances[list(balances.keys())[0]], 0.75)
-        self.assertEqual(balances[list(balances.keys())[1]], 0.25)
+        self.assertEqual(balances[list(balances.keys())[0]], 75)
+        self.assertEqual(balances[list(balances.keys())[1]], 25)
 
 
     def test_get_reformatted_balances_into_currency_data_correctly_with_multiple_currencies_same_quantity_per_quantity(self):
@@ -63,9 +63,9 @@ class GetCurrencyDataViewTestCase(TestCase):
         self.assertEqual(list(balances.keys())[1], 'GBP')
         self.assertEqual(list(balances.keys())[2], 'EUR')
 
-        self.assertEqual(balances[list(balances.keys())[0]], (1/3))
-        self.assertEqual(balances[list(balances.keys())[1]], 0.5)
-        self.assertEqual(balances[list(balances.keys())[2]], (1/6))
+        self.assertEqual(balances[list(balances.keys())[0]], (1/3)*100)
+        self.assertEqual(balances[list(balances.keys())[1]], 50)
+        self.assertEqual(balances[list(balances.keys())[2]], (1/6)*100)
 
     def test_make_post_request_to_url(self):
         response = self.client.post(self.url, follow = True)
@@ -77,7 +77,7 @@ class GetCurrencyDataViewTestCase(TestCase):
         response_json = json.loads(response.content)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0], "USD")
-        self.assertEqual(response_data['USD'], 1)
+        self.assertEqual(response_data['USD'], 100)
         self.assertEqual(response.status_code,200)
 
     def test_get_currenccy_succesfully_with_existing_cache(self):
@@ -87,5 +87,5 @@ class GetCurrencyDataViewTestCase(TestCase):
         response_json = json.loads(response_2.content)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0], "USD")
-        self.assertEqual(response_data['USD'], 1)
+        self.assertEqual(response_data['USD'], 100)
         self.assertEqual(response.status_code,200)

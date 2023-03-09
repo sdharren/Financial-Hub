@@ -181,7 +181,7 @@ def reformat_balances_into_currency(account_balances):
     proportions = {}
     for currency, amount in currency_total.items():
         proportion = amount / total_money
-        proportions[currency] = proportion
+        proportions[currency] = proportion * 100
 
     return proportions
 
