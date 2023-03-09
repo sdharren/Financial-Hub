@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import 'chart.js/auto';
-import { Line } from "react-chartjs-2";
+import Chart from "react-apexcharts";
 import AuthContext from '../context/AuthContext';
 
-
-const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
+function LineGraph({endpoint, endpoint_parameter, loadNext}) {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [lineGraphData, setLineGraphData] = useState(null);
 
@@ -25,27 +24,44 @@ const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
 
     useEffect(() => {
         get_data();
-    }, [endpoint]);
+      }, [endpoint]); 
 
-    let line_data = new Array();
-    let line_labels = new Array();
-    for (let key in lineGraphData) {
-        line_labels.push(key);
-        line_data.push(lineGraphData[key]);
-    }
+    // using built-in colors for now as otherwise they need to be hardcoded
+    // make a selection of colors that match the UI theme later and replace
+    var options = {
+        series: [{
+            data: lineGraphData
+          }],
+        chart: {
+            id: 'area-datetime',
+            type: 'line',
+            height: 350,
+            zoom: {
+              autoScaleYaxis: true
+            }
+          },
+        xaxis: {
+            type: 'datetime',
+            min: new Date('01 Mar 2012').getTime(),
+            tickAmount: 6,
+        },
+        tooltip: {
+            x: {
+              format: 'dd MMM yyyy'
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.7,
+              opacityTo: 0.9,
+              stops: [0, 100]
+            }
+          },
+    };
 
-    const data = {
-        labels: line_labels,
-        datasets: [{
-          label: endpoint_parameter + " " + 'Stock Price',
-          data: line_data,
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
-        }]
-      };
-    
-      return <Line data = {data}></Line>
-    }
+    return <Chart options = {options}></Chart>
+}
 
-    export default LineGraph;
+export default LineGraph;
