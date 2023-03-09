@@ -148,7 +148,6 @@ def monthlyGraph(request):
         raise Exception
         # should return bad request
     graphData = transactions.monthlySpendingInYear(int(yearName))
-    print(graphData)
     return Response(graphData, content_type='application/json')
 
 @api_view(['GET'])
