@@ -161,6 +161,31 @@ def retrieve_stock_getter(user):
     return stock_getter
 #test if the available amount is None
 
+def reformat_balances_into_currency(account_balances):
+    if type(account_balances) is not dict:
+        raise TypeError("account balances must be of type dict")
+
+    currency_total = {}
+
+    for institution in account_balances.keys():
+        for account in account_balances[institution].keys():
+            currency_type = account_balances[institution][account]['currency']
+            amount = account_balances[institution][account]['available_amount']
+            if currency_type not in currency_total.keys():
+                currency_total[currency_type] = 0
+
+            currency_total[currency_type] += amount
+
+    total_money = sum(currency_total.values())
+
+    proportions = {}
+    for currency, amount in currency_total.items():
+        proportion = amount / total_money
+        proportions[currency] = proportion
+
+    return proportions
+
+
 def reformatAccountBalancesData(account_balances,institution_name):
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
@@ -198,7 +223,32 @@ def reformatBalancesData(account_balances):
 
     return balances
 
-#refactor to include cache
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_currency_data(request):
+    user = request.user
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+
+        if cache.has_key('currency' + user.email):
+            return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
+
+        debit_card = DebitCard(plaid_wrapper,user)
+        account_balances = debit_card.get_account_balances()
+        currency = reformat_balances_into_currency(account_balances)
+
+        cache.set('currency' + user.email, currency)
+
+        return Response(currency, content_type='application/json', status = 200)
+
+
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_balances_data(request):
@@ -222,8 +272,8 @@ def get_balances_data(request):
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
 
-    if cache.has_key('balances' + user.email) is False:
-        cache.set('balances' + user.email, account_balances)
+    #if cache.has_key('balances' + user.email) is False
+    cache.set('balances' + user.email, account_balances)
 
     return Response(balances, content_type='application/json', status = 200)
 

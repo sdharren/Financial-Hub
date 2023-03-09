@@ -18,4 +18,5 @@ urlpatterns = [
     path('cache_assets/', views.cache_assets),
     path('get_balances_data/', views.get_balances_data, name='get_balances_data'),
     path('select_account/', views.select_account, name='select_account'),
+    path('currency_data/', views.get_currency_data, name='currency_data'),
 ]
