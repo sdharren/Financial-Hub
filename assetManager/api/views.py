@@ -16,7 +16,7 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken
 from assetManager.investments.stocks import StocksGetter
-
+from assetManager.assets.debit_card import DebitCard
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -179,10 +179,15 @@ def get_balances_data(request):
 def select_account(request):
         if request.GET.get('param'):
             institution_name = request.GET.get('param')
-            plaid_wrapper = SandboxWrapper()
-            public_token = plaid_wrapper.create_public_token_custom_user()
-            plaid_wrapper.exchange_public_token(public_token)
-            plaid_wrapper.save_access_token(request.user, ['transactions'])
+
+            if settings.PLAID_DEVELOPMENT:
+                plaid_wrapper = DevelopmentWrapper()
+            else:
+                plaid_wrapper = SandboxWrapper()
+                public_token = plaid_wrapper.create_public_token_custom_user()
+                plaid_wrapper.exchange_public_token(public_token)
+                plaid_wrapper.save_access_token(request.user, ['transactions'])
+
             debit_card = DebitCard(plaid_wrapper,request.user)
 
             account_balances = debit_card.get_account_balances()
