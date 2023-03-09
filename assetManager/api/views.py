@@ -183,6 +183,10 @@ def get_balances_data(request):
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
 
+    if cache.has_key('balances' + request.user.email) is False:
+        cache.set('balances' + request.user.email, account_balances)
+    
+
     return Response(balances, content_type='application/json', status = 200)
 
 @api_view(['GET'])
@@ -191,17 +195,10 @@ def select_account(request):
         if request.GET.get('param'):
             institution_name = request.GET.get('param')
 
-            if settings.PLAID_DEVELOPMENT:
-                plaid_wrapper = DevelopmentWrapper()
+            if cache.has_key('balances' + request.user.email) is False:
+                raise Exception('Balances was not queried')
             else:
-                plaid_wrapper = SandboxWrapper()
-                public_token = plaid_wrapper.create_public_token_custom_user()
-                plaid_wrapper.exchange_public_token(public_token)
-                plaid_wrapper.save_access_token(request.user, ['transactions'])
-
-            debit_card = DebitCard(plaid_wrapper,request.user)
-
-            account_balances = debit_card.get_account_balances()
+                account_balances = cache.get('balances' + request.user.email)
 
             if institution_name not in list(account_balances.keys()):
                 raise Exception("Provided institution name does not exist in the requested accounts")
