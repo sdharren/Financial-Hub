@@ -185,9 +185,14 @@ def get_balances_data(request):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user, ['transactions'])
 
+    if cache.has_key('balances' + user.email):
+        account_balances = cache.get('balances' + user.email)
+        if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
+            cache.delete('balances' + user.email)
+        else:
+            return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
     debit_card = DebitCard(plaid_wrapper,user)
-
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
 
@@ -212,7 +217,6 @@ def select_account(request):
 
             accounts = reformatAccountBalancesData(account_balances,institution_name)
 
-            print(accounts)
             return Response(accounts, content_type='application/json',status = 200)
 
         else:

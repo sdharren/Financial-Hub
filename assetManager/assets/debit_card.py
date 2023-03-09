@@ -57,11 +57,14 @@ class DebitCard():
             request_accounts = self.plaid_wrapper.get_accounts(token)
             accounts = {}
             for account in request_accounts:
-                case = {'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+                if account['balances']['available'] is None:
+                    case = {'available_amount':0.0, 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+                else:
+                    case = {'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+
                 accounts[account['account_id']] = case
 
             balances[self.plaid_wrapper.get_institution_name(token)] = accounts
-
 
         return balances
 

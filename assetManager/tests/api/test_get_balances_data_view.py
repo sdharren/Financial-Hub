@@ -9,6 +9,9 @@ from assetManager.api.views import get_balances_data
 
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
+from django.conf import settings
+from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+
 class GetBalancesDataViewTestCase(TestCase):
     """Tests of the log in view."""
     fixtures = [
@@ -16,11 +19,23 @@ class GetBalancesDataViewTestCase(TestCase):
     ]
 
     def setUp(self):
+        self.user = User.objects.get(email='johndoe@example.org')
+        self.client = APIClient()
+        self.client.login(email=self.user.email, password='Password123')
+        response = self.client.post('/api/token/', {'email': self.user.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+
         self.url = reverse('get_balances_data')
-        self.user = User.objects.get(email = 'johndoe@example.org')
+
 
     def test_balances_url(self):
         self.assertEqual(self.url,'/api/get_balances_data/')
+
+    def test_get_balances_data_without_jwt_not_logged_in(self):
+        self.client.credentials()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 401)
 
     def test_reformatBalancesData_incorrect_param_type(self):
         incorrect_account_balances = ['account1', 'account2']
@@ -34,35 +49,32 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(list(balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(balances[list(balances.keys())[0]], 1000.0)
 
+
     def test_make_post_request_to_url(self):
-        self.client.login(email=self.user.email, password="Password123")
         response = self.client.post(self.url, follow = True)
-
-        redirect_url = reverse('home_page')
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-
-        messages_list = list(response.context['messages'])
-        self.assertEqual(str(messages_list[0]), 'POST query not permitted to this URL')
-        self.assertEqual(messages_list[0].level, messages.ERROR)
+        self.assertEqual(response.status_code,405)
 
 
     def test_get_balances_succesfully(self):
-        self.client.login(email=self.user.email, password="Password123")
         response = self.client.get(self.url, follow=True)
         response_json = json.loads(response.content)
         response_data = response.json()
         self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 1000.0)
+        self.assertEqual(response.status_code,200)
 
     def test_get_balances_succesfully_for_multiple_accounts(self):
-        pass
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+        settings.PLAID_DEVELOPMENT = False
 
-    def test_get_balances_not_logged_in(self):
-        response = self.client.post(self.url, follow = True)
+        response = self.client.get(self.url, follow = True)
+        self.assertEqual(response.status_code, 200)
+        account_balances = json.loads(response.content)
 
-        redirect_url = reverse('home_page')
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'home.html')
+        self.assertEqual(list(account_balances.keys())[0], 'Bank of America')
+        self.assertEqual(list(account_balances.keys())[1], 'Royal Bank of Scotland - Current Accounts')
 
-        messages_list = list(response.context['messages'])
-        self.assertEqual(str(messages_list[0]), 'Not Logged In')
-        self.assertEqual(messages_list[0].level, messages.ERROR)
+        self.assertEqual(account_balances[list(account_balances.keys())[0]], 43500.0)
+        self.assertEqual(account_balances[list(account_balances.keys())[1]], 1000.0)
