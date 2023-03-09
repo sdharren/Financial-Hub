@@ -3,6 +3,7 @@ import re
 
 from django.test import TestCase
 from django.core.cache import cache
+from django.conf import settings
 
 from assetManager.models import User
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
@@ -59,15 +60,19 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'Achillion Pharmaceuticals Inc.': 100.0, 'Southside Bancshares Inc.': 100.0})
 
-    def test_investment_categoriy_breakdown_returns_see_other_with_no_investments_linked(self):
+    def test_investment_category_breakdown_returns_see_other_with_no_investments_linked(self):
         client = APIClient()
         user = User.objects.get(email='lillydoe@example.org')
         client.login(email=user.email, password='Password123')
         response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
         jwt = str(response.data['access'])
-        client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.get('/api/investment_category_breakdown/?param=equity')
         self.assertEqual(response.status_code, 303) 
+
+    def test_investment_category_breakdown_returns_bad_request_with_no_params(self):
+        response = self.client.get('/api/investment_category_breakdown/')
+        self.assertEqual(response.status_code, 400)
 
     def test_cache_assets_returns_method_not_allowed_wrong_request(self):
         response = self.client.get('/api/cache_assets/')
@@ -77,6 +82,16 @@ class APIViewsTestCase(TestCase):
         self.client.credentials()
         response = self.client.get('/api/cache_assets/')
         self.assertEqual(response.status_code, 401)
+
+    def test_put_cache_assets_returns_see_other_with_no_linked_investments(self):
+        client = APIClient()
+        user = User.objects.get(email='lillydoe@example.org')
+        client.login(email=user.email, password='Password123')
+        response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
+        response = client.put('/api/cache_assets/')
+        self.assertEqual(response.status_code, 303) 
 
     def test_put_cache_assets_works(self):
         cache.delete('investments' + self.user.email)
@@ -100,6 +115,13 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(cache.has_key('investments' + self.user.email))
 
+    def test_cache_assets_works_with_development(self):
+        settings.PLAID_DEVELOPMENT = True
+        response = self.client.delete('/api/cache_assets/')
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(cache.has_key('investments' + self.user.email))
+        settings.PLAID_DEVELOPMENT = False
+
     def test_get_stock_history_work(self):
         response = self.client.get('/api/stock_history/?param=iShares%20Inc%20MSCI%20Brazil')
         self.assertEqual(response.status_code, 200)
@@ -115,6 +137,10 @@ class APIViewsTestCase(TestCase):
         response = client.get('/api/investment_category_breakdown/?param=NFLX')
         self.assertEqual(response.status_code, 303) 
 
+    def test_get_stock_history_returns_bad_request_without_param(self):
+        response = self.client.get('/api/stock_history/')
+        self.assertEqual(response.status_code, 400)
+
     def test_get_link_token_returns_error_for_wrong_product(self):
         response = self.client.get('/api/link_token/?product=thisdoesntexit')
         self.assertEqual(response.status_code, 400)
@@ -129,11 +155,11 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/link_token/')
         self.assertEqual(response.status_code, 400)
 
-    def test_get_exchange_public_token_returns_error_for_wrong_public_token(self):
+    def test_post_exchange_public_token_returns_error_for_bad_public_token(self):
         response = self.client.post('/api/exchange_public_token/', {'public_token': 'notapublictoken'}, format='json')
         self.assertEqual(response.status_code, 400)
 
-    def test_get_exchange_returns_error_code_with_no_public_token(self):
+    def test_post_exchange_public_token_returns_error_code_with_no_public_token(self):
         response = self.client.post('/api/exchange_public_token/')
         self.assertEqual(response.status_code, 400)
 
@@ -157,3 +183,10 @@ class APIViewsTestCase(TestCase):
         self.assertTrue(len(stock_getter.investments) > 0)
         self.assertTrue(cache.has_key('investments' + self.user.email))
         self.assertEqual(len(stock_getter.investments), len(cache.get('investments'+self.user.email)))
+
+    def test_retrieve_stock_getter_works_with_development_wrapper(self):
+        settings.PLAID_DEVELOPMENT = True
+        cache.delete('investments' + self.user.email)
+        with self.assertRaises(InvestmentsNotLinked):
+            retrieve_stock_getter(self.user)
+        settings.PLAID_DEVELOPMENT = False

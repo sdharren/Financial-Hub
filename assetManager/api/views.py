@@ -65,7 +65,7 @@ def investment_category_breakdown(request):
     if request.GET.get('param'):
         category = request.GET.get('param')
     else:
-        return Response({'error': 'Bad request. Param not specified.'})
+        return Response({'error': 'Bad request. Param not specified.'}, 400)
     data = stock_getter.get_investment_category(category)
     return Response(data, content_type='application/json', status=200)
 
@@ -134,7 +134,10 @@ def cache_assets(request):
         #TODO: same thing for bank stuff
         #NOTE: do we need this for crypto? 
         stock_getter = StocksGetter(wrapper)
-        stock_getter.query_investments(user)
+        try:
+            stock_getter.query_investments(user)
+        except InvestmentsNotLinked:
+            return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
         cache.set('investments' + user.email, stock_getter.investments)
     elif request.method == 'DELETE':
         user = request.user
