@@ -71,7 +71,7 @@ def stock_history(request):
         stock_name = request.GET.get('param')
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
     else:
-        return Response({'error': 'Bad request. Param not specified.'}, status=500)
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
         #return bad request
     data = stock_getter.get_stock_history(stock_ticker)
     return Response(data, content_type='application/json', status=200)
@@ -83,13 +83,13 @@ def link_token(request):
         product = request.GET.get('product')
         cache.set('product_link' + request.user.email, [product])
     else:
-        return Response({'error': 'Bad request. Product not specified.'}, status=500)
+        return Response({'error': 'Bad request. Product not specified.'}, status=400)
     wrapper = DevelopmentWrapper()
 
     try:
         wrapper.create_link_token([product])
     except LinkTokenNotCreated:
-        return Response({'error': 'Bad request. Product not specified.'}, status=500)
+        return Response({'error': 'Bad request.'}, status=400)
 
     link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
@@ -103,10 +103,13 @@ def exchange_public_token(request):
     #products_selected = cache.get('product_link' + request.user.email)
     cache.delete('product_link' + request.user.email)
     wrapper = DevelopmentWrapper()
+    public_token = request.POST.get('public_token')
+    if public_token is None:
+        return Response({'error': 'Bad request. Public token not specified.'}, status=400)
     try:
-        wrapper.exchange_public_token(request.data['public_token'])
+        wrapper.exchange_public_token(public_token)
     except InvalidPublicToken as e:
-        return Response({'error': 'Bad request. Invalid public token.'}, status=500)
+        return Response({'error': 'Bad request. Invalid public token.'}, status=400)
     wrapper.save_access_token(request.user, products_selected)
     return Response(status=200)
 

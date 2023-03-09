@@ -57,21 +57,21 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/cache_assets/')
         self.assertEqual(response.status_code, 401)
 
-    # def test_put_cache_assets_works(self):
-    #     cache.delete('investments' + self.user.email)
-    #     # setup investments
-    #     wrapper = SandboxWrapper()
-    #     public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
-    #     wrapper.exchange_public_token(public_token)
-    #     wrapper.save_access_token(self.user, ['investments'])
-    #     response = self.client.put('/api/cache_assets/')
-    #     self.assertEqual(response.status_code, 200)
+    def test_put_cache_assets_works(self):
+        cache.delete('investments' + self.user.email)
+        # setup investments
+        wrapper = SandboxWrapper()
+        public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
+        wrapper.exchange_public_token(public_token)
+        wrapper.save_access_token(self.user, ['investments'])
+        response = self.client.put('/api/cache_assets/')
+        self.assertEqual(response.status_code, 200)
         
-    #     stock_getter = StocksGetter(wrapper)
-    #     stock_getter.query_investments(self.user)
-    #     investments = stock_getter.investments
-    #     cached_investments = cache.get('investments' + self.user.email)
-    #     self.assertEqual(len(investments), len(cached_investments))
+        stock_getter = StocksGetter(wrapper)
+        stock_getter.query_investments(self.user)
+        investments = stock_getter.investments
+        cached_investments = cache.get('investments' + self.user.email)
+        self.assertEqual(len(investments), len(cached_investments))
 
     def test_delete_cache_assets_works(self):
         self.assertTrue(cache.has_key('investments' + self.user.email))
@@ -86,10 +86,22 @@ class APIViewsTestCase(TestCase):
 
     def test_get_link_token_returns_error_for_wrong_product(self):
         response = self.client.get('/api/link_token/?product=thisdoesntexit')
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
     def test_get_link_token_works(self):
         response = self.client.get('/api/link_token/?product=investments')
         self.assertEqual(response.status_code, 200)
         link_token = response.data['link_token']
         self.assertIsNotNone(re.match(r"^link-development-[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$", link_token))
+
+    def test_get_link_token_returns_error_with_no_product_param(self):
+        response = self.client.get('/api/link_token/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_exchange_public_token_returns_error_for_wrong_public_token(self):
+        response = self.client.post('/api/exchange_public_token/', {'public_token': 'notapublictoken'}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_exchange_returns_error_code_with_no_public_token(self):
+        response = self.client.post('/api/exchange_public_token/')
+        self.assertEqual(response.status_code, 400)
