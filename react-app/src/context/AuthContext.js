@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate()
 
-    function cache_assets(method) {
-        fetch('http://127.0.0.1:8000/api/cache_assets/', {
+    async function cache_assets(method) {
+        await fetch('http://127.0.0.1:8000/api/cache_assets/', {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
