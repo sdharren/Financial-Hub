@@ -134,14 +134,20 @@ def retrieve_stock_getter(user):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
-    transactions = transaction_data_getter(request.user)
+    user = request.user
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+    transactions = json.loads(cache.get('transactions' + user.email))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
-    transactions = transaction_data_getter(request.user)
+    user = request.user
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+    transactions = json.loads(cache.get('transactions' + user.email))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
@@ -153,7 +159,10 @@ def monthlyGraph(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
-    transactions = transaction_data_getter(request.user)
+    user = request.user
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+    transactions = json.loads(cache.get('transactions' + user.email))
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
