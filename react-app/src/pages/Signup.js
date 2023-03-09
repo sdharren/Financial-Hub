@@ -3,6 +3,8 @@ import AuthContext from '../context/AuthContext';
 
 const Signup = () => {
 
+let {loginUser} = useContext(AuthContext);
+
     let SignupUser = async (e) => {
         e.preventDefault();
         let response = await fetch('http://127.0.0.1:8000/api/signup/', {
@@ -19,9 +21,11 @@ const Signup = () => {
         })
 
         let data = await response.json()
-        console.log(data)
         // response 400: email : "user with this email already exists."
         // response 400: password: 
+        if (response.status === 200) {
+            loginUser(e)
+        }
 
         // response 200:
 
