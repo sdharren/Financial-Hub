@@ -14,6 +14,9 @@ class TransactionsNotDefined(Exception):
 class InvestmentsNotDefined(Exception):
     pass
 
+class InvestmentsNotLinked(Exception):
+    pass
+
 class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
@@ -25,6 +28,8 @@ class StocksGetter():
     def query_investments(self, user):
         unformatted_investments = []
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
+        if len(access_tokens) == 0:
+            raise InvestmentsNotLinked()
         for token in access_tokens:
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
