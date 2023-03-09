@@ -27,8 +27,9 @@ class StocksGetter():
     # Sends API calls to plaid requesting investment info for each access token associated with user
     def query_investments(self, user):
         unformatted_investments = []
-        access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
-        if len(access_tokens) == 0:
+        try:
+            access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
+        except PublicTokenNotExchanged:
             raise InvestmentsNotLinked()
         for token in access_tokens:
             request = InvestmentsHoldingsGetRequest(access_token=token)
@@ -37,6 +38,7 @@ class StocksGetter():
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
+        #TODO: error handling for no access tokens
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
         for token in access_tokens:
             request = InvestmentsTransactionsGetRequest(

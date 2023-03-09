@@ -51,7 +51,7 @@ def investment_categories(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
     except InvestmentsNotLinked:
-        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=400)
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     categories = stock_getter.get_investment_categories()
     return Response(categories, content_type='application/json', status=200)
 
