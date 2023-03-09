@@ -142,13 +142,11 @@ def cache_assets(request):
             cache.delete('investments' + user.email)
     return Response(status=200)
 
-#TODO: handle error if investments aren't cached
 def retrieve_stock_getter(user):
     if cache.has_key('investments' + user.email):
         stock_getter = StocksGetter(None)
         data = cache.get('investments' + user.email)
         stock_getter.investments = data
-        
     else:
         if settings.PLAID_DEVELOPMENT:
             wrapper = DevelopmentWrapper()

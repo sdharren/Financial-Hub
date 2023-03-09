@@ -6,6 +6,7 @@ from django.core.cache import cache
 
 from assetManager.models import User
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+from assetManager.investments.stocks import InvestmentsNotLinked
 from assetManager.tests.investments.test_stocks import _create_stock_getter_with_fake_data
 from assetManager.api.views import *
 
@@ -135,3 +136,24 @@ class APIViewsTestCase(TestCase):
     def test_get_exchange_returns_error_code_with_no_public_token(self):
         response = self.client.post('/api/exchange_public_token/')
         self.assertEqual(response.status_code, 400)
+
+    def test_retrieve_stock_getter_works(self):
+        stock_getter = retrieve_stock_getter(self.user)
+        self.assertEqual(len(self.stock_getter.investments), len(stock_getter.investments))
+
+    def test_retrieve_stock_getter_raises_error_without_cached_investments_and_without_linked_investments(self):
+        cache.delete('investments' + self.user.email)
+        with self.assertRaises(InvestmentsNotLinked):
+            retrieve_stock_getter(self.user)
+
+    def test_retrieve_stock_getter_works_without_cached_investments_with_linked_investments(self):
+        cache.delete('investments' + self.user.email)
+        wrapper = SandboxWrapper()
+        public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
+        wrapper.exchange_public_token(public_token)
+        wrapper.save_access_token(self.user, ['investments'])
+
+        stock_getter = retrieve_stock_getter(self.user)
+        self.assertTrue(len(stock_getter.investments) > 0)
+        self.assertTrue(cache.has_key('investments' + self.user.email))
+        self.assertEqual(len(stock_getter.investments), len(cache.get('investments'+self.user.email)))
