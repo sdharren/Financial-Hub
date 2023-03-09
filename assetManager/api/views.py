@@ -15,7 +15,7 @@ from assetManager.models import User
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
-from assetManager.investments.stocks import StocksGetter
+from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -48,25 +48,34 @@ def getFirstName(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_categories(request):
-    stock_getter = retrieve_stock_getter(request.user)
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     categories = stock_getter.get_investment_categories()
     return Response(categories, content_type='application/json', status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_category_breakdown(request):
-    stock_getter = retrieve_stock_getter(request.user)
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     if request.GET.get('param'):
         category = request.GET.get('param')
     else:
-        return Response({'error': 'Bad request. Param not specified.'})
+        return Response({'error': 'Bad request. Param not specified.'}, 400)
     data = stock_getter.get_investment_category(category)
     return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def stock_history(request):
-    stock_getter = retrieve_stock_getter(request.user)
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     if request.GET.get('param'):
         stock_name = request.GET.get('param')
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
@@ -125,7 +134,10 @@ def cache_assets(request):
         #TODO: same thing for bank stuff
         #NOTE: do we need this for crypto? 
         stock_getter = StocksGetter(wrapper)
-        stock_getter.query_investments(user)
+        try:
+            stock_getter.query_investments(user)
+        except InvestmentsNotLinked:
+            return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
         cache.set('investments' + user.email, stock_getter.investments)
     elif request.method == 'DELETE':
         user = request.user
@@ -133,9 +145,17 @@ def cache_assets(request):
             cache.delete('investments' + user.email)
     return Response(status=200)
 
-#TODO: handle error if investments aren't cached
 def retrieve_stock_getter(user):
-    stock_getter = StocksGetter(None)
-    data = cache.get('investments' + user.email)
-    stock_getter.investments = data
+    if cache.has_key('investments' + user.email):
+        stock_getter = StocksGetter(None)
+        data = cache.get('investments' + user.email)
+        stock_getter.investments = data
+    else:
+        if settings.PLAID_DEVELOPMENT:
+            wrapper = DevelopmentWrapper()
+        else:
+            wrapper = SandboxWrapper()
+        stock_getter = StocksGetter(wrapper)
+        stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
+        cache.set('investments' + user.email, stock_getter.investments)
     return stock_getter
