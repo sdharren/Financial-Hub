@@ -140,13 +140,19 @@ def retrieve_stock_getter(user):
     stock_getter.investments = data
     return stock_getter
 
-
+#test if the available amount is None
 def reformatAccountBalancesData(account_balances,institution_name):
     accounts = {}
+    duplicates = 0
     for account in account_balances[institution_name].keys():
         total = 0
         total += account_balances[institution_name][account]['available_amount']
-        accounts[account] = total
+
+        if account_balances[institution_name][account]['type'] in accounts.keys():
+            duplicates += 1
+            accounts[account_balances[institution_name][account]['type'] + '_' + str(duplicates)] = total
+        else:
+            accounts[account_balances[institution_name][account]['type']] = total
 
     return accounts
 
@@ -166,26 +172,27 @@ def reformatBalancesData(account_balances):
 
     return balances
 
+#refactor to include cache
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_balances_data(request):
+    user = request.user
     if settings.PLAID_DEVELOPMENT:
         plaid_wrapper = DevelopmentWrapper()
     else:
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(request.user, ['transactions'])
+        plaid_wrapper.save_access_token(user, ['transactions'])
 
 
-    debit_card = DebitCard(plaid_wrapper,request.user)
+    debit_card = DebitCard(plaid_wrapper,user)
 
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
 
-    if cache.has_key('balances' + request.user.email) is False:
-        cache.set('balances' + request.user.email, account_balances)
-    
+    if cache.has_key('balances' + user.email) is False:
+        cache.set('balances' + user.email, account_balances)
 
     return Response(balances, content_type='application/json', status = 200)
 
@@ -205,6 +212,7 @@ def select_account(request):
 
             accounts = reformatAccountBalancesData(account_balances,institution_name)
 
+            print(accounts)
             return Response(accounts, content_type='application/json',status = 200)
 
         else:
