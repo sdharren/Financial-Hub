@@ -248,3 +248,7 @@ def select_account(request):
 
         else:
             raise Exception("No param field supplied to select_account url")
+
+
+def delete_balances_cache(user):
+    cache.delete('balances' + user.email)

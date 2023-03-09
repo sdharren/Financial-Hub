@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib import messages
 from assetManager.models import User
 import json
-from assetManager.api.views import reformatAccountBalancesData
+from assetManager.api.views import reformatAccountBalancesData,delete_balances_cache
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
@@ -27,6 +27,7 @@ class SelectAccountViewsWithoutGettingBalanceTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
     def test_get_select_account_without_first_querying_get_balances_data(self):
+        delete_balances_cache(self.user)
         with self.assertRaises(Exception) as cm:
             response = self.client.get(self.url,{'param':'Royal Bank of Scotland - Current Accounts'}, follow=True)
 
