@@ -26,10 +26,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['email'] = user.email
 
         return token
-    
+
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-    
+
 @api_view(['GET'])
 def getRoutes(request):
     routes = [
@@ -89,7 +89,7 @@ def create_link_token(request):
     link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
-    
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
@@ -115,12 +115,12 @@ def cache_assets(request):
     else:
         wrapper = SandboxWrapper()
     #TODO: same thing for bank stuff
-    #NOTE: do we need this for crypto? 
+    #NOTE: do we need this for crypto?
     stock_getter = StocksGetter(wrapper)
     stock_getter.query_investments(user)
     cache.set('investments' + user.email, stock_getter.investments)
     return Response(status=200)
-    
+
 
 #TODO: handle error if investments aren't cached
 def retrieve_stock_getter(user):
@@ -128,3 +128,71 @@ def retrieve_stock_getter(user):
     data = cache.get('investments' + user.email)
     stock_getter.investments = data
     return stock_getter
+
+
+def reformatAccountBalancesData(account_balances,institution_name):
+    accounts = {}
+    for account in account_balances[institution_name].keys():
+        total = 0
+        total += account_balances[institution_name][account]['available_amount']
+        accounts[account] = total
+
+    return accounts
+
+def reformatBalancesData(account_balances):
+    if type(account_balances) is not dict:
+        raise TypeError("account balances must be of type dict")
+
+    balances = {}
+
+    for institution_name in account_balances.keys():
+        total = 0
+        for account_id in account_balances[institution_name].keys():
+            total += account_balances[institution_name][account_id]['available_amount']
+
+
+        balances[institution_name] = total
+
+    return balances
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_balances_data(request):
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(request.user, ['transactions'])
+
+
+    debit_card = DebitCard(plaid_wrapper,request.user)
+
+    account_balances = debit_card.get_account_balances()
+    balances = reformatBalancesData(account_balances)
+
+    return Response(balances, content_type='application/json', status = 200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_account(request):
+        if request.GET.get('param'):
+            institution_name = request.GET.get('param')
+            plaid_wrapper = SandboxWrapper()
+            public_token = plaid_wrapper.create_public_token_custom_user()
+            plaid_wrapper.exchange_public_token(public_token)
+            plaid_wrapper.save_access_token(request.user, ['transactions'])
+            debit_card = DebitCard(plaid_wrapper,request.user)
+
+            account_balances = debit_card.get_account_balances()
+
+            if institution_name not in list(account_balances.keys()):
+                raise Exception("Provided institution name does not exist in the requested accounts")
+
+            accounts = reformatAccountBalancesData(account_balances,institution_name)
+
+            return Response(accounts, content_type='application/json',status = 200)
+
+        else:
+            raise Exception("No param field supplied to select_account url")
