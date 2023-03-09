@@ -15,4 +15,7 @@ urlpatterns = [
     path('stock_history/', views.stock_history, name='stock_history'),
     path('exchange_public_token/', views.exchange_public_token, name='exchange_public_token'),
     path('cache_assets/', views.cache_assets),
+    path('yearly_graphs/', views.yearlyGraph, name='yearlyGraph'),
+    path('monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
+    path('weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
 ]

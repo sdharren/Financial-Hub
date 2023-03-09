@@ -28,8 +28,5 @@ urlpatterns = [
     path('api/get_balances_data/', views.get_balances_data, name='get_balances_data'),
     path('api/select_account/', views.select_account, name='select_account'),
     path('api/cache_assets_hardcoded/', views.setup_asset_data), #NOTE: this url should be removed later - real one in api/views
-    path('api/yearly_graphs/', views.yearlyGraph, name='yearlyGraph'),
-    path('api/monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
-    path('api/weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
-    path('api/', include('assetManager.api.urls'))
+    path('api/', include('assetManager.api.urls')),
 ]

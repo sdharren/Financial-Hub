@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 
-import axios from 'axios';
+
 import{ Chart as ChartJS,
   BarElement,
   CategoryScale,
@@ -74,7 +75,7 @@ useEffect(() => {
       link: bar_labels
     }]
   }
-  
+
   const chartRef = useRef();
   const onClick = (event) => {
       if (getElementsAtEvent(chartRef.current, event).length > 0) {

@@ -36,6 +36,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/graph_display" element={<GraphDisplay />} />
+              <Route path="/bar_graph_display" element={<BarChartDisplay />} />
               <Route path="/plaid_link" element={<Link linkToken="link-development-414e1884-f61c-43bb-a782-b23145f9f3c5"/>}/>
               <Route path="/balances" element={<BalancesDisplay />} />
             </Routes>

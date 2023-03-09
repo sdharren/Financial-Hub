@@ -9,7 +9,10 @@ from assetManager.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
-
+from assetManager.transactionInsight.bank_graph_data import BankGraphData
+from dateutil.tz import tzlocal
+import datetime
+from django.http import JsonResponse
 from .serializers import UserSerializer
 from assetManager.models import User
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
@@ -127,3 +130,142 @@ def retrieve_stock_getter(user):
     data = cache.get('investments' + user.email)
     stock_getter.investments = data
     return stock_getter
+
+@api_view(['GET'])
+def yearlyGraph(request):
+    transactions = make_fake_transaction_getter()
+    graphData = transactions.yearlySpending()
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+def monthlyGraph(request):
+    transactions = make_fake_transaction_getter()
+    if request.GET.get('param'):
+        yearName = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.monthlySpendingInYear(int(yearName))
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+def weeklyGraph(request):
+    transactions = make_fake_transaction_getter()
+    if request.GET.get('param'):
+        date = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.weeklySpendingInYear(date)
+    return Response(graphData, content_type='application/json')
+
+def make_fake_transaction_getter():
+     return BankGraphData([{'account_id': 'a9X88M4oEpfBMMjVpOEVUp0m8ykRZ6f3n58M3a',
+     'account_owner': None,
+     'amount': 3.3,
+     'authorized_date': datetime.date(2022, 11, 18),
+     'authorized_datetime': None,
+     'category': ['Travel', 'Public Transportation Services'],
+     'category_id': '22014000',
+     'check_number': None,
+     'date': datetime.date(2022, 11, 21),
+     'datetime': datetime.datetime(2022, 11, 21, 0, 0, tzinfo=tzlocal()),
+     'iso_currency_code': 'GBP',
+     'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+     'merchant_name': 'Transport for London',
+     'name': '9114 18NOV22 CD TFL TRAVEL CH TFL.GOV.UK/CP GB',
+     'payment_channel': 'online',
+     'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+     'pending': False,
+     'pending_transaction_id': None,
+     'personal_finance_category': None,
+     'transaction_code': 'purchase',
+     'transaction_id': 'rkKAAqQRMeSMrrEj0PejH694dNqzKzCj3gvMOq',
+     'transaction_type': 'place',
+     'unofficial_currency_code': None}, {'account_id': 'a9X88M4oEpfBMMjVpOEVUp0m8ykRZ6f3n58M3a',
+     'account_owner': None,
+     'amount': -40.0,
+     'authorized_date': datetime.date(2022, 11, 19),
+     'authorized_datetime': None,
+     'category': ['Shops', 'Supermarkets and Groceries'],
+     'category_id': '19047000',
+     'check_number': None,
+     'date': datetime.date(2022, 11, 21),
+     'datetime': datetime.datetime(2022, 11, 21, 0, 0, tzinfo=tzlocal()),
+     'iso_currency_code': 'GBP',
+     'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+     'merchant_name': None,
+     'name': 'ANDREI AVETOV SERGEI MINAKOV FP 19/11/22 2125 P457SHRSL7HZKUA1EV',
+     'payment_channel': 'other',
+     'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+     'pending': False,
+     'pending_transaction_id': None,
+     'personal_finance_category': None,
+     'transaction_code': None,
+     'transaction_id': '5aexxV0NmKUBZZY8J4w8Uk0dXeOwEwHm0AqaEq',
+     'transaction_type': 'place',
+     'unofficial_currency_code': None}, {'account_id': 'a9X88M4oEpfBMMjVpOEVUp0m8ykRZ6f3n58M3a',
+     'account_owner': None,
+     'amount': 1.99,
+     'authorized_date': datetime.date(2022, 11, 20),
+     'authorized_datetime': None,
+     'category': ['Food and Drink', 'Restaurants', 'Fast Food'],
+     'category_id': '13005032',
+     'check_number': None,
+     'date': datetime.date(2022, 11, 21),
+     'datetime': datetime.datetime(2022, 11, 21, 0, 0, tzinfo=tzlocal()),
+     'iso_currency_code': 'GBP',
+     'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+     'merchant_name': "McDonald's",
+     'name': "McDonald's",
+     'payment_channel': 'in store',
+     'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+     'pending': False,
+     'pending_transaction_id': None,
+     'personal_finance_category': None,
+     'transaction_code': 'purchase',
+     'transaction_id': '0v5yyomk0PFL44oxNk9xt8Y3A0PwxwfBgjbz1P',
+     'transaction_type': 'place',
+     'unofficial_currency_code': None}])
