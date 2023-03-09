@@ -142,17 +142,23 @@ def retrieve_stock_getter(user):
 
 #test if the available amount is None
 def reformatAccountBalancesData(account_balances,institution_name):
+    if type(account_balances) is not dict:
+        raise TypeError("account balances must be of type dict")
+
+    if institution_name not in account_balances.keys():
+        raise Exception("passed institution_name is not account balances dictionary")
+
     accounts = {}
     duplicates = 0
     for account in account_balances[institution_name].keys():
         total = 0
         total += account_balances[institution_name][account]['available_amount']
 
-        if account_balances[institution_name][account]['type'] in accounts.keys():
+        if account_balances[institution_name][account]['name'] in accounts.keys():
             duplicates += 1
-            accounts[account_balances[institution_name][account]['type'] + '_' + str(duplicates)] = total
+            accounts[account_balances[institution_name][account]['name'] + '_' + str(duplicates)] = total
         else:
-            accounts[account_balances[institution_name][account]['type']] = total
+            accounts[account_balances[institution_name][account]['name']] = total
 
     return accounts
 
@@ -205,10 +211,11 @@ def get_balances_data(request):
 @permission_classes([IsAuthenticated])
 def select_account(request):
         if request.GET.get('param'):
+
             institution_name = request.GET.get('param')
 
             if cache.has_key('balances' + request.user.email) is False:
-                raise Exception('Balances was not queried')
+                raise Exception('get_balances_data was not queried')
             else:
                 account_balances = cache.get('balances' + request.user.email)
 

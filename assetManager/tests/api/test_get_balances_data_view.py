@@ -43,7 +43,7 @@ class GetBalancesDataViewTestCase(TestCase):
             reformatBalancesData(incorrect_account_balances)
 
     def test_get_reformatted_balances_data_correctly(self):
-        account_balances = {'Royal Bank of Scotland - Current Accounts': {'PzyM1jbyMzcekEDJlQzjcR6ZM4oRAPfQ4eJk1': {'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'NKeQZMReQKHnjBDKWRX7CEB3WbAE84tn1Gxjv': {'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
+        account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
         balances = reformatBalancesData(account_balances)
         self.assertEqual(len(balances),1)
         self.assertEqual(list(balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
