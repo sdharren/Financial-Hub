@@ -39,11 +39,32 @@ function LineGraph() {
         // Set the options for the chart
         const options = {
             chart: {
-                id: 'area-chart'
+                id: 'area-datetime',
+                height: 350,
+                zoom: {
+                    autoScaleYaxis: true
+                },
+            },
+            colors: ['#FDD36A'],
+            stroke: {
+                curve: 'straight',
             },
             xaxis: {
                 categories: chartCategories,
-            }
+            },
+            dataLabels: {
+                enabled: false
+              },
+              fill: {
+                type: 'gradient',
+                gradient: {
+                  type: 'vertical',
+                  shadeIntensity: 0.3,
+                  opacityFrom: 0.7,
+                  opacityTo: 0.9,
+                  stops: [0, 100]
+                }
+              },
         };
 
         // Set the series data for the chart
@@ -53,7 +74,7 @@ function LineGraph() {
         }];
 
         // Return the Chart component with the options and series
-        return <Chart options={options} series={series} type="area" height={350} />
+        return <Chart options={options} series={series} type = "area" />
 }
 
 export default LineGraph;
