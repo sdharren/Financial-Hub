@@ -21,8 +21,7 @@ let {loginUser} = useContext(AuthContext);
         })
 
         let data = await response.json()
-        // response 400: email : "user with this email already exists."
-        // response 400: password: 
+        
         if (response.status === 200) {
             loginUser(e)
         }
@@ -32,7 +31,6 @@ let {loginUser} = useContext(AuthContext);
                     alert(data[key])
                 }
             }
-            console.log("hello", data)
         }
 
     }
