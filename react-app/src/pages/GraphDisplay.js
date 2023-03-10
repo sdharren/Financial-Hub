@@ -1,9 +1,28 @@
 import PieChart from "./PieChart";
 import LineGraph from "./LineGraph";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import AuthContext from '../context/AuthContext';
 
 function GraphDisplay() {
     const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/>);
+    let {authTokens, logoutUser} = useContext(AuthContext);
+
+    let link_sandbox = async() => {
+        let response = await fetch('http://127.0.0.1:8000/api/sandbox_investments/',
+            {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            }
+        )
+        if (response.status === 200) {
+            alert("Linked sandbox investments successfuly.");
+        }
+    }
+
+    
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
@@ -28,7 +47,7 @@ function GraphDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}} onLoad={link_sandbox()}>
             {graph}
         </div>
     );

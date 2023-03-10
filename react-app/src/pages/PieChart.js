@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
+import {useNavigate} from 'react-router-dom';
 
 import {
     Chart as ChartJS,
@@ -22,6 +23,7 @@ ChartJS.register(
 function PieChart({endpoint, endpoint_parameter, loadNext}) {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, setPieChartData] = useState(null);
+    const navigate = useNavigate()
 
     let get_data = async() =>  {
         let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
@@ -35,6 +37,12 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
         let data = await response.json();
         if (response.status === 200) {
             setPieChartData(data);
+        }
+        else if (response.status === 303) {
+            //TODO: redirect to plaid link investments
+            if (data['error'] === 'Investments not linked.') {
+                navigate('/plaid_link')
+            }
         }
     }
 

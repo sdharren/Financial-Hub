@@ -14,6 +14,9 @@ class TransactionsNotDefined(Exception):
 class InvestmentsNotDefined(Exception):
     pass
 
+class InvestmentsNotLinked(Exception):
+    pass
+
 class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
@@ -24,7 +27,10 @@ class StocksGetter():
     # Sends API calls to plaid requesting investment info for each access token associated with user
     def query_investments(self, user):
         unformatted_investments = []
-        access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
+        try:
+            access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
+        except PublicTokenNotExchanged:
+            raise InvestmentsNotLinked()
         for token in access_tokens:
             request = InvestmentsHoldingsGetRequest(access_token=token)
             response = self.wrapper.client.investments_holdings_get(request)
@@ -32,6 +38,7 @@ class StocksGetter():
         self.format_investments(unformatted_investments)
 
     def query_transactions(self, user, start_date, end_date):
+        #TODO: error handling for no access tokens
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
         for token in access_tokens:
             request = InvestmentsTransactionsGetRequest(
