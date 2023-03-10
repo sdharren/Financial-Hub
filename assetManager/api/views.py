@@ -145,6 +145,21 @@ def cache_assets(request):
             cache.delete('investments' + user.email)
     return Response(status=200)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def sandbox_investments(request):
+    user = request.user
+    if cache.has_key('investments' + user.email):
+        return Response(status=201)
+    wrapper = SandboxWrapper()
+    public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
+    wrapper.exchange_public_token(public_token)
+    wrapper.save_access_token(user, products_chosen=['investments'])
+    stock_getter = StocksGetter(wrapper)
+    stock_getter.query_investments(user)
+    cache.set('investments' + user.email, stock_getter.investments)
+    return Response(status=200)
+
 def retrieve_stock_getter(user):
     if cache.has_key('investments' + user.email):
         stock_getter = StocksGetter(None)

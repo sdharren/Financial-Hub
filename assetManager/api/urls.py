@@ -16,4 +16,5 @@ urlpatterns = [
     path('exchange_public_token/', views.exchange_public_token, name='exchange_public_token'),
     path('link_token/', views.link_token, name='link_token'),
     path('cache_assets/', views.cache_assets),
+    path('sandbox_investments/', views.sandbox_investments, name='sandbox_investments'),
 ]
