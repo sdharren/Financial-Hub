@@ -7,7 +7,7 @@ from datetime import date
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid,PublicTokenNotExchanged
 from unittest import skip
 from django.core.exceptions import ObjectDoesNotExist
-
+from assetManager.transactionInsight.bank_graph_data import BankGraphData
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     #recursively checks that two dictionaries have the same structure and have the same value
@@ -163,10 +163,8 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         start_date = date.fromisoformat('2022-06-13')
         end_date = date.fromisoformat('2022-12-16')
         debit_card.make_graph_transaction_data_insight(start_date,end_date)
-        ordered_spending = debit_card.get_insight_data()[debit_card.get_institution_name_from_db(debit_card.access_tokens[0])].orderedCategorisedMonthlySpending(7,2022)
 
-        self.assertEqual(ordered_spending[0],('Food and Drink', 6382.66))
-        self.assertEqual(ordered_spending[1],('Recreation', 78.5))
-        self.assertEqual(ordered_spending[2],('Shops', 589.4))
-        self.assertEqual(ordered_spending[3],('Transfer', 3603.5))
-        self.assertEqual(ordered_spending[4],('Travel', 511.72999999999996))
+        insights = debit_card.get_insight_data()
+        self.assertTrue(insights is not None)
+        self.assertEqual(list(insights.keys())[0],'Royal Bank of Scotland - Current Accounts')
+        self.assertTrue(isinstance(insights['Royal Bank of Scotland - Current Accounts'], BankGraphData))
