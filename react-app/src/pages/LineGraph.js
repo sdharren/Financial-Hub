@@ -2,66 +2,58 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import 'chart.js/auto';
 import Chart from "react-apexcharts";
 import AuthContext from '../context/AuthContext';
+import { prototype } from 'apexcharts';
 
-function LineGraph({endpoint, endpoint_parameter, loadNext}) {
-    let {authTokens, logoutUser} = useContext(AuthContext);
-    const [lineGraphData, setLineGraphData] = useState(null);
+function LineGraph() {
+    const data =  {
+        '2023-02-10T00:00:00-05:00': 28.100000381469727, 
+        '2023-02-13T00:00:00-05:00': 28.549999237060547, 
+        '2023-02-14T00:00:00-05:00': 28.309999465942383, 
+        '2023-02-15T00:00:00-05:00': 28.530000686645508, 
+        '2023-02-16T00:00:00-05:00': 28.639999389648438, 
+        '2023-02-17T00:00:00-05:00': 28.690000534057617, 
+        '2023-02-21T00:00:00-05:00': 28.209999084472656, 
+        '2023-02-22T00:00:00-05:00': 28.200000762939453, 
+        '2023-02-23T00:00:00-05:00': 28.549999237060547, 
+        '2023-02-24T00:00:00-05:00': 27.690000534057617, 
+        '2023-02-27T00:00:00-05:00': 27.639999389648438, 
+        '2023-02-28T00:00:00-05:00': 27.270000457763672, 
+        '2023-03-01T00:00:00-05:00': 27.489999771118164, 
+        '2023-03-02T00:00:00-05:00': 27.059999465942383, 
+        '2023-03-03T00:00:00-05:00': 27.25, 
+        '2023-03-06T00:00:00-05:00': 27.68000030517578, 
+        '2023-03-07T00:00:00-05:00': 27.34000015258789, 
+        '2023-03-08T00:00:00-05:00': 28.190000534057617, 
+        '2023-03-09T00:00:00-05:00': 27.709999084472656
+        };
 
-    let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
-        let response = await fetch(url, {
-            method:'GET',
-            headers:{
-                'Content-Type':'application/json',
-                'Authorization':'Bearer ' + String(authTokens.access)
-            }
-        });
-        let data = await response.json();
-        if (response.status === 200) {
-            setLineGraphData(data);
+        var chartCategories = [], chartSeries = [];
+        for (var key in data) {
+            if ( ! data.hasOwnProperty(key)) {
+                continue;
+             }
+             chartSeries.push(data[key]);
+             chartCategories.push(key);
         }
-    }
 
-    useEffect(() => {
-        get_data();
-      }, [endpoint]); 
+        // Set the options for the chart
+        const options = {
+            chart: {
+                id: 'area-chart'
+            },
+            xaxis: {
+                categories: chartCategories,
+            }
+        };
 
-    // using built-in colors for now as otherwise they need to be hardcoded
-    // make a selection of colors that match the UI theme later and replace
-    var options = {
-        series: [{
-            data: lineGraphData
-          }],
-        chart: {
-            id: 'area-datetime',
-            type: 'line',
-            height: 350,
-            zoom: {
-              autoScaleYaxis: true
-            }
-          },
-        xaxis: {
-            type: 'datetime',
-            min: new Date('01 Mar 2012').getTime(),
-            tickAmount: 6,
-        },
-        tooltip: {
-            x: {
-              format: 'dd MMM yyyy'
-            }
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-              shadeIntensity: 1,
-              opacityFrom: 0.7,
-              opacityTo: 0.9,
-              stops: [0, 100]
-            }
-          },
-    };
+        // Set the series data for the chart
+        const series = [{
+            name: 'Price',
+            data: chartSeries,
+        }];
 
-    return <Chart options = {options}></Chart>
+        // Return the Chart component with the options and series
+        return <Chart options={options} series={series} type="area" height={350} />
 }
 
 export default LineGraph;

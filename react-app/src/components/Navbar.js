@@ -15,6 +15,9 @@ export default function Navbar() {
                 <Link to="/signup">Sign Up</Link>
             </li>
             <li>
+            <Link to="/line_graph">Line Graph Test</Link>
+            </li>
+            <li>
                 {user ? (<p onClick = {logoutUser}>Logout</p>): (<Link to ="/login">Login</Link>)}
             </li>
         </ul>
