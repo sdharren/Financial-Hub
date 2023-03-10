@@ -32,6 +32,19 @@ class DebitCard():
         self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
         self.bank_graph_data = {}
 
+    #add reference
+    def convert_dates_to_arrays(self,transactions):
+        if isinstance(transactions, dict):
+            for key, value in transactions.items():
+                if isinstance(value, dict) or isinstance(value, list):
+                    self.convert_dates_to_arrays(value)
+                elif isinstance(value, datetime.date) or isinstance(value, datetime.datetime):
+                    transactions[key] = [value.year, value.month, value.day]
+        elif isinstance(transactions, list):
+            for item in transactions:
+                self.convert_dates_to_arrays(item)
+        return transactions
+
     #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly
     def refresh_api(self,token):
         refresh_request = TransactionsRefreshRequest(access_token=token)
@@ -86,8 +99,9 @@ class DebitCard():
     def make_graph_transaction_data_insight(self,start_date_input,end_date_input):
         transaction_count = 0
         transactions = self.get_transactions_by_date(start_date_input,end_date_input)
+        reformatted_transactions = self.convert_dates_to_arrays(transactions)
         for token in self.access_tokens:
-            self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
+            self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(reformatted_transactions[transaction_count])
             transaction_count = transaction_count + 1
 
     def get_insight_data(self):
