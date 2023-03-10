@@ -18,6 +18,7 @@ import GraphDisplay from './pages/GraphDisplay';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
+import Currency from './pages/Currency';
 
 function App() {
   return (
@@ -36,8 +37,9 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/graph_display" element={<GraphDisplay />} />
-              <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/> 
+              <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
               <Route path="/balances" element={<BalancesDisplay />} />
+              <Route path="/currency" element={<Currency />} />
             </Routes>
           </div>
         </AuthProvider>
