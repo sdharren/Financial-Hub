@@ -10,6 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 import json
 import os
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     #recursively checks that two dictionaries have the same structure and have the same value
@@ -153,6 +155,12 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
     def test_get_empty_insight_data_dict(self):
         self.assertEqual(self.debit_card.get_insight_data(), None)
 
+    def test_create_debit_card_without_existing_access_tokens(self):
+        concrete_wrapper = SandboxWrapper()
+        user_lilly = User.objects.get(email='lillydoe@example.org')
+
+        with self.assertRaises(PublicTokenNotExchanged):
+            incorrect_debit_card = DebitCard(concrete_wrapper,user_lilly)
 
     def test_get_account_balances_with_None_available_amount_value(self):
         # Get the path to the directory containing the test file
