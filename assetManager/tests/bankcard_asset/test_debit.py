@@ -1,6 +1,6 @@
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.assets.debit_card import DebitCard
+from assetManager.assets.debit_card import DebitCard, format_accounts_data
 from django.test import TestCase
 from assetManager.models import User, AccountType
 from datetime import date
@@ -8,6 +8,8 @@ from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid,PublicTok
 from unittest import skip
 from django.core.exceptions import ObjectDoesNotExist
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
+import json
+import os
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     #recursively checks that two dictionaries have the same structure and have the same value
@@ -150,6 +152,26 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
     def test_get_empty_insight_data_dict(self):
         self.assertEqual(self.debit_card.get_insight_data(), None)
+
+
+    def test_get_account_balances_with_None_available_amount_value(self):
+        # Get the path to the directory containing the test file
+        test_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Specify the path to the json file relative to the test file directory
+        json_file_path = os.path.join(test_dir, 'account.json')
+
+
+        with open(json_file_path, 'r') as f:
+            account_data = json.load(f)
+            reformatted_data = format_accounts_data(account_data)
+
+            for account in reformatted_data:
+                self.assertTrue(reformatted_data[account]['available_amount'] is not None)
+                self.assertTrue(reformatted_data[account]['current_amount'] is not None)
+                self.assertTrue(isinstance(reformatted_data[account]['name'], str))
+                self.assertTrue(isinstance(reformatted_data[account]['type'], str))
+                self.assertTrue(isinstance(reformatted_data[account]['currency'], str))
 
 
     def test_make_transaction_data_insight_with_one_access_token(self):

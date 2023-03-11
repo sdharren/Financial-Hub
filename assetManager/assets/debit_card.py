@@ -25,6 +25,19 @@ from django.core.exceptions import ObjectDoesNotExist
 """
 DebitCard class to represent a Bank Card asset with relevant methods to access transactions and account specific data
 """
+def format_accounts_data(request_accounts):
+    accounts = {}
+    for account in request_accounts:
+        if (account['balances']['available'] is None):
+            case = {'name':account['name'],'available_amount':0.0, 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+        else:
+            case = {'name':account['name'],'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+
+        accounts[account['account_id']] = case
+
+
+    return accounts
+    
 class DebitCard():
     def __init__(self,concrete_wrapper,user):
         self.plaid_wrapper = concrete_wrapper
@@ -55,18 +68,12 @@ class DebitCard():
         balances = {}
         for token in self.access_tokens:
             request_accounts = self.plaid_wrapper.get_accounts(token)
-            accounts = {}
-            for account in request_accounts:
-                if account['balances']['available'] is None:
-                    case = {'name':account['name'],'available_amount':0.0, 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
-                else:
-                    case = {'name':account['name'],'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
 
-                accounts[account['account_id']] = case
+            accounts = format_accounts_data(request_accounts)
 
             balances[self.plaid_wrapper.get_institution_name(token)] = accounts
 
-        
+
         return balances
 
 
