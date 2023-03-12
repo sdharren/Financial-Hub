@@ -1,5 +1,6 @@
 
 import React from 'react';
+import '../table.css';
 
 const transactions = {
   'Royal Bank of Scotland - Current Accounts': [
@@ -58,7 +59,7 @@ const TransactionTable = () => {
   }
 
   return (
-    <table>
+    <table className="transaction-table">
       <thead>{renderTableHeader()}</thead>
       <tbody>{renderTableData()}</tbody>
     </table>
