@@ -9,10 +9,6 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import BarGraph from './pages/BarGraph';
-import LineGraph from './pages/LineGraph';
-import BarChartDisplay from './pages/BarChartDisplay';
-import PieChart from './pages/PieChart';
 import BalancesDisplay from './pages/Balances';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
 import GraphDisplay from './pages/GraphDisplay';
