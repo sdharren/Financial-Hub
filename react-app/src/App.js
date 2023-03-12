@@ -19,6 +19,7 @@ import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
 import Currency from './pages/Currency';
+import TransactionTable from './pages/RecentTransactionsDisplay';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
               <Route path="/balances" element={<BalancesDisplay />} />
               <Route path="/currency" element={<Currency />} />
+              <Route path="/list" element={<TransactionTable />} />
             </Routes>
           </div>
         </AuthProvider>
