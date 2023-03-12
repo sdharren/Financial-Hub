@@ -7,10 +7,37 @@ from plaid.exceptions import ApiException
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import date
 
 class InvalidInstitution(Exception):
     def __init__(self):
         self.message = 'Provided Instituion Name is not Linked'
+
+#only supports 20 currencies most common
+def get_currency_symbol(iso_code):
+    symbols = {
+        'USD': '$',
+        'EUR': '€',
+        'JPY': '¥',
+        'GBP': '£',
+        'CHF': 'Fr',
+        'CAD': '$',
+        'AUD': '$',
+        'NZD': '$',
+        'CNY': '¥',
+        'HKD': '$',
+        'SGD': '$',
+        'MXN': '$',
+        'INR': '₹',
+        'RUB': '₽',
+        'ZAR': 'R',
+        'BRL': 'R$',
+        'TRY': '₺',
+        'AED': 'د.إ',
+        'SAR': '﷼',
+    }
+    return symbols.get(iso_code, '')
+
 
 """
 DebitCard class to represent a Bank Card asset with relevant methods to access transactions and account specific data
@@ -101,6 +128,7 @@ class DebitCard():
             return self.bank_graph_data
 
     #write further tests for validaiton of elements returned by the function
+    #convert authorised date back to a date as it will be a string when merging with line-graphs branch
     def get_recent_transactions(self,institution_name):
         if(not self.bank_graph_data):
             raise TypeError("Bank graph data is empty")
@@ -110,8 +138,18 @@ class DebitCard():
 
         recent_transactions = {}
         transactions = self.bank_graph_data[institution_name].transaction_history
-        for account in transactions:
-            case = {'amount': transactions[account]['amount'], 'date':transactions[account]['authorized_date'], 'category':transactions[account]['authorized_date'], 'merchant':transactions[account]['merchant_name']}
-            recent_transactions[institution_name][account] = case
 
+        all_transactions = []
+        for account in transactions:
+            if(account['authorized_date'] == date.today()):
+                if(account['merchant_name'] is None):
+                    merchant_name = 'Not provided'
+                else:
+                    merchant_name = account['merchant_name']
+
+                case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':account['authorized_date'], 'category':account['category'], 'merchant':merchant_name}
+
+                all_transactions.append(case)
+
+        recent_transactions[institution_name] = all_transactions
         return recent_transactions
