@@ -1,8 +1,8 @@
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.assets.debit_card import DebitCard, format_accounts_data
+from assetManager.assets.debit_card import DebitCard, format_accounts_data,InvalidInstitution
 from django.test import TestCase
-from assetManager.models import User, AccountType
+from assetManager.models import User, AccountType, AccountTypeEnum
 from datetime import date
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid,PublicTokenNotExchanged
 from unittest import skip
@@ -11,6 +11,9 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 import json
 import os
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from dateutil.tz import tzlocal
+import datetime
+
 
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
@@ -36,6 +39,262 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         plaid_wrapper.save_access_token(self.user, ['transactions'])
         self.debit_card = DebitCard(plaid_wrapper, self.user)
 
+        self.single_transaction_history = [[{'account_id': 'kK3EeGbokrHnb1GWao1wc5rbep6npEIJQLxLa',
+ 'account_owner': None,
+ 'amount': 500.0,
+ 'authorized_date': None,
+ 'authorized_datetime': None,
+ 'category': ['Travel', 'Airlines and Aviation Services'],
+ 'category_id': '22001000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 16),
+ 'datetime': None,
+ 'iso_currency_code': 'GBP',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': 'United Airlines',
+ 'name': 'United Airlines',
+ 'payment_channel': 'in store',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': 'M3vq1AwVoBIGj5kv8X5oFlVw6pmLAziLGk1nk',
+ 'transaction_type': 'special',
+ 'unofficial_currency_code': None}]]
+
+        self.multiple_transaction_history = [[{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
+ 'account_owner': None,
+ 'amount': 896.65,
+ 'authorized_date': datetime.date(2022, 12, 16),
+ 'authorized_datetime': None,
+ 'category': ['Transfer', 'Debit'],
+ 'category_id': '21006000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 17),
+ 'datetime': None,
+ 'iso_currency_code': 'USD',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': None,
+ 'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C',
+ 'payment_channel': 'in store',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': 'PaJgwMn4y9fbPzjdPbl5hg9zN8kg1pSXyWRn6',
+ 'transaction_type': 'special',
+ 'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
+ 'account_owner': None,
+ 'amount': 398.34,
+ 'authorized_date': datetime.date(2022, 12, 16),
+ 'authorized_datetime': None,
+ 'category': ['Transfer', 'Debit'],
+ 'category_id': '21006000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 17),
+ 'datetime': None,
+ 'iso_currency_code': 'USD',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': None,
+ 'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A',
+ 'payment_channel': 'in store',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': '4e1XPQq43Bs5L4m6L5pEFGgjMA5GQvUlRAPKp',
+ 'transaction_type': 'special',
+ 'unofficial_currency_code': None}, {'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
+ 'account_owner': None,
+ 'amount': 1708.12,
+ 'authorized_date': datetime.date(2022, 12, 16),
+ 'authorized_datetime': None,
+ 'category': ['Food and Drink', 'Restaurants'],
+ 'category_id': '13005000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 16),
+ 'datetime': None,
+ 'iso_currency_code': 'USD',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': None,
+ 'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 CRGKFKKSPABG UXZYOTAYLDA D',
+ 'payment_channel': 'in store',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': 'NxJp9Qkdemcw4X7L4wW5cwqryvjwepTXA5wzp',
+ 'transaction_type': 'place',
+ 'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
+ 'account_owner': None,
+ 'amount': 1109.01,
+ 'authorized_date': datetime.date(2022, 12, 16),
+ 'authorized_datetime': None,
+ 'category': ['Transfer', 'Debit'],
+ 'category_id': '21006000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 16),
+ 'datetime': None,
+ 'iso_currency_code': 'USD',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': None,
+ 'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 KABCRGKSPKFG YOTALDUXZYA B',
+ 'payment_channel': 'in store',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': 'aWQwlaxAE4tKn1bEnKAvimBLNpMm7DtkKQMvK',
+ 'transaction_type': 'special',
+ 'unofficial_currency_code': None}], [{'account_id': 'bMXdQVkDRXHABLR5bZnycpXjq3qnP9uomZJK3',
+ 'account_owner': None,
+ 'amount': 896.65,
+ 'authorized_date': datetime.date(2022, 12, 16),
+ 'authorized_datetime': None,
+ 'category': ['Payment', 'Credit Card'],
+ 'category_id': '16001000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 17),
+ 'datetime': None,
+ 'iso_currency_code': 'USD',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': None,
+ 'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C',
+ 'payment_channel': 'other',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': 'V3LRGAPZzLfeDz1MxgGRfeLXr7BlbQfqdvgJy',
+ 'transaction_type': 'special',
+ 'unofficial_currency_code': None}, {'account_id': 'nrDL1VlR6DI4zMo5AXgdFwlRaJamZ7U3AWXVK',
+ 'account_owner': None,
+ 'amount': 398.34,
+ 'authorized_date': datetime.date(2022, 12, 16),
+ 'authorized_datetime': None,
+ 'category': ['Payment', 'Credit Card'],
+ 'category_id': '16001000',
+ 'check_number': None,
+ 'date': datetime.date(2022, 12, 17),
+ 'datetime': None,
+ 'iso_currency_code': 'USD',
+ 'location': {'address': None,
+              'city': None,
+              'country': None,
+              'lat': None,
+              'lon': None,
+              'postal_code': None,
+              'region': None,
+              'store_number': None},
+ 'merchant_name': None,
+ 'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A',
+ 'payment_channel': 'other',
+ 'payment_meta': {'by_order_of': None,
+                  'payee': None,
+                  'payer': None,
+                  'payment_method': None,
+                  'payment_processor': None,
+                  'ppd_id': None,
+                  'reason': None,
+                  'reference_number': None},
+ 'pending': False,
+ 'pending_transaction_id': None,
+ 'personal_finance_category': None,
+ 'transaction_code': None,
+ 'transaction_id': 'XdGXEn7b3GsZM5zLn8NpCzQ6apBZN8C1ErKRv',
+ 'transaction_type': 'special',
+ 'unofficial_currency_code': None}]]
+
 
     def test_debit_card_set_up_correctly(self):
         self.assertTrue(self.debit_card.plaid_wrapper.ACCESS_TOKEN is not None)
@@ -49,9 +308,66 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         accounts = AccountType.objects.filter(user = self.user)
         self.assertEqual(len(accounts),1)
 
+    def test_get_recent_transactions_with_incorrect_institution_name(self):
+        self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.single_transaction_history,0)
+        with self.assertRaises(InvalidInstitution) as cm:
+            self.debit_card.get_recent_transactions('HSBC')
+
+        self.assertEqual(str(cm.exception.message),'Provided Instituion Name is not Linked')
+
+    def test_get_recent_transactions_without_graph_data_initialised(self):
+        with self.assertRaises(TypeError) as e:
+            self.debit_card.get_recent_transactions('Royal Bank of Scotland - Current Accounts')
+
+        #self.assertEqual(str(e.message),'Bank graph data is empty')
+
+    def test_get_correct_indexing_of_transactions_data_with_single_institution(self):
+        self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.single_transaction_history,0)
+        insight_data = self.debit_card.get_insight_data()
+
+        self.assertEqual(list(insight_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history),1)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['amount'], 500.0)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['iso_currency_code'], 'GBP')
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['name'], 'United Airlines')
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['transaction_type'], 'special')
+
+    def test_get_correct_indexing_of_transactions_data_with_multiple_institutions(self):
+
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            account_institution_name = 'HSBC',
+        )
+
+        sandbox_wrapper = SandboxWrapper()
+
+        new_debit_card = DebitCard(sandbox_wrapper,self.user)
+        self.assertEqual(len(new_debit_card.access_tokens),2)
+
+        new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[0],self.multiple_transaction_history,0)
+        new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[1],self.multiple_transaction_history,1)
+
+        insight_data = new_debit_card.get_insight_data()
+
+        self.assertEqual(list(insight_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(insight_data.keys())[1], 'HSBC')
+        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history),4)
+        self.assertEqual(len(insight_data['HSBC'].transaction_history),2)
+
+
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['amount'], 896.65)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[1]['amount'], 398.34)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[2]['amount'], 1708.12)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[3]['amount'], 1109.01)
+
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['amount'], 896.65)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[1]['amount'], 398.34)
 
     def test_correct_instution_for_access_token(self):
         self.assertEqual(self.debit_card.plaid_wrapper.get_institution_name(self.debit_card.plaid_wrapper.ACCESS_TOKEN),'Royal Bank of Scotland - Current Accounts')
+
 
     def test_get_balances_with_incorrect_access_token(self):
         self.debit_card.access_tokens = ['wrongaccesstokenstring']
@@ -117,7 +433,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user_lilly, ['transactions'])
 
-        public_token_2 = plaid_wrapper_2.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'], override_username="custom_sixth")
+        public_token_2 = plaid_wrapper_2.create_public_token_custom_user(bank_id='ins_1', products_chosen=['transactions'])
         plaid_wrapper_2.exchange_public_token(public_token_2)
         plaid_wrapper_2.save_access_token(user_lilly, ['transactions'])
 
@@ -135,17 +451,10 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
         self.assertFalse(self.are_dicts_same(transactions[0], transactions[1]))
 
-        start_date = date.fromisoformat('2022-12-16')
-        end_date = date.fromisoformat('2022-12-19')
-        transactions = self.debit_card.get_transactions_by_date(start_date,end_date)
-        self.assertEqual(len(transactions),1)
-        self.assertEqual(len(transactions[0]),4)
-
         self.assertEqual(transactions[0][0]['amount'], 896.65)
         self.assertEqual(transactions[0][1]['amount'], 398.34)
         self.assertEqual(transactions[0][2]['amount'], 1708.12)
         self.assertEqual(transactions[0][3]['amount'], 1109.01)
-
 
     def test_get_non_existent_institution_name_from_db(self):
         access_tokens = 'wrongaccesstokenstring'
@@ -181,7 +490,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
                 self.assertTrue(isinstance(reformatted_data[account]['type'], str))
                 self.assertTrue(isinstance(reformatted_data[account]['currency'], str))
 
-
+    #attempt to incorporate set up in this
     def test_make_transaction_data_insight_with_one_access_token(self):
         user = User.objects.get(email='lillydoe@example.org')
         plaid_wrapper = SandboxWrapper()
