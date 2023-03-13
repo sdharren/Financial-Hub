@@ -24,7 +24,6 @@ class YFinanceWrapperTestCase(TestCase):
         with self.assertRaises(TickerNotSupported):
             self.wrapper.get_most_recent_stock_price('fdjio;aksop89ifaduj903427ukljdasnfiuahf9867239fhq32iuhfjkql3hf897qh')
 
-    def test_get_stock_price_at_date_works(self):
-        date = datetime(2022, 10, 10)
-        data = self.wrapper.get_stock_price_at_date(self.ticker, date)
-        self.assertEqual(int(data), 228)
+    def test_get_stock_history_for_period_works(self):
+        data = self.wrapper.get_stock_history_for_period(self.ticker, 1)
+        self.assertEqual(len(data), 19)

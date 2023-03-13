@@ -3,6 +3,7 @@ from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetR
 from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
@@ -131,6 +132,7 @@ class StocksGetter():
                     continue
         return returns
 
+    # Returns a dictionary - {category: total_price}
     def get_investment_category(self, category):
         category_dict = defaultdict(float)
         for investment in self.investments:
@@ -139,26 +141,39 @@ class StocksGetter():
                 category_dict[investment.get_name()] += investment.get_total_price()
         return category_dict
     
+    # Returns the stock ticker for associated with a name if one exists
     def get_stock_ticker(self, stock_name):
         for investment in self.investments:
             if investment.get_name() == stock_name:
                 return investment.get_ticker()
         return 'Cannot get stock ticker for ' + stock_name
     
-    def get_portfolio_history(self, user, months = 6):
+    # Returns the day-by-day portfolio history for a specified period in months (only 1, 3, 6 months accepted)
+    # The return is a dict of the form {date: portfolio vaue}
+    def get_portfolio_history(self, months = 6):
         end_date = date.today()
-        start_date = end_date - timedelta(weeks=months*4)
-        if len(self.transactions) == 0:
-            self.query_transactions(user, str(start_date), str(end_date))
-        if len(self.investments) == 0:
-            self.query_investments(user)
+        start_date = end_date - relativedelta(months=months)
         
-        sorted(self.transactions, key=attrgetter('date'))
-        # porfolio_history = defaultdict(float)
-        # for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
-        #     #2023-13-03
-        #     #2023-12-03
-        #     #2023-11-03
+        portfolio_history = defaultdict(float)
+        stock_histories = []
 
+        for investment in self.investments:
+            if investment.get_ticker() is not None:
+                try:
+                    stock_history = self.yfinance_wrapper.get_stock_history_for_period(investment.get_ticker(), months)
+                except TickerNotSupported:
+                    continue
+                stock_histories.append(stock_history)
 
-        #     pass
+        for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
+            current_sum = 0
+            skipDay = False
+            for stock_history in stock_histories:
+                try:
+                    current_sum += stock_history[current_date.strftime('%Y-%m-%d')]
+                except KeyError: # key error means it's a weekend so there is no price data
+                    skipDay = True
+                    break
+            if not skipDay:
+                portfolio_history[current_date.strftime('%Y-%m-%d')] = current_sum
+        return portfolio_history
