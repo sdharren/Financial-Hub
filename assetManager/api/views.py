@@ -17,6 +17,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -268,7 +269,11 @@ def get_balances_data(request):
         else:
             return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
-    debit_card = DebitCard(plaid_wrapper,user)
+    try:
+        debit_card = DebitCard(plaid_wrapper,user)
+    except PublicTokenNotExchanged:
+        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
 

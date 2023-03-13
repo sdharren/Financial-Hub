@@ -55,6 +55,20 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(response.status_code,405)
 
 
+    def test_get_balances_with_no_linked_transaction_access_token(self):
+        user_lilly = User.objects.get(email='lillydoe@example.org')
+        settings.PLAID_DEVELOPMENT = True
+        client = APIClient()
+        client.login(email=user_lilly.email, password='Password123')
+        response = client.post('/api/token/', {'email': user_lilly.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+
+        response = client.get('/api/get_balances_data/')
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.content.decode('utf-8'), '{"error":"Transactions Not Linked."}')
+
+
     def test_get_balances_succesfully(self):
         response = self.client.get(self.url, follow=True)
         response_json = json.loads(response.content)
