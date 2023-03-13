@@ -5,10 +5,18 @@ author: Pavan Rana
 """
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 
+def format_transactions(transactions):
+    reformatted_transactions = []
+    for account in transactions:
+        case = {'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name']}
+        reformatted_transactions.append(case)
+
+    return reformatted_transactions
+
 class BankGraphData():
     def __init__(self,transaction_history):
-        self.transaction_history = transaction_history
-        self.transactionInsight = CategoriseTransactions(self.transaction_history)
+        self.transaction_history = transaction_history #do not use this I need it thank you
+        self.transactionInsight = CategoriseTransactions(format_transactions(transaction_history))
 
     def yearlySpending(self):
         yearlySpending = []
