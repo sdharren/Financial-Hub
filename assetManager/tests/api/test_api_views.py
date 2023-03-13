@@ -53,7 +53,7 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
         response = client.get('/api/investment_categories/')
-        self.assertEqual(response.status_code, 303)        
+        self.assertEqual(response.status_code, 303)
 
     def test_investment_category_breakdown_returns_breakdown(self):
         response = self.client.get('/api/investment_category_breakdown/?param=equity')
@@ -68,7 +68,7 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.get('/api/investment_category_breakdown/?param=equity')
-        self.assertEqual(response.status_code, 303) 
+        self.assertEqual(response.status_code, 303)
 
     def test_investment_category_breakdown_returns_bad_request_with_no_params(self):
         response = self.client.get('/api/investment_category_breakdown/')
@@ -77,7 +77,7 @@ class APIViewsTestCase(TestCase):
     def test_cache_assets_returns_method_not_allowed_wrong_request(self):
         response = self.client.get('/api/cache_assets/')
         self.assertEqual(response.status_code, 405)
-    
+
     def test_cache_assets_returns_unauthorized_without_jwt(self):
         self.client.credentials()
         response = self.client.get('/api/cache_assets/')
@@ -91,7 +91,7 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
-        self.assertEqual(response.status_code, 303) 
+        self.assertEqual(response.status_code, 303)
 
     def test_put_cache_assets_works(self):
         cache.delete('investments' + self.user.email)
@@ -102,7 +102,7 @@ class APIViewsTestCase(TestCase):
         wrapper.save_access_token(self.user, ['investments'])
         response = self.client.put('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
-        
+
         stock_getter = StocksGetter(wrapper)
         stock_getter.query_investments(self.user)
         investments = stock_getter.investments
@@ -125,7 +125,7 @@ class APIViewsTestCase(TestCase):
     def test_get_stock_history_work(self):
         response = self.client.get('/api/stock_history/?param=iShares%20Inc%20MSCI%20Brazil')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.data) > 10)        
+        self.assertTrue(len(response.data) > 10)
 
     def test_stock_history_returns_see_other_with_no_investments_linked(self):
         client = APIClient()
@@ -135,7 +135,7 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
         response = client.get('/api/investment_category_breakdown/?param=NFLX')
-        self.assertEqual(response.status_code, 303) 
+        self.assertEqual(response.status_code, 303)
 
     def test_get_stock_history_returns_bad_request_without_param(self):
         response = self.client.get('/api/stock_history/')
