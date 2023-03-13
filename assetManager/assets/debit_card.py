@@ -13,7 +13,7 @@ class InvalidInstitution(Exception):
     def __init__(self):
         self.message = 'Provided Instituion Name is not Linked'
 
-#only supports 20 currencies most common
+
 def get_currency_symbol(iso_code):
     symbols = {
         'USD': '$',
