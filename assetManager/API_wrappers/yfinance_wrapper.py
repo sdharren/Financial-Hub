@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+from datetime import timedelta
 
 class TickerNotSupported(Exception):
     pass
@@ -20,6 +21,16 @@ class YFinanceWrapper():
         try:
             ticker = yf.Ticker(ticker_symbol)
             history = ticker.history(prepost = False, raise_errors = True, period='1d')
+            close_data = history['Close'].to_dict()
+            price = list(close_data.values())[0]
+        except Exception:
+            raise TickerNotSupported()
+        return price
+
+    def get_stock_price_at_date(self, ticker_symbol, date):
+        try:
+            ticker = yf.Ticker(ticker_symbol)
+            history = ticker.history(prepost = False, raise_errors = True, start = date.strftime('%Y-%m-%d'), end = (date + timedelta(days=1)).strftime('%Y-%m-%d') )
             close_data = history['Close'].to_dict()
             price = list(close_data.values())[0]
         except Exception:

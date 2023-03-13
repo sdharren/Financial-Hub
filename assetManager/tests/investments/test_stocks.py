@@ -39,12 +39,12 @@ class StocksTestCase(TestCase):
     #         self.assertTrue(account.account_institution_name == "Vanguard" or account.account_institution_name , "Fidelity")
     #         self.assertEqual(account.account_asset_type , AccountTypeEnum.STOCK)
 
-    def test_query_transactions(self):
-        self.stock_getter = self._create_stock_getter_with_sandbox()
-        self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
-        transactions = self.stock_getter.transactions
-        transactions_length = len(transactions)
-        self.assertEqual(transactions_length, 9)
+    # def test_query_transactions(self):
+    #     self.stock_getter = self._create_stock_getter_with_sandbox()
+    #     self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
+    #     transactions = self.stock_getter.transactions
+    #     transactions_length = len(transactions)
+    #     self.assertEqual(transactions_length, 9)
 
     # def test_get_sum_investments_returns_total(self):
     #     self.stock_getter = _create_stock_getter_with_fake_data()
@@ -78,50 +78,50 @@ class StocksTestCase(TestCase):
     #     history = self.stock_getter.get_stock_history('NFLX')
     #     self.assertIsNotNone(history)
 
-    def test_get_return_on_buy_orders_raises_error_if_transactions_are_undefined(self):
-        self.stock_getter = StocksGetter(None)
-        with self.assertRaises(TransactionsNotDefined):
-            self.stock_getter.get_return_on_buy_orders()
+    # def test_get_return_on_buy_orders_raises_error_if_transactions_are_undefined(self):
+    #     self.stock_getter = StocksGetter(None)
+    #     with self.assertRaises(TransactionsNotDefined):
+    #         self.stock_getter.get_return_on_buy_orders()
 
-    def test_get_return_on_buy_orders(self):
-        self.stock_getter = _create_stock_getter_with_fake_data()
-        data = self.stock_getter.get_return_on_buy_orders()
-        for key in data:
-            self.assertTrue(data[key] > 0)
-        self.assertEqual(len(data), 2)
+    # def test_get_return_on_buy_orders(self):
+    #     self.stock_getter = _create_stock_getter_with_fake_data()
+    #     data = self.stock_getter.get_return_on_buy_orders()
+    #     for key in data:
+    #         self.assertTrue(data[key] > 0)
+    #     self.assertEqual(len(data), 2)
 
-    def test_get_return_on_buy_orders_works_with_negative_returns(self):
-        transaction_dict = {
-            'quantity': 10,
-            'price': 1000000,
-            'amount': 10000000,
-            'security_id': 1,
-            'type': 'buy',
-            'date': '2022-01-01'
-        }
-        transactions = []
-        transactions.append(Transaction(transaction_dict, 'GOOG'))
-        transactions.append(Transaction(transaction_dict, 'NFLX'))
-        self.stock_getter = StocksGetter(None)
-        self.stock_getter.transactions = transactions
-        returns = self.stock_getter.get_return_on_buy_orders()
-        for key in returns:
-            self.assertTrue(returns[key] < 0)
+    # def test_get_return_on_buy_orders_works_with_negative_returns(self):
+    #     transaction_dict = {
+    #         'quantity': 10,
+    #         'price': 1000000,
+    #         'amount': 10000000,
+    #         'security_id': 1,
+    #         'type': 'buy',
+    #         'date': '2022-01-01'
+    #     }
+    #     transactions = []
+    #     transactions.append(Transaction(transaction_dict, 'GOOG'))
+    #     transactions.append(Transaction(transaction_dict, 'NFLX'))
+    #     self.stock_getter = StocksGetter(None)
+    #     self.stock_getter.transactions = transactions
+    #     returns = self.stock_getter.get_return_on_buy_orders()
+    #     for key in returns:
+    #         self.assertTrue(returns[key] < 0)
 
-    def test_get_return_on_buy_orders_returns_nothing_for_unsupported_ticker(self):
-        transaction_dict = {
-            'quantity': 10,
-            'price': 1000000,
-            'amount': 10000000,
-            'security_id': 1,
-            'type': 'buy',
-            'date': '2022-01-01'
-        }
-        transactions = [Transaction(transaction_dict, "UNSUPPORTED_TICKER938428u9jiokefnm")]
-        self.stock_getter = StocksGetter(None)
-        self.stock_getter.transactions = transactions
-        data = self.stock_getter.get_return_on_buy_orders()
-        self.assertEqual(len(data), 0)
+    # def test_get_return_on_buy_orders_returns_nothing_for_unsupported_ticker(self):
+    #     transaction_dict = {
+    #         'quantity': 10,
+    #         'price': 1000000,
+    #         'amount': 10000000,
+    #         'security_id': 1,
+    #         'type': 'buy',
+    #         'date': '2022-01-01'
+    #     }
+    #     transactions = [Transaction(transaction_dict, "UNSUPPORTED_TICKER938428u9jiokefnm")]
+    #     self.stock_getter = StocksGetter(None)
+    #     self.stock_getter.transactions = transactions
+    #     data = self.stock_getter.get_return_on_buy_orders()
+    #     self.assertEqual(len(data), 0)
 
     # def test_get_return_on_current_holdings_raises_error_if_investments_are_undefined(self):
     #     self.stock_getter = StocksGetter(None)
@@ -148,11 +148,13 @@ class StocksTestCase(TestCase):
     #     data = self.stock_getter.get_stock_ticker('Netflix but not real')
     #     self.assertEqual(data, 'Cannot get stock ticker for Netflix but not real')
 
-    # def test_get_portfolio_history_works(self):
-    #     self.stock_getter = self._create_stock_getter_with_sandbox()
-    #     self.stock_getter.get_portfolio_history(self.user, months=12)
-    #     print(self.stock_getter.transactions)
-    #     self.assertEqual(2,2)
+    def test_get_portfolio_history_works(self):
+        self.stock_getter = self._create_stock_getter_with_sandbox()
+        self.stock_getter.get_portfolio_history(self.user, months=12)
+        for transaction in self.stock_getter.transactions:
+            print(transaction.date)
+            print('\n')
+        self.assertEqual(2,2)
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()

@@ -150,9 +150,10 @@ class StocksGetter():
         start_date = end_date - timedelta(weeks=months*4)
         if len(self.transactions) == 0:
             self.query_transactions(user, str(start_date), str(end_date))
-        if self.investments is None:
+        if len(self.investments) == 0:
             self.query_investments(user)
         
+        sorted(self.transactions, key=attrgetter('date'))
         # porfolio_history = defaultdict(float)
         # for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
         #     #2023-13-03
