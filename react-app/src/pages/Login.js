@@ -5,7 +5,7 @@ import { loginFields } from '../components/formFields';
 import Input from '../components/input';
 import FormAction from '../components/formAction';
 import FormExtra from '../components/formExtra';
-import '../static/errors.css'
+import '../static/errors.css';
 
 // add remember me functionality
 
@@ -16,16 +16,6 @@ fields.forEach(field => fieldState[field.id] = '');
 const Login = () => {
 
   let {loginUser} = useContext(AuthContext);
-
-  let form1 = (
-    <div>
-        <form onSubmit={loginUser}>
-            <input type = "text" name = "email" placeholder='Enter email:' />
-            <input type = "password" name='password' placeholder='Enter password'/>
-            <input type = "submit"/>
-        </form>
-    </div>
-  )
 
   let form2 = (
     <div>
@@ -51,12 +41,11 @@ const Login = () => {
                                 isRequired={field.isRequired}
                                 placeholder={field.placeholder}
                             />
-                            <p class = {"error " + field.name + "-error"}>hello</p>
+                            <p class = {"error " + field.name + "-error"}></p>
                         </div>
                     )  
                 }
             </div>
-            <FormExtra />
             <FormAction handleSubmit={loginUser} text = "Login" />
         </form>
        </div>
