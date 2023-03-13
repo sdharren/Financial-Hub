@@ -25,6 +25,25 @@ class YFinanceWrapper():
         except Exception:
             raise TickerNotSupported()
         return price
+    
+    def getIndexValues(self, index_ticker, time_period="6mo"):
+        # Tickers = ^GSPC - sp500, ^ftse - ftse100, ^dji - dow, ^STOXX50E - eurostoxx50, ^GDAXI - dax
+        INDICES = ["^GSPC","^FTSE", "^DJI", "^STOXX50E", "^GDAXI"]
+        if(index_ticker in INDICES):
+            try:
+                ticker = yf.ticker(index_ticker)
+                history = ticker.history(period=time_period, interval="1d")
+                close = history['Close'].to_dict()
+            except Exception:
+                raise TickerNotSupported()
+        else:
+            raise TickerNotSupported()
+        return close
 
-    
-    
+    def getDayDelta(self, initial_amount, data):
+        keys = list(data.keys())
+        values = list(data.values())
+        for i in range(values.len()-1):
+            data.update({(keys[i+1]) : (initial_amount * (values[i+1]-values[i])/(values[i]))})
+        
+        return data
