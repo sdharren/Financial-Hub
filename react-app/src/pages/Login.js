@@ -3,6 +3,9 @@ import AuthContext from '../context/AuthContext';
 import Header from '../components/header';
 import { loginFields } from '../components/formFields';
 import Input from '../components/input';
+import FormAction from '../components/formAction';
+import FormExtra from '../components/formExtra';
+
 
 const fields = loginFields;
 let fieldState = {};
@@ -11,7 +14,6 @@ fields.forEach(field => fieldState[field.id] = '');
 const Login = () => {
 
   let {loginUser} = useContext(AuthContext);
-
 
   let form1 = (
     <div>
@@ -31,7 +33,7 @@ const Login = () => {
             linkName = "Signup"
             linkUrl = "/signup"
         />
-        <form className = "mt-8 space-y-6">
+        <form className = "mt-8 space-y-6" onSubmit = {loginUser}>
             <div className = "-space-y-px">
                 {
                     fields.map(field=>
@@ -50,6 +52,8 @@ const Login = () => {
                     )  
                 }
             </div>
+            <FormExtra />
+            <FormAction handleSubmit={loginFields} text = "Login" />
         </form>
        </div>
   )
