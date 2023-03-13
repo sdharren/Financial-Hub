@@ -2,11 +2,12 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetRequest
 from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
-from datetime import date
+from datetime import date, timedelta
 from collections import defaultdict
 from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
+from operator import attrgetter
 
 class TransactionsNotDefined(Exception):
     pass
@@ -21,7 +22,7 @@ class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
         self.investments = []
-        self.transactions = defaultdict(list)
+        self.transactions = []
         self.yfinance_wrapper = YFinanceWrapper()
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
@@ -51,17 +52,12 @@ class StocksGetter():
 
     def format_transactions(self, unformatted_transactions):
         for transaction in unformatted_transactions['investment_transactions']:
-            shouldSkip = False
             if str(transaction['type']) == 'buy':
                 for security in unformatted_transactions['securities']:
                     if security['security_id'] == transaction['security_id']:
                         ticker = security['ticker_symbol']
-                        if security['type'] != 'equity' and security['type'] != 'etf':
-                            shouldSkip = True
-                        security_id = transaction['security_id']
                         break
-                if not shouldSkip:
-                    self.transactions[security_id].append(Transaction(transaction, ticker))
+                self.transactions.append(Transaction(transaction, ticker))
 
     def format_investments(self, unformatted_investments):
         for current_investment in unformatted_investments:
@@ -148,3 +144,20 @@ class StocksGetter():
             if investment.get_name() == stock_name:
                 return investment.get_ticker()
         return 'Cannot get stock ticker for ' + stock_name
+    
+    def get_portfolio_history(self, user, months = 6):
+        end_date = date.today()
+        start_date = end_date - timedelta(weeks=months*4)
+        if len(self.transactions) == 0:
+            self.query_transactions(user, str(start_date), str(end_date))
+        if self.investments is None:
+            self.query_investments(user)
+        
+        # porfolio_history = defaultdict(float)
+        # for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
+        #     #2023-13-03
+        #     #2023-12-03
+        #     #2023-11-03
+
+
+        #     pass
