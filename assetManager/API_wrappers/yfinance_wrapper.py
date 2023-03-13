@@ -31,7 +31,7 @@ class YFinanceWrapper():
         INDICES = ["^GSPC","^FTSE", "^DJI", "^STOXX50E", "^GDAXI"]
         if(index_ticker in INDICES):
             try:
-                ticker = yf.ticker(index_ticker)
+                ticker = yf.Ticker(index_ticker)
                 history = ticker.history(period=time_period, interval="1d")
                 close = history['Close'].to_dict()
             except Exception:
