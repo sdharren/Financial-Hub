@@ -30,8 +30,8 @@ function App() {
       <Router>
         <AuthProvider>
           <Navbar />
-          {/* <div className="min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md w-full space-y-8"> */}
+          <div className="min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
           <div className="container">
             <Routes>
               <Route element={<PrivateRoutes/>}>
@@ -50,8 +50,8 @@ function App() {
               <Route path="/link_assets" element={<LinkAssets />} />
             </Routes>
           </div>
-          {/* </div>
-          </div> */}
+          </div>
+          </div>
         </AuthProvider>
       </Router>
     </div>
