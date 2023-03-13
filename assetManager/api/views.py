@@ -332,3 +332,59 @@ def select_account(request):
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)
+
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def yearlyGraph(request):
+    user = request.user
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+    transactions = json.loads(cache.get('transactions' + user.email))
+    graphData = transactions.yearlySpending()
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def monthlyGraph(request):
+    user = request.user
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+    transactions = json.loads(cache.get('transactions' + user.email))
+    if request.GET.get('param'):
+        yearName = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.monthlySpendingInYear(int(yearName))
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def weeklyGraph(request):
+    user = request.user
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+    transactions = json.loads(cache.get('transactions' + user.email))
+    if request.GET.get('param'):
+        date = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.weeklySpendingInYear(date)
+    return Response(graphData, content_type='application/json')
+
+def transaction_data_getter(user):
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+
+    debitCards = DebitCard(plaid_wrapper,user)
+    debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
+    accountData = debitCards.get_insight_data()
+    first_key = next(iter(accountData))
+    return accountData[first_key]
