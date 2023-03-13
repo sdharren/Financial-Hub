@@ -18,6 +18,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getUsableCrypto, getCryptoAddressData
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
