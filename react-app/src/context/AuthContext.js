@@ -4,6 +4,10 @@ import {useNavigate} from 'react-router-dom';
 
 const AuthContext = createContext();
 
+// you cannot type links because everytime you type a link, the app "refreshes"
+// and calls updateToken(), which then calls logoutUser() and redirects to
+// "login/"
+
 export const AuthProvider = ({ children }) => {
 
     let [authTokens, setAuthTokens] = useState(() => localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
@@ -29,7 +33,7 @@ export const AuthProvider = ({ children }) => {
             headers : {
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({'email':e.target.email.value, 'password':e.target.password.value})
+            body:JSON.stringify({'email':e.target.email_address.value, 'password':e.target.password.value})
         })
         let data = await response.json()
         if (response.status === 200) {
