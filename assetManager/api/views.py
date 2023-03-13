@@ -176,7 +176,8 @@ def retrieve_stock_getter(user):
 def yearlyGraph(request):
     user = request.user
     if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+        print('set year')
+        cache.set('transactions' + user.email, transaction_data_getter(user))
     transactions = json.loads(cache.get('transactions' + user.email))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
@@ -186,7 +187,8 @@ def yearlyGraph(request):
 def monthlyGraph(request):
     user = request.user
     if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+        print('set month')
+        cache.set('transactions' + user.email, transaction_data_getter(user))
     transactions = json.loads(cache.get('transactions' + user.email))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
@@ -201,7 +203,8 @@ def monthlyGraph(request):
 def weeklyGraph(request):
     user = request.user
     if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
+        print('set week')
+        cache.set('transactions' + user.email, transaction_data_getter(user))
     transactions = json.loads(cache.get('transactions' + user.email))
     if request.GET.get('param'):
         date = request.GET.get('param')
@@ -223,8 +226,9 @@ def transaction_data_getter(user):
     debitCards = DebitCard(plaid_wrapper,user)
     debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
     accountData = debitCards.get_insight_data()
-    first_key = next(iter(accountData))
-    return accountData[first_key]
+    #first_key = next(iter(accountData))
+    #return accountData[first_key]
+    return accountData[0]
 
 #test if the available amount is None
 
