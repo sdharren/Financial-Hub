@@ -57,7 +57,11 @@ class DebitCard():
             request_accounts = self.plaid_wrapper.get_accounts(token)
             accounts = {}
             for account in request_accounts:
-                case = {'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':account['type'],'currency':account['balances']['iso_currency_code']}
+                if account['balances']['available'] is None:
+                    case = {'name':account['name'],'available_amount':0.0, 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+                else:
+                    case = {'name':account['name'],'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+
                 accounts[account['account_id']] = case
 
             balances[self.plaid_wrapper.get_institution_name(token)] = accounts
@@ -76,11 +80,10 @@ class DebitCard():
                 start_date=start_date_input,
                 end_date=end_date_input,
             )
-            try:
-                transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
-                transactions.append(transaction_response['transactions'])
-            except ApiException:
-                raise AccessTokenInvalid
+
+            transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+            transactions.append(transaction_response['transactions'])
+
 
         return transactions
 

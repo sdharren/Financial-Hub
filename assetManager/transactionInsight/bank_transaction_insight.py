@@ -27,6 +27,26 @@ class CategoriseTransactions():
                 amount = amount + item['amount']
         return amount
 
+    def getRangeOfYears(self):
+        rangeOfYears = []
+        for item in self.transaction_history:
+            if len(rangeOfYears) == 0:
+                rangeOfYears.append(item['date'].year)
+                rangeOfYears.append(item['date'].year)
+            elif item['date'].year < rangeOfYears[0]:
+                rangeOfYears[0] = item['date'].year
+            elif item['date'].year > rangeOfYears[1]:
+                rangeOfYears[1] = item['date'].year
+        return rangeOfYears
+
+    # return that total spending for a month, month variable is an integer
+    def getYearlySpending(self,year):
+        amount = 0
+        for item in self.transaction_history:
+            if item['amount'] > 0 and item['date'].year == year:
+                amount = amount + item['amount']
+        return amount
+
     # return that total spending for a month, month variable is an integer
     def getMonthlySpending(self,month,year):
         amount = 0
@@ -59,6 +79,14 @@ class CategoriseTransactions():
                 currentValue = spenditurePerCategory.get(item['category'][0]) or 0
                 spenditurePerCategory[item['category'][0]] = currentValue + item['amount']
         return spenditurePerCategory
+
+    # return an json of transactions within a year, month variable is an integer
+    def getYearlyTransactions(self,year):
+        yearlyTransactions = []
+        for item in self.transaction_history:
+            if item['amount'] > 0 and item['date'].year == year:
+                yearlyTransactions.append(item)
+        return yearlyTransactions
 
     # return an json of transactions within a month, month variable is an integer
     def getMonthlyTransactions(self,month,year):

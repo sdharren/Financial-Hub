@@ -16,6 +16,16 @@ export const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate()
 
+    async function cache_assets(method) {
+        await fetch('http://127.0.0.1:8000/api/cache_assets/', {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+        });
+    }
+
     let loginUser = async (e )=> {
         e.preventDefault();
         let response = await fetch('http://127.0.0.1:8000/api/token/', {
@@ -30,6 +40,9 @@ export const AuthProvider = ({ children }) => {
             setAuthTokens(data)
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
+
+            cache_assets('PUT');
+            
             navigate('/homepage')
         }
         else {
@@ -38,6 +51,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     let logoutUser = () => {
+        cache_assets('DELETE');
+
         setAuthTokens(null)
         setUser(null)
         localStorage.removeItem('authTokens')

@@ -2,7 +2,7 @@ from django.test import TestCase
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from assetManager.investments.stocks import StocksGetter, TransactionsNotDefined
+from assetManager.investments.stocks import StocksGetter, TransactionsNotDefined, InvestmentsNotDefined
 from assetManager.investments.transaction import Transaction
 from assetManager.investments.investment import Investment
 from assetManager.API_wrappers.yfinance_wrapper import TickerNotSupported
@@ -49,12 +49,12 @@ class StocksTestCase(TestCase):
         self.assertEqual(transactions_length, 4)
 
     def test_get_sum_investments_returns_total(self):
-        self._create_stock_getter_with_fake_data()
+        self.stock_getter = _create_stock_getter_with_fake_data()
         total_sum = self.stock_getter.get_total_investment_sum()
         self.assertEqual(total_sum, 10580.3)
     
     def test_get_investment_categories(self):
-        self._create_stock_getter_with_fake_data()
+        self.stock_getter = _create_stock_getter_with_fake_data()
         categories = self.stock_getter.get_investment_categories()
         self.assertTrue('derivative' in categories)
         self.assertTrue('cash' in categories)
@@ -63,7 +63,7 @@ class StocksTestCase(TestCase):
         self.assertTrue('etf' in categories)
 
     def test_get_stocks(self):
-        self._create_stock_getter_with_fake_data()
+        self.stock_getter = _create_stock_getter_with_fake_data()
         stocks = self.stock_getter.get_stocks()
         self.assertTrue('ACHN' in stocks)
         self.assertTrue('EWZ' in stocks)
@@ -86,7 +86,7 @@ class StocksTestCase(TestCase):
             self.stock_getter.get_return_on_buy_orders()
 
     def test_get_return_on_buy_orders(self):
-        self._create_stock_getter_with_fake_data()
+        self.stock_getter = _create_stock_getter_with_fake_data()
         data = self.stock_getter.get_return_on_buy_orders()
         for key in data:
             self.assertTrue(data[key] > 0)
@@ -123,39 +123,30 @@ class StocksTestCase(TestCase):
         data = self.stock_getter.get_return_on_buy_orders()
         self.assertEqual(len(data), 0)
 
-    # def test_temp(self):
-    #     self.stock_getter = self._create_stock_getter_with_custom_user()
-    #     self.stock_getter.query_investments(self.user)
-    #     self.stock_getter.query_transactions(self.user, '2022-06-29', '2022-07-08')
-    #     self.assertEqual(2,2)
-
-    def _create_stock_getter_with_fake_data(self):
+    def test_get_return_on_current_holdings_raises_error_if_investments_are_undefined(self):
         self.stock_getter = StocksGetter(None)
-        self.stock_getter.investments = self._get_fake_investments()
-        self.stock_getter.transactions = self._get_fake_transactions()
+        with self.assertRaises(InvestmentsNotDefined):
+            self.stock_getter.get_return_on_current_holdings()
 
-    def _get_fake_investments(self):
-        current_dir = os.path.dirname(__file__)
-        securities_file = open(os.path.join(current_dir, 'fake_securities.json'))
-        holdings_file = open(os.path.join(current_dir, 'fake_holdings.json'))
-        securities = json.load(securities_file)
-        holdings = json.load(holdings_file)
-        investments = []
-        for i in range (0, len(securities)):
-            investments.append(Investment(holdings[i], securities[i]))
-        securities_file.close()
-        holdings_file.close()
-        return investments
-    
-    def _get_fake_transactions(self):
-        current_dir = os.path.dirname(__file__)
-        transactions_file = open(os.path.join(current_dir, 'fake_transactions.json'))
-        transactions = json.load(transactions_file)
-        return_list = []
-        for transaction in transactions:
-            return_list.append(Transaction(transaction, transaction['ticker']))
-        transactions_file.close()
-        return return_list
+    def test_get_return_on_current_holdings(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_return_on_current_holdings()
+        self.assertTrue(len(data) > 0)
+
+    def test_get_investment_category_returns_category(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_investment_category('equity')
+        self.assertEqual(data, {'Achillion Pharmaceuticals Inc.': 100.0, 'Southside Bancshares Inc.': 100.0})
+
+    def test_get_stock_ticker_works_for_existing_stock(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_stock_ticker('Achillion Pharmaceuticals Inc.')
+        self.assertEqual(data, 'ACHN')
+
+    def test_get_stock_ticker_returns_error_string_for_undefined_stock(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_stock_ticker('Netflix but not real')
+        self.assertEqual(data, 'Cannot get stock ticker for Netflix but not real')
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()
@@ -171,3 +162,32 @@ class StocksTestCase(TestCase):
         self.wrapper.exchange_public_token(public_token)
         self.wrapper.save_access_token(self.user, ['investments'])
         return StocksGetter(self.wrapper)
+
+def _create_stock_getter_with_fake_data():
+    stock_getter = StocksGetter(None)
+    stock_getter.investments = _get_fake_investments()
+    stock_getter.transactions = _get_fake_transactions()
+    return stock_getter
+
+def _get_fake_investments():
+    current_dir = os.path.dirname(__file__)
+    securities_file = open(os.path.join(current_dir, 'fake_securities.json'))
+    holdings_file = open(os.path.join(current_dir, 'fake_holdings.json'))
+    securities = json.load(securities_file)
+    holdings = json.load(holdings_file)
+    investments = []
+    for i in range (0, len(securities)):
+        investments.append(Investment(holdings[i], securities[i]))
+    securities_file.close()
+    holdings_file.close()
+    return investments
+
+def _get_fake_transactions():
+    current_dir = os.path.dirname(__file__)
+    transactions_file = open(os.path.join(current_dir, 'fake_transactions.json'))
+    transactions = json.load(transactions_file)
+    return_list = []
+    for transaction in transactions:
+        return_list.append(Transaction(transaction, transaction['ticker']))
+    transactions_file.close()
+    return return_list

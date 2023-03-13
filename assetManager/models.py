@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    #write tests for this 
+    #write tests for this
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -48,7 +48,6 @@ class UserManager(BaseUserManager):
         if not last_name:
             raise ValueError("Users must have a last name")
         if not email:
-            print(email)
             raise ValueError("Users must have an email address")
         if not password:
             raise ValueError("Users must have a password")
