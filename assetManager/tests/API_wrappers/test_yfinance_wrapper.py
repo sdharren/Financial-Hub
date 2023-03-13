@@ -27,3 +27,10 @@ class YFinanceWrapperTestCase(TestCase):
     def test_get_stock_history_for_period_works(self):
         data = self.wrapper.get_stock_history_for_period(self.ticker, 1)
         self.assertEqual(len(data), 19)
+    def test_get_indices_last_year_returns_values(self):
+        data = self.wrapper.getIndexValues("^GSPC")
+        self.assertIsNotNone(data)
+
+    def test_index_in_available_list(self):
+        with self.assertRaises(TickerNotSupported):
+            self.wrapper.getIndexValues("SPY")
