@@ -15,6 +15,8 @@ import GraphDisplay from './pages/GraphDisplay';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 
+// ask matthew about how margins are lined
+
 function App() {
   return (
     <div>

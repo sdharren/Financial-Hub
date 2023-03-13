@@ -1,11 +1,11 @@
 const loginFields = [
     {
         labelText : "Email address",
-        labelFor : "email-address",
-        id : "email-address",
-        name : "email",
+        labelFor : "email_address",
+        id : "email_address",
+        name : "email_address",
         type : "email",
-        autocomplete : "email",
+        autocomplete : "email_address",
         isRequired : true,
         placeholder : "Email address"
     },
@@ -15,7 +15,7 @@ const loginFields = [
         id : "password",
         name : "password",
         type : "password",
-        autocomplete : "current-password",
+        autocomplete : "current_password",
         isRequired : true,
         placeholder : "Password"
     }
@@ -24,31 +24,31 @@ const loginFields = [
 const signupFields = [
     {
         labelText : "First Name",
-        labelFor : "first-name",
-        id : "first-name",
-        name : "first-name",
+        labelFor : "first_name",
+        id : "first_name",
+        name : "first_name",
         type : "text",
-        autocomplete : "first-name",
+        autocomplete : "first_name",
         isRequired : true,
         placeholder : "First Name"
     },
     {
         labelText : "Last Name",
-        labelFor : "last-name",
-        id : "last-name",
-        name : "last-name",
+        labelFor : "last_name",
+        id : "last_name",
+        name : "last_name",
         type : "text",
-        autocomplete : "last-name",
+        autocomplete : "last_name",
         isRequired : true,
         placeholder : "Last Name"
     },
     {
         labelText : "Email address",
-        labelFor : "email-address",
-        id : "email-address",
-        name : "email",
+        labelFor : "email_address",
+        id : "email_address",
+        name : "email_address",
         type : "email",
-        autocomplete : "email",
+        autocomplete : "email_address",
         isRequired : true,
         placeholder : "Email address" 
     },
@@ -58,17 +58,17 @@ const signupFields = [
         id : "password",
         name : "password",
         type : "password",
-        autocomplete : "current-password",
+        autocomplete : "current_password",
         isRequired : true,
         placeholder : "Password"
     },
     {
         labelText : "Confirm password",
-        labelFor : "confirm-password",
-        id : "confirm-password",
-        name : "confirm-password",
+        labelFor : "confirm_password",
+        id : "confirm_password",
+        name : "confirm_password",
         type : "password",
-        autocomplete : "confirm-password",
+        autocomplete : "confirm_password",
         isRequired : true,
         placeholder : "Confirm password"
     },

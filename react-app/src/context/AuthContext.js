@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
             headers : {
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({'email':e.target.email.value, 'password':e.target.password.value})
+            body:JSON.stringify({'email':e.target.email_address.value, 'password':e.target.password.value})
         })
         let data = await response.json()
         if (response.status === 200) {

@@ -6,6 +6,7 @@ import Input from '../components/input';
 import FormAction from '../components/formAction';
 import FormExtra from '../components/formExtra';
 
+// add remember me functionality
 
 const fields = loginFields;
 let fieldState = {};
@@ -39,7 +40,7 @@ const Login = () => {
                     fields.map(field=>
                         <Input
                             key={field.id}
-                            handleChange={loginUser}
+                            handleChange={null}
                             labelText={field.labelText}
                             labelFor={field.labelFor}
                             id={field.id}
@@ -53,7 +54,7 @@ const Login = () => {
                 }
             </div>
             <FormExtra />
-            <FormAction handleSubmit={loginFields} text = "Login" />
+            <FormAction handleSubmit={loginUser} text = "Login" />
         </form>
        </div>
   )
