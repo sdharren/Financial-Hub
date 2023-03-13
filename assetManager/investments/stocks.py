@@ -150,7 +150,7 @@ class StocksGetter():
     
     # Returns the day-by-day portfolio history for a specified period in months (only 1, 3, 6 months accepted)
     # The return is a dict of the form {date: portfolio vaue}
-    def get_portfolio_history(self, months = 6):
+    def get_portfolio_history(self, months=6):
         end_date = date.today()
         start_date = end_date - relativedelta(months=months)
         

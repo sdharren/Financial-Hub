@@ -150,7 +150,7 @@ class StocksTestCase(TestCase):
 
     def test_get_portfolio_history_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
-        data = self.stock_getter.get_portfolio_history(self.user, months=6)
+        data = self.stock_getter.get_portfolio_history(months=6)
         self.assertTrue(len(data) > 100)
         for key in data:
             self.assertTrue(data[key] > 0)
