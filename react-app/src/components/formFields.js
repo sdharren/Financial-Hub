@@ -33,16 +33,6 @@ const signupFields = [
         placeholder : "First Name"
     },
     {
-        labelText : "Email address",
-        labelFor : "email-address",
-        id : "email-address",
-        name : "email",
-        type : "email",
-        autocomplete : "email",
-        isRequired : true,
-        placeholder : "Email address" 
-    },
-    {
         labelText : "Last Name",
         labelFor : "last-name",
         id : "last-name",
@@ -51,6 +41,16 @@ const signupFields = [
         autocomplete : "last-name",
         isRequired : true,
         placeholder : "Last Name"
+    },
+    {
+        labelText : "Email address",
+        labelFor : "email-address",
+        id : "email-address",
+        name : "email",
+        type : "email",
+        autocomplete : "email",
+        isRequired : true,
+        placeholder : "Email address" 
     },
     {
         labelText : "Password",
@@ -73,3 +73,5 @@ const signupFields = [
         placeholder : "Confirm password"
     },
 ]
+
+export {loginFields, signupFields};
