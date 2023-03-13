@@ -2,7 +2,6 @@ const fixedInputClass="rounded-md appearance-none relative block w-full px-3 py-
 
 export default function Input({
     handleChange,
-    value,
     labelText,
     labelFor,
     id,
@@ -19,7 +18,6 @@ export default function Input({
             </label>
             <input
               onChange={handleChange}
-              value={value}
               id={id}
               name={name}
               type={type}
