@@ -4,7 +4,7 @@ import { signupFields } from '../components/formFields';
 import Input from '../components/input'
 import FormAction from '../components/formAction';
 import Header from '../components/header';
-import '../static/signup.css';
+import '../static/errors.css';
 
 // need to add confirmation that passwords match
 
@@ -86,7 +86,7 @@ const Signup = () => {
                                     isRequired = {field.isRequired}
                                     placeholder = {field.placeholder}
                                 />
-                                <p class = {"error " + field.name + "-error"}></p>
+                                <p class = {"error " + field.name + "-error"}>hello</p>
 
                             </div>
                         )

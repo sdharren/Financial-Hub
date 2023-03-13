@@ -5,6 +5,7 @@ import { loginFields } from '../components/formFields';
 import Input from '../components/input';
 import FormAction from '../components/formAction';
 import FormExtra from '../components/formExtra';
+import '../static/errors.css'
 
 // add remember me functionality
 
@@ -38,18 +39,20 @@ const Login = () => {
             <div className = "-space-y-px">
                 {
                     fields.map(field=>
-                        <Input
-                            key={field.id}
-                            handleChange={null}
-                            labelText={field.labelText}
-                            labelFor={field.labelFor}
-                            id={field.id}
-                            name={field.name}
-                            type={field.type}
-                            isRequired={field.isRequired}
-                            placeholder={field.placeholder}
-                        />
-                
+                        <div>
+                            <Input
+                                key={field.id}
+                                handleChange={null}
+                                labelText={field.labelText}
+                                labelFor={field.labelFor}
+                                id={field.id}
+                                name={field.name}
+                                type={field.type}
+                                isRequired={field.isRequired}
+                                placeholder={field.placeholder}
+                            />
+                            <p class = {"error " + field.name + "-error"}>hello</p>
+                        </div>
                     )  
                 }
             </div>
