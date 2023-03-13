@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import BalancesDisplay from './pages/Balances';
+import BarChartDisplay from './pages/BarChartDisplay';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
 import GraphDisplay from './pages/GraphDisplay';
 import PrivateRoutes from './utils/PrivateRoute';
@@ -33,6 +34,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/graph_display" element={<GraphDisplay />} />
+              <Route path="/display" element={<BarChartDisplay />} />
               <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/> 
               <Route path="/balances" element={<BalancesDisplay />} />
             </Routes>

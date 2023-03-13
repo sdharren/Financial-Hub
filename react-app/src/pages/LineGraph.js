@@ -1,30 +1,9 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import 'chart.js/auto';
 import Chart from "react-apexcharts";
-import AuthContext from '../context/AuthContext';
+import usePlaid from '../custom_hooks/usePlaid';
 
 function LineGraph({endpoint, endpoint_parameter, loadNext}) {
-    let {authTokens, logoutUser} = useContext(AuthContext);
-    const [lineChartData, setLineChartData] = useState(null);
 
-    let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
-        let response = await fetch(url, {
-            method:'GET',
-            headers:{
-                'Content-Type':'application/json',
-                'Authorization':'Bearer ' + String(authTokens.access)
-            }
-        });
-        let data = await response.json();
-        if (response.status === 200) {
-            setLineChartData(data);
-        }
-    }
-
-    useEffect(() => {
-        get_data();
-    }, [endpoint]);
+    const lineChartData = usePlaid({endpoint, endpoint_parameter, loadNext})
 
     var chartCategories = [], chartSeries = [];
     for (var key in lineChartData) {
