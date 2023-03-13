@@ -36,6 +36,12 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
         if (response.status === 200) {
             setPieChartData(data);
         }
+        else if (response.status === 303) {
+            //TODO: redirect to plaid link investments
+            if (data['error'] === 'Investments not linked.') {
+                console.log('investments not linked');
+            }
+        }
     }
 
     useEffect(() => {

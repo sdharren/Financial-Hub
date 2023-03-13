@@ -17,85 +17,6 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from assetManager.models import User
 from assetManager.assets.debit_card import DebitCard
 from django.contrib.auth.decorators import login_required
-#from assetManager.bankcards.debit_card import DebitCard
-
-def reformatAccountBalancesData(account_balances,institution_name):
-    accounts = {}
-    for account in account_balances[institution_name].keys():
-        total = 0
-        total += account_balances[institution_name][account]['available_amount']
-        accounts[account] = total
-
-    return accounts
-
-def reformatBalancesData(account_balances):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    balances = {}
-
-    for institution_name in account_balances.keys():
-        total = 0
-        for account_id in account_balances[institution_name].keys():
-            total += account_balances[institution_name][account_id]['available_amount']
-
-
-        balances[institution_name] = total
-
-    return balances
-
-#User.objects.get(email = "augusto_uk@yahoo.co.uk")
-def get_balances_data(request):
-    if request.user.is_authenticated:
-        if request.method == "GET":
-            plaid_wrapper = SandboxWrapper()
-            public_token = plaid_wrapper.create_public_token_custom_user()
-            plaid_wrapper.exchange_public_token(public_token)
-            plaid_wrapper.save_access_token(request.user, ['transactions'])
-            debit_card = DebitCard(plaid_wrapper,request.user)
-
-            account_balances = debit_card.get_account_balances()
-            balances = reformatBalancesData(account_balances)
-
-            return HttpResponse(json.dumps(balances), content_type='application/json')
-        else:
-            messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
-            return redirect('home_page')
-    else:
-        messages.add_message(request, messages.ERROR, 'Not Logged In')
-        return redirect('home_page')
-
-
-def select_account(request):
-    if request.user.is_authenticated:
-        if request.method == "GET":
-            if request.GET.get('param'):
-                institution_name = request.GET.get('param')
-                plaid_wrapper = SandboxWrapper()
-                public_token = plaid_wrapper.create_public_token_custom_user()
-                plaid_wrapper.exchange_public_token(public_token)
-                plaid_wrapper.save_access_token(request.user, ['transactions'])
-                debit_card = DebitCard(plaid_wrapper,request.user)
-
-                account_balances = debit_card.get_account_balances()
-
-                if institution_name not in list(account_balances.keys()):
-                    raise Exception("Provided institution name does not exist in the requested accounts")
-
-                accounts = reformatAccountBalancesData(account_balances,institution_name)
-
-                return HttpResponse(json.dumps(accounts), content_type='application/json')
-
-            else:
-                raise Exception("No param field supplied to select_account url")
-        else:
-            messages.add_message(request, messages.ERROR, 'POST query not permitted to this URL')
-            return redirect('home_page')
-
-    else:
-        messages.add_message(request, messages.ERROR, 'Not Logged In')
-        return redirect('home_page')
-
 
 def home(request):
     plaid_wrapper = SandboxWrapper()
@@ -160,27 +81,26 @@ def connect_investments(request):
         plaid_wrapper = DevelopmentWrapper()
         plaid_wrapper.create_link_token(products_chosen)
         link_token = plaid_wrapper.get_link_token()
-        print(link_token)
-    #     # attach products_chosen to session so they can be used in POST request
-    #     request.session['products_chosen'] = products_chosen
-    #     return render(request, 'connect_investments.html', {'link_token': link_token})
-    # else:
-    #     plaid_wrapper = DevelopmentWrapper()
-    #     #plaid_wrapper.products_requested = ['transactions']
-    #     body_unicode = request.body.decode('utf-8')
-    #     body = json.loads(body_unicode)
+        # attach products_chosen to session so they can be used in POST request
+        request.session['products_chosen'] = products_chosen
+        return render(request, 'connect_investments.html', {'link_token': link_token})
+    else:
+        plaid_wrapper = DevelopmentWrapper()
+        #plaid_wrapper.products_requested = ['transactions']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
 
-    #     public_token = body['public_token']
+        public_token = body['public_token']
 
-    #     plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.exchange_public_token(public_token)
 
-    #     products_chosen = request.session.get('products_chosen', None)
-    #     # if POST request recieved before GET
-    #     if products_chosen is None:
-    #         return redirect('connect_investments')
-    #     plaid_wrapper.save_access_token(request.user, products_chosen)
-    #     del request.session['products_chosen']
-    #     return redirect('home_page')
+        products_chosen = request.session.get('products_chosen', None)
+        # if POST request recieved before GET
+        if products_chosen is None:
+            return redirect('connect_investments')
+        plaid_wrapper.save_access_token(request.user, products_chosen)
+        del request.session['products_chosen']
+        return redirect('home_page')
 
 def number_view(request):
     data = {'number': NumberShow.getNumber()}

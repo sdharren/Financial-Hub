@@ -18,6 +18,10 @@ import GraphDisplay from './pages/GraphDisplay';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
+import Currency from './pages/Currency';
+import TransactionTable from './pages/RecentTransactionsDisplay';
+
+// ask matthew about how margins are lined
 
 function App() {
   return (
@@ -25,6 +29,8 @@ function App() {
       <Router>
         <AuthProvider>
           <Navbar />
+          <div className="min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
           <div className="container">
             <Routes>
               <Route element={<PrivateRoutes/>}>
@@ -36,9 +42,13 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/graph_display" element={<GraphDisplay />} />
-              <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/> 
+              <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
               <Route path="/balances" element={<BalancesDisplay />} />
+              <Route path="/currency" element={<Currency />} />
+              <Route path="/list" element={<TransactionTable />} />
             </Routes>
+          </div>
+          </div>
           </div>
         </AuthProvider>
       </Router>

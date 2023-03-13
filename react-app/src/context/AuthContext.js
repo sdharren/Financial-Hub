@@ -4,6 +4,10 @@ import {useNavigate} from 'react-router-dom';
 
 const AuthContext = createContext();
 
+// you cannot type links because everytime you type a link, the app "refreshes"
+// and calls updateToken(), which then calls logoutUser() and redirects to
+// "login/"
+
 export const AuthProvider = ({ children }) => {
 
     let [authTokens, setAuthTokens] = useState(() => localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
@@ -12,6 +16,16 @@ export const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate()
 
+    async function cache_assets(method) {
+        await fetch('http://127.0.0.1:8000/api/cache_assets/', {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+        });
+    }
+
     let loginUser = async (e )=> {
         e.preventDefault();
         let response = await fetch('http://127.0.0.1:8000/api/token/', {
@@ -19,13 +33,16 @@ export const AuthProvider = ({ children }) => {
             headers : {
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({'email':e.target.email.value, 'password':e.target.password.value})
+            body:JSON.stringify({'email':e.target.email_address.value, 'password':e.target.password.value})
         })
         let data = await response.json()
         if (response.status === 200) {
             setAuthTokens(data)
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
+
+            cache_assets('PUT');
+            
             navigate('/homepage')
         }
         else {
@@ -34,6 +51,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     let logoutUser = () => {
+        cache_assets('DELETE');
+
         setAuthTokens(null)
         setUser(null)
         localStorage.removeItem('authTokens')
