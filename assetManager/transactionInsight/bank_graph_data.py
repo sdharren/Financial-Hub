@@ -8,8 +8,11 @@ from assetManager.transactionInsight.bank_transaction_insight import CategoriseT
 def format_transactions(transactions):
     reformatted_transactions = []
     for account in transactions:
-        case = {'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name']}
-        reformatted_transactions.append(case)
+        try:
+            case = {'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name']}
+            reformatted_transactions.append(case)
+        except:
+            return transactions
 
     return reformatted_transactions
 

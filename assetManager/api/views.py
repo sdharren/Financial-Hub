@@ -177,8 +177,8 @@ def yearlyGraph(request):
     user = request.user
     if False==cache.has_key('transactions' + user.email):
         print('set year')
-        cache.set('transactions' + user.email, transaction_data_getter(user))
-    transactions = json.loads(cache.get('transactions' + user.email))
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+    transactions = BankGraphData(json.loads(cache.get('transactions' + user.email)))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
@@ -187,9 +187,9 @@ def yearlyGraph(request):
 def monthlyGraph(request):
     user = request.user
     if False==cache.has_key('transactions' + user.email):
-        print('set month')
-        cache.set('transactions' + user.email, transaction_data_getter(user))
-    transactions = json.loads(cache.get('transactions' + user.email))
+        print('set year')
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+    transactions = BankGraphData(json.loads(cache.get('transactions' + user.email)))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
@@ -203,9 +203,9 @@ def monthlyGraph(request):
 def weeklyGraph(request):
     user = request.user
     if False==cache.has_key('transactions' + user.email):
-        print('set week')
-        cache.set('transactions' + user.email, transaction_data_getter(user))
-    transactions = json.loads(cache.get('transactions' + user.email))
+        print('set year')
+        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+    transactions = BankGraphData(json.loads(cache.get('transactions' + user.email)))
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
@@ -226,9 +226,9 @@ def transaction_data_getter(user):
     debitCards = DebitCard(plaid_wrapper,user)
     debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
     accountData = debitCards.get_insight_data()
-    #first_key = next(iter(accountData))
-    #return accountData[first_key]
-    return accountData[0]
+    first_key = next(iter(accountData))
+    return accountData[first_key]
+    # return accountData[0]
 
 #test if the available amount is None
 
