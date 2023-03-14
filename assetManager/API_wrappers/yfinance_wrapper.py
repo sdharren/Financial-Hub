@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+from datetime import datetime
 
 class TickerNotSupported(Exception):
     pass
@@ -25,6 +26,18 @@ class YFinanceWrapper():
         except Exception:
             raise TickerNotSupported()
         return price
+
+    def get_stock_history_for_period(self, ticker_symbol, period):
+        try:
+            ticker = yf.Ticker(ticker_symbol)
+            history = ticker.history(prepost = False, raise_errors = True, period=str(period)+'mo')
+            close_data = history['Close'].to_dict()
+        except Exception:
+            raise TickerNotSupported()
+        dict_with_datetimes = {}
+        for key in close_data.keys():
+            dict_with_datetimes[key.to_pydatetime().strftime('%Y-%m-%d')] = close_data[key]
+        return dict_with_datetimes
     
     def getIndexValues(self, index_ticker, time_period="6mo"):
         # Tickers = ^GSPC - sp500, ^ftse - ftse100, ^dji - dow, ^STOXX50E - eurostoxx50, ^GDAXI - dax
