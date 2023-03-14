@@ -3,10 +3,10 @@
 body {
     margin: 0;
     color: white;
-    background-image:url("../images/background-image.png");
+    /* background-image:url("../images/background-image.png");
     background-size: cover;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: fixed; */
 }
 
 .nav {
