@@ -17,7 +17,7 @@ from datetime import date
 from assetManager.tests.bankcard_asset.multiple_transactions import multiple_transactions_dict
 from assetManager.tests.bankcard_asset.recent_transactions import recent_transactions_dict, multiple_recent_transactions_dict
 from assetManager.tests.bankcard_asset.single_transaction import single_transaction_dict
-
+from datetime import timedelta
 #change locations of long jsons
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
@@ -88,8 +88,30 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         recent_transactions = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data())
         self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),0)
 
-    def test_with_whole_flow_of_recent_transactions_with_actually_getting(self):
-        pass
+    def test_get_recent_transactions_from_returned_transactions_get(self):
+        user = User.objects.get(email='lillydoe@example.org')
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+        debit_card = DebitCard(plaid_wrapper, user)
+
+        self.assertEqual(len(debit_card.access_tokens),1)
+
+        start_date = date.today()
+        end_date = date.today()
+        transactions = debit_card.make_graph_transaction_data_insight(start_date,end_date)
+
+        recent_transactions = debit_card.get_recent_transactions(debit_card.get_insight_data())
+
+        self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),1)
+        self.assertEqual(list(recent_transactions.keys())[0],'Royal Bank of Scotland - Current Accounts')
+
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£6.33')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today() - timedelta(days=1))
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['category'],['Travel', 'Taxi'])
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Uber')
+
 
     def test_get_recent_transactions_with_multiple_institutions_with_transactions_today(self):
         before_accountype_objects_count = AccountType.objects.count()
@@ -112,6 +134,10 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[1],self.multiple_recent_transactions,1)
 
         recent_transactions = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data())
+        self.assertEqual(len(list(recent_transactions.keys())),2)
+        self.assertEqual(list(recent_transactions.keys())[0],'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(recent_transactions.keys())[1],'HSBC')
+
         self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),4)
         self.assertEqual(len(recent_transactions['HSBC']),2)
 
@@ -174,9 +200,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['category'],['Food and Drink', 'Restaurants', 'Fast Food'])
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['category'],['Food and Drink', 'Restaurants'])
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['category'],['Transfer', 'Debit'])
-
-
-
 
     def test_get_correct_indexing_of_transactions_data_with_single_institution(self):
         self.single_transaction_history = single_transaction_dict

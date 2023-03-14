@@ -138,7 +138,7 @@ class DebitCard():
         for institution in bank_graph_data.keys():
             all_transactions = []
             for account in bank_graph_data[institution].transaction_history:
-                if(account['authorized_date'] == date.today()):
+                if(account['authorized_date'] == date.today() or (account['date'] == date.today())):
                     if(account['merchant_name'] is None):
                         merchant_name = 'Not provided'
                     else:
