@@ -2,7 +2,7 @@ from dateutil.tz import tzlocal
 import datetime
 from datetime import date
 
-multiple_transactions = [[{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
+multiple_transactions_dict = [[{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
 'account_owner': None,
 'amount': 896.65,
 'authorized_date': datetime.date(2022, 12, 16),

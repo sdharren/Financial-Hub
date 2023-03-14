@@ -127,29 +127,27 @@ class DebitCard():
         else:
             return self.bank_graph_data
 
+    #refactor function to work with passed in bank_graph_data
     #write further tests for validaiton of elements returned by the function
     #convert authorised date back to a date as it will be a string when merging with line-graphs branch
-    def get_recent_transactions(self,institution_name):
-        if(not self.bank_graph_data):
+    def get_recent_transactions(self,bank_graph_data):
+        if(not bank_graph_data):
             raise TypeError("Bank graph data is empty")
-
-        if institution_name not in self.bank_graph_data.keys():
-            raise InvalidInstitution
-
         recent_transactions = {}
-        transactions = self.bank_graph_data[institution_name].transaction_history
 
-        all_transactions = []
-        for account in transactions:
-            if(account['authorized_date'] == date.today()):
-                if(account['merchant_name'] is None):
-                    merchant_name = 'Not provided'
-                else:
-                    merchant_name = account['merchant_name']
+        for institution in bank_graph_data.keys():
+            all_transactions = []
+            for account in bank_graph_data[institution].transaction_history:
+                if(account['authorized_date'] == date.today()):
+                    if(account['merchant_name'] is None):
+                        merchant_name = 'Not provided'
+                    else:
+                        merchant_name = account['merchant_name']
 
-                case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':account['authorized_date'], 'category':account['category'], 'merchant':merchant_name}
+                    case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':account['authorized_date'], 'category':account['category'], 'merchant':merchant_name}
 
-                all_transactions.append(case)
+                    all_transactions.append(case)
 
-        recent_transactions[institution_name] = all_transactions
+            recent_transactions[institution] = all_transactions
+
         return recent_transactions

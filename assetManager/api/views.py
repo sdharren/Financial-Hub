@@ -357,7 +357,6 @@ def get_balances_data(request):
 @permission_classes([IsAuthenticated])
 def select_account(request):
         if request.GET.get('param'):
-
             institution_name = request.GET.get('param')
 
             if cache.has_key('balances' + request.user.email) is False:
@@ -376,18 +375,8 @@ def select_account(request):
             raise Exception("No param field supplied to select_account url")
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def recentTransactions(request):
-    user = request.user
-    if False==cache.has_key('transactions' + user.email):
-        print('set year')
-        cache.set('transactions' + user.email, transaction_data_getter(user))
-    transactions = json.loads(cache.get('transactions' + user.email))
-    graphData = transactions.yearlySpending()
-    return Response(graphData, content_type='application/json')
-
-
+#recent transactions using the already existing getter of information
+#refactor recent_transactions getter
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)

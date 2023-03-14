@@ -15,7 +15,7 @@ def format_transactions(transactions):
 
 class BankGraphData():
     def __init__(self,transaction_history):
-        self.transaction_history = transaction_history #do not use this I need it thank you
+        self.transaction_history = transaction_history
         self.transactionInsight = CategoriseTransactions(format_transactions(transaction_history))
 
     def yearlySpending(self):
