@@ -1,37 +1,47 @@
 import cards from '../images/home-cards.png';
-import computer from '../images/home-comp.png'
+import computer from '../images/home-comp.png';
+import Navbar from '../components/Navbar';
 
 export default function Home() {
     return (
-        <section class = "home_boxes">
-            <div class= "home_text_holder">
-                <div class = "home__box">
-                    <div class = "image-container">
-                        <img class= "box__image"
-                            src = {cards} alt = "#"
-                            ></img>
+        <div class = "home_page">
+            
+            <div class = "home_boxes">
+                <div class= "home_text_holder">
+                    
+                    <div class = "home__box">
+                        
+                            <div class = "image-container">
+                                <img class= "box__image"
+                                    src = {cards}
+                                    ></img>
+                            </div>
+                            <div class = "home__wrapper">
+                                <p class="home__text">Welcome to the future of financial monitoring - track everything from bank cards, stocks, and crypto.</p>
+                            </div>
+                        
                     </div>
-                    <div class = "home__wrapper">
-                        <p class="home__text">Welcome to the future of financial monitoring - track everything from bank cards, stocks, and crypto.</p>
+                    
+                    <div class = "home__box">
+                        
+                            <div class = "image-container">
+                                <img class= "box__image"
+                                    src = {computer}
+                                    alt = "#"></img>
+                            
+                            </div>
+                            <div class = "home__wrapper">
+                                <p class="home__text">Our aggregate asset tracking and dynamic charts will provide you with the best understanding of your finances.</p>
+                            </div>
+                        
                     </div>
-                </div>
 
-                <div class = "home__box">
-                    <div class = "image-container">
-                        <img class= "box__image"
-                            src = {computer}
-                            alt = "#"></img>
-
-                    </div>
-                    <div class = "home__wrapper">
-                        <p class="home__text">Our aggregate asset tracking and dynamic charts will provide you with the best understanding of your finances.</p>
-                    </div>
                 </div>
 
             </div>
+        </div>
 
-        </section>
-
+        
     );
 
 
