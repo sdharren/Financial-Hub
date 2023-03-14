@@ -230,7 +230,6 @@ def transaction_data_getter(user):
     #return accountData[first_key]
     return accountData[0]
 
-#test if the available amount is None
 
 def reformat_balances_into_currency(account_balances):
     if type(account_balances) is not dict:
@@ -294,44 +293,40 @@ def reformatBalancesData(account_balances):
 
     return balances
 
+def get_balances_wrapper(user):
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+
+    return plaid_wrapper
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_currency_data(request):
     user = request.user
 
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token_custom_user()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
+    plaid_wrapper = get_balances_wrapper(user)
 
-        if cache.has_key('currency' + user.email):
-            return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
+    if cache.has_key('currency' + user.email):
+        return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
-        debit_card = DebitCard(plaid_wrapper,user)
-        account_balances = debit_card.get_account_balances()
-        currency = reformat_balances_into_currency(account_balances)
+    debit_card = DebitCard(plaid_wrapper,user)
+    account_balances = debit_card.get_account_balances()
+    currency = reformat_balances_into_currency(account_balances)
+    cache.set('currency' + user.email, currency)
 
-        cache.set('currency' + user.email, currency)
-
-        return Response(currency, content_type='application/json', status = 200)
-
-
-
+    return Response(currency, content_type='application/json', status = 200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_balances_data(request):
     user = request.user
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token_custom_user()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
+
+    plaid_wrapper = get_balances_wrapper(user)
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
@@ -347,8 +342,6 @@ def get_balances_data(request):
 
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
-
-    #if cache.has_key('balances' + user.email) is False
     cache.set('balances' + user.email, account_balances)
 
     return Response(balances, content_type='application/json', status = 200)
@@ -356,23 +349,24 @@ def get_balances_data(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
-        if request.GET.get('param'):
-            institution_name = request.GET.get('param')
 
-            if cache.has_key('balances' + request.user.email) is False:
-                raise Exception('get_balances_data was not queried')
-            else:
-                account_balances = cache.get('balances' + request.user.email)
+    if request.GET.get('param'):
+        institution_name = request.GET.get('param')
 
-            if institution_name not in list(account_balances.keys()):
-                raise Exception("Provided institution name does not exist in the requested accounts")
-
-            accounts = reformatAccountBalancesData(account_balances,institution_name)
-
-            return Response(accounts, content_type='application/json',status = 200)
-
+        if cache.has_key('balances' + request.user.email) is False:
+            raise Exception('get_balances_data was not queried')
         else:
-            raise Exception("No param field supplied to select_account url")
+            account_balances = cache.get('balances' + request.user.email)
+
+        if institution_name not in list(account_balances.keys()):
+            raise Exception("Provided institution name does not exist in the requested accounts")
+
+        accounts = reformatAccountBalancesData(account_balances,institution_name)
+
+        return Response(accounts, content_type='application/json',status = 200)
+
+    else:
+        raise Exception("No param field supplied to select_account url")
 
 
 #recent transactions using the already existing getter of information
