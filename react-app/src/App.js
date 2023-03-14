@@ -21,6 +21,7 @@ import Link from './pages/Link';
 import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
 import LinkAssets from './pages/LinkAssets';
+import Accounts from './pages/Accounts';
 
 // ask matthew about how margins are lined
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="/currency" element={<Currency />} />
               <Route path="/list" element={<TransactionTable />} />
               <Route path="/link_assets" element={<LinkAssets />} />
+              <Route path="/accounts" element={<Accounts />} />
             </Routes>
           </div>
           </div>
