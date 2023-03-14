@@ -79,8 +79,7 @@ class DebitCard():
 
         return institution_name
 
-    #returns a dictionary containing account balances for all DEBIT account types stored in the database for a specific user, including if a user has multiple existing transactions access_tokens
-    #outermost keys are the institution_name, then all accounts under that instituion by id, the all the relevant info
+
     def get_account_balances(self):
         balances = {}
         for token in self.access_tokens:
@@ -99,6 +98,7 @@ class DebitCard():
         for token in self.access_tokens:
             self.refresh_api(token)
 
+            #embed in try catch
             transaction_request = TransactionsGetRequest(
                 access_token=token,
                 start_date=start_date_input,

@@ -228,9 +228,17 @@ def transaction_data_getter(user):
     accountData = debitCards.get_insight_data()
     #first_key = next(iter(accountData))
     #return accountData[first_key]
-    return accountData[0]
+    return accountData
 
 
+"""
+@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
+
+@Description: -Iterates through account_balances extracting every account and total amount of liquid assets in that account for a specific currency
+              -Calculates percentage totals for all unique currencies for total overall amounts in all accounts
+
+@return: Reformatted dictionary containing the percentage amount of liquidity overall categorised by currency for all accounts in all linked institutions
+"""
 def reformat_balances_into_currency(account_balances):
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
@@ -255,7 +263,14 @@ def reformat_balances_into_currency(account_balances):
 
     return proportions
 
+"""
+@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key, institution_name string representing the name of the institution name
 
+@Description: -Iterates through all account_balances extracting every account and total amount of liquid assets in that account for a specific the passed insitution
+              -Creates a dictionary (key: name of the account, value: amount in that account)
+
+@return: Reformatted dictionary containing all accounts and corresponding amount in that account
+"""
 def reformatAccountBalancesData(account_balances,institution_name):
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
@@ -365,6 +380,7 @@ def select_account(request):
 
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
+
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)

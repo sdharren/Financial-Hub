@@ -54,6 +54,8 @@ class GetCurrencyDataViewTestCase(TestCase):
         self.assertEqual(balances[list(balances.keys())[0]], 75)
         self.assertEqual(balances[list(balances.keys())[1]], 25)
 
+    def test_multiple_institutions(self):
+        pass
 
     def test_get_reformatted_balances_into_currency_data_correctly_with_multiple_currencies_same_quantity_per_quantity(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'GBP'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZbP': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'GBP'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZLm': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczkaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'EUR'}, 'k1xZm8kW7jCnRqmkqGgrt96VaexNzGczkaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'GBP'}}}
