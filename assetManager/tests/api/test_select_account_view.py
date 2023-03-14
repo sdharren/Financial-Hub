@@ -3,13 +3,13 @@ from django.urls import reverse
 from django.contrib import messages
 from assetManager.models import User
 import json
-from assetManager.api.views import reformatAccountBalancesData
+from assetManager.api.views import reformatAccountBalancesData,delete_balances_cache
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-
-
+from django.conf import settings
+from assetManager.models import AccountTypeEnum,AccountType
 
 class SelectAccountViewsTestCase(TestCase):
     """Tests of the log in view."""
@@ -65,10 +65,11 @@ class SelectAccountViewsTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 401)
 
-    def test_get_select_account_url_succesfully(self):
+    def test_get_select_account_url_succesfully_for_single_institution(self):
+        settings.PLAID_DEVELOPMENT = False
         self.balances = self.client.get(reverse('get_balances_data'), follow=True)
-        response = self.client.get(self.url,{'param':'Royal Bank of Scotland - Current Accounts'}, follow=True)
-        response_json = json.loads(response.content)
+        response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
+
         response_data = response.json()
 
         self.assertEqual(len(list(response_data.keys())),2)
@@ -78,15 +79,79 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]], 500.0)
         self.assertEqual(response_data[list(response_data.keys())[1]], 500.0)
 
+        delete_balances_cache(self.user)
+
+    def test_get_select_account_url_for_multiple_institutions(self):
+        settings.PLAID_DEVELOPMENT = False
+        before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
+
+        self.client.get(reverse('get_balances_data'), follow=True)
+        after_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.assertEqual(before_count + 2, after_count)
+
+        response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(response.status_code, 200)
+        response_data_first = response.json()
+        self.assertEqual(len(list(response_data_first.keys())),2)
+        self.assertTrue(list(response_data_first.keys())[0] == 'Savings' or list(response_data_first.keys())[0] == 'Checking')
+        self.assertTrue(list(response_data_first.keys())[1] == 'Savings' or list(response_data_first.keys())[1] == 'Checking')
+
+        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 500.0)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 500.0)
+
+        response_second = self.client.get('/api/select_account/?param=Bank of America')
+        self.assertEqual(response_second.status_code, 200)
+        response_data_second = response_second.json()
+        self.assertEqual(len(list(response_data_second.keys())),9)
+        self.assertEqual(list(response_data_second.keys())[0] , 'Plaid Checking')
+        self.assertEqual(list(response_data_second.keys())[1] , 'Plaid Saving')
+        self.assertEqual(list(response_data_second.keys())[4] , 'Plaid Money Market')
+
+        self.assertEqual(response_data_second[list(response_data_second.keys())[0]], 100.0)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[1]], 200.0)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[4]], 43200.0)
+
 
     def test_get_select_account_url_without_giving_param_field_a_value(self):
-        with self.assertRaises(Exception) as cm:
-            response = self.client.get(self.url,{'param':''}, follow=True)
+        settings.PLAID_DEVELOPMENT = False
+        response = self.client.get('/api/select_account/?param=')
+        self.assertEqual(response.status_code, 303)
 
-        self.assertEqual(str(cm.exception),'No param field supplied to select_account url')
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'No param field supplied.')
+
 
     def test_get_select_accounts_url_with_incorrect_key(self):
-        with self.assertRaises(Exception) as cm:
-            response = self.client.get(self.url,{'param':'HSBC (UK)'}, follow=True)
+        settings.PLAID_DEVELOPMENT = False
+        self.balances = self.client.get(reverse('get_balances_data'), follow=True)
+        response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(response.status_code, 200)
+        response_data_first = response.json()
+        self.assertEqual(len(list(response_data_first.keys())),2)
+        self.assertTrue(list(response_data_first.keys())[0] == 'Savings' or list(response_data_first.keys())[0] == 'Checking')
+        self.assertTrue(list(response_data_first.keys())[1] == 'Savings' or list(response_data_first.keys())[1] == 'Checking')
 
-        self.assertEqual(str(cm.exception),'Provided institution name does not exist in the requested accounts')
+        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 500.0)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 500.0)
+
+        response_second = self.client.get('/api/select_account/?param=HSBC (UK)')
+        self.assertEqual(response_second.status_code, 303)
+
+        response_data = response_second.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Invalid Insitution ID.')
+
+    def test_get_select_account_balances_without_having_first_queried_get_balances_data(self):
+        settings.PLAID_DEVELOPMENT = False
+        delete_balances_cache(self.user)
+        response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(response.status_code, 303)
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Balances not queried.')

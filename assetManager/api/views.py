@@ -331,7 +331,7 @@ def get_balances_data(request):
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
         if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
-            cache.delete('balances' + user.email)
+            delete_balances_cache(user)
         else:
             return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
@@ -349,28 +349,22 @@ def get_balances_data(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
-
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
-
         if cache.has_key('balances' + request.user.email) is False:
-            raise Exception('get_balances_data was not queried')
+            return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
         else:
             account_balances = cache.get('balances' + request.user.email)
 
         if institution_name not in list(account_balances.keys()):
-            raise Exception("Provided institution name does not exist in the requested accounts")
+            return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
 
         accounts = reformatAccountBalancesData(account_balances,institution_name)
 
         return Response(accounts, content_type='application/json',status = 200)
 
     else:
-        raise Exception("No param field supplied to select_account url")
-
-
-#recent transactions using the already existing getter of information
-#refactor recent_transactions getter
+        return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)

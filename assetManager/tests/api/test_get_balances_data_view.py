@@ -5,12 +5,13 @@ from assetManager.models import User
 import json
 from assetManager.api.views import reformatBalancesData
 
-from assetManager.api.views import get_balances_data
+from assetManager.api.views import get_balances_data,delete_balances_cache
 
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+from assetManager.models import AccountTypeEnum,AccountType
 
 class GetBalancesDataViewTestCase(TestCase):
     """Tests of the log in view."""
@@ -70,11 +71,12 @@ class GetBalancesDataViewTestCase(TestCase):
 
 
     def test_get_balances_succesfully(self):
+        settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url, follow=True)
-        response_json = json.loads(response.content)
         response_data = response.json()
         self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 1000.0)
         self.assertEqual(response.status_code,200)
+        delete_balances_cache(self.user)
 
     def test_get_balances_succesfully_for_multiple_accounts(self):
         plaid_wrapper = SandboxWrapper()
@@ -92,3 +94,44 @@ class GetBalancesDataViewTestCase(TestCase):
 
         self.assertEqual(account_balances[list(account_balances.keys())[0]], 43500.0)
         self.assertEqual(account_balances[list(account_balances.keys())[1]], 1000.0)
+
+        delete_balances_cache(self.user)
+
+    def test_get_balances_data_enforce_cache_delete_due_to_new_institution_linked_in_application(self):
+        settings.PLAID_DEVELOPMENT = False
+        before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        response_first = self.client.get(reverse('get_balances_data'), follow=True)
+        self.assertEqual(response_first.status_code, 200)
+        after_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.assertEqual(before_count + 1, after_count)
+
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+        new_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.assertEqual(before_count + 2, new_count)
+        response = self.client.get(reverse('get_balances_data'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        account_balances = response.json()
+
+        self.assertEqual(list(account_balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(account_balances.keys())[1], 'Bank of America')
+
+        self.assertEqual(account_balances[list(account_balances.keys())[0]], 1000.0)
+        self.assertEqual(account_balances[list(account_balances.keys())[1]], 43500.0)
+        delete_balances_cache(self.user)
+
+    def test_get_balances_data_from_the_cache(self):
+        settings.PLAID_DEVELOPMENT = False
+        response = self.client.get(self.url, follow=True)
+        response_data = response.json()
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 1000.0)
+        self.assertEqual(response.status_code,200)
+
+        settings.PLAID_DEVELOPMENT = True
+        response_second = self.client.get(self.url, follow=True)
+        response_data_second = response_second.json()
+        self.assertEqual(response_data_second['Royal Bank of Scotland - Current Accounts'], 1000.0)
+        self.assertEqual(response_second.status_code,200)
+        delete_balances_cache(self.user)
