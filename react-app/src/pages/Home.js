@@ -1,4 +1,4 @@
-import cards from '../Ecommerce_13.png';
+import cards from '../static/images/Ecommerce_13.png';
 import computer from '../Other 07.png'
 
 export default function Home() {

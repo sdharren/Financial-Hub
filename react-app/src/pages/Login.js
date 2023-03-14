@@ -5,7 +5,7 @@ import { loginFields } from '../components/formFields';
 import Input from '../components/input';
 import FormAction from '../components/formAction';
 import FormExtra from '../components/formExtra';
-import '../static/errors.css';
+import '../static/css/errors.css';
 
 // add remember me functionality
 

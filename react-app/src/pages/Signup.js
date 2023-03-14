@@ -4,7 +4,7 @@ import { signupFields } from '../components/formFields';
 import Input from '../components/input'
 import FormAction from '../components/formAction';
 import Header from '../components/header';
-import '../static/errors.css';
+import '../static/css/errors.css';
 
 // need to add confirmation that passwords match
 

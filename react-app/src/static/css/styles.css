@@ -3,7 +3,7 @@
 body {
     margin: 0;
     color: white;
-    background-image:url(background-image.png);
+    background-image:url("../images/background-image.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
