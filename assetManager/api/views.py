@@ -79,6 +79,18 @@ def investment_category_breakdown(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def first_investment_category(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+    category = stock_getter.get_first_category()
+    # TODO: handle no categories
+    data = {'category': category}
+    return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def stock_history(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
@@ -89,8 +101,19 @@ def stock_history(request):
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
     else:
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
-        #return bad request
     data = stock_getter.get_stock_history(stock_ticker)
+    return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def first_stock(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+    stock = stock_getter.get_first_supported_stock()
+    #TODO: handle no stocks
+    data = {'stock': stock}
     return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])

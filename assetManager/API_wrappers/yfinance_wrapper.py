@@ -60,3 +60,10 @@ class YFinanceWrapper():
             data.update({(keys[i+1]) : (initial_amount * (values[i+1]-values[i])/(values[i]))})
         
         return data
+
+    def is_ticker_supported(self, ticker):
+        try:
+            self.get_most_recent_stock_price(ticker)
+        except TickerNotSupported:
+            return False
+        return True
