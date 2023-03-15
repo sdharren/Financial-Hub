@@ -5,14 +5,30 @@ author: Pavan Rana
 """
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 
+def handle_case(account):
+    if(account['authorized_date'] is None):
+        if(account['date'] is None):
+            case = {'authorized_date':'Not Provided','date':'Not Provided', 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+            return case
+        else:
+            case = {'authorized_date':'Not Provided','date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+            return case
+    elif(account['date'] is None):
+        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':'Not Provided', 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+        return case
+    elif(account['merchant_name'] is None):
+        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':'Not Provided'}
+        return case
+    else:
+        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+        return case
+
+
 def format_transactions(transactions):
     reformatted_transactions = []
     for account in transactions:
-        try:
-            case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
-            reformatted_transactions.append(case)
-        except:
-            return transactions
+        case = handle_case(account)
+        reformatted_transactions.append(case)
 
     return reformatted_transactions
 

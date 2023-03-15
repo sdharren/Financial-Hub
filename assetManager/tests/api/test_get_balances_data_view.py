@@ -29,7 +29,6 @@ class GetBalancesDataViewTestCase(TestCase):
 
         self.url = reverse('get_balances_data')
 
-
     def test_balances_url(self):
         self.assertEqual(self.url,'/api/get_balances_data/')
 

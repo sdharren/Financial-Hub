@@ -61,6 +61,7 @@ class DebitCard():
         self.plaid_wrapper = concrete_wrapper
         self.user = user
         self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
+        print(self.access_tokens)
         self.bank_graph_data = {}
 
     #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly

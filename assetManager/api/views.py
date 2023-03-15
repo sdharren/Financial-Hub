@@ -5,7 +5,6 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from assetManager.models import User
 from assetManager.assets.debit_card import DebitCard
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -23,7 +22,7 @@ from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
-from decimal import Decimal
+from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -233,120 +232,13 @@ def transaction_data_getter(user):
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
     return accountData[first_key]
-    # return accountData[0]
 
 def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
         cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+
     return BankGraphData(json.loads(cache.get('transactions' + user.email)))
 
-
-def get_currency_converter():
-    if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
-    else:
-        input_date = datetime.datetime.today()
-
-    return input_date
-"""
-@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
-
-@Description: -Iterates through account_balances extracting every account and total amount of liquid assets in that account for a specific currency
-              -Calculates percentage totals for all unique currencies for total overall amounts in all accounts
-
-@return: Reformatted dictionary containing the percentage amount of liquidity overall categorised by currency for all accounts in all linked institutions
-"""
-def reformat_balances_into_currency(account_balances):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    currency_total = {}
-    currency_rates =  CurrencyRates()
-
-    input_date = get_currency_converter()
-
-    for institution in account_balances.keys():
-        for account in account_balances[institution].keys():
-            currency_type = account_balances[institution][account]['currency']
-            amount = account_balances[institution][account]['available_amount']
-            if currency_type not in currency_total.keys():
-                currency_total[currency_type] = 0
-
-            result = currency_rates.convert(currency_type, 'GBP', amount,input_date)
-            currency_total[currency_type] +=  result
-
-    return currency_total
-
-def calculate_perentage_proportions_of_currency_data(currency_total):
-    proportions = {}
-    total_money = sum(currency_total.values())
-
-    for currency, amount in currency_total.items():
-        proportion = amount / total_money
-        proportions[currency] = round((proportion * 100),2)
-
-    return proportions
-
-"""
-@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key, institution_name string representing the name of the institution name
-
-@Description: -Iterates through all account_balances extracting every account and total amount of liquid assets in that account for a specific the passed insitution
-              -Creates a dictionary (key: name of the account, value: amount in that account)
-              -Uses GBP as unique currency for quantifying amounts
-
-@return: Reformatted dictionary containing all accounts and corresponding amount in that account
-"""
-def reformatAccountBalancesData(account_balances,institution_name):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    if institution_name not in account_balances.keys():
-        raise Exception("passed institution_name is not account balances dictionary")
-
-    currency_rates =  CurrencyRates()
-    input_date = get_currency_converter()
-    accounts = {}
-    duplicates = 0
-    for account in account_balances[institution_name].keys():
-        total = 0
-        total += currency_rates.convert(account_balances[institution_name][account]['currency'], 'GBP',account_balances[institution_name][account]['available_amount'],input_date)
-
-        if account_balances[institution_name][account]['name'] in accounts.keys():
-            duplicates += 1
-            accounts[account_balances[institution_name][account]['name'] + '_' + str(duplicates)] = total
-        else:
-            accounts[account_balances[institution_name][account]['name']] = total
-
-    return accounts
-
-def reformatBalancesData(account_balances):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    balances = {}
-
-    currency_rates =  CurrencyRates()
-    input_date = get_currency_converter()
-
-    for institution_name in account_balances.keys():
-        total = 0
-        for account_id in account_balances[institution_name].keys():
-            total += currency_rates.convert(account_balances[institution_name][account_id]['currency'], 'GBP', account_balances[institution_name][account_id]['available_amount'],input_date)
-
-        balances[institution_name] = total
-
-    return balances
-
-def get_balances_wrapper(user):
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token_custom_user()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
-    return plaid_wrapper
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -423,7 +315,11 @@ def recent_transactions(request):
         institution_name = request.GET.get('param')
         bank_graph_data_insight = cacheBankTransactionData(user)
         concrete_wrapper = DevelopmentWrapper()
-        debit_card = DebitCard(user,concrete_wrapper)
+        debit_card = DebitCard(concrete_wrapper,user)
+        if(check_institution_name_selected_exists(user,institution_name) is False):
+            return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
+
+
         recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
