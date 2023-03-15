@@ -37,10 +37,6 @@ class GetCurrencyDataViewTestCase(TestCase):
         with self.assertRaises(TypeError) as cm:
             reformat_balances_into_currency(incorrect_account_balances)
 
-
-    def test_get_unknown_currency(self):
-        self.fail('f')
-
     def test_reformat_balances_into_currency_empty_dict(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts':{}}
         self.assertEqual(reformat_balances_into_currency(account_balances),{})

@@ -4,7 +4,7 @@ from datetime import date
 single_transaction_dict = [[{'account_id': 'kK3EeGbokrHnb1GWao1wc5rbep6npEIJQLxLa',
 'account_owner': None,
 'amount': 500.0,
-'authorized_date': None,
+'authorized_date':datetime.date(2022, 12, 16),
 'authorized_datetime': None,
 'category': ['Travel', 'Airlines and Aviation Services'],
 'category_id': '22001000',

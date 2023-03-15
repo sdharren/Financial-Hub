@@ -1,13 +1,14 @@
 from plaid.model.transactions_refresh_request import TransactionsRefreshRequest
 from plaid.model.transactions_get_request import TransactionsGetRequest
 from plaid.model.products import Products
+import datetime
 from datetime import date
 from assetManager.models import AccountType, AccountTypeEnum
 from plaid.exceptions import ApiException
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import date
+
 
 class InvalidInstitution(Exception):
     def __init__(self):
@@ -108,7 +109,6 @@ class DebitCard():
             transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
             transactions.append(transaction_response['transactions'])
 
-        print(transactions)
         return transactions
 
     def make_bank_graph_data_dict(self,token,transactions,transaction_count):
@@ -119,7 +119,6 @@ class DebitCard():
         transaction_count = 0
         transactions = self.get_transactions_by_date(start_date_input,end_date_input)
         for token in self.access_tokens:
-            print('here')
             self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
             transaction_count = transaction_count + 1
 
@@ -132,24 +131,26 @@ class DebitCard():
     #refactor function to work with passed in bank_graph_data
     #write further tests for validaiton of elements returned by the function
     #convert authorised date back to a date as it will be a string when merging with line-graphs branch
-    def get_recent_transactions(self,bank_graph_data):
+    def get_recent_transactions(self,bank_graph_data,institution):
         if(not bank_graph_data):
             raise TypeError("Bank graph data is empty")
         recent_transactions = {}
 
-        for institution in bank_graph_data.keys():
-            all_transactions = []
-            for account in bank_graph_data[institution].transaction_history:
-                if(account['authorized_date'] == date.today() or (account['date'] == date.today())):
-                    if(account['merchant_name'] is None):
-                        merchant_name = 'Not provided'
-                    else:
-                        merchant_name = account['merchant_name']
+        all_transactions = []
+        for account in bank_graph_data:
+            authorized_date = datetime.date(account['authorized_date'][0],account['authorized_date'][1],account['authorized_date'][2])
+            date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
 
-                    case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':account['authorized_date'], 'category':account['category'], 'merchant':merchant_name}
+            if(authorized_date == date.today() or (date == date.today())):
+                if(account['merchant_name'] is None):
+                    merchant_name = 'Not provided'
+                else:
+                    merchant_name = account['merchant_name']
 
-                    all_transactions.append(case)
+                case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':authorized_date, 'category':account['category'], 'merchant':merchant_name}
 
-            recent_transactions[institution] = all_transactions
+                all_transactions.append(case)
+
+        recent_transactions[institution] = all_transactions
 
         return recent_transactions

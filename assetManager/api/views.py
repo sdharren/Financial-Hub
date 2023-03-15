@@ -241,6 +241,13 @@ def cacheBankTransactionData(user):
     return BankGraphData(json.loads(cache.get('transactions' + user.email)))
 
 
+def get_currency_converter():
+    if settings.PLAID_DEVELOPMENT is False:
+        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
+    else:
+        input_date = datetime.datetime.today()
+
+    return input_date
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
 
@@ -256,10 +263,7 @@ def reformat_balances_into_currency(account_balances):
     currency_total = {}
     currency_rates =  CurrencyRates()
 
-    if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
-    else:
-        input_date = datetime.datetime.today()
+    input_date = get_currency_converter()
 
     for institution in account_balances.keys():
         for account in account_balances[institution].keys():
@@ -288,6 +292,7 @@ def calculate_perentage_proportions_of_currency_data(currency_total):
 
 @Description: -Iterates through all account_balances extracting every account and total amount of liquid assets in that account for a specific the passed insitution
               -Creates a dictionary (key: name of the account, value: amount in that account)
+              -Uses GBP as unique currency for quantifying amounts
 
 @return: Reformatted dictionary containing all accounts and corresponding amount in that account
 """
@@ -298,11 +303,13 @@ def reformatAccountBalancesData(account_balances,institution_name):
     if institution_name not in account_balances.keys():
         raise Exception("passed institution_name is not account balances dictionary")
 
+    currency_rates =  CurrencyRates()
+    input_date = get_currency_converter()
     accounts = {}
     duplicates = 0
     for account in account_balances[institution_name].keys():
         total = 0
-        total += account_balances[institution_name][account]['available_amount']
+        total += currency_rates.convert(account_balances[institution_name][account]['currency'], 'GBP',account_balances[institution_name][account]['available_amount'],input_date)
 
         if account_balances[institution_name][account]['name'] in accounts.keys():
             duplicates += 1
@@ -318,11 +325,13 @@ def reformatBalancesData(account_balances):
 
     balances = {}
 
+    currency_rates =  CurrencyRates()
+    input_date = get_currency_converter()
+
     for institution_name in account_balances.keys():
         total = 0
         for account_id in account_balances[institution_name].keys():
-            total += account_balances[institution_name][account_id]['available_amount']
-
+            total += currency_rates.convert(account_balances[institution_name][account_id]['currency'], 'GBP', account_balances[institution_name][account_id]['available_amount'],input_date)
 
         balances[institution_name] = total
 

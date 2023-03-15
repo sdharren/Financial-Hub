@@ -44,11 +44,12 @@ class GetBalancesDataViewTestCase(TestCase):
             reformatBalancesData(incorrect_account_balances)
 
     def test_get_reformatted_balances_data_correctly(self):
+        settings.PLAID_DEVELOPMENT = False
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
         balances = reformatBalancesData(account_balances)
         self.assertEqual(len(balances),1)
         self.assertEqual(list(balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(balances[list(balances.keys())[0]], 1000.0)
+        self.assertEqual(balances[list(balances.keys())[0]], 593.8004402054293)
 
 
     def test_make_post_request_to_url(self):
@@ -74,7 +75,7 @@ class GetBalancesDataViewTestCase(TestCase):
         settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url, follow=True)
         response_data = response.json()
-        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 1000.0)
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
         self.assertEqual(response.status_code,200)
         delete_balances_cache(self.user)
 
@@ -92,8 +93,8 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(list(account_balances.keys())[0], 'Bank of America')
         self.assertEqual(list(account_balances.keys())[1], 'Royal Bank of Scotland - Current Accounts')
 
-        self.assertEqual(account_balances[list(account_balances.keys())[0]], 43500.0)
-        self.assertEqual(account_balances[list(account_balances.keys())[1]], 1000.0)
+        self.assertEqual(account_balances[list(account_balances.keys())[0]], 25830.31914893617)
+        self.assertEqual(account_balances[list(account_balances.keys())[1]], 593.8004402054293)
 
         delete_balances_cache(self.user)
 
@@ -118,20 +119,20 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(list(account_balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(list(account_balances.keys())[1], 'Bank of America')
 
-        self.assertEqual(account_balances[list(account_balances.keys())[0]], 1000.0)
-        self.assertEqual(account_balances[list(account_balances.keys())[1]], 43500.0)
+        self.assertEqual(account_balances[list(account_balances.keys())[0]], 593.8004402054293)
+        self.assertEqual(account_balances[list(account_balances.keys())[1]], 25830.31914893617)
         delete_balances_cache(self.user)
 
     def test_get_balances_data_from_the_cache(self):
         settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url, follow=True)
         response_data = response.json()
-        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 1000.0)
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
         self.assertEqual(response.status_code,200)
 
         settings.PLAID_DEVELOPMENT = True
         response_second = self.client.get(self.url, follow=True)
         response_data_second = response_second.json()
-        self.assertEqual(response_data_second['Royal Bank of Scotland - Current Accounts'], 1000.0)
+        self.assertTrue(response_data_second['Royal Bank of Scotland - Current Accounts'] != response_data['Royal Bank of Scotland - Current Accounts'])
         self.assertEqual(response_second.status_code,200)
         delete_balances_cache(self.user)
