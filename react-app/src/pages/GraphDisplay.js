@@ -1,13 +1,15 @@
 import PieChart from "./PieChart";
 import LineGraph from "./LineGraph";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
+import InvestmentOptions from "../components/InvestmentOptions";
 
 function GraphDisplay() {
     const [graph, setGraph] = useState(<div><PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/></div>);
     let {authTokens, logoutUser} = useContext(AuthContext);
 
-    const [graphOptions, setGraphOptions] = useState(null);
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [investmentOptions, setInvestmentOptions] = useState([]);
 
     const [overviewActive, setOverviewActive] = useState(true);
     const [categoryActive, setCategoryActive] = useState(false);
@@ -15,6 +17,10 @@ function GraphDisplay() {
 
     const [lastCategory, setLastCategory] = useState(null);
     const [lastStock, setLastStock] = useState(null);
+
+    useEffect(() => {
+
+    }, [investmentOptions])
 
     let link_sandbox = async() => {
         let response = await fetch('http://127.0.0.1:8000/api/sandbox_investments/',
@@ -31,6 +37,24 @@ function GraphDisplay() {
         }
     }
     
+    async function updateOptions() {
+        let options = {
+            'investments': [],
+            'categories': []
+        }
+        if (investmentOptions.length === 0) {
+            let data = await callApi('supported_investments');
+            options['investments'] = data['investments'];
+            setInvestmentOptions(data['investments'])
+        }
+        if (categoryOptions.length === 0) {
+            let data = await callApi('investment_category_names');
+            options['categories'] = data['categories'];
+            setCategoryOptions(data['categories'])
+        }
+        return options;
+    }
+
     function changeGraphState(graph) {
         if (graph === 'investment_categories') {
             setCategoryActive(false);
@@ -49,24 +73,41 @@ function GraphDisplay() {
         }
     }
     
-    function changeGraph(endpoint, endpoint_parameter) {
-        if (endpoint === 'stock_history') {
-            setGraph(
-                <LineGraph endpoint={endpoint} endpoint_parameter={lastStock} />
-            );
-            setLastStock(endpoint_parameter);
-        }
-        else {
-            if (endpoint === 'investment_categories') {
-                setLastCategory(endpoint_parameter);
-            }
-            setGraph(
-                <div>
-                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
-                </div>
-            );
-        }
+    async function changeGraph(endpoint, endpoint_parameter) {
+        const options = await updateOptions();
+        switch(endpoint) {
+            case 'investment_categories':
+                setGraph(
+                    <div>
+                        <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
+                    </div>
+                );
+                break;
 
+            case 'investment_category_breakdown':
+                setLastCategory(endpoint_parameter);
+                setGraph(
+                    <div>
+                        <InvestmentOptions 
+                            options={categoryOptions.length === 0 ? options['categories'] : categoryOptions} 
+                            selectedOption={endpoint_parameter}
+                        />
+                        <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
+                    </div>
+                );
+                break;
+
+            case 'stock_history':
+                setLastStock(endpoint_parameter);
+                setGraph(
+                    <div>
+                        <InvestmentOptions options={investmentOptions.length === 0 ? options['investments'] : investmentOptions} />
+                        <LineGraph endpoint={endpoint} endpoint_parameter={endpoint_parameter} />
+                    </div>
+                    
+                );
+                break;
+        }
         changeGraphState(endpoint);
     }
 
@@ -102,8 +143,8 @@ function GraphDisplay() {
                 changeGraph(endpoint, lastStock);
             }
             else {
-                let data = await callApi('first_stock')
-                let stock = data['stock'];
+                let data = await callApi('supported_investments')
+                let stock = data['investments'][0];
 
                 changeGraph(endpoint, stock);
             }
@@ -113,8 +154,8 @@ function GraphDisplay() {
                 changeGraph(endpoint, lastCategory);
             }
             else {
-                let data = await callApi('first_investment_category')
-                let category = data['category'];
+                let data = await callApi('investment_category_names')
+                let category = data['categories'][0];
 
                 changeGraph(endpoint, category);
             }    
@@ -139,7 +180,7 @@ function GraphDisplay() {
                 </button>
             </div>
 
-            <div className="tabcontent" onLoad={link_sandbox()}>
+            <div className="tabcontent">
                 {graph}
             </div>
         </div>

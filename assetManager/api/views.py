@@ -53,6 +53,7 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_categories(request):
@@ -79,14 +80,14 @@ def investment_category_breakdown(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def first_investment_category(request):
+def investment_category_names(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
     except InvestmentsNotLinked:
         return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
-    category = stock_getter.get_first_category()
+    categories = stock_getter.get_categories()
     # TODO: handle no categories
-    data = {'category': category}
+    data = {'categories': categories}
     return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])
@@ -106,14 +107,14 @@ def stock_history(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def first_stock(request):
+def supported_investments(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
     except InvestmentsNotLinked:
         return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
-    stock = stock_getter.get_first_supported_stock()
+    stocks = stock_getter.get_supported_investments()
     #TODO: handle no stocks
-    data = {'stock': stock}
+    data = {'investments': stocks}
     return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])
