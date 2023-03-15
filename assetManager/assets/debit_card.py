@@ -108,6 +108,7 @@ class DebitCard():
             transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
             transactions.append(transaction_response['transactions'])
 
+        print(transactions)
         return transactions
 
     def make_bank_graph_data_dict(self,token,transactions,transaction_count):
@@ -118,6 +119,7 @@ class DebitCard():
         transaction_count = 0
         transactions = self.get_transactions_by_date(start_date_input,end_date_input)
         for token in self.access_tokens:
+            print('here')
             self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
             transaction_count = transaction_count + 1
 

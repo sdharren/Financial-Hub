@@ -22,6 +22,8 @@ from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkToke
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from forex_python.converter import CurrencyRates
+from decimal import Decimal
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -252,6 +254,12 @@ def reformat_balances_into_currency(account_balances):
         raise TypeError("account balances must be of type dict")
 
     currency_total = {}
+    currency_rates =  CurrencyRates()
+
+    if settings.PLAID_DEVELOPMENT is False:
+        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
+    else:
+        input_date = datetime.datetime.today()
 
     for institution in account_balances.keys():
         for account in account_balances[institution].keys():
@@ -260,14 +268,18 @@ def reformat_balances_into_currency(account_balances):
             if currency_type not in currency_total.keys():
                 currency_total[currency_type] = 0
 
-            currency_total[currency_type] += amount
+            result = currency_rates.convert(currency_type, 'GBP', amount,input_date)
+            currency_total[currency_type] +=  result
 
+    return currency_total
+
+def calculate_perentage_proportions_of_currency_data(currency_total):
+    proportions = {}
     total_money = sum(currency_total.values())
 
-    proportions = {}
     for currency, amount in currency_total.items():
         proportion = amount / total_money
-        proportions[currency] = proportion * 100
+        proportions[currency] = round((proportion * 100),2)
 
     return proportions
 
@@ -338,11 +350,12 @@ def get_currency_data(request):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
     debit_card = DebitCard(plaid_wrapper,user)
+    #try catch to ensure data is returned
     account_balances = debit_card.get_account_balances()
     currency = reformat_balances_into_currency(account_balances)
-    cache.set('currency' + user.email, currency)
-
-    return Response(currency, content_type='application/json', status = 200)
+    proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
+    cache.set('currency' + user.email, proportion_currencies)
+    return Response(proportion_currencies, content_type='application/json', status = 200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

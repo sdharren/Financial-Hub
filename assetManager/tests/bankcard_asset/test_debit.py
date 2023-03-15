@@ -101,7 +101,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         start_date = date.today()
         end_date = date.today()
         transactions = debit_card.make_graph_transaction_data_insight(start_date,end_date)
-
+        print(transactions)
         recent_transactions = debit_card.get_recent_transactions(debit_card.get_insight_data())
 
         self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),1)
