@@ -166,8 +166,6 @@ class StocksGetter():
                 stock_histories.append(stock_history)
 
         for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
-            print("working through: ")
-            print(str(current_date))
             current_sum = 0
             skipDay = False
             for stock_history in stock_histories:

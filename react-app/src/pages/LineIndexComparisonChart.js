@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/AuthContext';
 
 function LineIndexComparisonChart () {
-    const [portfolio, setPortfolio] = useState(null);
-    const [index, setIndex] = useState(null);
+    const [comparisonData, setComparisonData] = useState(null);
 
     const navigate = useNavigate();
 
@@ -24,11 +23,11 @@ function LineIndexComparisonChart () {
                     'Authorization':'Bearer ' + String(authTokens.access)
                 }
             });
-            console.log("request sent");
+
             let data = await response.json();
+            
             if (response.status === 200) {
-                console.log("received 200")
-                console.log(data);
+                setComparisonData(data);
             }
             else if (response.status === 303) {
                 if (data['error'] === 'Investments not linked.') {
@@ -37,19 +36,27 @@ function LineIndexComparisonChart () {
             }
         }
         get_data();
-        console.log("here");
     }, []);
 
+    let dates = [];
+    let portfolio = [];
+    let index = [];
+    
+    for (let key in comparisonData) {
+        dates.push(key);
+        portfolio.push(comparisonData[key]['portfolio']);
+        index.push(comparisonData[key]['index']);
+    }
 
     const series = [  
         {    
             name: 'Portfolio',   
-            data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 130]
+            data: portfolio
         },
 
         {
             name: 'Index',
-            data: [20, 22, 30, 45, 60, 90, 105, 120, 135, 150]
+            data: index
         }
     ];
 
@@ -68,7 +75,7 @@ function LineIndexComparisonChart () {
     },
     xaxis: {
         //type: 'datetime', COMMENTED THIS OUT FOR TESTING
-        categories:  [1,2,3,4,5,6,7,8,9,0], // THIS IS WHERE THE DATES GO
+        categories:  dates, // THIS IS WHERE THE DATES GO
     },
     yaxis: {
         title: {
