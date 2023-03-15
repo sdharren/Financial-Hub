@@ -11,6 +11,7 @@
     "jwt-decode": "^3.1.2",
     "plaid": "^12.5.0",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.4.0",
     "react-bubble-chart": "^0.4.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",

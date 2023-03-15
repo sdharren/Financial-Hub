@@ -95,6 +95,24 @@ def stock_history(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def portfolio_comparison(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    if request.GET.get('param'):
+        ticker = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
+
+    comparison = stock_getter.get_portfolio_comparison(ticker, period=6)
+    return Response(comparison, content_type='application/json', status=200)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')

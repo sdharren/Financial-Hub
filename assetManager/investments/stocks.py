@@ -166,6 +166,8 @@ class StocksGetter():
                 stock_histories.append(stock_history)
 
         for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
+            print("working through: ")
+            print(str(current_date))
             current_sum = 0
             skipDay = False
             for stock_history in stock_histories:
@@ -177,3 +179,22 @@ class StocksGetter():
             if not skipDay:
                 portfolio_history[current_date.strftime('%Y-%m-%d')] = current_sum
         return portfolio_history
+
+    def get_index_history(self, ticker, period="6mo"):
+        return self.yfinance_wrapper.getIndexValues(ticker, period)
+
+    def get_portfolio_comparison(self, ticker, period=6):
+        index_history = self.get_index_history(ticker, str(period) + 'mo')
+        portfolio_history = self.get_portfolio_history(period)
+        comparison = defaultdict(dict)
+        for date in portfolio_history:
+            try:
+                current_index = index_history[date]
+            except KeyError:
+                continue
+            else:
+                comparison[date] = {
+                    'portfolio': portfolio_history[date],
+                    'index': index_history[date]
+                }
+        return comparison

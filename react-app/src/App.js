@@ -20,6 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
 import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
+import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
 
 // ask matthew about how margins are lined
 
@@ -46,6 +47,7 @@ function App() {
               <Route path="/balances" element={<BalancesDisplay />} />
               <Route path="/currency" element={<Currency />} />
               <Route path="/list" element={<TransactionTable />} />
+              <Route path="/portfolio_comparison" element={<LineIndexComparisonChart />} />
             </Routes>
           </div>
           </div>
