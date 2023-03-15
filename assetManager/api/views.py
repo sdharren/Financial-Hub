@@ -414,3 +414,17 @@ def select_account(request):
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def recent_transactions(request):
+    user = request.user
+    if request.GET.get('param'):
+        institution_name = request.GET.get('param')
+        bank_graph_data_insight = cacheBankTransactionData(user)
+        concrete_wrapper = DevelopmentWrapper()
+        debit_card = DebitCard(user,concrete_wrapper)
+        recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
+        return Response(recent_transactions,content_type='application/json',status = 200)
+    else:
+        return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
