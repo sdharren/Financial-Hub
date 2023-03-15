@@ -29,6 +29,23 @@ function GraphDisplay() {
         }
     }
 
+    function changeGraphState(graph) {
+        if (graph === 'investment_categories') {
+            setCategoryActive(false);
+            setStocksActive(false);
+            setOverviewActive(true);
+        }
+        else if (graph === 'investment_category_breakdown') {
+            setCategoryActive(true);
+            setStocksActive(false);
+            setOverviewActive(false);
+        }
+        else if (graph === 'stock_history') {
+            setCategoryActive(false);
+            setStocksActive(true);
+            setOverviewActive(false);
+        }
+    }
     
 
     // JSON to know which API endpoint to query next
@@ -42,24 +59,22 @@ function GraphDisplay() {
         let next = nextRoute[event.current];
 
         if (next == 'stock_history') {
-            setCategoryActive(false);
-            setStocksActive(true);
             setLastStock(event.next);
 
             setGraph(
                 <LineGraph endpoint={next} endpoint_parameter={event.next} />
             );
+            changeGraphState(next);
         }
         else {
             let nextEndpoint = nextRoute[event.current];
             if (nextEndpoint === 'investment_category_breakdown') {
-                setOverviewActive(false);
-                setCategoryActive(true);
                 setLastCategory(event.next);
             }
             setGraph(
                 <PieChart endpoint={nextEndpoint} endpoint_parameter={event.next} loadNext={handleLoadNext} />
             );
+            changeGraphState(nextEndpoint);
         }
     }
 
@@ -83,20 +98,17 @@ function GraphDisplay() {
                 setGraph(
                     <LineGraph endpoint={endpoint} endpoint_parameter={lastStock} />
                 );
+                changeGraphState(endpoint);
             }
             else {
                 let data = await callApi('first_stock')
                 let stock = data['stock'];
 
                 setLastStock(stock);
-
-                setCategoryActive(false);
-                setStocksActive(true);
-                setOverviewActive(false);
-
                 setGraph(
                     <LineGraph endpoint={endpoint} endpoint_parameter={stock} />
                 );
+                changeGraphState(endpoint);
             }
         }
         else if (endpoint === 'investment_category_breakdown') {
@@ -104,37 +116,31 @@ function GraphDisplay() {
                 setGraph(
                     <PieChart endpoint={endpoint} endpoint_parameter={lastCategory} loadNext={handleLoadNext} />
                 );
+                changeGraphState(endpoint);
             }
             else {
                 let data = await callApi('first_investment_category')
                 let category = data['category'];
 
                 setLastCategory(category);
-
-                setCategoryActive(true);
-                setStocksActive(false);
-                setOverviewActive(false);
-
                 setGraph(
                     <PieChart endpoint={endpoint} endpoint_parameter={category} loadNext={handleLoadNext} />
                 );
+                changeGraphState(endpoint);
             }    
         }
         else if (endpoint === 'investment_categories') {
-            setCategoryActive(false);
-            setStocksActive(false);
-            setOverviewActive(true);
-            
             setGraph(
                 <PieChart endpoint={endpoint} loadNext={handleLoadNext} />
             );
+            changeGraphState(endpoint);
         }
     }
 
 
     return (
-        <div>
-            <div class="tab">
+        <div className="investment-graphs">
+            <div className="tab">
                 <button className={"tablinks" + (overviewActive ? " active" : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
                 </button>
