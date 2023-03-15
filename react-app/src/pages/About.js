@@ -28,7 +28,7 @@ export default function About() {
                     <div className="about-background-box">
                         <img src={group} alt="#" />
                         <div className="about-image-box">
-                            <img src={ecommerce} alt="#" />
+                            <img src={ecommerce} alt="Banks" />
                         </div>
                     </div>
                 </div>
@@ -37,7 +37,7 @@ export default function About() {
                     <div className="about-background-box">
                         <img src={group} alt="#" />
                         <div className="about-image-box">
-                            <img src={etherium} alt="#" />
+                            <img src={etherium} alt="Crypto" />
                         </div>
                     </div>
                 </div>
