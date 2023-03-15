@@ -290,3 +290,55 @@ font-size: 2.3em;
   margin-right: 20px;
 }
  
+.about-page {
+  text-align: center;
+}
+
+.txt-about-us {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3rem;
+  margin-top: 2rem;
+}
+
+.txt-monitoring-finances {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.txt-link-assets {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about-container {
+  display: flex;
+  justify-content: center;
+  
+}
+
+.about-box {
+  margin: 0;
+  padding: 0;
+}
+
+.about-box h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  
+}
+
+.about-image-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.about-background-box {
+  
+  position: relative;
+  
+}
