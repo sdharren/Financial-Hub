@@ -4,8 +4,10 @@ import { useState, useContext } from "react";
 import AuthContext from '../context/AuthContext';
 
 function GraphDisplay() {
-    const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(<div><PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/></div>);
     let {authTokens, logoutUser} = useContext(AuthContext);
+
+    const [graphOptions, setGraphOptions] = useState(null);
 
     const [overviewActive, setOverviewActive] = useState(true);
     const [categoryActive, setCategoryActive] = useState(false);
@@ -28,7 +30,7 @@ function GraphDisplay() {
             alert("Linked sandbox investments successfuly.");
         }
     }
-
+    
     function changeGraphState(graph) {
         if (graph === 'investment_categories') {
             setCategoryActive(false);
@@ -47,6 +49,26 @@ function GraphDisplay() {
         }
     }
     
+    function changeGraph(endpoint, endpoint_parameter) {
+        if (endpoint === 'stock_history') {
+            setGraph(
+                <LineGraph endpoint={endpoint} endpoint_parameter={lastStock} />
+            );
+            setLastStock(endpoint_parameter);
+        }
+        else {
+            if (endpoint === 'investment_categories') {
+                setLastCategory(endpoint_parameter);
+            }
+            setGraph(
+                <div>
+                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
+                </div>
+            );
+        }
+
+        changeGraphState(endpoint);
+    }
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
@@ -57,25 +79,7 @@ function GraphDisplay() {
     // passed as a parameter to the pie chart to update this page once a section of the pie chart is clicked
     function handleLoadNext(event) {
         let next = nextRoute[event.current];
-
-        if (next == 'stock_history') {
-            setLastStock(event.next);
-
-            setGraph(
-                <LineGraph endpoint={next} endpoint_parameter={event.next} />
-            );
-            changeGraphState(next);
-        }
-        else {
-            let nextEndpoint = nextRoute[event.current];
-            if (nextEndpoint === 'investment_category_breakdown') {
-                setLastCategory(event.next);
-            }
-            setGraph(
-                <PieChart endpoint={nextEndpoint} endpoint_parameter={event.next} loadNext={handleLoadNext} />
-            );
-            changeGraphState(nextEndpoint);
-        }
+        changeGraph(next, event.next);
     }
 
     async function callApi(endpoint) {
@@ -95,45 +99,28 @@ function GraphDisplay() {
     async function handleTabClick(endpoint) {
         if (endpoint === 'stock_history') {
             if (lastStock !== null) {
-                setGraph(
-                    <LineGraph endpoint={endpoint} endpoint_parameter={lastStock} />
-                );
-                changeGraphState(endpoint);
+                changeGraph(endpoint, lastStock);
             }
             else {
                 let data = await callApi('first_stock')
                 let stock = data['stock'];
 
-                setLastStock(stock);
-                setGraph(
-                    <LineGraph endpoint={endpoint} endpoint_parameter={stock} />
-                );
-                changeGraphState(endpoint);
+                changeGraph(endpoint, stock);
             }
         }
         else if (endpoint === 'investment_category_breakdown') {
             if (lastCategory !== null) {
-                setGraph(
-                    <PieChart endpoint={endpoint} endpoint_parameter={lastCategory} loadNext={handleLoadNext} />
-                );
-                changeGraphState(endpoint);
+                changeGraph(endpoint, lastCategory);
             }
             else {
                 let data = await callApi('first_investment_category')
                 let category = data['category'];
 
-                setLastCategory(category);
-                setGraph(
-                    <PieChart endpoint={endpoint} endpoint_parameter={category} loadNext={handleLoadNext} />
-                );
-                changeGraphState(endpoint);
+                changeGraph(endpoint, category);
             }    
         }
         else if (endpoint === 'investment_categories') {
-            setGraph(
-                <PieChart endpoint={endpoint} loadNext={handleLoadNext} />
-            );
-            changeGraphState(endpoint);
+            changeGraph(endpoint);
         }
     }
 
