@@ -134,6 +134,21 @@ font-size: 2.3em;
     
   }
 
+  .address-form {
+    text-align: center;
+
+  }
+  
+  .address-form-content {
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+
+  .inline-wallet-address-container {
+    margin-right: 50px;
+    text-justify: distribute;
+  }
+
   /*Container for the section of the contents of the page*/
   .piechart-box {
     display: flex;

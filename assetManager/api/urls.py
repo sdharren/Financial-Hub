@@ -27,4 +27,5 @@ urlpatterns = [
     path('select_account/', views.select_account, name='select_account'),
     path('currency_data/', views.get_currency_data, name='currency_data'),
     #path('recent_transactions/', views.recent_transactions, name='recent_transactions'),
+    #path('crypto_addresses/', views.getCryptoAddresses, name='crypto_addresses')
 ]

@@ -63,7 +63,7 @@ def getAllData():
 
     btcAddresses = ADDRESSES.get("btc", None)
     ethAddresses = ADDRESSES.get("eth", None)
-
+    
     if(btcAddresses != None):
         for addr in btcAddresses:
             value = [getAddressData.BTC_all(addr), "btc"]

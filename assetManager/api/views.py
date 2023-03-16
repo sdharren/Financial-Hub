@@ -25,6 +25,8 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
 from decimal import Decimal
 
+from assetManager.models import AccountType, AccountTypeEnum
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -140,6 +142,7 @@ def link_token(request):
     link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
