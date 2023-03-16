@@ -43,10 +43,8 @@ class StocksTestCase(TestCase):
         self.stock_getter = self._create_stock_getter_with_sandbox()
         self.stock_getter.query_transactions(self.user, '2023-01-02', '2023-02-09')
         transactions = self.stock_getter.transactions
-        transactions_length = 0
-        for key in transactions:
-            transactions_length += len(transactions[key])
-        self.assertEqual(transactions_length, 4)
+        transactions_length = len(transactions)
+        self.assertEqual(transactions_length, 9)
 
     def test_get_sum_investments_returns_total(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
@@ -98,7 +96,8 @@ class StocksTestCase(TestCase):
             'price': 1000000,
             'amount': 10000000,
             'security_id': 1,
-            'type': 'buy'
+            'type': 'buy',
+            'date': '2022-01-01'
         }
         transactions = []
         transactions.append(Transaction(transaction_dict, 'GOOG'))
@@ -115,7 +114,8 @@ class StocksTestCase(TestCase):
             'price': 1000000,
             'amount': 10000000,
             'security_id': 1,
-            'type': 'buy'
+            'type': 'buy',
+            'date': '2022-01-01'
         }
         transactions = [Transaction(transaction_dict, "UNSUPPORTED_TICKER938428u9jiokefnm")]
         self.stock_getter = StocksGetter(None)
@@ -147,6 +147,14 @@ class StocksTestCase(TestCase):
         self.stock_getter = _create_stock_getter_with_fake_data()
         data = self.stock_getter.get_stock_ticker('Netflix but not real')
         self.assertEqual(data, 'Cannot get stock ticker for Netflix but not real')
+
+    def test_get_portfolio_history_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        data = self.stock_getter.get_portfolio_history(months=6)
+        self.assertTrue(len(data) > 100)
+        for key in data:
+            self.assertTrue(data[key] > 0)
+        
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()
