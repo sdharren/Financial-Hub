@@ -1,9 +1,33 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { Link } from "react-router-dom"
 import AuthContext from '../context/AuthContext';
 
 export default function Navbar() {
-    let {user, logoutUser} = useContext(AuthContext);
+    let {user, logoutUser, authTokens} = useContext(AuthContext);
+    let [firstName, setFirstName] = useState("")
+
+    useEffect( () => {
+        getFirstName()
+    })
+
+    let getFirstName = async() => {
+        let response = await fetch('http://127.0.0.1:8000/api/firstname/', {
+            method:'GET',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization':'Bearer ' + String(authTokens.access)
+            }
+        })
+        let data = await response.json()
+
+        if (response.status === 200) {
+            setFirstName(data["first_name"].charAt(0).toUpperCase() + 
+                         data["first_name"].slice(1))
+        }
+        else if (response.statusText === 'Unauthorized') {
+            logoutUser()
+        }
+    }
 
     let defaultForm = (
         <ul>
@@ -22,7 +46,7 @@ export default function Navbar() {
     let loggedInForm = (
         <ul>
             <li>
-                {user && <p>Hello, {user.email}</p>}
+                {user && <p>Hello, {firstName}</p>}
             </li>
             <li>
                 <p onClick = {logoutUser}>Logout</p>
