@@ -10,7 +10,7 @@ function InvestmentOptions ({ options, handleSelectionUpdate, selectedOption, op
 
     let get_options = async() => {
         
-        if (optionType === 'investment_categories') {
+        if (optionType === 'investment_category_breakdown') {
             let response = await fetch('http://127.0.0.1:8000/api/investment_category_names/',
                 {
                     method:'GET',
@@ -28,7 +28,7 @@ function InvestmentOptions ({ options, handleSelectionUpdate, selectedOption, op
                 ))
             )
         }
-        else if (optionType === 'investment_category_breakdown') {
+        else if (optionType === 'stock_history') {
             let response = await fetch('http://127.0.0.1:8000/api/supported_investments/',
                 {
                     method:'GET',
