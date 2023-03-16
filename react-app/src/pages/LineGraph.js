@@ -26,7 +26,7 @@ const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
 
     useEffect(() => {
         get_data();
-    }, [endpoint]);
+    }, [endpoint, endpoint_parameter]);
 
     let line_data = new Array();
     let line_labels = new Array();
