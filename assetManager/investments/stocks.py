@@ -181,7 +181,7 @@ class StocksGetter():
     def get_supported_investments(self):
         stocks = set()
         for investment in self.investments:
-            if investment.get_ticker() is not None:
+            if investment.get_ticker() and self.is_ticker_supported(investment.get_ticker()) is not None:
                 stocks.add(investment.get_name())
         return stocks
 
