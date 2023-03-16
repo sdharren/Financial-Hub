@@ -70,20 +70,7 @@ export default function Navbar() {
         <nav className="nav">
             <div className='navbarContents'>
                 <Link to = {user ? "/dashboard" : "/"} className="site-title">Financial Hub</Link>
-                {/* <ul>
-                    {user && <li><p>Hello, {user.email}</p></li>}
-                    <li>
-                        <Link to="/about">About</Link>
-                    </li>
-                    <li>
-                        <Link to="/signup">Sign Up</Link>
-                    </li>
-                    <li>
-                        {user ? (<p className='logout' onClick = {logoutUser}>Logout</p>): (<Link to ="/login">Login</Link>)}
-                    </li>
-                </ul> */}
                 {user ? loggedInForm : defaultForm}
-                {/* {defaultForm} */}
             </div>
         </nav>
     )
