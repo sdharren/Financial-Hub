@@ -1,5 +1,6 @@
 from django.test import TestCase
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
+from datetime import datetime
 
 class YFinanceWrapperTestCase(TestCase):
     def setUp(self):
@@ -23,6 +24,10 @@ class YFinanceWrapperTestCase(TestCase):
         with self.assertRaises(TickerNotSupported):
             self.wrapper.get_most_recent_stock_price('fdjio;aksop89ifaduj903427ukljdasnfiuahf9867239fhq32iuhfjkql3hf897qh')
 
+    def test_get_stock_history_for_period_works(self):
+        data = self.wrapper.get_stock_history_for_period(self.ticker, 1)
+        self.assertTrue(len(data) > 10)
+
     def test_get_indices_last_year_returns_values(self):
         data = self.wrapper.getIndexValues("^GSPC")
         self.assertIsNotNone(data)
@@ -30,3 +35,7 @@ class YFinanceWrapperTestCase(TestCase):
     def test_index_in_available_list(self):
         with self.assertRaises(TickerNotSupported):
             self.wrapper.getIndexValues("SPY")
+
+    def test_is_ticker_supported_works(self):
+        data = self.wrapper.is_ticker_supported("ACHN")
+        self.assertTrue(data)
