@@ -57,6 +57,7 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_categories(request):
@@ -83,6 +84,18 @@ def investment_category_breakdown(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def investment_category_names(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+    categories = stock_getter.get_categories()
+    # TODO: handle no categories
+    data = {'categories': categories}
+    return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def stock_history(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
@@ -93,8 +106,19 @@ def stock_history(request):
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
     else:
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
-        #return bad request
     data = stock_getter.get_stock_history(stock_ticker)
+    return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def supported_investments(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+    stocks = stock_getter.get_supported_investments()
+    #TODO: handle no stocks
+    data = {'investments': stocks}
     return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])
@@ -190,14 +214,14 @@ def retrieve_stock_getter(user):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
-    transactions = cacheBankTransactionData(request.user)
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
-    transactions = cacheBankTransactionData(request.user)
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
@@ -209,7 +233,7 @@ def monthlyGraph(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
-    transactions = cacheBankTransactionData(request.user)
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
@@ -255,9 +279,11 @@ def get_currency_data(request):
     debit_card = DebitCard(plaid_wrapper,user)
     #try catch to ensure data is returned
     account_balances = debit_card.get_account_balances()
+
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
     cache.set('currency' + user.email, proportion_currencies)
+
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
 @api_view(['GET'])
@@ -282,7 +308,6 @@ def get_balances_data(request):
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
     cache.set('balances' + user.email, account_balances)
-
     return Response(balances, content_type='application/json', status = 200)
 
 @api_view(['GET'])
