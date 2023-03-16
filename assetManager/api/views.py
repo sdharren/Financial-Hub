@@ -383,10 +383,10 @@ def get_currency_data(request):
     if cache.has_key('currency' + user.email):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
-    debit_card = DebitCard(plaid_wrapper,user)
+        debit_card = DebitCard(plaid_wrapper,user)
     #try catch to ensure data is returned
-    account_balances = debit_card.get_account_balances()
-    currency = reformat_balances_into_currency(account_balances)
+        account_balances = debit_card.get_account_balances()
+        currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
     cache.set('currency' + user.email, proportion_currencies)
     return Response(proportion_currencies, content_type='application/json', status = 200)
@@ -419,22 +419,22 @@ def get_balances_data(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
-        if cache.has_key('balances' + request.user.email) is False:
-            return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+        if request.GET.get('param'):
+            institution_name = request.GET.get('param')
+            if cache.has_key('balances' + request.user.email) is False:
+                return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+            else:
+                account_balances = cache.get('balances' + request.user.email)
+
+            if institution_name not in list(account_balances.keys()):
+                return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
+
+            accounts = reformatAccountBalancesData(account_balances,institution_name)
+
+            return Response(accounts, content_type='application/json',status = 200)
+
         else:
-            account_balances = cache.get('balances' + request.user.email)
-
-        if institution_name not in list(account_balances.keys()):
-            return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
-
-        accounts = reformatAccountBalancesData(account_balances,institution_name)
-
-        return Response(accounts, content_type='application/json',status = 200)
-
-    else:
-        return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
+            return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
 
 def delete_balances_cache(user):
