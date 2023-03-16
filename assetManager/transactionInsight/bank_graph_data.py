@@ -9,7 +9,7 @@ def format_transactions(transactions):
     reformatted_transactions = []
     for account in transactions:
         try:
-            case = {'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name']}
+            case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
             reformatted_transactions.append(case)
         except:
             return transactions
@@ -18,7 +18,6 @@ def format_transactions(transactions):
 
 class BankGraphData():
     def __init__(self,transaction_history):
-        self.transaction_history = transaction_history #do not use this I need it thank you
         self.transactionInsight = CategoriseTransactions(format_transactions(transaction_history))
 
     def yearlySpending(self):
