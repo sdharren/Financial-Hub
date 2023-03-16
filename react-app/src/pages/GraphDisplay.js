@@ -5,7 +5,8 @@ import AuthContext from '../context/AuthContext';
 import InvestmentOptions from "../components/InvestmentOptions";
 
 function GraphDisplay() {
-    const [graph, setGraph] = useState(<div><PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/></div>);
+    const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/>);
+    const [select, setSelect] = useState(null);
     let {authTokens, logoutUser} = useContext(AuthContext);
 
     const [categoryOptions, setCategoryOptions] = useState([]);
@@ -17,10 +18,6 @@ function GraphDisplay() {
 
     const [lastCategory, setLastCategory] = useState(null);
     const [lastStock, setLastStock] = useState(null);
-
-    useEffect(() => {
-
-    }, [investmentOptions])
 
     let link_sandbox = async() => {
         let response = await fetch('http://127.0.0.1:8000/api/sandbox_investments/',
@@ -75,40 +72,52 @@ function GraphDisplay() {
     
     async function changeGraph(endpoint, endpoint_parameter) {
         const options = await updateOptions();
+        changeGraphState(endpoint);
+
         switch(endpoint) {
             case 'investment_categories':
+                setSelect(null);
                 setGraph(
-                    <div>
-                        <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
-                    </div>
+                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
                 );
                 break;
 
             case 'investment_category_breakdown':
                 setLastCategory(endpoint_parameter);
+                setSelect(
+                    <InvestmentOptions 
+                        options={categoryOptions.length === 0 ? options['categories'] : categoryOptions}
+                        handleSelectionUpdate={handleSelectionUpdate}
+                        selectedOption={endpoint_parameter}
+                        optionType={endpoint}
+                    />
+                );
                 setGraph(
-                    <div>
-                        <InvestmentOptions 
-                            options={categoryOptions.length === 0 ? options['categories'] : categoryOptions} 
-                            selectedOption={endpoint_parameter}
-                        />
-                        <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
-                    </div>
+                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
                 );
                 break;
 
             case 'stock_history':
                 setLastStock(endpoint_parameter);
+                console.log(investmentOptions.length === 0 ? options['investments'] : investmentOptions);
+                setSelect(
+                    <InvestmentOptions 
+                        options={investmentOptions.length === 0 ? options['investments'] : investmentOptions}
+                        handleSelectionUpdate={handleSelectionUpdate}
+                        selectedOption={endpoint_parameter}
+                        optionType={endpoint}
+                    />
+                )
                 setGraph(
-                    <div>
-                        <InvestmentOptions options={investmentOptions.length === 0 ? options['investments'] : investmentOptions} />
                         <LineGraph endpoint={endpoint} endpoint_parameter={endpoint_parameter} />
-                    </div>
-                    
                 );
                 break;
         }
-        changeGraphState(endpoint);
+        
+    }
+
+    function handleSelectionUpdate(event) {
+        changeGraph(event.optionType, event.nextSelect);
     }
 
     // JSON to know which API endpoint to query next
@@ -181,6 +190,7 @@ function GraphDisplay() {
             </div>
 
             <div className="tabcontent">
+                {select}
                 {graph}
             </div>
         </div>

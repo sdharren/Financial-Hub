@@ -3,7 +3,7 @@
 body {
     margin: 0;
     color: white;
-    background-image:url(background-image.png);
+    background-image:url(images/background-image.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -58,11 +58,16 @@ body {
     background: white;
 }
 
+.home__content__holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .home__box {
-    border-radius: 25px;
-    border: 2px solid #9f5ae0;
-    outline: none;
-    
+    position: relative;
+    max-width: 100%;
+    /*Might refactor underneath  */
     filter: drop-shadow(5px 5px 4px #4444);
     outline: transparent;
     box-shadow: 0px;
@@ -75,14 +80,48 @@ body {
     overflow: hidden;
   }
 
-  .box__image {
-    float: right;
-    border-radius: 8px;
-    max-width: 40%;
- 
-    height:auto;
-    margin: 10px 10px 10px 10px;
-    margin-bottom: -10px;
+  .home__background__image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+   
+}
+
+.home__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+}
+
+.home__first__image {
+  max-width: 100%;
+  margin-right: 20px;
+}
+
+.home-text {
+font-family: 'Outfit', sans-serif;
+font-size: 2.3em;
+
+
+}
+  .signup-container {
+    max-width: 28rem;
+    width: 100%;
+    margin: auto;
+    width: 50%;
+  }
+
+  .super-signup-container {
+    min-height: 100%;
+    -ms-flex-align: center;
+    justify-items: center;
+    padding-left: 36px;
+    padding-right: 4px;
+    /*min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8*/
+
   }
 
   .home__text {
@@ -215,6 +254,72 @@ body {
       background-color: #ddd;
     }
     
+  .assetLink_holder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  
+  .background__box {
+      position: relative;
+      max-width: 100%;
+  }
+  
+  .background__image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+  }
+  
+  .asset__content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+  }
+  
+  .debit__card__image {
+      max-width: 100%;
+      margin-right: 20px;
+  }
+  
+  .middle-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.3em;
+    font-weight: bold;
+  }
+  
+  .link-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.link-button:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+
+
+.bank__image {
+  max-width: 100%;
+  margin-right: 20px;
+}
+
+.crypto__image {
+  
+  max-width: 50%;
+  margin-right: 20px;
+}
 /* Investment Graphs Display */
 .tab {
     float: left;
@@ -261,3 +366,55 @@ body {
 }
     
  
+.about-page {
+  text-align: center;
+}
+
+.txt-about-us {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3rem;
+  margin-top: 2rem;
+}
+
+.txt-monitoring-finances {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.txt-link-assets {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about-container {
+  display: flex;
+  justify-content: center;
+  
+}
+
+.about-box {
+  margin: 0;
+  padding: 0;
+}
+
+.about-box h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  
+}
+
+.about-image-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.about-background-box {
+  
+  position: relative;
+  
+}
