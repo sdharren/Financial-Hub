@@ -1,18 +1,22 @@
 
 .transaction-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 10;
   background-color: #f5f5f5;
-  overflow: hidden;
-  margin-left: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-width: 650px;
+  margin-left: -20%;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
 }
 
 .transaction-table th,
 .transaction-table td {
   padding: 8px 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
 }
 
 .transaction-table th {
@@ -23,8 +27,8 @@
 .transaction-table tbody {
   background-color: #333;
   border-top: 2px solid #673ab7;
-  border-bottom: 2px solid #673ab7;
-  border-radius: 20px;
+  
+  border-radius: 40px;
 }
 
 .transaction-table tbody tr:nth-child(even) {
