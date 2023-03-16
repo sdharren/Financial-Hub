@@ -12,9 +12,10 @@ body {
 .nav {
     color: white;
     display: flex;
-    margin-top: 29px;
+    /* margin-top: 29px;
     margin-left: 189px;
-    margin-right: 189px;
+    margin-right: 189px; */
+    margin : 1% 10%;
     justify-content: space-between;
     align-items: center;
     gap: 2rem;
@@ -57,6 +58,11 @@ body {
     width: 100%;
     background: white;
 }
+
+/* .logout {
+  width: 100%;
+  background: white;
+} */
 
 .home__box {
     border-radius: 25px;
