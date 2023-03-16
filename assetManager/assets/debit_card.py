@@ -1,154 +1,156 @@
-from plaid.model.sandbox_item_fire_webhook_request import SandboxItemFireWebhookRequest
 from plaid.model.transactions_refresh_request import TransactionsRefreshRequest
-from plaid.model.transactions_sync_request import TransactionsSyncRequest
 from plaid.model.transactions_get_request import TransactionsGetRequest
-from plaid.model.institutions_get_request import InstitutionsGetRequest
-
-from plaid.model.sandbox_public_token_create_request_options import SandboxPublicTokenCreateRequestOptions
-from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
-
-from plaid.model.item_get_request import ItemGetRequest
-
-from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
-from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
-from plaid.model.country_code import CountryCode
 from plaid.model.products import Products
+import datetime
 from datetime import date
+from assetManager.models import AccountType, AccountTypeEnum
+from plaid.exceptions import ApiException
+from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
+from assetManager.transactionInsight.bank_graph_data import BankGraphData
+from django.core.exceptions import ObjectDoesNotExist
 
-from pprint import pprint
 
-#response = client.sandbox_item_fire_webhook(request)
-#GqQalvm5JrCAaQ8lPjq7tdjXVK7wpyt1jexyg
+class InvalidInstitution(Exception):
+    def __init__(self):
+        self.message = 'Provided Instituion Name is not Linked'
+
+
+def get_currency_symbol(iso_code):
+    symbols = {
+        'USD': '$',
+        'EUR': '€',
+        'JPY': '¥',
+        'GBP': '£',
+        'CHF': 'Fr',
+        'CAD': '$',
+        'AUD': '$',
+        'NZD': '$',
+        'CNY': '¥',
+        'HKD': '$',
+        'SGD': '$',
+        'MXN': '$',
+        'INR': '₹',
+        'RUB': '₽',
+        'ZAR': 'R',
+        'BRL': 'R$',
+        'TRY': '₺',
+        'AED': 'د.إ',
+        'SAR': '﷼',
+    }
+    return symbols.get(iso_code, '')
+
+
+"""
+DebitCard class to represent a Bank Card asset with relevant methods to access transactions and account specific data
+"""
+def format_accounts_data(request_accounts):
+    accounts = {}
+    for account in request_accounts:
+        if (account['balances']['available'] is None):
+            case = {'name':account['name'],'available_amount':0.0, 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+        else:
+            case = {'name':account['name'],'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+
+        accounts[account['account_id']] = case
+
+
+    return accounts
 
 class DebitCard():
-    def __init__(self,concrete_wrapper):
+    def __init__(self,concrete_wrapper,user):
         self.plaid_wrapper = concrete_wrapper
-        public_token = self.plaid_wrapper.create_public_token()
-        self.plaid_wrapper.products_requested = 'transactions'
-        self.plaid_wrapper.exchange_public_token(public_token)
+        self.user = user
+        self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
+        self.bank_graph_data = {}
+
+    #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly
+    def refresh_api(self,token):
+        refresh_request = TransactionsRefreshRequest(access_token=token)
+        try:
+            refresh_response = self.plaid_wrapper.client.transactions_refresh(refresh_request)
+        except ApiException:
+            raise AccessTokenInvalid
 
 
+    def get_institution_name_from_db(self,token):
+        try:
+            institution_name = AccountType.objects.get(user = self.user, access_token = token, account_asset_type = AccountTypeEnum.DEBIT).account_institution_name
+        except ObjectDoesNotExist:
+            return None
 
-    def get_item(self):
-        pt_request = SandboxPublicTokenCreateRequest(
-            institution_id='ins_115642',
-            initial_products=[Products('transactions')],
-            options = SandboxPublicTokenCreateRequestOptions(
-                override_username = 'custom_john_smith',
+        return institution_name
+
+
+    def get_account_balances(self):
+        balances = {}
+        for token in self.access_tokens:
+            request_accounts = self.plaid_wrapper.get_accounts(token)
+
+            accounts = format_accounts_data(request_accounts)
+
+            balances[self.plaid_wrapper.get_institution_name(token)] = accounts
+
+
+        return balances
+
+
+    def get_transactions_by_date(self,start_date_input,end_date_input):
+        transactions = []
+        for token in self.access_tokens:
+            self.refresh_api(token)
+
+            #embed in try catch
+            transaction_request = TransactionsGetRequest(
+                access_token=token,
+                start_date=start_date_input,
+                end_date=end_date_input,
             )
 
-        )
-        pt_response = self.plaid_wrapper.client.sandbox_public_token_create(pt_request)
-        # The generated public_token can now be
-        # exchanged for an access_token
-        exchange_request = ItemPublicTokenExchangeRequest(
-            public_token=pt_response['public_token']
-        )
-        exchange_response = self.plaid_wrapper.client.item_public_token_exchange(exchange_request)
+            transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+            transactions.append(transaction_response['transactions'])
 
-        access_token = exchange_response['access_token']
+        return transactions
 
-        self.get_transactions(access_token)
-        #request = SandboxItemFireWebhookRequest(
-        #access_token=access_token,
-        #webhook_code='DEFAULT_UPDATE'
-        #)
-        #response = client.sandbox_item_fire_webhook(request)
+    def make_bank_graph_data_dict(self,token,transactions,transaction_count):
+        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
 
 
-    def get_institutions(self):
-        request = InstitutionsGetRequest(
-            country_codes=[CountryCode('GB')],
-            count=10,
-            offset=1,
-            )
-        response = self.plaid_wrapper.client.institutions_get(request)
-        institutions = response['institutions']
-        print(institutions)
+    def make_graph_transaction_data_insight(self,start_date_input,end_date_input):
+        transaction_count = 0
+        transactions = self.get_transactions_by_date(start_date_input,end_date_input)
+        for token in self.access_tokens:
+            self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
+            transaction_count = transaction_count + 1
 
-    def create_new_item():
-        request = SandboxProcessorTokenCreate(institution_id=INSTITUTION_ID)
-        response = client.sandbox_processor_token_create(request)
-        processor_token = response['processor_token']
-        print(processor_token)
+    def get_insight_data(self):
+        if(not self.bank_graph_data):
+            return None
+        else:
+            return self.bank_graph_data
 
-    def get_item():
-        request = ItemGetRequest(access_token=self.plaid_wrapper.ACCESS_TOKEN)
-        response = self.plaid_wrapper.client.item_get(request)
-        item = response['item']
-        status = response['status']
+    #refactor function to work with passed in bank_graph_data
+    #write further tests for validaiton of elements returned by the function
+    #convert authorised date back to a date as it will be a string when merging with line-graphs branch
+    def get_recent_transactions(self,bank_graph_data,institution):
+        if(not bank_graph_data):
+            raise TypeError("Bank graph data is empty")
+        recent_transactions = {}
 
-    def get_synch_transactions(self):
-        cursor = ""
-        # New transaction updates since "cursor"
-        added = []
-        modified = []
-        removed = [] # Removed transaction ids
-        has_more = True
-# Iterate through each page of new transaction updates for item
-        while has_more:
-            request = TransactionsSyncRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            cursor=cursor,
-            )
-            response = self.plaid_wrapper.client.transactions_sync(request)
-            print(response)
-            # Add this page of results
-            added.extend(response['added'])
-            modified.extend(response['modified'])
-            removed.extend(response['removed'])
-            has_more = response['has_more']
+        all_transactions = []
+        for account in bank_graph_data:
+            authorized_date = datetime.date(account['authorized_date'][0],account['authorized_date'][1],account['authorized_date'][2])
+            date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
 
+            if(authorized_date == date.today() or (date == date.today())):
+                if(account['merchant_name'] is None):
+                    merchant_name = 'Not provided'
+                else:
+                    merchant_name = account['merchant_name']
 
+                case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':authorized_date, 'category':account['category'], 'merchant':merchant_name}
 
-    def fire_webhook(self):
-        print(self.plaid_wrapper.get_item_id())
-        request = SandboxItemFireWebhookRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            webhook_code='DEFAULT_UPDATE',
-            )
-        response = self.plaid_wrapper.client.sandbox_item_fire_webhook(request)
-        print(response)
+                all_transactions.append(case)
 
-    def get_recurring_transactions():
-        request = TransactionsRecurringGetRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            account_ids=account_ids,
-        )
-        response = client.transactions_recurring_get(request)
+        recent_transactions[institution] = all_transactions
 
-    def print_class(self):
-        obj = TransactionsGetRequestOptions()
-        print(dir(obj))
-
-    def get_transactions(self):
-        request1 = TransactionsRefreshRequest(access_token=self.plaid_wrapper.ACCESS_TOKEN)
-        response1 = self.plaid_wrapper.client.transactions_refresh(request1)
-
-        request = TransactionsGetRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            start_date=date.fromisoformat('2023-01-02'),
-            end_date=date.fromisoformat('2023-02-09'),
-            #options =TransactionsGetRequestOptions(
-            #username = "John Smith",
-            #)
-            )
-        response = self.plaid_wrapper.client.transactions_get(request)
-        transactions = response['transactions']
-        print(transactions)
-        print(len(transactions))
-        """
-        while len(transactions) < response['total_transactions']:
-            request = TransactionsGetRequest(
-            access_token=self.plaid_wrapper.ACCESS_TOKEN,
-            start_date=datetime.date('2018-01-01'),
-            end_date=datetime.date('2018-02-01'),
-            options=TransactionsGetRequestOptions(
-                offset=len(transactions)
-                )
-            )
-
-        response = self.plaid_wrapper.client.transactions_get(request)
-        transactions.extend(response['transactions'])
-        print(transactions)
-        """
+        return recent_transactions

@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from assetManager import views
 
 urlpatterns = [
@@ -23,4 +23,8 @@ urlpatterns = [
     path('connect_investments/', views.connect_investments, name='connect_investments'),
     path('sign_up/', views.sign_up, name='sign_up'),
     path('log_in/', views.log_in, name='log_in'),
+    path('link_sandbox_investments/', views.link_sandbox_investments),
+    path('api/number/', views.number_view, name='number'),
+    path('api/cache_assets_hardcoded/', views.setup_asset_data), #NOTE: this url should be removed later - real one in api/views
+    path('api/', include('assetManager.api.urls')),
 ]

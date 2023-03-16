@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from assetManager.models import User, AccountType, AccountTypeEnum, is_debit, is_credit, is_stock, is_crypto
+from assetManager.models import User, AccountType, AccountTypeEnum, is_debit, is_stock, is_crypto
 from datetime import datetime
 import re
 from django.db import IntegrityError
@@ -44,9 +44,6 @@ class AccountTypeCase(TestCase):
 
     def test_debit_card_is_debit(self):
         self.assertTrue(is_debit(self.debit_card_account.account_asset_type))
-
-    def test_credit_card_is_credit(self):
-        self.assertTrue(is_credit(self.credit_card_account.account_asset_type))
 
     def test_stock_is_stock(self):
         self.assertTrue(is_stock(self.stock_account.account_asset_type))

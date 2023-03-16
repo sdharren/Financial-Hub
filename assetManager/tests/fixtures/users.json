@@ -32,5 +32,23 @@
         "groups": [],
         "user_permissions": []
     }
+},
+{
+    "model": "assetManager.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$jPu8imKWYYssIYNKBaldaV$TXrA5IIkSUF95RTGF3eWoh8DSLnw/tycGtMXH9dOvO8=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Augusto",
+        "last_name": "Favero",
+        "email": "augusto_uk@yahoo.co.uk",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-12-07T00:50:37.272Z",
+        "groups": [],
+        "user_permissions": []
+    }
 }
+
 ]
