@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 
-import axios from 'axios';
+
 import{ Chart as ChartJS,
   BarElement,
   CategoryScale,
@@ -20,22 +21,27 @@ ChartJS.register(
 );
 
 function BarGraph({endpoint, endpoint_parameter, loadNext}) {
+  let {authTokens, logoutUser} = useContext(AuthContext);
   const [barChartData, setBarChartData] = useState(null);
 
-  useEffect(() => {
-      axios.get(
-          'http://127.0.0.1:8000/api/' + String(endpoint) + '/',
-          { params: {
-              param: endpoint_parameter
-          }}
-      )
-        .then(response => {
-          setBarChartData(response.data);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    }, [endpoint]);
+  let get_data = async() =>  {
+    let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
+    let response = await fetch(url, {
+        method:'GET',
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }
+    });
+    let data = await response.json();
+    if (response.status === 200) {
+        setBarChartData(data);
+    }
+}
+
+useEffect(() => {
+  get_data();
+}, [endpoint]);
 
   let bar_data = [];
   let bar_labels = [];
@@ -43,8 +49,8 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
       bar_labels.push(barChartData[key].name);
       bar_data.push(barChartData[key].value);
   }
-  console.log(bar_labels);
-  console.log(bar_data);
+  // console.log(bar_labels);
+  // console.log(bar_data);
 
 
   const options = {
@@ -59,6 +65,7 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
           }
         }
   };
+
   const data = {
     labels : bar_labels,
     datasets : [{
@@ -68,6 +75,7 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
       link: bar_labels
     }]
   }
+
   const chartRef = useRef();
   const onClick = (event) => {
       if (getElementsAtEvent(chartRef.current, event).length > 0) {

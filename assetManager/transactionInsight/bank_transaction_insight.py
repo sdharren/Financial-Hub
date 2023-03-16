@@ -31,19 +31,19 @@ class CategoriseTransactions():
         rangeOfYears = []
         for item in self.transaction_history:
             if len(rangeOfYears) == 0:
-                rangeOfYears.append(item['date'].year)
-                rangeOfYears.append(item['date'].year)
-            elif item['date'].year < rangeOfYears[0]:
-                rangeOfYears[0] = item['date'].year
-            elif item['date'].year > rangeOfYears[1]:
-                rangeOfYears[1] = item['date'].year
+                rangeOfYears.append(item['date'][0])
+                rangeOfYears.append(item['date'][0])
+            elif item['date'][0] < rangeOfYears[0]:
+                rangeOfYears[0] = item['date'][0]
+            elif item['date'][0] > rangeOfYears[1]:
+                rangeOfYears[1] = item['date'][0]
         return rangeOfYears
 
     # return that total spending for a month, month variable is an integer
     def getYearlySpending(self,year):
         amount = 0
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].year == year:
+            if item['amount'] > 0 and item['date'][0] == year:
                 amount = amount + item['amount']
         return amount
 
@@ -51,7 +51,7 @@ class CategoriseTransactions():
     def getMonthlySpending(self,month,year):
         amount = 0
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].month == month and item['date'].year == year:
+            if item['amount'] > 0 and item['date'][1] == month and item['date'][0] == year:
                 amount = amount + item['amount']
         return amount
 
@@ -59,7 +59,7 @@ class CategoriseTransactions():
     def getWeeklySpending(self,week,month,year):
         amount = 0
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].day//7 == week and item['date'].month == month and item['date'].year == year:
+            if item['amount'] > 0 and item['date'][2]//7 == week and item['date'][1] == month and item['date'][0] == year:
                 amount = amount + item['amount']
         return amount
 
@@ -84,7 +84,7 @@ class CategoriseTransactions():
     def getYearlyTransactions(self,year):
         yearlyTransactions = []
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].year == year:
+            if item['amount'] > 0 and item['date'][0] == year:
                 yearlyTransactions.append(item)
         return yearlyTransactions
 
@@ -92,7 +92,7 @@ class CategoriseTransactions():
     def getMonthlyTransactions(self,month,year):
         monthlyTransactions = []
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].month == month and item['date'].year == year:
+            if item['amount'] > 0 and item['date'][1] == month and item['date'][0] == year:
                 monthlyTransactions.append(item)
         return monthlyTransactions
 
@@ -100,6 +100,6 @@ class CategoriseTransactions():
     def getWeeklyTransactions(self,week,month,year):
         weeklyTransactions = []
         for item in self.transaction_history:
-            if item['amount'] > 0 and item['date'].day <= week*7 and item['date'].month == month and item['date'].year == year:
+            if item['amount'] > 0 and item['date'][2] <= week*7 and item['date'][1] == month and item['date'][0] == year:
                 weeklyTransactions.append(item)
         return weeklyTransactions

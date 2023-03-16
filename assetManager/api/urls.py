@@ -19,8 +19,12 @@ urlpatterns = [
     path('exchange_public_token/', views.exchange_public_token, name='exchange_public_token'),
     path('link_token/', views.link_token, name='link_token'),
     path('cache_assets/', views.cache_assets),
+    path('yearly_graphs/', views.yearlyGraph, name='yearlyGraph'),
+    path('monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
+    path('weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
     path('sandbox_investments/', views.sandbox_investments, name='sandbox_investments'),
     path('get_balances_data/', views.get_balances_data, name='get_balances_data'),
     path('select_account/', views.select_account, name='select_account'),
     path('currency_data/', views.get_currency_data, name='currency_data'),
+    #path('recent_transactions/', views.recent_transactions, name='recent_transactions'),
 ]

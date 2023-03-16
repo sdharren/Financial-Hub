@@ -1,8 +1,9 @@
 import PieChart from "./BarGraph";
 import { useState } from "react";
+import BarGraph from "./BarGraph";
 
 function BarChartDisplay() {
-    const [graph, setGraph] = useState(<PieChart endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(<BarGraph endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>);
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
@@ -11,11 +12,11 @@ function BarChartDisplay() {
         'weekly_graphs': 'weekly_graphs'
     }
 
-    // passed as a parameter to the pie chart to update this page once a section of the pie chart is clicked
+    // passed as a parameter to the bar chart to update this page once a section of the bar chart is clicked
     function handleLoadNext(event) {
         console.log(nextRoute[event.current]);
         setGraph(
-                <PieChart endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                <BarGraph endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
         );
     }
 
