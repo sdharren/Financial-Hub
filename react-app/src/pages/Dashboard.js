@@ -1,5 +1,27 @@
 import React, { useState, useEffect } from 'react';
 
+const tabGraphData = {
+  Overall: [
+    { name: 'Graph 1', content: `Content for Graph 1 in Overall tab goes here.` },
+    { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
+    { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
+    { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
+  ],
+  Stocks: [
+    { name: 'Graph 1', content: `Content for Graph 1 in Stocks tab goes here.` },
+    { name: 'Graph 2', content: `Content for Graph 2 in Stocks tab goes here.` },
+  ],
+  Banks: [
+    { name: 'Graph 1', content: `Content for Graph 1 in Banks tab goes here.` },
+    { name: 'Graph 2', content: `Content for Graph 2 in Banks tab goes here.` },
+    { name: 'Graph 3', content: `Content for Graph 3 in Banks tab goes here.` },
+  ],
+  Crypto: [
+    { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
+    { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
+    { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
+  ],
+};
 
 function Dashboard() {
   const [activeTabPie, setActiveTabPie] = useState('Overall');
@@ -11,6 +33,7 @@ function Dashboard() {
 
   const handlePieTabClick = (tabName) => {
     setActiveTabPie(tabName);
+    setActiveGraphPie(tabGraphData[tabName][0].name);
   };
 
   const handlePieGraphClick = (graphName) => {
@@ -35,108 +58,33 @@ function Dashboard() {
         <div className="piechart-box">
           <div className ="piechart-section">
             <div className="piechart-tabs">
-              <div
-                className={`piechart-tab ${activeTabPie === 'Overall' ? 'active' : ''}`}
-                onClick={() => handlePieTabClick('Overall')}
-              >
-                Overall
-              </div>
-              <div
-                className={`piechart-tab ${activeTabPie === 'Stocks' ? 'active' : ''}`}
-                onClick={() => handlePieTabClick('Stocks')}
-              >
-                Stocks
-              </div>
-              <div
-                className={`piechart-tab ${activeTabPie === 'Banks' ? 'active' : ''}`}
-                onClick={() => handlePieTabClick('Banks')}
-              >
-                Banks
-              </div>
-              <div
-                className={`piechart-tab ${activeTabPie === 'Crypto' ? 'active' : ''}`}
-                onClick={() => handlePieTabClick('Crypto')}
-              >
-                Crypto
-              </div>
+              {Object.keys(tabGraphData).map((tabName) => (
+                <div
+                  key={tabName}
+                  className={`piechart-tab ${activeTabPie === tabName ? 'active' : ''}`}
+                  onClick={() => handlePieTabClick(tabName)}
+                >
+                  {tabName}
+                </div>
+              ))}
             </div>
             <div className="piechart-container">
               <div className="piechart-graphs">
-                <div
-                  className={`piechart-graph ${activeGraphPie === 'Graph 1' ? 'active' : ''}`}
-                  onClick={() => handlePieGraphClick('Graph 1')}
-                >
-                  Graph 1
-                </div>
-                <div
-                  className={`piechart-graph ${activeGraphPie === 'Graph 2' ? 'active' : ''}`}
-                  onClick={() => handlePieGraphClick('Graph 2')}
-                >
-                  Graph 2
-                </div>
-                <div
-                  className={`piechart-graph ${activeGraphPie === 'Graph 3' ? 'active' : ''}`}
-                  onClick={() => handlePieGraphClick('Graph 3')}
-                >
-                  Graph 3
-                </div>
-                <div
-                  className={`piechart-graph ${activeGraphPie === 'Graph 4' ? 'active' : ''}`}
-                  onClick={() => handlePieGraphClick('Graph 4')}
-                >
-                  Graph 4
-                </div>
+                {tabGraphData[activeTabPie].map((graph) => (
+                  <div
+                    key={graph.name}
+                    className={`piechart-graph ${activeGraphPie === graph.name ? 'active' : ''}`}
+                    onClick={() => handlePieGraphClick(graph.name)}
+                  >
+                    {graph.name}
+                  </div>
+                ))}
               </div>
               
               <div className="piegraph-content">
-                {activeTabPie === 'Overall' && activeGraphPie === 'Graph 1' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Overall' && activeGraphPie === 'Graph 2' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Overall' && activeGraphPie === 'Graph 3' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Overall' && activeGraphPie === 'Graph 4' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Stocks' && activeGraphPie === 'Graph 1' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Stocks' && activeGraphPie === 'Graph 2' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Stocks' && activeGraphPie === 'Graph 3' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Stocks' && activeGraphPie === 'Graph 4' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Banks' && activeGraphPie === 'Graph 1' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Banks' && activeGraphPie === 'Graph 2' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Banks' && activeGraphPie === 'Graph 3' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Banks' && activeGraphPie === 'Graph 4' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Crypto' && activeGraphPie === 'Graph 1' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Crypto' && activeGraphPie === 'Graph 2' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Crypto' && activeGraphPie === 'Graph 3' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
-                {activeTabPie === 'Crypto' && activeGraphPie === 'Graph 4' && (
-                  <p>{`Content for ${activeGraphPie} in ${activeTabPie} tab goes here.`}</p>
-                )}
+                {tabGraphData[activeTabPie].map((graph) => (
+                  activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
+                ))}
               </div>
 
               <div className="right-menu">

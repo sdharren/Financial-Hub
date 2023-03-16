@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+from datetime import datetime
 
 class TickerNotSupported(Exception):
     pass
@@ -25,13 +26,25 @@ class YFinanceWrapper():
         except Exception:
             raise TickerNotSupported()
         return price
+
+    def get_stock_history_for_period(self, ticker_symbol, period):
+        try:
+            ticker = yf.Ticker(ticker_symbol)
+            history = ticker.history(prepost = False, raise_errors = True, period=str(period)+'mo')
+            close_data = history['Close'].to_dict()
+        except Exception:
+            raise TickerNotSupported()
+        dict_with_datetimes = {}
+        for key in close_data.keys():
+            dict_with_datetimes[key.to_pydatetime().strftime('%Y-%m-%d')] = close_data[key]
+        return dict_with_datetimes
     
     def getIndexValues(self, index_ticker, time_period="6mo"):
         # Tickers = ^GSPC - sp500, ^ftse - ftse100, ^dji - dow, ^STOXX50E - eurostoxx50, ^GDAXI - dax
         INDICES = ["^GSPC","^FTSE", "^DJI", "^STOXX50E", "^GDAXI"]
         if(index_ticker in INDICES):
             try:
-                ticker = yf.ticker(index_ticker)
+                ticker = yf.Ticker(index_ticker)
                 history = ticker.history(period=time_period, interval="1d")
                 close = history['Close'].to_dict()
             except Exception:
@@ -47,3 +60,10 @@ class YFinanceWrapper():
             data.update({(keys[i+1]) : (initial_amount * (values[i+1]-values[i])/(values[i]))})
         
         return data
+
+    def is_ticker_supported(self, ticker):
+        try:
+            self.get_most_recent_stock_price(ticker)
+        except TickerNotSupported:
+            return False
+        return True
