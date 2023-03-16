@@ -11,16 +11,25 @@ body {
 
 .nav {
     color: white;
-    display: flex;
+    /* display: flex; */
     /* margin-top: 29px;
     margin-left: 189px;
     margin-right: 189px; */
-    margin : 1% 10%;
-    justify-content: space-between;
-    align-items: center;
+    /* margin : 1% 10%; */
+    /* justify-content: space-between;
+    align-items: center; */
     gap: 2rem;
     padding: 0 1rem;
+    border-style: solid;
+    border-color: black;
+    border-bottom-width: 4px;
 
+}
+.navbarContents {
+    margin: 1% 10%;
+    display : flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .nav ul {
