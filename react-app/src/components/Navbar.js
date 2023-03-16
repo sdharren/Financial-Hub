@@ -49,6 +49,18 @@ export default function Navbar() {
                 {user && <p>Hello, {firstName}</p>}
             </li>
             <li>
+                <Link to = "/balances">Bank accounts</Link>
+            </li>
+            <li>
+                <Link to = "/currency">Currencies</Link>
+            </li>
+            <li>
+                <Link to = "/list">Transactions</Link>
+            </li>
+            <li>
+                <Link to = "/bar_graph_display">Bar graph</Link>
+            </li>
+            <li>
                 <p onClick = {logoutUser}>Logout</p>
             </li>
         </ul>
