@@ -9,7 +9,13 @@ from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from forex_python.converter import CurrencyRates
 
+"""
+@params: No params
 
+@Description: -Depending on the settings.PLAID_DEVELOPMENT variable, either DEVELOPMENT for today's exhange rates or the SANDBOX for the fixed 2014 exchange rates for testing
+
+@return: input_date, datetime object for returning corresponding exchange rate
+"""
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
         input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
@@ -17,6 +23,7 @@ def get_currency_converter():
         input_date = datetime.datetime.today()
 
     return input_date
+
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
 
@@ -46,6 +53,13 @@ def reformat_balances_into_currency(account_balances):
 
     return currency_total
 
+"""
+@params: No params
+
+@Description: -Depending on the settings.PLAID_DEVELOPMENT variable, either DEVELOPMENT for today's exhange rates or the SANDBOX for the fixed 2014 exchange rates for testing
+
+@return: input_date, datetime object for returning corresponding exchange rate
+"""
 def calculate_perentage_proportions_of_currency_data(currency_total):
     proportions = {}
     total_money = sum(currency_total.values())

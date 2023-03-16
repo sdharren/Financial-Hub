@@ -20,7 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
 import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
-
+import AssetBank from './pages/bankAssets';
 // ask matthew about how margins are lined
 
 function App() {
@@ -47,6 +47,7 @@ function App() {
               <Route path="/balances" element={<BalancesDisplay />} />
               <Route path="/currency" element={<Currency />} />
               <Route path="/list" element={<TransactionTable />} />
+              //<Route path="/bankassets" element={<AssetBank />} />
             </Routes>
           </div>
           </div>

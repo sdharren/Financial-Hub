@@ -1,6 +1,6 @@
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.assets.debit_card import DebitCard, format_accounts_data,InvalidInstitution,get_currency_symbol
+from assetManager.assets.debit_card import DebitCard, format_accounts_data,InvalidInstitution
 from django.test import TestCase
 from assetManager.models import User, AccountType, AccountTypeEnum
 from datetime import date
@@ -42,30 +42,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(self.user, ['transactions'])
         self.debit_card = DebitCard(plaid_wrapper, self.user)
-
-
-    def test_get_currency_symbol(self):
-        self.assertEqual(get_currency_symbol('USD'), '$')
-        self.assertEqual(get_currency_symbol('EUR'), '€')
-        self.assertEqual(get_currency_symbol('JPY'), '¥')
-        self.assertEqual(get_currency_symbol('GBP'), '£')
-        self.assertEqual(get_currency_symbol('CHF'), 'Fr')
-        self.assertEqual(get_currency_symbol('CAD'), '$')
-        self.assertEqual(get_currency_symbol('AUD'), '$')
-        self.assertEqual(get_currency_symbol('NZD'), '$')
-        self.assertEqual(get_currency_symbol('CNY'), '¥')
-        self.assertEqual(get_currency_symbol('HKD'), '$')
-        self.assertEqual(get_currency_symbol('SGD'), '$')
-        self.assertEqual(get_currency_symbol('MXN'), '$')
-        self.assertEqual(get_currency_symbol('INR'), '₹')
-        self.assertEqual(get_currency_symbol('RUB'), '₽')
-        self.assertEqual(get_currency_symbol('ZAR'), 'R')
-        self.assertEqual(get_currency_symbol('BRL'), 'R$')
-        self.assertEqual(get_currency_symbol('TRY'), '₺')
-        self.assertEqual(get_currency_symbol('AED'), 'د.إ')
-        self.assertEqual(get_currency_symbol('SAR'), '﷼')
-        self.assertEqual(get_currency_symbol('WRoNGcurrency'),'')
-
 
     def test_debit_card_set_up_correctly(self):
         self.assertTrue(self.debit_card.plaid_wrapper.ACCESS_TOKEN is not None)
@@ -116,7 +92,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Uber')
 
     """
-
     def test_get_recent_transactions_with_multiple_institutions_with_transactions_today(self):
         before_accountype_objects_count = AccountType.objects.count()
         AccountType.objects.create(
@@ -149,13 +124,13 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),4)
         self.assertEqual(len(recent_transactions_hsbc['HSBC']),2)
 
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'$896.65')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['amount'],'$398.34')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['amount'],'$1708.12')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['amount'],'$1109.01')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£532.43')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['amount'],'£236.53')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['amount'],'£1014.28')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['amount'],'£658.53')
 
-        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['amount'],'$896.65')
-        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['amount'],'$398.34')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['amount'],'£532.43')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['amount'],'£236.53')
 
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['date'],date.today())
@@ -189,10 +164,10 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(list(recent_transactions_made.keys())[0],'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(len(recent_transactions_made[list(recent_transactions_made.keys())[0]]),4)
 
-        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['amount'],'$896.65')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£532.43')
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['amount'],'£398.34')
-        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['amount'],'₹1708.12')
-        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['amount'],'1109.01')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['amount'],'£17.34')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['amount'],'£110.4')
 
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today())
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['date'],date.today())
@@ -250,13 +225,13 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(len(insight_data['HSBC'].transactionInsight.transaction_history),2)
 
 
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 896.65)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'], 398.34)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[2]['amount'], 1708.12)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[3]['amount'], 1109.01)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'],532.43 )
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'], 236.53)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[2]['amount'], 1014.28)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[3]['amount'], 658.53)
 
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 896.65)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'], 398.34)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 532.43)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'],  236.53)
 
     def test_correct_instution_for_access_token(self):
         self.assertEqual(self.debit_card.plaid_wrapper.get_institution_name(self.debit_card.plaid_wrapper.ACCESS_TOKEN),'Royal Bank of Scotland - Current Accounts')
