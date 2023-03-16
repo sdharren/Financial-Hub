@@ -61,7 +61,7 @@ export default function Navbar() {
                 <Link to = "/bar_graph_display">Bar graph</Link>
             </li>
             <li>
-                <p onClick = {logoutUser}>Logout</p>
+                <p className="nav-logout" onClick = {logoutUser}>Logout</p>
             </li>
         </ul>
     );
