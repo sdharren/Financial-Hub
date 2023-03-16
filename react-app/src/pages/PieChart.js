@@ -60,7 +60,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
         //   .catch(error => {
         //     console.log(error);
         //   });
-      }, [endpoint]);
+      }, [endpoint, endpoint_parameter]);
 
     let pie_data = new Array();
     let pie_labels = new Array();
