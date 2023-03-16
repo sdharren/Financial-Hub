@@ -58,6 +58,7 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_categories(request):
@@ -84,6 +85,18 @@ def investment_category_breakdown(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def investment_category_names(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+    categories = stock_getter.get_categories()
+    # TODO: handle no categories
+    data = {'categories': categories}
+    return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def stock_history(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
@@ -94,8 +107,19 @@ def stock_history(request):
         stock_ticker = stock_getter.get_stock_ticker(stock_name)
     else:
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
-        #return bad request
     data = stock_getter.get_stock_history(stock_ticker)
+    return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def supported_investments(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+    stocks = stock_getter.get_supported_investments()
+    #TODO: handle no stocks
+    data = {'investments': stocks}
     return Response(data, content_type='application/json', status=200)
 
 @api_view(['GET'])
