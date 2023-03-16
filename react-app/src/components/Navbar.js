@@ -69,7 +69,7 @@ export default function Navbar() {
     return (
         <nav className="nav">
             <div className='navbarContents'>
-                <Link to = "/" className="site-title">Financial Hub</Link>
+                <Link to = {user ? "/dashboard" : "/"} className="site-title">Financial Hub</Link>
                 {/* <ul>
                     {user && <li><p>Hello, {user.email}</p></li>}
                     <li>
