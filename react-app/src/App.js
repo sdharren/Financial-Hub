@@ -21,6 +21,7 @@ import Link from './pages/Link';
 import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
 import LinkAssets from './pages/LinkAssets';
+import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
 
 // ask matthew about how margins are lined
 
@@ -47,6 +48,7 @@ function App() {
               <Route path="/currency" element={<Currency />} />
               <Route path="/list" element={<TransactionTable />} />
               <Route path="/link_assets" element={<LinkAssets />} />
+              <Route path="/crypto_addresses" element={<CryptoWalletAddresses />} />
             </Routes>
         
         </AuthProvider>

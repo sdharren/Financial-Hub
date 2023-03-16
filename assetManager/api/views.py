@@ -20,6 +20,8 @@ from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 
+from assetManager.models import AccountType, AccountTypeEnum
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -111,6 +113,7 @@ def link_token(request):
     link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
