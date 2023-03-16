@@ -35,9 +35,9 @@ const SaveWalletAddresses = () => {
             
             <div class="inline-wallet-address-container">
                 <label htmlFor="multiple-choice-1">Bitcoin: </label>
-                <input type="radio" id="multiple-choice-1" name="multiple-choice" />    
+                <input type="radio" id="btc-choice-1" name="multiple-choice" />    
                 <label htmlFor="multiple-choice-1">Ethereum: </label>
-                <input type="radio" id="multiple-choice-1" name="multiple-choice" />
+                <input type="radio" id="eth-choice-1" name="multiple-choice" />
             </div>
 
             <button type="button" onClick={() => handleRemoveOption(option.id)}>Remove</button>
