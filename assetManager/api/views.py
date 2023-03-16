@@ -21,7 +21,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
-from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getUsableCrypto, getCryptoAddressData
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, getUsableCrypto, getCryptoAddressData
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
 from decimal import Decimal
@@ -212,6 +212,11 @@ def retrieve_stock_getter(user):
         stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
         cache.set('investments' + user.email, stock_getter.investments)
     return stock_getter
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_all_data(request):
+    get
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

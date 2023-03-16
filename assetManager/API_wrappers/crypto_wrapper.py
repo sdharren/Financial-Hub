@@ -57,12 +57,12 @@ class getUsableCrypto:
         return value
 
 # When run collect data for all addresses listed
-def getAllCryptoData():
+def getAllCryptoData(addresses):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = {} # 2D Array where index 0 is actual data and index 1 is type (of coin)
 
-    btcAddresses = ADDRESSES.get("btc", None)
-    ethAddresses = ADDRESSES.get("eth", None)
+    btcAddresses = addresses.get("btc", None)
+    ethAddresses = addresses.get("eth", None)
 
     if(btcAddresses != None):
         for addr in btcAddresses:
@@ -77,7 +77,7 @@ def getAllCryptoData():
             data.update(addr, value)
 
 # Collect select data from api instead of requesting all data
-def getAlternateCryptoData(command):
+def getAlternateCryptoData(addresses, command):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = {} # 2D Array where index 0 is actual data and index 1 is type (of coin)
 
