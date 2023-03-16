@@ -55,9 +55,10 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         accounts = AccountType.objects.filter(user = self.user)
         self.assertEqual(len(accounts),1)
 
+    #double checks the correctness of assertion
     def test_get_recent_transactions_without_graph_data_initialised(self):
         with self.assertRaises(TypeError) as e:
-            self.debit_card.get_recent_transactions(self.debit_card.get_insight_data())
+            self.debit_card.get_recent_transactions([],['Royal Bank of Scotland - Current Accounts'])
 
 
     def test_get_recent_transactions_one_institution_linked_without_any_transactions_today(self):
