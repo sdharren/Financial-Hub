@@ -1,5 +1,5 @@
-import cards from '../Ecommerce_13.png';
-import computer from '../Other 07.png'
+import cards from '../images/home-cards.png';
+import computer from '../images/home-comp.png'
 
 export default function Home() {
     return (

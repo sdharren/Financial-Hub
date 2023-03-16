@@ -3,7 +3,7 @@
 body {
     margin: 0;
     color: white;
-    background-image:url(background-image.png);
+    background-image:url(images/background-image.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -83,6 +83,23 @@ body {
     height:auto;
     margin: 10px 10px 10px 10px;
     margin-bottom: -10px;
+  }
+
+  .signup-container {
+    max-width: 28rem;
+    width: 100%;
+    margin: auto;
+    width: 50%;
+  }
+
+  .super-signup-container {
+    min-height: 100%;
+    -ms-flex-align: center;
+    justify-items: center;
+    padding-left: 36px;
+    padding-right: 4px;
+    /*min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8*/
+
   }
 
   .home__text {
@@ -215,6 +232,72 @@ body {
       background-color: #ddd;
     }
     
+  .assetLink_holder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  
+  .background__box {
+      position: relative;
+      max-width: 100%;
+  }
+  
+  .background__image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+  }
+  
+  .asset__content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+  }
+  
+  .debit__card__image {
+      max-width: 100%;
+      margin-right: 20px;
+  }
+  
+  .middle-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.3em;
+    font-weight: bold;
+  }
+  
+  .link-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.link-button:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+
+
+.bank__image {
+  max-width: 100%;
+  margin-right: 20px;
+}
+
+.crypto__image {
+  
+  max-width: 50%;
+  margin-right: 20px;
+}
 /* Investment Graphs Display */
 .tab {
     float: left;
