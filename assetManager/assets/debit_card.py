@@ -61,7 +61,6 @@ class DebitCard():
         self.plaid_wrapper = concrete_wrapper
         self.user = user
         self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
-        print(self.access_tokens)
         self.bank_graph_data = {}
 
     #Method to refresh the plaid api for any new transactions, must be made before querying transactions directly
@@ -136,21 +135,21 @@ class DebitCard():
         if(not bank_graph_data):
             raise TypeError("Bank graph data is empty")
         recent_transactions = {}
-
         all_transactions = []
         for account in bank_graph_data:
-            authorized_date = datetime.date(account['authorized_date'][0],account['authorized_date'][1],account['authorized_date'][2])
-            date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
+            if(account['date'] != 'Not Provided'):
+                #authorized_date = datetime.date(account['authorized_date'][0],account['authorized_date'][1],account['authorized_date'][2])
+                date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
 
-            if(authorized_date == date.today() or (date == date.today())):
-                if(account['merchant_name'] is None):
-                    merchant_name = 'Not provided'
-                else:
-                    merchant_name = account['merchant_name']
+                if(date == date.today()):
+                    if(account['merchant_name'] is None):
+                        merchant_name = 'Not provided'
+                    else:
+                        merchant_name = account['merchant_name']
 
-                case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':authorized_date, 'category':account['category'], 'merchant':merchant_name}
+                    case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':merchant_name}
 
-                all_transactions.append(case)
+                    all_transactions.append(case)
 
         recent_transactions[institution] = all_transactions
 

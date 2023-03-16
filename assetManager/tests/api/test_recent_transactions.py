@@ -46,7 +46,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Name Not Selected')
-    """
+
     def test_get_recent_transactions_with_non_linked_institution_name(self):
         settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/recent_transactions/?param=HSBC UK')
@@ -55,4 +55,15 @@ class RecentTransactionsViewsTestCase(TestCase):
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Selected Is Not Linked.')
-    """
+
+    def test_get_recent_transactions_with_correctly_linked_institution(self):
+        settings.PLAID_DEVELOPMENT = False
+        response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(response.status_code, 200)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£500.0')
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['date'],'2023-03-16')
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['category'],['Travel', 'Airlines and Aviation Services'])
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'United Airlines')

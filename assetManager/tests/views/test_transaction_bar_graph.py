@@ -26,9 +26,9 @@ class LogInViewTestCase(TestCase, LogInTester):
             password='Password123'
         )
 
-    # def test_monthly_graph_with_param(self):
-    #     request = self.factory.get('/monthly-graph/?param=2022')
-    #     force_authenticate(request, user=self.user)
-    #     response = monthlyGraph(request)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response['Content-Type'], 'application/json') 
+     def test_monthly_graph_with_param(self):
+         request = self.factory.get('/monthly-graph/?param=2022')
+         force_authenticate(request, user=self.user)
+         response = monthlyGraph(request)
+         self.assertEqual(response.status_code, 200)
+         self.assertEqual(response['Content-Type'], 'application/json')

@@ -26,11 +26,14 @@ def handle_case(account):
 
 def format_transactions(transactions):
     reformatted_transactions = []
-    for account in transactions:
-        case = handle_case(account)
-        reformatted_transactions.append(case)
+    try:
+        for account in transactions:
+            case = handle_case(account)
+            reformatted_transactions.append(case)
 
-    return reformatted_transactions
+        return reformatted_transactions
+    except:
+        return transactions
 
 class BankGraphData():
     def __init__(self,transaction_history):

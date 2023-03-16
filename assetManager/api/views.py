@@ -228,7 +228,9 @@ def transaction_data_getter(user):
         plaid_wrapper.save_access_token(user, ['transactions'])
 
     debitCards = DebitCard(plaid_wrapper,user)
-    debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
+    #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
+    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
     return accountData[first_key]
@@ -237,7 +239,7 @@ def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
         cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
 
-    return BankGraphData(json.loads(cache.get('transactions' + user.email)))
+    return (json.loads(cache.get('transactions' + user.email)))
 
 
 @api_view(['GET'])
@@ -314,11 +316,10 @@ def recent_transactions(request):
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
         bank_graph_data_insight = cacheBankTransactionData(user)
-        concrete_wrapper = DevelopmentWrapper()
-        debit_card = DebitCard(concrete_wrapper,user)
         if(check_institution_name_selected_exists(user,institution_name) is False):
             return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
-
+        concrete_wrapper = DevelopmentWrapper()
+        debit_card = DebitCard(concrete_wrapper,user)
 
         recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
         return Response(recent_transactions,content_type='application/json',status = 200)

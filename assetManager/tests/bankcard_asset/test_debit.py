@@ -165,13 +165,13 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_hsbc['HSBC'][0]['date'],date.today())
         self.assertEqual(recent_transactions_hsbc['HSBC'][1]['date'],date.today())
 
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Not provided')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['merchant'],'Not provided')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['merchant'],'Not provided')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not Provided')
 
-        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['merchant'],'Not provided')
-        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['merchant'],'Not provided')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['merchant'],'Not Provided')
 
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['category'],['Transfer', 'Debit'])
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['category'],['Transfer', 'Debit'])
@@ -202,7 +202,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Bank Of Switzerland')
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['merchant'],'Eat Tokyo')
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['merchant'],'Burger and Lobster')
-        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not provided')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not Provided')
 
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['category'],['Transfer', 'Debit'])
         self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['category'],['Food and Drink', 'Restaurants', 'Fast Food'])
