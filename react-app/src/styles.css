@@ -85,6 +85,23 @@ body {
     margin-bottom: -10px;
   }
 
+  .signup-container {
+    max-width: 28rem;
+    width: 100%;
+    margin: auto;
+    width: 50%;
+  }
+
+  .super-signup-container {
+    min-height: 100%;
+    -ms-flex-align: center;
+    justify-items: center;
+    padding-left: 36px;
+    padding-right: 4px;
+    /*min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8*/
+
+  }
+
   .home__text {
     font-family: 'Outfit', sans-serif;
     font-size: 2.3em;
