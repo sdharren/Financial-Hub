@@ -14,7 +14,7 @@ import BarChartDisplay from './pages/BarChartDisplay';
 import PieChart from './pages/PieChart';
 import BalancesDisplay from './pages/Balances';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
-import GraphDisplay from './pages/GraphDisplay';
+import InvestmentGraphs from './pages/InvestmentGraphs';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
@@ -41,7 +41,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/graph_display" element={<GraphDisplay />} />
+              <Route path="/investment_graphs" element={<InvestmentGraphs />} />
 
               <Route path="/plaid_link" element={<Link />}/> 
               {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}

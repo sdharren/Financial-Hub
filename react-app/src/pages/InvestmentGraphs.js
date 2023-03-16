@@ -4,7 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import InvestmentOptions from "../components/InvestmentOptions";
 
-function GraphDisplay() {
+function InvestmentGraphs() {
     const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/>);
     const [select, setSelect] = useState(null);
     let {authTokens, logoutUser} = useContext(AuthContext);
@@ -197,4 +197,4 @@ function GraphDisplay() {
     );
 }
 
-export default GraphDisplay;
+export default InvestmentGraphs;
