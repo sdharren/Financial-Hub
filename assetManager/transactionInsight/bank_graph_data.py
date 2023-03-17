@@ -1,41 +1,58 @@
 from forex_python.converter import CurrencyRates
 from django.conf import settings
 import datetime
+from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 
 """
 Class of methods to produce data to pass to the frontend to create the graphs
 for bank data.
 author: Pavan Rana
 """
-from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 
+
+"""
+@params: No params
+
+@Description: -Depending on the settings.PLAID_DEVELOPMENT variable, either DEVELOPMENT for today's exhange rates or the SANDBOX for the fixed 2014 exchange rates for testing
+
+@return: input_date, datetime object for returning corresponding exchange rate
+"""
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
         input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
     else:
         input_date = datetime.datetime.today()
+
     return input_date
+
+def check_value_is_none(value_in_dict):
+    if(value_in_dict is None):
+        return 'Not Provided'
+    else:
+        return value_in_dict
 
 def handle_case(account):
     input_date = get_currency_converter()
     currency_rates = CurrencyRates()
     converted_amount = round(currency_rates.convert(account['iso_currency_code'], 'GBP', account['amount'],input_date),2)
+
     if(account['authorized_date'] is None):
-        if(account['date'] is None):
-            case = {'authorized_date':'Not Provided','date':'Not Provided', 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
-            return case
-        else:
-            case = {'authorized_date':'Not Provided','date':[account['date'].year,account['date'].month,account['date'].day], 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
-            return case
-    elif(account['date'] is None):
-        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':'Not Provided', 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
-        return case
-    elif(account['merchant_name'] is None):
-        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':'Not Provided'}
-        return case
+        authorized_date = 'Not Provided'
     else:
-        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
-        return case
+        authorized_date = [account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day]
+
+    if(account['date'] is None):
+        date = 'Not Provided'
+    else:
+        date = [account['date'].year,account['date'].month,account['date'].day]
+
+    merchant = check_value_is_none(account['merchant_name'])
+    category = check_value_is_none(account['category'])
+    name = check_value_is_none(account['name'])
+
+    case = {'authorized_date':authorized_date,'date':date, 'amount':converted_amount, 'category': category, 'name':name,'iso_currency_code':account['iso_currency_code'], 'merchant_name':merchant}
+
+    return case
 
 
 def format_transactions(transactions):

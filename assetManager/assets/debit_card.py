@@ -2,7 +2,7 @@ from plaid.model.transactions_refresh_request import TransactionsRefreshRequest
 from plaid.model.transactions_get_request import TransactionsGetRequest
 from plaid.model.products import Products
 import datetime
-from datetime import date
+from datetime import date,timedelta
 from assetManager.models import AccountType, AccountTypeEnum
 from plaid.exceptions import ApiException
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
@@ -17,6 +17,13 @@ class InvalidInstitution(Exception):
         self.message = 'Provided Instituion Name is not Linked'
 
 """
+Custom Exception Thrown In the case that the passed list of transactions is empty
+"""
+class bankDataEmpty(Exception):
+    def __init__(self):
+        self.message = 'Provided transaction data is empty'
+
+"""
 @params: request_accounts, PLAID dictionary containing all information regarding accounts of a single linked institution
 
 @Description:-Iterates through un-formatted requested accounts and extracting relevant values for graohs
@@ -27,17 +34,24 @@ class InvalidInstitution(Exception):
 def format_accounts_data(request_accounts):
     accounts = {}
     for account in request_accounts:
-        if (account['balances']['available'] is None):
-            if(account['balances']['current'] is None):
-                case = {'name':account['name'],'available_amount':0.0, 'current_amount':0.0,'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
-            else:
-                case = {'name':account['name'],'available_amount':0.0, 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
-        else:
-            if(account['balances']['current'] is None):
-                case = {'name':account['name'],'available_amount':account['balances']['available'], 'current_amount':0.0,'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
-            else:
-                case = {'name':account['name'],'available_amount':account['balances']['available'], 'current_amount':account['balances']['current'],'type':str(account['type']),'currency':account['balances']['iso_currency_code']}
+        available = 0.0
+        current = 0.0
+        name = 'Not Provided'
+        type = 'Not Provided'
 
+        if(account['balances']['available'] is not None):
+            available = account['balances']['available']
+
+        if(account['balances']['current'] is not None):
+            current = account['balances']['current']
+
+        if(account['name'] is not None):
+            name = account['name']
+
+        if(account['type'] is not None):
+            type = str(account['type'])
+
+        case = {'name':name,'available_amount':available, 'current_amount':current,'type':type,'currency':account['balances']['iso_currency_code']}
         accounts[account['account_id']] = case
 
     return accounts
@@ -157,9 +171,9 @@ class DebitCard():
     def make_graph_transaction_data_insight(self,start_date_input,end_date_input):
         transaction_count = 0
         transactions = self.get_transactions_by_date(start_date_input,end_date_input)
+        print(transactions)
         for token in self.access_tokens:
             self.make_bank_graph_data_dict(token,transactions,transaction_count)
-            #self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
             transaction_count = transaction_count + 1
 
     """
@@ -187,7 +201,7 @@ class DebitCard():
     #if returned transactions is empty then make sure that something is returned to the front end
     def get_recent_transactions(self,bank_graph_data,institution):
         if(not bank_graph_data):
-            raise TypeError("Bank graph data is empty")
+            raise bankDataEmpty()
 
         recent_transactions = {}
         all_transactions = []
@@ -195,11 +209,10 @@ class DebitCard():
             if(account['date'] != 'Not Provided'):
                 date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
 
-                if(date == date.today()):
+                if(date == date.today() or date == (date.today() - timedelta(days=1))):
                     case = {'amount': '£' + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':account['merchant_name']}
 
                     all_transactions.append(case)
 
         recent_transactions[institution] = all_transactions
-
         return recent_transactions
