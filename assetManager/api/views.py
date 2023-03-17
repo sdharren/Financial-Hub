@@ -14,7 +14,7 @@ from dateutil.tz import tzlocal
 import datetime
 from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User
+from assetManager.models import User,AccountType,AccountTypeEnum
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
@@ -295,10 +295,11 @@ def get_balances_data(request):
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
-        if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
-            delete_balances_cache(user)
-        else:
-            return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
+        #if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
+        #    delete_balances_cache(user)
+        #else:
+        print('here')
+        return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
     try:
         debit_card = DebitCard(plaid_wrapper,user)
@@ -350,6 +351,7 @@ def recent_transactions(request):
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
+
 
 """
     @params: 
