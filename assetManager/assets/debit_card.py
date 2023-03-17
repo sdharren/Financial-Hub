@@ -9,12 +9,6 @@ from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from django.core.exceptions import ObjectDoesNotExist
 
-"""
-Custom Exception Thrown In the case that the queried Institution is not linked in the application
-"""
-class InvalidInstitution(Exception):
-    def __init__(self):
-        self.message = 'Provided Instituion Name is not Linked'
 
 """
 Custom Exception Thrown In the case that the passed list of transactions is empty
@@ -171,7 +165,6 @@ class DebitCard():
     def make_graph_transaction_data_insight(self,start_date_input,end_date_input):
         transaction_count = 0
         transactions = self.get_transactions_by_date(start_date_input,end_date_input)
-        print(transactions)
         for token in self.access_tokens:
             self.make_bank_graph_data_dict(token,transactions,transaction_count)
             transaction_count = transaction_count + 1
@@ -189,7 +182,6 @@ class DebitCard():
         else:
             return self.bank_graph_data
 
-
     """
     @params: bank_graph_data, dictionary , institution_name: string of the corresponding institution name of the dictionary
 
@@ -203,16 +195,19 @@ class DebitCard():
         if(not bank_graph_data):
             raise bankDataEmpty()
 
+        first_five_transactions = bank_graph_data[:5]
         recent_transactions = {}
         all_transactions = []
-        for account in bank_graph_data:
+        for account in first_five_transactions:
             if(account['date'] != 'Not Provided'):
                 date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
+            else:
+                date = account['date']
 
-                if(date == date.today() or date == (date.today() - timedelta(days=1))):
-                    case = {'amount': '£' + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':account['merchant_name']}
+            #    if(date == date.today() or date == (date.today() - timedelta(days=1))):
+            case = {'amount': '£' + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':account['merchant_name']}
 
-                    all_transactions.append(case)
+            all_transactions.append(case)
 
         recent_transactions[institution] = all_transactions
         return recent_transactions
