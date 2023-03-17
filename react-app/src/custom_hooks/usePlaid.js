@@ -1,11 +1,12 @@
 import React, { useContext, useMemo } from 'react';
-import AuthContext from '../context/AuthContext';
 import useApiResult from './useApiResult';
 import { getData } from '../requests/RequestOptions';
+import AuthContext from '../context/AuthContext';
 
 const usePlaid = ({endpoint, endpoint_parameter, loadNext}) => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const request = useMemo(() => getData({endpoint, endpoint_parameter, authTokens}), []);
+    console.log(request);
     return useApiResult({request, endpoint});
 };
 

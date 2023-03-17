@@ -2,8 +2,7 @@ import Chart from "react-apexcharts";
 import usePlaid from '../custom_hooks/usePlaid';
 
 function LineGraph({endpoint, endpoint_parameter}) {
-
-    const lineChartData = usePlaid({endpoint, endpoint_parameter})
+    const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
 
     var chartCategories = [], chartSeries = [];
     for (var key in lineChartData) {
