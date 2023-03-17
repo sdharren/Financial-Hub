@@ -357,3 +357,4 @@ def get_linked_assets(request):
     account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
     reformatted = [account_type.account_institution_name]
     return Response(reformatted, content_type='application/json',status = 200)
+
