@@ -351,10 +351,22 @@ def recent_transactions(request):
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
 
+"""
+    @params: 
+        request (HttpRequest): the HTTP request object.
+
+    @Description: 
+        Retrieve the linked banks for the authenticated user.
+
+    @return:
+        Response: the HTTP response object containing a list of institution names in JSON format.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_linked_assets(request):
-    account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
-    reformatted = [account_type.account_institution_name]
-    return Response(reformatted, content_type='application/json',status = 200)
-
+def get_linked_banks(request):
+    get_balances_wrapper(request.user)
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
+    institutions = []
+    for account in account_types:
+        institutions.append(account.account_institution_name)
+    return Response(institutions, content_type='application/json',status = 200)
