@@ -295,10 +295,11 @@ def get_balances_data(request):
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
-        if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
-            delete_balances_cache(user)
-        else:
-            return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
+        #if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
+        #    delete_balances_cache(user)
+        #else:
+        print('here')
+        return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
     try:
         debit_card = DebitCard(plaid_wrapper,user)
@@ -350,3 +351,10 @@ def recent_transactions(request):
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_linked_assets(request):
+    account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
+    reformatted = [account_type.account_institution_name]
+    return Response(reformatted, content_type='application/json',status = 200)

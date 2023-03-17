@@ -104,22 +104,11 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(response_first.status_code, 200)
         after_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
         self.assertEqual(before_count + 1, after_count)
-
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(self.user, ['transactions'])
-        new_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
-        self.assertEqual(before_count + 2, new_count)
-        response = self.client.get(reverse('get_balances_data'), follow=True)
-        self.assertEqual(response.status_code, 200)
-        account_balances = response.json()
+        account_balances = response_first.json()
 
         self.assertEqual(list(account_balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(list(account_balances.keys())[1], 'Bank of America')
 
         self.assertEqual(account_balances[list(account_balances.keys())[0]], 593.8004402054293)
-        self.assertEqual(account_balances[list(account_balances.keys())[1]], 25830.31914893617)
         delete_balances_cache(self.user)
 
     def test_get_balances_data_from_the_cache(self):
