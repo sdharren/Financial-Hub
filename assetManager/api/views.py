@@ -211,6 +211,13 @@ def retrieve_stock_getter(user):
         cache.set('investments' + user.email, stock_getter.investments)
     return stock_getter
 
+"""
+@params: request
+
+@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
@@ -218,6 +225,14 @@ def yearlyGraph(request):
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
+"""
+@params: request
+
+@Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
+     to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
@@ -230,6 +245,14 @@ def monthlyGraph(request):
     graphData = transactions.monthlySpendingInYear(int(yearName))
     return Response(graphData, content_type='application/json')
 
+"""
+@params: request
+
+@Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
+     to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
@@ -242,6 +265,14 @@ def weeklyGraph(request):
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
 
+"""
+@params: user
+
+@Description: Sets the correct wrapper depending on the PLAID_DEVELOPMENT setting and then if it sets the SandboxWrapper it creates all the necessary tokens.
+    Then queries plaid for all the transactions from the access tokens stored, and inserts them into a BankGraphData object and returns the relevant object
+
+@return: BankGraphDataObject with the users transaction history stored inside
+"""
 def transaction_data_getter(user):
     if settings.PLAID_DEVELOPMENT:
         plaid_wrapper = DevelopmentWrapper()
@@ -259,12 +290,18 @@ def transaction_data_getter(user):
     first_key = next(iter(accountData))
     return accountData[first_key]
 
+"""
+@params: user
+
+@Description: if the transactions for the user have already been cached then it returns the transaction otherwise it caches the transaction data
+
+@return: json of transaction data for the account
+"""
 def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
         cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
 
     return (json.loads(cache.get('transactions' + user.email)))
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
