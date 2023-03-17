@@ -25,6 +25,13 @@ def get_currency_converter():
 
     return input_date
 
+"""
+@params: value_in_dict: dictionary
+
+@Description: -If the value within the dictionary is set to None then it returns the 'Not Provided' otherwise it returns the dictionary
+
+@return: value_in_dict: a dictionary or a string: 'Not Provided'
+"""
 def check_value_is_none(value_in_dict):
     if(value_in_dict is None):
         return 'Not Provided'
@@ -54,7 +61,13 @@ def handle_case(account):
 
     return case
 
+"""
+@params: transactions: json
 
+@Description: If the json that is passed into the constructor is in the incorrect format then it gets reformatted otherwise it remains the same
+
+@return: transactions: json or reformatted_transactions: json
+"""
 def format_transactions(transactions):
     reformatted_transactions = []
     try:
@@ -66,10 +79,27 @@ def format_transactions(transactions):
     except:
         return transactions
 
+"""
+Class BankGraphData represents transaction data organized for easy graphing.
+
+Constructor:
+    @params: transaction_history, list of dictionaries containing raw transaction data to be categorized and analyzed
+
+    @instance_variables:
+        -transactionInsight: CategoriseTransactions object containing the categorized transaction data
+"""
+
 class BankGraphData():
     def __init__(self,transaction_history):
         self.transactionInsight = CategoriseTransactions(format_transactions(transaction_history))
 
+    """
+    @Description: Calculates the yearly spending for the given `transaction_history`.
+        For each year in the range of years, it calls the `getYearlySpending()` method from `transactionInsight` to get the total spending for that year and appends the year and spending to a list of dictionaries named `yearlySpending`.
+
+    @Return: yearlySpending, a list of dictionaries where each dictionary represents the yearly spending for a year.
+        Each dictionary has two keys, 'name' and 'value', where 'name' is the year as a string and 'value' is the yearly spending as a float.
+    """
     def yearlySpending(self):
         yearlySpending = []
         rangeOfYears = self.transactionInsight.getRangeOfYears()
@@ -78,6 +108,16 @@ class BankGraphData():
                 yearlySpending.append({'name':str(year),'value': self.transactionInsight.getYearlySpending(year)})
         return yearlySpending
 
+    """
+    @params: year, integer value representing the year for which the monthly spending data is needed
+
+    @Description: This method calculates monthly spending data for a particular year. It iterates through each month of the year,
+        retrieves monthly spending using the CategoriseTransactions instance's getMonthlySpending method,
+        and appends the result to the monthlySpending list. The monthly spending value is rounded to two decimal places.
+
+    @return: monthlySpending, a list of dictionaries, with each dictionary containing 'name' and 'value' keys.
+        The 'name' key contains the name of the month and year (e.g. "Jan 2023"), while the 'value' key contains the monthly spending amount.
+    """
     def monthlySpendingInYear(self,year):
         monthlySpending = []
         months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -85,6 +125,17 @@ class BankGraphData():
             monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.getMonthlySpending(i,year)})
         return monthlySpending
 
+    """
+    @params: date, string containing a space-separated month and year, e.g. "Mar 2022"
+
+    @Description: Generates a list of weekly spending data for a given year and month, broken down into 5 weeks.
+        Each item in the list contains a dictionary with the keys 'name' (string) and 'value' (float).
+        The 'name' field for each week is generated using the week number, and the 'value' field
+        is calculated by calling the getWeeklySpending method of the transactionInsight object,
+        passing in the week number and the month and year converted to integers.
+
+    @return: weeklySpending, a list of dictionaries containing the name and value for each week's spending in the given month and year.
+    """
     def weeklySpendingInYear(self,date):
         weeklySpending = []
         month, year = date.split()
@@ -93,14 +144,40 @@ class BankGraphData():
             weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
         return weeklySpending
 
+    """
+    @params: month (string), year (int)
+
+    @Description: Fetches all transactions in a given month and year
+        Orders the transactions by categories and returns the categories and their corresponding spending amounts
+
+    @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given month and year)
+    """
     def orderedCategorisedMonthlySpending(self,month,year):
         monthlyTransactions = self.transactionInsight.getMonthlyTransactions(month,year)
         return self.transactionInsight.getOrderCategories(monthlyTransactions)
 
+    """
+    @params: week(int), month (int), year (int)
+
+    @Description: Fetches all transactions in a given month and year
+        Orders the transactions by categories and returns the categories and their corresponding spending amounts
+
+    @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given month and year)
+    """
     def orderedCategorisedWeeklySpending(self,week,month,year):
         weeklyTransactions = self.transactionInsight.getWeeklyTransactions(week,month,year)
         return self.transactionInsight.getOrderCategories(weeklyTransactions)
 
+    """
+    @params:
+        monthName (str): Name of the month in three letter abbreviation (e.g. "Jan")
+
+    @Description:
+        Returns the corresponding numeric value of a month given its name in three letter abbreviation.
+
+    @return:
+        int: Numeric value of the month (e.g. 1 for "Jan")
+    """
     def getMonth(self,monthName):
         month_dict = {
         "Jan": 1,
