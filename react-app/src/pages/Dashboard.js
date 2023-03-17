@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import PieChart from './PieChart';
+import Balances from './Balances';
+import Transactions from './RecentTransactionsDisplay';
+import Currency from './Currency';
+import BarChart from './BarChartDisplay';
+
 
 const tabGraphData = {
   Overall: [
@@ -8,13 +14,14 @@ const tabGraphData = {
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
   ],
   Stocks: [
-    { name: 'Graph 1', content: `Content for Graph 1 in Stocks tab goes here.` },
+    { name: 'Graph 1', content: <PieChart endpoint={'investment_categories'} />  },
     { name: 'Graph 2', content: `Content for Graph 2 in Stocks tab goes here.` },
   ],
   Banks: [
-    { name: 'Graph 1', content: `Content for Graph 1 in Banks tab goes here.` },
-    { name: 'Graph 2', content: `Content for Graph 2 in Banks tab goes here.` },
-    { name: 'Graph 3', content: `Content for Graph 3 in Banks tab goes here.` },
+    { name: 'Balance', content: <Balances /> },
+    { name: 'Transaction', content: <Transactions /> },
+    { name: 'Currency', content: <Currency /> },
+    { name: 'Bar Chart', content: <BarChart /> },
   ],
   Crypto: [
     { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
