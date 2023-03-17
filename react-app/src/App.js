@@ -56,12 +56,9 @@ function App() {
               <Route path="/balances" element={<BalancesDisplay />} />
               <Route path="/currency" element={<Currency />} />
               <Route path="/list" element={<TransactionTable />} />
-<<<<<<< HEAD
-              //<Route path="/bankassets" element={<AssetBank />} />
-=======
+              <Route path="/bankassets" element={<AssetBank />} />
               <Route path="/link_assets" element={<LinkAssets />} />
               <Route path="/accounts" element={<Accounts />} />
->>>>>>> main
             </Routes>
 
         </AuthProvider>
