@@ -14,7 +14,7 @@ const tabGraphData = {
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
   ],
   Stocks: [
-    { name: 'Graph 1', content: <PieChart endpoint={'investment_categories'} />  },
+    { name: 'Graph 1', content: `Content for Graph 1 in Overall tab goes here.`  },
     { name: 'Graph 2', content: `Content for Graph 2 in Stocks tab goes here.` },
   ],
   Banks: [
