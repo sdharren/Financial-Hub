@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useContext } from 'react';
 import usePlaid from '../custom_hooks/usePlaid';
+import AuthContext from '../context/AuthContext';
 
 import{ Chart as ChartJS,
   BarElement,

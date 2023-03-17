@@ -1,9 +1,9 @@
 import Chart from "react-apexcharts";
 import usePlaid from '../custom_hooks/usePlaid';
 
-function LineGraph({endpoint, endpoint_parameter, loadNext}) {
+function LineGraph({endpoint, endpoint_parameter}) {
 
-    const lineChartData = usePlaid({endpoint, endpoint_parameter, loadNext})
+    const lineChartData = usePlaid({endpoint, endpoint_parameter})
 
     var chartCategories = [], chartSeries = [];
     for (var key in lineChartData) {
@@ -91,7 +91,15 @@ function LineGraph({endpoint, endpoint_parameter, loadNext}) {
         }];
 
         // Return the Chart component with the options and series
-        return <Chart options={options} series={series} type = "area" />
+        return (
+            <div>
+                {
+                    lineChartData == null ? <p>Loading...</p> :
+                    <Chart options={options} series={series} type = "area" />
+
+                }
+            </div>
+        )
 }
 
 export default LineGraph;

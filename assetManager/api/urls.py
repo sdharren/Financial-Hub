@@ -21,4 +21,7 @@ urlpatterns = [
     path('get_balances_data/', views.get_balances_data, name='get_balances_data'),
     path('select_account/', views.select_account, name='select_account'),
     path('currency_data/', views.get_currency_data, name='currency_data'),
+    path('yearly_graphs/',views.yearlyGraph, name='yearly_graphs'),
+    path('monthly_graphs/',views.monthlyGraph, name='monthly_graphs'),
+    path('weekly_graphs/',views.weeklyGraph, name='weekly_graphs'),
 ]

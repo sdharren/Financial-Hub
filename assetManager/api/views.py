@@ -337,35 +337,26 @@ def delete_balances_cache(user):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
-    user = request.user
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
-    transactions = json.loads(cache.get('transactions' + user.email))
+    transactions = transaction_data_getter(request.user)
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
-    user = request.user
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
-    transactions = json.loads(cache.get('transactions' + user.email))
+    transactions = transaction_data_getter(request.user)
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
         raise Exception
         # should return bad request
-    graphData = transactions.monthlySpendingInYear(int(yearName))
+    graphData = transactions.monthlySpendingInYear(yearName)
     return Response(graphData, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
-    user = request.user
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user)))
-    transactions = json.loads(cache.get('transactions' + user.email))
+    transactions = transaction_data_getter(request.user)
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
