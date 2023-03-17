@@ -1,3 +1,7 @@
+from forex_python.converter import CurrencyRates
+from django.conf import settings
+import datetime
+
 """
 Class of methods to produce data to pass to the frontend to create the graphs
 for bank data.
@@ -5,16 +9,45 @@ author: Pavan Rana
 """
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 
+def get_currency_converter():
+    if settings.PLAID_DEVELOPMENT is False:
+        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
+    else:
+        input_date = datetime.datetime.today()
+    return input_date
+
+def handle_case(account):
+    input_date = get_currency_converter()
+    currency_rates = CurrencyRates()
+    converted_amount = round(currency_rates.convert(account['iso_currency_code'], 'GBP', account['amount'],input_date),2)
+    if(account['authorized_date'] is None):
+        if(account['date'] is None):
+            case = {'authorized_date':'Not Provided','date':'Not Provided', 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+            return case
+        else:
+            case = {'authorized_date':'Not Provided','date':[account['date'].year,account['date'].month,account['date'].day], 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+            return case
+    elif(account['date'] is None):
+        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':'Not Provided', 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+        return case
+    elif(account['merchant_name'] is None):
+        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':'Not Provided'}
+        return case
+    else:
+        case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':converted_amount, 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+        return case
+
+
 def format_transactions(transactions):
     reformatted_transactions = []
-    for account in transactions:
-        try:
-            case = {'authorized_date':[account['authorized_date'].year,account['authorized_date'].month,account['authorized_date'].day],'date':[account['date'].year,account['date'].month,account['date'].day], 'amount':account['amount'], 'category': account['category'], 'name':account['name'],'iso_currency_code':account['iso_currency_code'], 'merchant_name':account['merchant_name']}
+    try:
+        for account in transactions:
+            case = handle_case(account)
             reformatted_transactions.append(case)
-        except:
-            return transactions
 
-    return reformatted_transactions
+        return reformatted_transactions
+    except:
+        return transactions
 
 class BankGraphData():
     def __init__(self,transaction_history):
