@@ -106,7 +106,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
         }
     };
 
-    return <Pie data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+    return <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
 }
 
 export default PieChart;
