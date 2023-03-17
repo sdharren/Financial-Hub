@@ -2,14 +2,20 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import 'chart.js/auto';
 import { Line } from "react-chartjs-2";
 import AuthContext from '../context/AuthContext';
+import InvestmentOptions from '../components/InvestmentOptions';
 
-
-const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
+const LineGraph = ({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [lineGraphData, setLineGraphData] = useState(null);
 
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
+    }
+
     let get_data = async() =>  {
-        console.log("getting data")
         let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
         let response = await fetch(url, {
             method:'GET',
@@ -46,7 +52,12 @@ const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
         }]
       };
     
-      return <Line data = {data}></Line>
+      return (
+        <div>
+            {selectOptions===undefined||selectOptions===null?null:<InvestmentOptions options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}></InvestmentOptions>}
+            <Line data = {data}></Line>
+        </div>
+      )
     }
 
     export default LineGraph;

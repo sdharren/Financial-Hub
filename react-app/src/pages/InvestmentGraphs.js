@@ -5,7 +5,7 @@ import AuthContext from '../context/AuthContext';
 import InvestmentOptions from "../components/InvestmentOptions";
 
 function InvestmentGraphs() {
-    const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext} selectOptions={"null"}/>);
     const [select, setSelect] = useState(null);
     let {authTokens, logoutUser} = useContext(AuthContext);
 
@@ -76,40 +76,22 @@ function InvestmentGraphs() {
 
         switch(endpoint) {
             case 'investment_categories':
-                setSelect(null);
                 setGraph(
-                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
+                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} updateGraph={handleGraphUpdate}/>
                 );
                 break;
 
             case 'investment_category_breakdown':
                 setLastCategory(endpoint_parameter);
-                setSelect(
-                    <InvestmentOptions 
-                        options={categoryOptions.length === 0 ? options['categories'] : categoryOptions}
-                        handleSelectionUpdate={handleSelectionUpdate}
-                        selectedOption={endpoint_parameter}
-                        optionType={endpoint}
-                    />
-                );
                 setGraph(
-                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} />
+                    <PieChart endpoint={endpoint} endpoint_parameter={endpoint_parameter} loadNext={handleLoadNext} updateGraph={handleGraphUpdate} selectOptions={categoryOptions.length===0?options['categories']:categoryOptions}/>
                 );
                 break;
 
             case 'stock_history':
                 setLastStock(endpoint_parameter);
-                console.log(investmentOptions.length === 0 ? options['investments'] : investmentOptions);
-                setSelect(
-                    <InvestmentOptions 
-                        options={investmentOptions.length === 0 ? options['investments'] : investmentOptions}
-                        handleSelectionUpdate={handleSelectionUpdate}
-                        selectedOption={endpoint_parameter}
-                        optionType={endpoint}
-                    />
-                )
                 setGraph(
-                        <LineGraph endpoint={endpoint} endpoint_parameter={endpoint_parameter} />
+                        <LineGraph endpoint={endpoint} updateGraph={handleGraphUpdate} endpoint_parameter={endpoint_parameter} selectOptions={investmentOptions.length===0?options['investments']:investmentOptions}/>
                 );
                 break;
         }
@@ -130,6 +112,12 @@ function InvestmentGraphs() {
     function handleLoadNext(event) {
         let next = nextRoute[event.current];
         changeGraph(next, event.next);
+    }
+
+    function handleGraphUpdate(event) {
+        let endpoint = event['endpoint'];
+        let param = event['param'];
+        changeGraph(endpoint, param)
     }
 
     async function callApi(endpoint) {
@@ -190,7 +178,6 @@ function InvestmentGraphs() {
             </div>
 
             <div className="tabcontent">
-                {select}
                 {graph}
             </div>
         </div>

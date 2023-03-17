@@ -10,8 +10,8 @@ import {
     Colors
 } from 'chart.js'
 
-import axios from 'axios';
 import { Pie, getElementsAtEvent } from 'react-chartjs-2';
+import InvestmentOptions from '../components/InvestmentOptions';
 
 
 ChartJS.register(
@@ -20,10 +20,11 @@ ChartJS.register(
     Legend,
     Colors
 )
-function PieChart({endpoint, endpoint_parameter, loadNext}) {
+function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, setPieChartData] = useState(null);
     const navigate = useNavigate()
+    console.log(selectOptions)
 
     let get_data = async() =>  {
         let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
@@ -44,6 +45,13 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
                 navigate('/plaid_link')
             }
         }
+    }
+
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
     }
 
     useEffect(() => {
@@ -106,7 +114,14 @@ function PieChart({endpoint, endpoint_parameter, loadNext}) {
         }
     };
 
-    return <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+    return (
+        <div>
+            {endpoint==='investment_categories'?null:<InvestmentOptions options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}></InvestmentOptions>}
+            <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+        </div>
+        
+    ) 
+    
 }
 
 export default PieChart;
