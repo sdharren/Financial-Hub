@@ -22,7 +22,7 @@ import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
-import AssetBank from './pages/bankAssets';
+//import AssetBank from './pages/bankAssets';
 // ask matthew about how margins are lined
 
 function App() {
@@ -56,7 +56,7 @@ function App() {
               <Route path="/balances" element={<BalancesDisplay />} />
               <Route path="/currency" element={<Currency />} />
               <Route path="/list" element={<TransactionTable />} />
-              <Route path="/bankassets" element={<AssetBank />} />
+              {/* <Route path="/bankassets" element={<AssetBank />} /> */}
               <Route path="/link_assets" element={<LinkAssets />} />
               <Route path="/accounts" element={<Accounts />} />
             </Routes>
