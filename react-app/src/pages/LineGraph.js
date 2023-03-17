@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import 'chart.js/auto';
 import { Line } from "react-chartjs-2";
 import AuthContext from '../context/AuthContext';
-import InvestmentOptions from '../components/InvestmentOptions';
+import GraphSelect from '../components/GraphSelect';
 
-const LineGraph = ({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) => {
+const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [lineGraphData, setLineGraphData] = useState(null);
 
@@ -54,7 +54,11 @@ const LineGraph = ({endpoint, endpoint_parameter, loadNext, updateGraph, selectO
     
       return (
         <div>
-            {selectOptions===undefined||selectOptions===null?null:<InvestmentOptions options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}></InvestmentOptions>}
+            {
+                selectOptions === undefined || selectOptions === null
+                ? null
+                : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
+            }
             <Line data = {data}></Line>
         </div>
       )

@@ -11,7 +11,7 @@ import {
 } from 'chart.js'
 
 import { Pie, getElementsAtEvent } from 'react-chartjs-2';
-import InvestmentOptions from '../components/InvestmentOptions';
+import GraphSelect from '../components/GraphSelect';
 
 
 ChartJS.register(
@@ -24,7 +24,6 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, setPieChartData] = useState(null);
     const navigate = useNavigate()
-    console.log(selectOptions)
 
     let get_data = async() =>  {
         let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
@@ -47,6 +46,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         }
     }
 
+    // if a user selects a different option from select dropdown - tell parent to update this graph
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
             'endpoint': endpoint,
@@ -56,19 +56,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
 
     useEffect(() => {
         get_data();
-        // axios.get(
-        //     'http://127.0.0.1:8000/api/' + String(endpoint) + '/',
-        //     { params: {
-        //         param: endpoint_parameter
-        //     }}
-        // )
-        //   .then(response => {
-        //     setPieChartData(response.data);
-        //   })
-        //   .catch(error => {
-        //     console.log(error);
-        //   });
-      }, [endpoint, endpoint_parameter]);
+    }, [endpoint, endpoint_parameter]);
 
     let pie_data = new Array();
     let pie_labels = new Array();
@@ -88,6 +76,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
             }
         ]
     };
+
     // using built-in colors for now as otherwise they need to be hardcoded
     // make a selection of colors that match the UI theme later and replace
     const options = {
@@ -107,16 +96,21 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         if (getElementsAtEvent(chartRef.current, event).length > 0) {
             const datasetIndex = getElementsAtEvent(chartRef.current, event)[0].datasetIndex;
             const dataIndex = getElementsAtEvent(chartRef.current, event)[0].index;
+            // a section of pie chart has been clicked so tell parent to update the graph
             loadNext({
-                'next': data.datasets[datasetIndex].link[dataIndex],
-                'current': endpoint
+                'next': data.datasets[datasetIndex].link[dataIndex], // section that was clicked - this will be what the next graph is about
+                'current': endpoint // current endpoint - to let the parent know what endpoint to query next
             });
         }
     };
 
     return (
         <div>
-            {endpoint==='investment_categories'?null:<InvestmentOptions options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}></InvestmentOptions>}
+            {
+                endpoint==='investment_categories' 
+                ? null 
+                : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
+            }
             <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
         
