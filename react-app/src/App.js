@@ -23,7 +23,6 @@ import TransactionTable from './pages/RecentTransactionsDisplay';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 //import AssetBank from './pages/bankAssets';
-// ask matthew about how margins are lined
 
 function App() {
   return (
@@ -35,8 +34,15 @@ function App() {
             <Routes>
               <Route element={<PrivateRoutes/>}>
                 <Route element={<HomePage/>} path = "/homepage" exact />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/graph_display" element={<GraphDisplay />} />
+                <Route path="/bar_graph_display" element={<BarChartDisplay />} />
+                <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
+                <Route path="/balances" element={<BalancesDisplay />} />
+                <Route path="/currency" element={<Currency />} />
+                <Route path="/list" element={<TransactionTable />} />
               </Route>
-              <Route element={<Login/>} path="/login"/>
+              <Route path="/login" element={<Login/>} />
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
