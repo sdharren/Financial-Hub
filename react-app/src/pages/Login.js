@@ -18,7 +18,7 @@ const Login = () => {
   let {loginUser} = useContext(AuthContext);
 
   let form2 = (
-    <div>
+    <div class="signup-container">
         <Header
             heading = "Login to your account"
             paragraph= "Don't have an account yet? "

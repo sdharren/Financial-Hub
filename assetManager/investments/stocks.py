@@ -177,3 +177,19 @@ class StocksGetter():
             if not skipDay:
                 portfolio_history[current_date.strftime('%Y-%m-%d')] = current_sum
         return portfolio_history
+
+    def get_supported_investments(self):
+        stocks = set()
+        for investment in self.investments:
+            if investment.get_ticker() and self.is_ticker_supported(investment.get_ticker()) is not None:
+                stocks.add(investment.get_name())
+        return stocks
+
+    def get_categories(self):
+        categories = set()
+        for investment in self.investments:
+            categories.add(investment.get_category())
+        return categories
+
+    def is_ticker_supported(self, ticker):
+        return self.yfinance_wrapper.is_ticker_supported(ticker)

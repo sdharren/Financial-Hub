@@ -20,9 +20,18 @@ function BarChartDisplay() {
         );
     }
 
+    function handleLoadPrevious(event){
+        setGraph(
+            <BarGraph endpoint='yearly_graphs' endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+        );
+    }
+
 
     return (
         <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+            <button onClick={handleLoadPrevious}>
+                Go Back
+            </button>
             {graph}
         </div>
     );

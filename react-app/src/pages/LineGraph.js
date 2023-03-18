@@ -9,6 +9,7 @@ const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
     const [lineGraphData, setLineGraphData] = useState(null);
 
     let get_data = async() =>  {
+        console.log("getting data")
         let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
         let response = await fetch(url, {
             method:'GET',
@@ -25,7 +26,7 @@ const LineGraph = ({endpoint, endpoint_parameter, loadNext}) => {
 
     useEffect(() => {
         get_data();
-    }, [endpoint]);
+    }, [endpoint, endpoint_parameter]);
 
     let line_data = new Array();
     let line_labels = new Array();

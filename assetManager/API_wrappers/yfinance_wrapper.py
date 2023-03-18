@@ -14,7 +14,7 @@ class YFinanceWrapper():
             history = ticker.history(prepost = False, raise_errors = True)
             close_data = history['Close'].to_dict()
         except Exception:
-            raise TickerNotSupported()
+            raise TickerNotSupported(ticker_symbol)
         return close_data
 
     def get_most_recent_stock_price(self, ticker_symbol):
@@ -60,3 +60,10 @@ class YFinanceWrapper():
             data.update({(keys[i+1]) : (initial_amount * (values[i+1]-values[i])/(values[i]))})
         
         return data
+
+    def is_ticker_supported(self, ticker):
+        try:
+            self.get_most_recent_stock_price(ticker)
+        except TickerNotSupported:
+            return False
+        return True

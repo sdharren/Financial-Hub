@@ -14,32 +14,6 @@ class InvalidInstitution(Exception):
     def __init__(self):
         self.message = 'Provided Instituion Name is not Linked'
 
-
-def get_currency_symbol(iso_code):
-    symbols = {
-        'USD': '$',
-        'EUR': '€',
-        'JPY': '¥',
-        'GBP': '£',
-        'CHF': 'Fr',
-        'CAD': '$',
-        'AUD': '$',
-        'NZD': '$',
-        'CNY': '¥',
-        'HKD': '$',
-        'SGD': '$',
-        'MXN': '$',
-        'INR': '₹',
-        'RUB': '₽',
-        'ZAR': 'R',
-        'BRL': 'R$',
-        'TRY': '₺',
-        'AED': 'د.إ',
-        'SAR': '﷼',
-    }
-    return symbols.get(iso_code, '')
-
-
 """
 DebitCard class to represent a Bank Card asset with relevant methods to access transactions and account specific data
 """
@@ -135,21 +109,20 @@ class DebitCard():
         if(not bank_graph_data):
             raise TypeError("Bank graph data is empty")
         recent_transactions = {}
-
         all_transactions = []
         for account in bank_graph_data:
-            authorized_date = datetime.date(account['authorized_date'][0],account['authorized_date'][1],account['authorized_date'][2])
-            date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
+            if(account['date'] != 'Not Provided'):
+                date = datetime.date(account['date'][0],account['date'][1],account['date'][2])
 
-            if(authorized_date == date.today() or (date == date.today())):
-                if(account['merchant_name'] is None):
-                    merchant_name = 'Not provided'
-                else:
-                    merchant_name = account['merchant_name']
+                if(date == date.today()):
+                    if(account['merchant_name'] is None):
+                        merchant_name = 'Not provided'
+                    else:
+                        merchant_name = account['merchant_name']
 
-                case = {'amount': get_currency_symbol(account['iso_currency_code']) + str(account['amount']), 'date':authorized_date, 'category':account['category'], 'merchant':merchant_name}
+                    case = {'amount': '£' + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':merchant_name}
 
-                all_transactions.append(case)
+                    all_transactions.append(case)
 
         recent_transactions[institution] = all_transactions
 
