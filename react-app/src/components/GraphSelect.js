@@ -11,8 +11,12 @@ function GraphSelect ({ options, handleSelectionUpdate, selectedOption }) {
     );
     
     return (
-        <select autoFocus={true} onChange={(event) => handleSelectionUpdate(event.target.value)}>
-            {select}
+        <select className="graph-select" onChange={(event) => handleSelectionUpdate(event.target.value) }>
+            {options.map(o => (
+                    o === selectedOption ? 
+                    <option className="select-option" key={o} value={o} selected={true} disabled={true}>{o}</option> :
+                    <option className="select-option" key={o} value={o}>{o}</option>
+                ))}
         </select>
     )
 }

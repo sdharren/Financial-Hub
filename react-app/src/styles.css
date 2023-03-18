@@ -391,7 +391,18 @@ max-width: 120%;
 .investment-pie {
     margin: auto;
 }
-    
+ 
+.graph-select {
+    color: #000000 !important;
+    float: left;
+    overflow: hidden;
+    width: 10rem;
+    margin-top: 10px;
+    margin-to: 0.625rem;
+}
+
+.select-option {
+}
  
 .about-page {
   text-align: center;

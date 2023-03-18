@@ -189,7 +189,7 @@ function InvestmentGraphs() {
 
 
     return (
-        <div className="investment-graphs" onLoad={link_sandbox()}>
+        <div className="investment-graphs">
             <div className="tab">
                 <button className={"tablinks" + (overviewActive ? " active" : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
