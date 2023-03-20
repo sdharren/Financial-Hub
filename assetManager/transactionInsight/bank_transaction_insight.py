@@ -9,7 +9,7 @@ class CategoriseTransactions():
     def getTransactionHistory(self):
         return self.transaction_history
 
-    # returns an ordered array of tuples of categories and their spenditure
+    # returns an ordered array of dictionaries of categories and their spenditure
     def getOrderCategories(self,transactionHistory):
         categories = self.getCategorisedSpending(transactionHistory)
         orderedListOfCategories = sorted(categories.items(), key=lambda x: x[1],reverse=True)
