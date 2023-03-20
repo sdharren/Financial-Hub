@@ -12,11 +12,10 @@ class CategoriseTransactions():
     # returns an ordered array of tuples of categories and their spenditure
     def getOrderCategories(self,transactionHistory):
         categories = self.getCategorisedSpending(transactionHistory)
-        orderedListOfCategories = sorted(categories)
+        orderedListOfCategories = sorted(categories, key=lambda x: x[1])
         orderedDictionaryOfCategories = []
         for item in orderedListOfCategories:
-            category = (item,categories.get(item))
-            orderedDictionaryOfCategories.append(category)
+            orderedDictionaryOfCategories.append({'name': item,'value': categories.get(item)})
         return orderedDictionaryOfCategories
 
     # return that total spending for all transactions
@@ -62,6 +61,13 @@ class CategoriseTransactions():
             if item['amount'] > 0 and item['date'][2]//7 == week and item['date'][1] == month and item['date'][0] == year:
                 amount = amount + item['amount']
         return amount
+
+    def getCompaniesPerSector(self,sector):
+        companies = []
+        for item in self.transaction_history:
+            if item['category'][0] == sector:
+                companies.append({"name": item['name'],"value": self.getSpendingForCompany(item['name'])})
+        return companies
 
     # return total spending for the company name passed in
     def getSpendingForCompany(self,company):

@@ -213,6 +213,25 @@ def retrieve_stock_getter(user):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def company_spending(request):
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    if request.GET.get('param'):
+        sector = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.companySpendingPerSector(sector)
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def sector_spending(request):
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    graphData = transactions.orderedCategorisedSpending()
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def yearlyGraph(request):
     transactions = BankGraphData(cacheBankTransactionData(request.user))
     graphData = transactions.yearlySpending()
