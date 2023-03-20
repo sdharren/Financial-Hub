@@ -12,10 +12,10 @@ class CategoriseTransactions():
     # returns an ordered array of tuples of categories and their spenditure
     def getOrderCategories(self,transactionHistory):
         categories = self.getCategorisedSpending(transactionHistory)
-        orderedListOfCategories = sorted(categories, key=lambda x: x[1])
+        orderedListOfCategories = sorted(categories.items(), key=lambda x: x[1],reverse=True)
         orderedDictionaryOfCategories = []
         for item in orderedListOfCategories:
-            orderedDictionaryOfCategories.append({'name': item,'value': categories.get(item)})
+            orderedDictionaryOfCategories.append({'name': item[0],'value': item[1]})
         return orderedDictionaryOfCategories
 
     # return that total spending for all transactions

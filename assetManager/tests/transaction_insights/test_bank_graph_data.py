@@ -35,11 +35,11 @@ class CreateBankGraphDataTestCase(TestCase):
 
     def test_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(11,2022), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
+        self.assertEqual(annualMonthlySpending.orderedCategorisedMonthlySpending(11,2022), [{'name': 'Food and Drink', 'value': 21.99},{'name': 'Service', 'value': 15.99},{'name': 'Travel', 'value': 3.3}])
 
     def test_ordered_categorised_weekly_spending(self):
         annualWeeklySpending = BankGraphData(self.transaction_history)
-        self.assertEqual(annualWeeklySpending.orderedCategorisedWeeklySpending(3,11,2022), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
+        self.assertEqual(annualWeeklySpending.orderedCategorisedWeeklySpending(3,11,2022), [{'name': 'Food and Drink', 'value': 21.99},{'name': 'Service', 'value': 15.99},{'name': 'Travel', 'value': 3.3}])
 
     def test_no_ordered_categorised_monthly_spending(self):
         annualMonthlySpending = BankGraphData("")
