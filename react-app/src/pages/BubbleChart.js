@@ -1,43 +1,78 @@
 import React from 'react';
-import { BubbleChart } from 'react-bubble-chart';
+import ApexCharts from 'apexcharts-react';
 
-const data = [
-  { label: 'AAPL', value: 10, color: '#FFC107' },
-  { label: 'GOOGL', value: 20, color: '#FF9800' },
-  { label: 'BRK.A', value: 15, color: '#FF5722' },
-  { label: 'ETH', value: 8, color: '#F44336' },
-  { label: 'BTC', value: 18, color: '#F44336' },
-  { label: 'USD', value: 80, color: '#F44336' },
-  { label: 'GBP', value: 120, color: '#F44336' },
-  { label: 'YEN', value: 20, color: '#F44336' },
-];
+const BubbleChart = () => {
+  const options = {
+    chart: {
+      type: 'bubble',
+      height: 350,
+    },
+    series: [
+      {
+        name: 'Stocks',
+        data: [
+          { x: 'AAPL', y: 300, z: 50 },
+          { x: 'AMZN', y: 600, z: 80 },
+          { x: 'GOOG', y: 500, z: 60 },
+        ],
+      },
+      {
+        name: 'Bank Accounts',
+        data: [
+          { x: 'Savings', y: 150, z: 30 },
+          { x: 'Checking', y: 200, z: 40 },
+        ],
+      },
+      {
+        name: 'Crypto',
+        data: [
+          { x: 'BTC', y: 1000, z: 70 },
+          { x: 'ETH', y: 800, z: 50 },
+        ],
+      },
+    ],
+    dataLabels: {
+      enabled: false,
+    },
+    fill: {
+      opacity: 0.8,
+    },
+    title: {
+      text: 'Bubble Chart for Stocks, Bank Accounts, and Crypto',
+      align: 'center',
+      style: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+      },
+    },
+    xaxis: {
+      tickPlacement: 'on',
+    },
+    yaxis: {
+      tickAmount: 5,
+      labels: {
+        formatter: function (val) {
+          return val.toFixed(0) + ' USD';
+        },
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return val.toFixed(0) + ' USD';
+        },
+      },
+    },
+  };
 
-const BubbleChartExample = () => {
   return (
-    <BubbleChart
-      graph={{
-        zoom: 1,
-        offsetX: -0.05,
-        offsetY: -0.01,
-      }}
-      width={500}
-      height={500}
-      showLegend={false}
-      valueFont={{
-        family: 'Arial',
-        size: 12,
-        color: '#fff',
-        weight: 'bold',
-      }}
-      labelFont={{
-        family: 'Arial',
-        size: 16,
-        color: '#fff',
-        weight: 'bold',
-      }}
-      data={data}
+    <ApexCharts
+      options={options}
+      series={options.series}
+      type="bubble"
+      height={350}
     />
   );
 };
 
-export default BubbleChartExample;
+export default BubbleChart;
