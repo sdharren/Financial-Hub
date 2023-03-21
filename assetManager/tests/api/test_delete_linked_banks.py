@@ -45,7 +45,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         institutions_number_change = self.client.get(reverse("get_linked_banks"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
         institutions_2 = institutions_number_change.json()
-        print(institutions_2)
+        
         self.assertEqual(len(institutions_2), 1)
         
 
@@ -56,7 +56,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         institutions_number_change = self.client.get(reverse("get_linked_banks"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
         institutions_2 = institutions_number_change.json()
-        print(institutions_2)
+      
         self.assertEqual(len(institutions_2), 0)
         
 
@@ -103,7 +103,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         response = self.client.get(reverse("get_linked_banks"), format="json")
         self.assertEqual(response.status_code, 200)
         institutions = response.json()
-        print(institutions)
+    
         self.assertEqual(len(institutions), 2)
 
         # Delete institution
@@ -117,5 +117,5 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         response = self.client.get(reverse("get_linked_banks"), format="json")
         self.assertEqual(response.status_code, 200)
         institutions = response.json()
-        print(institutions)
+    
         self.assertEqual(len(institutions), 1)
