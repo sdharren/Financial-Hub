@@ -143,6 +143,17 @@ class BankGraphData():
         for i in range(1,6):
             weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
         return weeklySpending
+    
+    def companySpendingPerSector(self,sector):
+        original_list = self.transactionInsight.getCompaniesPerSector(sector)
+        new_list = []
+        for item in original_list:
+            if item not in new_list:
+                new_list.append(item)
+        return new_list
+
+    def orderedCategorisedSpending(self):
+        return self.transactionInsight.getOrderCategories(self.transactionInsight.transaction_history)
 
     """
     @params: month (string), year (int)

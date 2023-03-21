@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import InvestmentGraphs from './InvestmentGraphs';
 import PieChart from './PieChart';
 import Balances from './Balances';
 import Transactions from './RecentTransactionsDisplay';
@@ -14,8 +15,7 @@ const tabGraphData = {
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
   ],
   Stocks: [
-    { name: 'Graph 1', content: <PieChart endpoint={'investment_categories'} />  },
-    { name: 'Graph 2', content: `Content for Graph 2 in Stocks tab goes here.` },
+    { name: 'Graph 1', content: <InvestmentGraphs/>}
   ],
   Banks: [
     { name: 'Balance', content: <Balances /> },
@@ -32,6 +32,7 @@ const tabGraphData = {
 
 function Dashboard() {
   const [activeTabPie, setActiveTabPie] = useState('Overall');
+  const [stocksActive, setStocksActive] = useState(false);
 
   const [activeGraphPie, setActiveGraphPie] = useState('Graph 1');
 
@@ -39,6 +40,12 @@ function Dashboard() {
 
 
   const handlePieTabClick = (tabName) => {
+    if (tabName === 'Stocks') {
+        setStocksActive(true);
+    }
+    else {
+        setStocksActive(false);
+    }
     setActiveTabPie(tabName);
     setActiveGraphPie(tabGraphData[tabName][0].name);
   };
@@ -79,6 +86,7 @@ function Dashboard() {
               <div className="piechart-graphs">
                 {tabGraphData[activeTabPie].map((graph) => (
                   <div
+                    hidden={stocksActive}
                     key={graph.name}
                     className={`piechart-graph ${activeGraphPie === graph.name ? 'active' : ''}`}
                     onClick={() => handlePieGraphClick(graph.name)}
@@ -88,13 +96,13 @@ function Dashboard() {
                 ))}
               </div>
               
-              <div className="piegraph-content">
+              <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
                 {tabGraphData[activeTabPie].map((graph) => (
                   activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
                 ))}
               </div>
 
-              <div className="right-menu">
+              <div className="right-menu" hidden={stocksActive}>
                 <select value={selectedPieAccount} onChange={handlePieAccountChange}>
                   <option value="All Accounts">All Accounts</option>
                   <option value="Account 1">Account 1</option>

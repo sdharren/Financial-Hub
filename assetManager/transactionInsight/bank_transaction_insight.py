@@ -30,11 +30,10 @@ class CategoriseTransactions():
     """
     def getOrderCategories(self,transactionHistory):
         categories = self.getCategorisedSpending(transactionHistory)
-        orderedListOfCategories = sorted(categories)
+        orderedListOfCategories = sorted(categories, key=lambda x: x[1])
         orderedDictionaryOfCategories = []
         for item in orderedListOfCategories:
-            category = (item,categories.get(item))
-            orderedDictionaryOfCategories.append(category)
+            orderedDictionaryOfCategories.append({'name': item,'value': categories.get(item)})
         return orderedDictionaryOfCategories
 
     """
@@ -52,7 +51,7 @@ class CategoriseTransactions():
     """
     @Description: This method fetches the earliest and latest year for which transactions exist in the transaction history.
     It iterates through the transaction history, checks the year for each transaction, and updates the range of years accordingly.
-    
+
     @return: rangeOfYears, a list containing two integers representing the earliest and latest year for which transactions exist in the transaction history.
     """
     def getRangeOfYears(self):
@@ -71,7 +70,7 @@ class CategoriseTransactions():
     @params: year (int)
 
     @Description: Calculates the total spending for a given year by iterating over all the transactions in the transaction history.
-    
+
     @return: amount (float), representing the total spending in the given year.
     """
     def getYearlySpending(self,year):
@@ -85,7 +84,7 @@ class CategoriseTransactions():
     @params: month (int), year (int)
 
     @Description: Calculates the total amount spent in a given month and year, by iterating over all transactions in transaction_history and summing the positive amounts for transactions that occurred in that month and year
-    
+
     @return: amount (float), representing the total amount spent in the given month and year
     """
     def getMonthlySpending(self,month,year):
@@ -110,13 +109,21 @@ class CategoriseTransactions():
                 amount = amount + item['amount']
         return amount
 
-    """
-    @params: company (string)
+        """
+        @params: company (string)
 
-    @Description: Fetches all transactions for a given company and returns the total spending amount for that company.
+        @Description: Fetches all transactions for a given company and returns the total spending amount for that company.
 
-    @return: amount (float), representing the total amount spent on transactions with the given company name.
-    """
+        @return: amount (float), representing the total amount spent on transactions with the given company name.
+        """
+    def getCompaniesPerSector(self,sector):
+        companies = []
+        for item in self.transaction_history:
+            if item['category'][0] == sector:
+                companies.append({"name": item['name'],"value": self.getSpendingForCompany(item['name'])})
+        return companies
+
+    # return total spending for the company name passed in
     def getSpendingForCompany(self,company):
         amount = 0
         for item in self.transaction_history:

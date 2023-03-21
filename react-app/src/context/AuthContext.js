@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
             cache_assets('PUT');
             
-            navigate('/homepage')
+            navigate('/dashboard')
         }
         else {
             alert("Something went wrong!")
