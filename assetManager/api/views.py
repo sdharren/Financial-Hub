@@ -309,6 +309,11 @@ def transaction_data_getter(user):
     first_key = next(iter(accountData))
     return accountData[first_key]
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_bank_access_token(request):
+    return Response(status=200)
+
 """
 @params: user
 
@@ -386,6 +391,20 @@ def select_account(request):
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_bank_account(request):
+    user = request.user
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+
+    debitCards = DebitCard(plaid_wrapper,user)
+    return Response(debitCards.access_tokens,status=200)
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)
