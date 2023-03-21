@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
-import PieChart from './PieChart';
 import Balances from './Balances';
 import Transactions from './RecentTransactionsDisplay';
 import Currency from './Currency';
-import BarChart from './BarChartDisplay';
+import BarChart from './TransactionDisplay';
 
 
 const tabGraphData = {
