@@ -17,9 +17,9 @@ const tabGraphData = {
     { name: 'Graph 3', content: `Content for Graph 3 in Banks tab goes here.` },
   ],
   Crypto: [
-    { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-    { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-    { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
+    { name: 'Pie Chart', content: `Content for crypto 1 in Crypto tab goes here.` },
+    { name: 'Line Graph', content: `Content for crypto 2 in Crypto tab goes here.` },
+    { name: 'Time Scatter Graph', content: `Content for crypto 3 in Crypto tab goes here.` },
   ],
 };
 
