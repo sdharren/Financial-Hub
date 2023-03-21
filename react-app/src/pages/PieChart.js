@@ -10,7 +10,6 @@ import {
     Colors
 } from 'chart.js'
 
-import axios from 'axios';
 import { Pie, getElementsAtEvent } from 'react-chartjs-2';
 
 
