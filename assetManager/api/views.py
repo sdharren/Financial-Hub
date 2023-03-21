@@ -374,6 +374,17 @@ def get_linked_banks(request):
         institutions.append(account.account_institution_name)
     return Response(institutions, content_type='application/json',status = 200)
 
+"""
+    @params:
+        request (HttpRequest): the HTTP request object.
+    
+    @Description: 
+        Retrieve the linked brokerages for the authenticated user.
+
+    @return:
+        Response: the HTTP response object containing a list of brokerage names in JSON format.
+
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def linked_brokerage(request):
@@ -383,6 +394,20 @@ def linked_brokerage(request):
         brokerages.append(brokerage.account_institution_name)
     return Response(brokerages, content_type='application/json',status = 200)
 
+
+"""
+    @params:
+        request: The HTTP request object that contains information about the current request.
+        institution: The name of the linked institution account to be deleted.
+    
+    @Description: 
+        This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
+
+    @return:
+        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+        A HttpResponseBadRequest object with an error message if the account was not found.
+
+"""
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_linked_banks(request, institution):
@@ -395,6 +420,20 @@ def delete_linked_banks(request, institution):
     account_type.delete()
     return HttpResponse(status=204)
 
+
+"""
+    @params:
+        request: The HTTP request object that contains information about the current request.
+        brokerage: The name of the linked brokerage account to be deleted.
+    
+    @Description: 
+        This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
+
+    @return:
+        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+        A HttpResponseBadRequest object with an error message if the account was not found.
+
+"""
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_linked_brokerage(request, brokerage):
