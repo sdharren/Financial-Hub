@@ -56,7 +56,6 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
 
-<<<<<<< HEAD
               <Route path="/plaid_link" element={<Link />}/>
               {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
 
@@ -73,8 +72,6 @@ function App() {
               <Route path="/link_assets" element={<LinkAssets />} />
               <Route path="/accounts" element={<Accounts />} />
               <Route path="/crypto_addresses" element={<CryptoWalletAddresses />} />
-=======
->>>>>>> main
             </Routes>
 
         </AuthProvider>
