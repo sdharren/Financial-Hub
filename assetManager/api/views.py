@@ -5,7 +5,6 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from assetManager.assets.debit_card import DebitCard
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
@@ -324,9 +323,15 @@ def transaction_data_getter(user):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user, ['transactions'])
 
-    debitCards = DebitCard(plaid_wrapper,user)
+    try:
+        debitCards = DebitCard(plaid_wrapper,user)
+    except PublicTokenNotExchanged:
+        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
     #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    try:
+        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    except Exception:
+        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
 
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
@@ -355,9 +360,16 @@ def get_currency_data(request):
     if cache.has_key('currency' + user.email):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
-    debit_card = DebitCard(plaid_wrapper,user)
+    try:
+        debit_card = DebitCard(plaid_wrapper,user)
+    except PublicTokenNotExchanged:
+        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
     #try catch to ensure data is returned
-    account_balances = debit_card.get_account_balances()
+
+    try:
+        account_balances = debit_card.get_account_balances()
+    except Exception:
+        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
 
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
@@ -381,7 +393,11 @@ def get_balances_data(request):
     except PublicTokenNotExchanged:
         return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
 
-    account_balances = debit_card.get_account_balances()
+    try:
+        account_balances = debit_card.get_account_balances()
+    except Exception:
+        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+
     balances = reformatBalancesData(account_balances)
     cache.set('balances' + user.email, account_balances)
     return Response(balances, content_type='application/json', status = 200)
@@ -417,9 +433,17 @@ def recent_transactions(request):
         if(check_institution_name_selected_exists(user,institution_name) is False):
             return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
         concrete_wrapper = DevelopmentWrapper()
-        debit_card = DebitCard(concrete_wrapper,user)
 
-        recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
+        try:
+            debit_card = DebitCard(concrete_wrapper,user)
+        except PublicTokenNotExchanged:
+            return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+
+        try:
+            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
+        except Exception:
+            return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
