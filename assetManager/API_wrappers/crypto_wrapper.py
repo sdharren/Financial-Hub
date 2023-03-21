@@ -69,19 +69,19 @@ def getAllCryptoData(addresses):
             value = getCryptoAddressData.BTC_all(addr)
             arrVal = [value, "btc"]
 
-            data.update(addr, arrVal)
+            data[addr] = arrVal
 
     if(ethAddresses != None):
         for addr in ethAddresses:
             value = getCryptoAddressData.ETH_all(addr)
             arrVal = [value, "eth"]
 
-            data.update(addr, arrVal)
+            data[addr] = arrVal
     
     return data
 
 # Collect select data from api instead of requesting all data
-def getAlternateCryptoData(addresses, command):
+def getAlternateCryptoData(addresses, alternate):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
@@ -92,44 +92,42 @@ def getAlternateCryptoData(addresses, command):
         for addr in btcAddresses:
             value = getCryptoAddressData.BTC_all(addr)
 
-            match command:
-                case "address":
-                    value = getUsableCrypto.getAddress(value, "btc")
-                case "balance":
-                    value = getUsableCrypto.getBalance(value, "btc")
-                case "notx":
-                    value = getUsableCrypto.getNoTx(value, "btc")
-                case "received":
-                    value = getUsableCrypto.getTotalReceived(value, "btc")
-                case "sent":
-                    value = getUsableCrypto.getTotalSent(value, "btc")
-                case "txs":
-                    value = getUsableCrypto.getTxs(value, "btc")
+            if alternate == "address":
+                value = getUsableCrypto.getAddress(value, "btc")
+            elif alternate == "balance":
+                value = getUsableCrypto.getBalance(value, "btc")
+            elif alternate == "notx":
+                value = getUsableCrypto.getNoTx(value, "btc")
+            elif alternate == "received":
+                value = getUsableCrypto.getTotalReceived(value, "btc")
+            elif alternate == "sent":
+                value = getUsableCrypto.getTotalSent(value, "btc")
+            elif alternate == "txs":
+                value = getUsableCrypto.getTxs(value, "btc")
                 
             arrVal = [value, "btc"]
 
-            data.update(addr, arrVal)
+            data[addr] = arrVal
 
     if(ethAddresses != None):
         for addr in ethAddresses:
             value = getCryptoAddressData.ETH_all(addr)
 
-            match command:
-                case "address":
-                    value = getUsableCrypto.getAddress(value, "eth")
-                case "balance":
-                    value = getUsableCrypto.getBalance(value, "eth")
-                case "notx":
-                    value = getUsableCrypto.getNoTx(value, "eth")
-                case "received":
-                    value = getUsableCrypto.getTotalReceived(value, "eth")
-                case "sent":
-                    value = getUsableCrypto.getTotalSent(value, "eth")
-                case "txs":
-                    value = getUsableCrypto.getTxs(value, "eth")
+            if alternate == "address":
+                value = getUsableCrypto.getAddress(value, "eth")
+            elif alternate == "balance":
+                value = getUsableCrypto.getBalance(value, "eth")
+            elif alternate == "notx":
+                value = getUsableCrypto.getNoTx(value, "eth")
+            elif alternate == "received":
+                value = getUsableCrypto.getTotalReceived(value, "eth")
+            elif alternate == "sent":
+                value = getUsableCrypto.getTotalSent(value, "eth")
+            elif alternate == "txs":
+                value = getUsableCrypto.getTxs(value, "eth")
             
             arrVal = [value, "eth"]
 
-            data.update(addr, arrVal)
+            data[addr] = arrVal
 
     return data
