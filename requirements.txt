@@ -39,3 +39,5 @@ soupsieve==2.4
 webencodings==0.5.1
 yfinance==0.2.12
 # /\ /\ /\ /\
+bitcoin==1.1.39
+blockcypher==1.0.93
