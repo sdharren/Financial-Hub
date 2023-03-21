@@ -5,7 +5,10 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
+
+from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.assets.debit_card import DebitCard
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
@@ -14,12 +17,12 @@ from dateutil.tz import tzlocal
 import datetime
 from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, getUsableCrypto, getCryptoAddressData
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
 from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
@@ -239,6 +242,26 @@ def sector_spending(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def crypto_all_data(request):
+    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    data = getAllCryptoData(addresses=stored_addresses)
+
+    return Response(data, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_select_data(request):
+    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    if request.GET.get('param'):
+        data = getAlternateCryptoData(addresses=stored_addresses, command=(request.GET.get('param')))
+    else:
+        raise Exception
+        # should return bad request
+
+    return Response(data, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def yearlyGraph(request):
     transactions = BankGraphData(cacheBankTransactionData(request.user))
     graphData = transactions.yearlySpending()
@@ -332,11 +355,13 @@ def get_currency_data(request):
     if cache.has_key('currency' + user.email):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
-    debit_card = DebitCard(plaid_wrapper,user)
+        debit_card = DebitCard(plaid_wrapper,user)
     #try catch to ensure data is returned
+
     account_balances = debit_card.get_account_balances()
 
     currency = reformat_balances_into_currency(account_balances)
+    
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
     cache.set('currency' + user.email, proportion_currencies)
 
@@ -369,22 +394,22 @@ def get_balances_data(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
-        if cache.has_key('balances' + request.user.email) is False:
-            return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+        if request.GET.get('param'):
+            institution_name = request.GET.get('param')
+            if cache.has_key('balances' + request.user.email) is False:
+                return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+            else:
+                account_balances = cache.get('balances' + request.user.email)
+
+            if institution_name not in list(account_balances.keys()):
+                return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
+
+            accounts = reformatAccountBalancesData(account_balances,institution_name)
+
+            return Response(accounts, content_type='application/json',status = 200)
+
         else:
-            account_balances = cache.get('balances' + request.user.email)
-
-        if institution_name not in list(account_balances.keys()):
-            return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
-
-        accounts = reformatAccountBalancesData(account_balances,institution_name)
-
-        return Response(accounts, content_type='application/json',status = 200)
-
-    else:
-        return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
+            return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
 
 def delete_balances_cache(user):
