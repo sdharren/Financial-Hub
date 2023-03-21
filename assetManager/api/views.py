@@ -376,13 +376,12 @@ def get_linked_banks(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_linked_stocks(request):
-    get_balances_wrapper(request.user)
+def linked_brokerage(request):
     account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.STOCK)
-    stocks = []
-    for stock in account_types:
-        stocks.append(stock.account_institution_name)
-    return Response(stocks, content_type='application/json',status = 200)
+    brokerages = []
+    for brokerage in account_types:
+        brokerages.append(brokerage.account_institution_name)
+    return Response(brokerages, content_type='application/json',status = 200)
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

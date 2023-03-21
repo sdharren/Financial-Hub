@@ -13,15 +13,14 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import AccountTypeEnum,AccountType
 from assetManager.assets.debit_card import DebitCard
 
-class GetLinkedBankViewsTestCase(TestCase):
+class GetLinkedBrokerageViewsTestCase(TestCase):
     """Tests of the log in view."""
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]
 
     def setUp(self):
-
-        self.url = reverse('get_linked_banks')
+        self.url = reverse('linked_brokerage')
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
         self.client.login(email=self.user.email, password='Password123')
@@ -30,7 +29,7 @@ class GetLinkedBankViewsTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
     def test_link_banks_transactions_url(self):
-        self.assertEqual(self.url,'/api/get_linked_banks/')
+        self.assertEqual(self.url,'/api/linked_brokerage/')
 
     def test_get_institution_data_without_jwt_not_logged_in(self):
         self.client.credentials()
@@ -43,19 +42,20 @@ class GetLinkedBankViewsTestCase(TestCase):
 
     
 
-    def test_get_linked_institution_name(self):
+    def test_get_linked_brokerage_name(self):
         settings.PLAID_DEVELOPMENT = False
         AccountType.objects.create(
             user = self.user,
-            account_asset_type = AccountTypeEnum.DEBIT,
+            account_asset_type = AccountTypeEnum.STOCK,
             access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
-            account_institution_name = 'HSBC',
+            account_institution_name = 'Vanguard',
         )
         response = self.client.get(self.url,follow = True)
         self.assertEqual(response.status_code,200)
-        institution_name = response.json()
-        self.assertEqual(institution_name,['HSBC'])
+        brokerage_name = response.json()
+        self.assertEqual(brokerage_name,['Vanguard'])
 
+    
     def test_get_no_linked_institution(self):
         settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url,follow = True)
@@ -63,30 +63,30 @@ class GetLinkedBankViewsTestCase(TestCase):
         institution_name = response.json()
         self.assertEqual(institution_name,[])
 
-        
+
     def test_get_multiple_linked_institution_names(self):
         settings.PLAID_DEVELOPMENT = False
         AccountType.objects.create(
             user = self.user,
-            account_asset_type = AccountTypeEnum.DEBIT,
+            account_asset_type = AccountTypeEnum.STOCK,
             access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
-            account_institution_name = 'HSBC',
+            account_institution_name = 'Vanguard',
         )
         AccountType.objects.create(
             user = self.user,
-            account_asset_type = AccountTypeEnum.DEBIT,
+            account_asset_type = AccountTypeEnum.STOCK,
             access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
-            account_institution_name = 'Barclays',
+            account_institution_name = 'Fidelity',
         )
         response = self.client.get(self.url,follow = True)
         self.assertEqual(response.status_code,200)
         institution_name = response.json()
-        self.assertEqual(institution_name,['HSBC','Barclays'])
+        self.assertEqual(institution_name,['Vanguard', 'Fidelity'])
 
 
     def test_get_linked_banks_with_unauthenticated_user(self):
         settings.PLAID_DEVELOPMENT = False
         self.client.logout()
-        url = reverse('get_linked_banks')
+        url = reverse('linked_brokerage')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 401)

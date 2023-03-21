@@ -28,5 +28,6 @@ urlpatterns = [
     path('currency_data/', views.get_currency_data, name='currency_data'),
     path('recent_transactions/', views.recent_transactions, name='recent_transactions'),
     path('get_linked_banks/', views.get_linked_banks, name='get_linked_banks'),
+    path('linked_brokerage/', views.linked_brokerage, name='linked_brokerage'),
     path('delete_linked_bank/<str:institution>/', views.delete_linked_banks, name='delete_linked_banks'),
 ]
