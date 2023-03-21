@@ -351,9 +351,6 @@ def get_balances_data(request):
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
-        #if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
-        #    delete_balances_cache(user)
-        #else:
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
     try:

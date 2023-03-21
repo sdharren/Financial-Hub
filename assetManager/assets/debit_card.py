@@ -74,7 +74,6 @@ class DebitCard():
         self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
         self.bank_graph_data = {}
 
-
     """
     @params: token for plaid_wrapper
 

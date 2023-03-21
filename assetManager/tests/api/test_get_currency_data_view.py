@@ -8,12 +8,18 @@ from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
+from django.core.cache import cache
+from assetManager.assets.debit_card import DebitCard
+from assetManager.models import User,AccountType,AccountTypeEnum
 
 class GetCurrencyDataViewTestCase(TestCase):
     """Tests of the log in view."""
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]
+
+    def tearDown(self):
+        cache.clear()
 
     def setUp(self):
         self.url = reverse('currency_data')
@@ -155,6 +161,22 @@ class GetCurrencyDataViewTestCase(TestCase):
         response = self.client.get(self.url, follow=True)
         response_2 = self.client.get(self.url, follow=True)
         response_json = json.loads(response_2.content)
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0], "USD")
+        self.assertEqual(response_data['USD'], 100)
+        self.assertEqual(response.status_code,200)
+
+    def test_get_currencies_for_multiple_institution(self):
+        before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+        debit_card = DebitCard(plaid_wrapper, self.user)
+        response = self.client.get(self.url, follow=True)
+        after_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.assertEqual(after_count, before_count + 2)
+        response_json = json.loads(response.content)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0], "USD")
         self.assertEqual(response_data['USD'], 100)
