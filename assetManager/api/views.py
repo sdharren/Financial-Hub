@@ -5,8 +5,10 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
+
 from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.assets.debit_card import DebitCard
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
@@ -15,7 +17,6 @@ from dateutil.tz import tzlocal
 import datetime
 from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
@@ -24,7 +25,7 @@ from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, getUsableCrypto, getCryptoAddressData
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
-from decimal import Decimal
+from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -213,6 +214,32 @@ def retrieve_stock_getter(user):
         cache.set('investments' + user.email, stock_getter.investments)
     return stock_getter
 
+"""
+@params: request
+
+@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def company_spending(request):
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    if request.GET.get('param'):
+        sector = request.GET.get('param')
+    else:
+        raise Exception
+        # should return bad request
+    graphData = transactions.companySpendingPerSector(sector)
+    return Response(graphData, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def sector_spending(request):
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    graphData = transactions.orderedCategorisedSpending()
+    return Response(graphData, content_type='application/json')
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def crypto_all_data(request):
@@ -236,14 +263,22 @@ def crypto_select_data(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
-    transactions = cacheBankTransactionData(request.user)
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
+"""
+@params: request
+
+@Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
+     to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
-    transactions = cacheBankTransactionData(request.user)
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
@@ -252,10 +287,18 @@ def monthlyGraph(request):
     graphData = transactions.monthlySpendingInYear(int(yearName))
     return Response(graphData, content_type='application/json')
 
+"""
+@params: request
+
+@Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
+     to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
-    transactions = cacheBankTransactionData(request.user)
+    transactions = BankGraphData(cacheBankTransactionData(request.user))
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
@@ -264,6 +307,14 @@ def weeklyGraph(request):
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
 
+"""
+@params: user
+
+@Description: Sets the correct wrapper depending on the PLAID_DEVELOPMENT setting and then if it sets the SandboxWrapper it creates all the necessary tokens.
+    Then queries plaid for all the transactions from the access tokens stored, and inserts them into a BankGraphData object and returns the relevant object
+
+@return: BankGraphDataObject with the users transaction history stored inside
+"""
 def transaction_data_getter(user):
     if settings.PLAID_DEVELOPMENT:
         plaid_wrapper = DevelopmentWrapper()
@@ -274,124 +325,25 @@ def transaction_data_getter(user):
         plaid_wrapper.save_access_token(user, ['transactions'])
 
     debitCards = DebitCard(plaid_wrapper,user)
-    debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
+    #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
+    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
     return accountData[first_key]
-    # return accountData[0]
 
+"""
+@params: user
+
+@Description: if the transactions for the user have already been cached then it returns the transaction otherwise it caches the transaction data
+
+@return: json of transaction data for the account
+"""
 def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
         cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
-    return BankGraphData(json.loads(cache.get('transactions' + user.email)))
 
-
-def get_currency_converter():
-    if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
-    else:
-        input_date = datetime.datetime.today()
-
-    return input_date
-"""
-@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
-
-@Description: -Iterates through account_balances extracting every account and total amount of liquid assets in that account for a specific currency
-              -Calculates percentage totals for all unique currencies for total overall amounts in all accounts
-
-@return: Reformatted dictionary containing the percentage amount of liquidity overall categorised by currency for all accounts in all linked institutions
-"""
-def reformat_balances_into_currency(account_balances):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    currency_total = {}
-    currency_rates =  CurrencyRates()
-
-    input_date = get_currency_converter()
-
-    for institution in account_balances.keys():
-        for account in account_balances[institution].keys():
-            currency_type = account_balances[institution][account]['currency']
-            amount = account_balances[institution][account]['available_amount']
-            if currency_type not in currency_total.keys():
-                currency_total[currency_type] = 0
-
-            result = currency_rates.convert(currency_type, 'GBP', amount,input_date)
-            currency_total[currency_type] +=  result
-
-    return currency_total
-
-def calculate_perentage_proportions_of_currency_data(currency_total):
-    proportions = {}
-    total_money = sum(currency_total.values())
-
-    for currency, amount in currency_total.items():
-        proportion = amount / total_money
-        proportions[currency] = round((proportion * 100),2)
-
-    return proportions
-
-"""
-@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key, institution_name string representing the name of the institution name
-
-@Description: -Iterates through all account_balances extracting every account and total amount of liquid assets in that account for a specific the passed insitution
-              -Creates a dictionary (key: name of the account, value: amount in that account)
-              -Uses GBP as unique currency for quantifying amounts
-
-@return: Reformatted dictionary containing all accounts and corresponding amount in that account
-"""
-def reformatAccountBalancesData(account_balances,institution_name):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    if institution_name not in account_balances.keys():
-        raise Exception("passed institution_name is not account balances dictionary")
-
-    currency_rates =  CurrencyRates()
-    input_date = get_currency_converter()
-    accounts = {}
-    duplicates = 0
-    for account in account_balances[institution_name].keys():
-        total = 0
-        total += currency_rates.convert(account_balances[institution_name][account]['currency'], 'GBP',account_balances[institution_name][account]['available_amount'],input_date)
-
-        if account_balances[institution_name][account]['name'] in accounts.keys():
-            duplicates += 1
-            accounts[account_balances[institution_name][account]['name'] + '_' + str(duplicates)] = total
-        else:
-            accounts[account_balances[institution_name][account]['name']] = total
-
-    return accounts
-
-def reformatBalancesData(account_balances):
-    if type(account_balances) is not dict:
-        raise TypeError("account balances must be of type dict")
-
-    balances = {}
-
-    currency_rates =  CurrencyRates()
-    input_date = get_currency_converter()
-
-    for institution_name in account_balances.keys():
-        total = 0
-        for account_id in account_balances[institution_name].keys():
-            total += currency_rates.convert(account_balances[institution_name][account_id]['currency'], 'GBP', account_balances[institution_name][account_id]['available_amount'],input_date)
-
-        balances[institution_name] = total
-
-    return balances
-
-def get_balances_wrapper(user):
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token_custom_user()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
-    return plaid_wrapper
+    return (json.loads(cache.get('transactions' + user.email)))
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -405,10 +357,14 @@ def get_currency_data(request):
 
         debit_card = DebitCard(plaid_wrapper,user)
     #try catch to ensure data is returned
-        account_balances = debit_card.get_account_balances()
-        currency = reformat_balances_into_currency(account_balances)
+
+    account_balances = debit_card.get_account_balances()
+
+    currency = reformat_balances_into_currency(account_balances)
+    
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
     cache.set('currency' + user.email, proportion_currencies)
+
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
 @api_view(['GET'])
@@ -420,10 +376,10 @@ def get_balances_data(request):
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
-        if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
-            delete_balances_cache(user)
-        else:
-            return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
+        #if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
+        #    delete_balances_cache(user)
+        #else:
+        return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
     try:
         debit_card = DebitCard(plaid_wrapper,user)
@@ -433,7 +389,6 @@ def get_balances_data(request):
     account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
     cache.set('balances' + user.email, account_balances)
-
     return Response(balances, content_type='application/json', status = 200)
 
 @api_view(['GET'])
@@ -459,3 +414,27 @@ def select_account(request):
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def recent_transactions(request):
+    user = request.user
+    if request.GET.get('param'):
+        institution_name = request.GET.get('param')
+        bank_graph_data_insight = cacheBankTransactionData(user)
+        if(check_institution_name_selected_exists(user,institution_name) is False):
+            return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
+        concrete_wrapper = DevelopmentWrapper()
+        debit_card = DebitCard(concrete_wrapper,user)
+
+        recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
+        return Response(recent_transactions,content_type='application/json',status = 200)
+    else:
+        return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_linked_assets(request):
+    account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
+    reformatted = [account_type.account_institution_name]
+    return Response(reformatted, content_type='application/json',status = 200)
