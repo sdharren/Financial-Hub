@@ -107,9 +107,9 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     return (
         <div>
             {
-                endpoint==='investment_categories' 
-                ? null 
-                : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
+                selectOptions !== undefined 
+                ? <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
+                : null
             }
             <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
