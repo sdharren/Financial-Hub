@@ -34,6 +34,9 @@ class APIViewsTestCase(TestCase):
 
     def tearDown(self):
         cache.delete('investmentsjohndoe@example.org')
+        cache.delete('balancesjohndoe@example.org')
+        cache.delete('transactionsjohndoe@example.org')
+
 
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
@@ -93,13 +96,30 @@ class APIViewsTestCase(TestCase):
         response = client.put('/api/cache_assets/')
         self.assertEqual(response.status_code, 303)
 
-    def test_put_cache_assets_works(self):
-        cache.delete('investments' + self.user.email)
-        # setup investments
+    def test_put_cache_assets_returns_see_other_with_no_linked_transactions(self):
+        client = APIClient()
+        user = User.objects.get(email='lillydoe@example.org')
+
         wrapper = SandboxWrapper()
         public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
         wrapper.exchange_public_token(public_token)
-        wrapper.save_access_token(self.user, ['investments'])
+        wrapper.save_access_token(user, ['investments'])
+
+        client.login(email=user.email, password='Password123')
+        response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
+        jwt = str(response.data['access'])
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
+        response = client.put('/api/cache_assets/')
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.content.decode('utf-8'), '{"error":"Transactions Not Linked."}')
+
+    def test_put_cache_assets_works(self):
+        #cache.delete('investments' + self.user.email)
+        # setup investments
+        wrapper = SandboxWrapper()
+        public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments','transactions'])
+        wrapper.exchange_public_token(public_token)
+        wrapper.save_access_token(self.user, ['investments','transactions'])
         response = self.client.put('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
 
@@ -108,6 +128,18 @@ class APIViewsTestCase(TestCase):
         investments = stock_getter.investments
         cached_investments = cache.get('investments' + self.user.email)
         self.assertEqual(len(investments), len(cached_investments))
+
+        balances = cache.get('balances' + self.user.email)
+        self.assertEqual(list(balances.keys())[0], 'Vanguard')
+
+        for all_accounts in balances['Vanguard']:
+            self.assertTrue('name' in balances['Vanguard'][all_accounts])
+            self.assertTrue('available_amount' in balances['Vanguard'][all_accounts])
+            self.assertTrue('current_amount' in balances['Vanguard'][all_accounts])
+            self.assertTrue('type' in balances['Vanguard'][all_accounts])
+            self.assertTrue('currency' in balances['Vanguard'][all_accounts])
+
+
 
     def test_delete_cache_assets_works(self):
         self.assertTrue(cache.has_key('investments' + self.user.email))
@@ -128,6 +160,7 @@ class APIViewsTestCase(TestCase):
         self.assertTrue(len(response.data) > 10)
 
     def test_stock_history_returns_see_other_with_no_investments_linked(self):
+        cache.clear()
         client = APIClient()
         user = User.objects.get(email='lillydoe@example.org')
         client.login(email=user.email, password='Password123')

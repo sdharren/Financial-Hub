@@ -117,6 +117,7 @@ class DebitCard():
         )
 
         transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+        return transaction_response
 
     """
     @params:

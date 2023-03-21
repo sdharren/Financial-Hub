@@ -175,10 +175,33 @@ def cache_assets(request):
         except InvestmentsNotLinked:
             return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
         cache.set('investments' + user.email, stock_getter.investments)
+
+        #caching of bank related investements
+        #Balances
+        try:
+            debit_card = DebitCard(wrapper,request.user)
+        except PublicTokenNotExchanged:
+            return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+
+        account_balances = debit_card.get_account_balances()
+        cache.set('balances' + user.email, account_balances)
+
+        #cacheBankTransactionData(request.user) #transactions
+
     elif request.method == 'DELETE':
         user = request.user
         if cache.has_key('investments' + user.email):
             cache.delete('investments' + user.email)
+
+        #test in api views -> augusto
+        if cache.has_key('transactions' + user.email):
+            cache.delete('transactions' + user.email)
+
+        if cache.has_key('currency' + user.email):
+            cache.delete('currency' + user.email)
+
+        if cache.has_key('balances' + user.email):
+            cache.delete('balances' + user.email)
     return Response(status=200)
 
 @api_view(['GET'])
