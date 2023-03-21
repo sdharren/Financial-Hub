@@ -395,3 +395,14 @@ def delete_linked_banks(request, institution):
     account_type.delete()
     return HttpResponse(status=204)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_brokerage(request, brokerage):
+    
+    account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
