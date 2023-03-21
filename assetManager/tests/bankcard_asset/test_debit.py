@@ -94,7 +94,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Uber')
 
     """
-    #fix logic
+
     def test_get_recent_transactions_with_multiple_institutions(self):
         before_accountype_objects_count = AccountType.objects.count()
         AccountType.objects.create(
@@ -158,7 +158,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_hsbc['HSBC'][0]['category'],['Payment', 'Credit Card'])
         self.assertEqual(recent_transactions_hsbc['HSBC'][1]['category'],['Payment', 'Credit Card'])
 
-    #logic
+
     def test_get_recent_transactions_with_one_institution_linked_and_today_dates(self):
         self.recent_transactions = recent_transactions_dict
         self.assertEqual(len(self.recent_transactions[0]),5)
