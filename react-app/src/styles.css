@@ -11,15 +11,25 @@ body {
 
 .nav {
     color: white;
-    display: flex;
-    margin-top: 29px;
+    /* display: flex; */
+    /* margin-top: 29px;
     margin-left: 189px;
-    margin-right: 189px;
-    justify-content: space-between;
-    align-items: center;
+    margin-right: 189px; */
+    /* margin : 1% 10%; */
+    /* justify-content: space-between;
+    align-items: center; */
     gap: 2rem;
     padding: 0 1rem;
+    border-style: solid;
+    border-color: black;
+    border-bottom-width: 4px;
 
+}
+.navbarContents {
+    margin: 1% 10%;
+    display : flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .nav ul {
@@ -34,6 +44,8 @@ body {
     color: inherit;
     text-decoration: none;
 }
+
+
 
 
 .site-title {
@@ -58,42 +70,85 @@ body {
     background: white;
 }
 
+.nav a,
+.nav .nav-logout {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav .nav-logout:hover {
+  cursor: pointer;
+}
+
+.nav li > a::after,
+.nav li > .nav-logout::after {
+  content: "";
+  display: block;
+  margin: auto;
+  height: 3px;
+  width: 0;
+  top: 5px;
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.nav li > a:hover::after,
+li > a.active-nav::after,
+.nav li > .nav-logout:hover::after {
+  width: 100%;
+  background: white;
+}
+
+/* .logout {
+  width: 100%;
+  background: white;
+} */
+
+.home_text_holder {
+  overflow: hidden;
+}
+
 .home__content__holder {
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: scale(0.85, 0.85);
+  margin-top: -50px;
+  
 }
 
 .home__box {
     position: relative;
     max-width: 100%;
-    /*Might refactor underneath  */
-    filter: drop-shadow(5px 5px 4px #4444);
-    outline: transparent;
-    box-shadow: 0px;
-    padding: 10px;
-    margin-left: -60%;
-    margin-top: 25px;
-    width: 1000px;
-    height: 300px;
-    text-align: center;
-    overflow: hidden;
+    align-items: center;
+    
   }
 
   .home__background__image {
     display: block;
     max-width: 100%;
     height: auto;
-   
+    
 }
 
 .home__content {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 35%;
+  transform: translate(-30%, -50%);
   display: flex;
-  align-items: center;
+  align-items: start;
+  width: 80%;
+}
+
+.home__first__content {
+  position: absolute;
+  top: 50%;
+  left: 35%;
+  transform: translate(-35%, -50%);
+  display: flex;
+  align-items: start;
+  width: 80%;
 }
 
 .home__first__image {
@@ -103,10 +158,23 @@ body {
 
 .home-text {
 font-family: 'Outfit', sans-serif;
-font-size: 2.3em;
+font-size: 2.6em;
+max-width: 120%;
 
 
 }
+
+.home__second__content__holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -160px;
+  transform: scale(0.85, 0.85);
+  
+}
+
+
+
   .signup-container {
     max-width: 28rem;
     width: 100%;
@@ -338,9 +406,7 @@ font-size: 2.3em;
 /* Investment Graphs Display */
 .tab {
     float: left;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-    width: 30%;
+    width: 10%;
     height: 500px;
     height: 31.25rem;
 }
@@ -348,7 +414,7 @@ font-size: 2.3em;
 .tab button {
     display: block;
     background-color: inherit;
-    color: black;
+    color: white;
     padding: 22px 16px;
     width: 100%;
     border: none;
@@ -356,6 +422,7 @@ font-size: 2.3em;
     text-align: left;
     cursor: pointer;
     transition: 0.3s;
+    overflow: hidden;
 }
 
 .tab button:hover {
@@ -363,23 +430,40 @@ font-size: 2.3em;
 }
 
 .tab button.active {
-    background-color: #ccc;
+    font-weight: bold;
 }
 
 .tabcontent {
     float: left;
     padding: 0px 12px;
-    border: 1px solid #ccc;
-    width: 70%;
+    border: 1px solid #ccc !important;
+    width: 90%;
     border-left: none;
     height: 500px;
     height: 31.25rem;
 }
 
 .investment-graphs {
-    height: 1000px;
+    position: absolute;
+    left: 5rem;
+    right: 5rem;
 }
-    
+
+.investment-pie {
+    margin: auto;
+}
+ 
+.graph-select {
+    color: #000000 !important;
+    float: left;
+    overflow: hidden;
+    width: 10rem;
+    margin-top: 10px;
+    margin-to: 0.625rem;
+}
+
+.select-option {
+}
  
 .about-page {
   text-align: center;

@@ -37,5 +37,5 @@ class YFinanceWrapperTestCase(TestCase):
             self.wrapper.getIndexValues("SPY")
 
     def test_is_ticker_supported_works(self):
-        data = self.wrapper.is_ticker_supported("ACHN")
+        data = self.wrapper.is_ticker_supported("AAPL")
         self.assertTrue(data)
