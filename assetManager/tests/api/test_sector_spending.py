@@ -10,7 +10,7 @@ from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 from rest_framework.test import force_authenticate
 from rest_framework.exceptions import ErrorDetail
-from assetManager.api.views import yearlyGraph, monthlyGraph, weeklyGraph, transaction_data_getter, cacheBankTransactionData
+from assetManager.api.views import sector_spending, company_spending
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
@@ -39,88 +39,44 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     def tearDown(self):
         cache.clear()
 
-    # tests for yearly graph view
+    # tests for sector_spending graph view
 
-    def test_yearly_graph_with_param(self):
-        request = self.factory.get('/yearly-graph/?param=2022')
+    def test_sector_spending_graph_with_param(self):
+        request = self.factory.get('/sector_spending/')
         force_authenticate(request, user=self.user)
-        response = yearlyGraph(request)
+        response = sector_spending(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
-    def test_yearly_graph_without_authentication(self):
-        request = self.factory.get('yearly-graph/?param=2022')
-        response = yearlyGraph(request)
+    def test_sector_spending_graph_without_authentication(self):
+        request = self.factory.get('/sector_spending/')
+        response = sector_spending(request)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(
             response.data['detail'],
             ErrorDetail('Authentication credentials were not provided.', code='not_authenticated')
         )
 
-    # tests for monthly graph view
+    # tests for company_spending graph view
 
-    def test_monthly_graph_with_param(self):
-        request = self.factory.get('/monthly-graph/?param=2022')
+    def test_company_spending_graph_with_param(self):
+        request = self.factory.get('/company_spending/?param=Transport')
         force_authenticate(request, user=self.user)
-        response = monthlyGraph(request)
+        response = company_spending(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
-    def test_monthly_graph_without_param(self):
-        request = self.factory.get('/monthly-graph/')
+    def test_company_spending_graph_without_authentication(self):
+        request = self.factory.get('/company_spending/?param=Transport')
+        response = company_spending(request)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(
+            response.data['detail'],
+            ErrorDetail('Authentication credentials were not provided.', code='not_authenticated')
+        )
+
+    def test_company_spending_graph_without_param(self):
+        request = self.factory.get('/company_spending-graph/')
         force_authenticate(request, user=self.user)
         with self.assertRaises(Exception):
-            monthlyGraph(request)
-
-    def test_monthly_graph_without_authentication(self):
-        request = self.factory.get('/monthly-graph/?param=2022')
-        response = monthlyGraph(request)
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(
-            response.data['detail'],
-            ErrorDetail('Authentication credentials were not provided.', code='not_authenticated')
-        )
-
-    # tests for weekly graph view
-
-    def test_weekly_graph_with_param(self):
-        request = self.factory.get('/weekly-graph/?param=May+2022')
-        force_authenticate(request, user=self.user)
-        response = weeklyGraph(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-
-    def test_weekly_graph_without_param(self):
-        request = self.factory.get('/weekly-graph/')
-        force_authenticate(request, user=self.user)
-        with self.assertRaises(Exception):
-            weeklyGraph(request)
-
-    def test_weekly_graph_without_authentication(self):
-        request = self.factory.get('/weekly-graph/?param=2022')
-        response = weeklyGraph(request)
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(
-            response.data['detail'],
-            ErrorDetail('Authentication credentials were not provided.', code='not_authenticated')
-        )
-
-    # tests for cache bank transaction data view
-
-    def test_cache_bank_transaction_data(self):
-        bankgraphdata = BankGraphData(cacheBankTransactionData(self.user))
-        cached_data = json.loads(cache.get('transactions' + self.user.email))
-        correct_data = bankgraphdata.transactionInsight.transaction_history
-        self.assertNotEqual(correct_data,"")
-        self.assertNotEqual(cached_data,"")
-        self.assertEqual(correct_data,cached_data)
-        self.assertIsInstance(cached_data, list)
-        all(self.assertIsInstance(transaction, dict) for transaction in cached_data)
-
-    # test for transaction data getter view
-
-    def test_transaction_data_getter(self):
-        json_data = transaction_data_getter(self.user).transactionInsight.transaction_history
-        self.assertNotEqual(json_data,"")
-        self.assertIsInstance(json_data, list)
-        all(self.assertIsInstance(transaction, dict) for transaction in json_data)
+            company_spending(request)
