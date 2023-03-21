@@ -1,6 +1,6 @@
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.assets.debit_card import DebitCard, format_accounts_data,InvalidInstitution
+from assetManager.assets.debit_card import DebitCard, format_accounts_data,bankDataEmpty
 from django.test import TestCase
 from assetManager.models import User, AccountType, AccountTypeEnum
 from datetime import date
@@ -14,8 +14,12 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from dateutil.tz import tzlocal
 import datetime
 from datetime import date
+from assetManager.tests.bankcard_asset.multiple_transactions import multiple_transactions_dict
+from assetManager.tests.bankcard_asset.recent_transactions import recent_transactions_dict, multiple_recent_transactions_dict
+from assetManager.tests.bankcard_asset.single_transaction import single_transaction_dict
+from datetime import timedelta
+from django.conf import settings
 
-#change locations of long jsons
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     #recursively checks that two dictionaries have the same structure and have the same value
@@ -33,450 +37,13 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.user = User.objects.get(email='johndoe@example.org')
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(self.user, ['transactions'])
         self.debit_card = DebitCard(plaid_wrapper, self.user)
-
-        self.recent_transactions = [[{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
-         'account_owner': None,
-         'amount': 896.65,
-         'authorized_date': date.today(),
-         'authorized_datetime': None,
-         'category': ['Transfer', 'Debit'],
-         'category_id': '21006000',
-         'check_number': None,
-         'date': datetime.date(2022, 12, 17),
-         'datetime': None,
-         'iso_currency_code': 'USD',
-         'location': {'address': None,
-            'city': None,
-            'country': None,
-            'lat': None,
-            'lon': None,
-            'postal_code': None,
-            'region': None,
-            'store_number': None},
-         'merchant_name': 'Bank Of Switzerland',
-         'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C',
-         'payment_channel': 'in store',
-         'payment_meta': {'by_order_of': None,
-                'payee': None,
-                'payer': None,
-                'payment_method': None,
-                'payment_processor': None,
-                'ppd_id': None,
-                'reason': None,
-                'reference_number': None},
-         'pending': False,
-         'pending_transaction_id': None,
-         'personal_finance_category': None,
-         'transaction_code': None,
-         'transaction_id': 'PaJgwMn4y9fbPzjdPbl5hg9zN8kg1pSXyWRn6',
-         'transaction_type': 'special',
-         'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
-         'account_owner': None,
-         'amount': 398.34,
-         'authorized_date': date.today(),
-         'authorized_datetime': None,
-         'category': ['Food and Drink', 'Restaurants', 'Fast Food'],
-         'category_id': '21006000',
-         'check_number': None,
-         'date': datetime.date(2022, 12, 17),
-         'datetime': None,
-         'iso_currency_code': 'GBP',
-         'location': {'address': None,
-            'city': None,
-            'country': None,
-            'lat': None,
-            'lon': None,
-            'postal_code': None,
-            'region': None,
-            'store_number': None},
-         'merchant_name': 'Eat Tokyo',
-         'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A',
-         'payment_channel': 'in store',
-         'payment_meta': {'by_order_of': None,
-                'payee': None,
-                'payer': None,
-                'payment_method': None,
-                'payment_processor': None,
-                'ppd_id': None,
-                'reason': None,
-                'reference_number': None},
-         'pending': False,
-         'pending_transaction_id': None,
-         'personal_finance_category': None,
-         'transaction_code': None,
-         'transaction_id': '4e1XPQq43Bs5L4m6L5pEFGgjMA5GQvUlRAPKp',
-         'transaction_type': 'special',
-         'unofficial_currency_code': None}, {'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
-         'account_owner': None,
-         'amount': 1708.12,
-         'authorized_date':date.today(),
-         'authorized_datetime': None,
-         'category': ['Food and Drink', 'Restaurants'],
-         'category_id': '13005000',
-         'check_number': None,
-         'date': datetime.date(2022, 12, 16),
-         'datetime': None,
-         'iso_currency_code': 'INR',
-         'location': {'address': None,
-            'city': None,
-            'country': None,
-            'lat': None,
-            'lon': None,
-            'postal_code': None,
-            'region': None,
-            'store_number': None},
-         'merchant_name': 'Burger and Lobster',
-         'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 CRGKFKKSPABG UXZYOTAYLDA D',
-         'payment_channel': 'in store',
-         'payment_meta': {'by_order_of': None,
-                'payee': None,
-                'payer': None,
-                'payment_method': None,
-                'payment_processor': None,
-                'ppd_id': None,
-                'reason': None,
-                'reference_number': None},
-         'pending': False,
-         'pending_transaction_id': None,
-         'personal_finance_category': None,
-         'transaction_code': None,
-         'transaction_id': 'NxJp9Qkdemcw4X7L4wW5cwqryvjwepTXA5wzp',
-         'transaction_type': 'place',
-         'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
-         'account_owner': None,
-         'amount': 1109.01,
-         'authorized_date': date.today(),
-         'authorized_datetime': None,
-         'category': ['Transfer', 'Debit'],
-         'category_id': '21006000',
-         'check_number': None,
-         'date': datetime.date(2022, 12, 16),
-         'datetime': None,
-         'iso_currency_code': 'NOK',
-         'location': {'address': None,
-            'city': None,
-            'country': None,
-            'lat': None,
-            'lon': None,
-            'postal_code': None,
-            'region': None,
-            'store_number': None},
-         'merchant_name': None,
-         'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 KABCRGKSPKFG YOTALDUXZYA B',
-         'payment_channel': 'in store',
-         'payment_meta': {'by_order_of': None,
-                'payee': None,
-                'payer': None,
-                'payment_method': None,
-                'payment_processor': None,
-                'ppd_id': None,
-                'reason': None,
-                'reference_number': None},
-         'pending': False,
-         'pending_transaction_id': None,
-         'personal_finance_category': None,
-         'transaction_code': None,
-         'transaction_id': 'aWQwlaxAE4tKn1bEnKAvimBLNpMm7DtkKQMvK',
-         'transaction_type': 'special',
-         'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRkl',
-         'account_owner': None,
-         'amount': 200,
-         'authorized_date': datetime.date(2022, 12, 16),
-         'authorized_datetime': None,
-         'category': ['Transfer', 'Debit'],
-         'category_id': '21006000',
-         'check_number': None,
-         'date': datetime.date(2022, 12, 16),
-         'datetime': None,
-         'iso_currency_code': 'NOK',
-         'location': {'address': None,
-            'city': None,
-            'country': None,
-            'lat': None,
-            'lon': None,
-            'postal_code': None,
-            'region': None,
-            'store_number': None},
-         'merchant_name': None,
-         'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 KABCRGKSPKFG YOTALDUXZYA B',
-         'payment_channel': 'in store',
-         'payment_meta': {'by_order_of': None,
-                'payee': None,
-                'payer': None,
-                'payment_method': None,
-                'payment_processor': None,
-                'ppd_id': None,
-                'reason': None,
-                'reference_number': None},
-         'pending': False,
-         'pending_transaction_id': None,
-         'personal_finance_category': None,
-         'transaction_code': None,
-         'transaction_id': 'aWQwlaxAE4tKn1bEnKAvimBLNpMm7DtkKQMkl',
-         'transaction_type': 'special',
-         'unofficial_currency_code': None}]]
-
-        self.single_transaction_history = [[{'account_id': 'kK3EeGbokrHnb1GWao1wc5rbep6npEIJQLxLa',
- 'account_owner': None,
- 'amount': 500.0,
- 'authorized_date': None,
- 'authorized_datetime': None,
- 'category': ['Travel', 'Airlines and Aviation Services'],
- 'category_id': '22001000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 16),
- 'datetime': None,
- 'iso_currency_code': 'GBP',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': 'United Airlines',
- 'name': 'United Airlines',
- 'payment_channel': 'in store',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': 'M3vq1AwVoBIGj5kv8X5oFlVw6pmLAziLGk1nk',
- 'transaction_type': 'special',
- 'unofficial_currency_code': None}]]
-
-        self.multiple_transaction_history = [[{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
- 'account_owner': None,
- 'amount': 896.65,
- 'authorized_date': datetime.date(2022, 12, 16),
- 'authorized_datetime': None,
- 'category': ['Transfer', 'Debit'],
- 'category_id': '21006000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 17),
- 'datetime': None,
- 'iso_currency_code': 'USD',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': None,
- 'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C',
- 'payment_channel': 'in store',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': 'PaJgwMn4y9fbPzjdPbl5hg9zN8kg1pSXyWRn6',
- 'transaction_type': 'special',
- 'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
- 'account_owner': None,
- 'amount': 398.34,
- 'authorized_date': datetime.date(2022, 12, 16),
- 'authorized_datetime': None,
- 'category': ['Transfer', 'Debit'],
- 'category_id': '21006000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 17),
- 'datetime': None,
- 'iso_currency_code': 'USD',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': None,
- 'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A',
- 'payment_channel': 'in store',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': '4e1XPQq43Bs5L4m6L5pEFGgjMA5GQvUlRAPKp',
- 'transaction_type': 'special',
- 'unofficial_currency_code': None}, {'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
- 'account_owner': None,
- 'amount': 1708.12,
- 'authorized_date': datetime.date(2022, 12, 16),
- 'authorized_datetime': None,
- 'category': ['Food and Drink', 'Restaurants'],
- 'category_id': '13005000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 16),
- 'datetime': None,
- 'iso_currency_code': 'USD',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': None,
- 'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 CRGKFKKSPABG UXZYOTAYLDA D',
- 'payment_channel': 'in store',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': 'NxJp9Qkdemcw4X7L4wW5cwqryvjwepTXA5wzp',
- 'transaction_type': 'place',
- 'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
- 'account_owner': None,
- 'amount': 1109.01,
- 'authorized_date': datetime.date(2022, 12, 16),
- 'authorized_datetime': None,
- 'category': ['Transfer', 'Debit'],
- 'category_id': '21006000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 16),
- 'datetime': None,
- 'iso_currency_code': 'USD',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': None,
- 'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 KABCRGKSPKFG YOTALDUXZYA B',
- 'payment_channel': 'in store',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': 'aWQwlaxAE4tKn1bEnKAvimBLNpMm7DtkKQMvK',
- 'transaction_type': 'special',
- 'unofficial_currency_code': None}], [{'account_id': 'bMXdQVkDRXHABLR5bZnycpXjq3qnP9uomZJK3',
- 'account_owner': None,
- 'amount': 896.65,
- 'authorized_date': datetime.date(2022, 12, 16),
- 'authorized_datetime': None,
- 'category': ['Payment', 'Credit Card'],
- 'category_id': '16001000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 17),
- 'datetime': None,
- 'iso_currency_code': 'USD',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': None,
- 'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C',
- 'payment_channel': 'other',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': 'V3LRGAPZzLfeDz1MxgGRfeLXr7BlbQfqdvgJy',
- 'transaction_type': 'special',
- 'unofficial_currency_code': None}, {'account_id': 'nrDL1VlR6DI4zMo5AXgdFwlRaJamZ7U3AWXVK',
- 'account_owner': None,
- 'amount': 398.34,
- 'authorized_date': datetime.date(2022, 12, 16),
- 'authorized_datetime': None,
- 'category': ['Payment', 'Credit Card'],
- 'category_id': '16001000',
- 'check_number': None,
- 'date': datetime.date(2022, 12, 17),
- 'datetime': None,
- 'iso_currency_code': 'USD',
- 'location': {'address': None,
-              'city': None,
-              'country': None,
-              'lat': None,
-              'lon': None,
-              'postal_code': None,
-              'region': None,
-              'store_number': None},
- 'merchant_name': None,
- 'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A',
- 'payment_channel': 'other',
- 'payment_meta': {'by_order_of': None,
-                  'payee': None,
-                  'payer': None,
-                  'payment_method': None,
-                  'payment_processor': None,
-                  'ppd_id': None,
-                  'reason': None,
-                  'reference_number': None},
- 'pending': False,
- 'pending_transaction_id': None,
- 'personal_finance_category': None,
- 'transaction_code': None,
- 'transaction_id': 'XdGXEn7b3GsZM5zLn8NpCzQ6apBZN8C1ErKRv',
- 'transaction_type': 'special',
- 'unofficial_currency_code': None}]]
 
     def test_debit_card_set_up_correctly(self):
         self.assertTrue(self.debit_card.plaid_wrapper.ACCESS_TOKEN is not None)
@@ -490,69 +57,158 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         accounts = AccountType.objects.filter(user = self.user)
         self.assertEqual(len(accounts),1)
 
-    def test_get_recent_transactions_with_incorrect_institution_name(self):
-        self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.single_transaction_history,0)
-        with self.assertRaises(InvalidInstitution) as cm:
-            self.debit_card.get_recent_transactions('HSBC')
-
-        self.assertEqual(str(cm.exception.message),'Provided Instituion Name is not Linked')
-
     def test_get_recent_transactions_without_graph_data_initialised(self):
-        with self.assertRaises(TypeError) as e:
-            self.debit_card.get_recent_transactions('Royal Bank of Scotland - Current Accounts')
+        with self.assertRaises(bankDataEmpty) as e:
+            self.debit_card.get_recent_transactions([],['Royal Bank of Scotland - Current Accounts'])
 
-        #self.assertEqual(str(e.message),'Bank graph data is empty')
-    def test_get_recent_transactions_one_institution_linked_without_transactions_today(self):
+
+    def test_get_recent_transactions_one_institution_linked_without_five_transactions_retrieved(self):
+        self.multiple_transaction_history = multiple_transactions_dict
         self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.multiple_transaction_history,0)
-        recent_transactions = self.debit_card.get_recent_transactions('Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),0)
+        recent_transactions = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),4)
 
-    def test_with_whole_flow_of_recent_transactions(self):
-        pass
+    """
+    def test_get_recent_transactions_from_returned_transactions_get(self):
+        user = User.objects.get(email='lillydoe@example.org')
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+        debit_card = DebitCard(plaid_wrapper, user)
 
+        self.assertEqual(len(debit_card.access_tokens),1)
 
-    def test_get_recent_transactions_with_one_institution_linked_and_today_dates(self):
-        self.assertEqual(len(self.recent_transactions[0]),5)
-        self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.recent_transactions,0)
-        recent_transactions = self.debit_card.get_recent_transactions('Royal Bank of Scotland - Current Accounts')
+        start_date = date.today()
+        end_date = date.today()
+        transactions = debit_card.make_graph_transaction_data_insight(start_date,end_date)
+
+        recent_transactions = debit_card.get_recent_transactions(debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
+
+        self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),1)
         self.assertEqual(list(recent_transactions.keys())[0],'Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(len(recent_transactions[list(recent_transactions.keys())[0]]),4)
 
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'$896.65')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['amount'],'£398.34')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['amount'],'₹1708.12')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['amount'],'1109.01')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£6.33')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today() - timedelta(days=1))
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['category'],['Travel', 'Taxi'])
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Uber')
+
+    """
+    #fix logic
+    def test_get_recent_transactions_with_multiple_institutions(self):
+        before_accountype_objects_count = AccountType.objects.count()
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            account_institution_name = 'HSBC',
+        )
+        after_accountype_objects_count = AccountType.objects.count()
+
+        self.assertEqual(after_accountype_objects_count,before_accountype_objects_count + 1)
+
+        sandbox_wrapper = SandboxWrapper()
+
+        new_debit_card = DebitCard(sandbox_wrapper,self.user)
+        self.assertEqual(len(new_debit_card.access_tokens),2)
+        self.multiple_recent_transactions = multiple_recent_transactions_dict
+        new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[0],self.multiple_recent_transactions,0)
+        new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[1],self.multiple_recent_transactions,1)
+
+        recent_transactions = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
+        recent_transactions_hsbc = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data()['HSBC'].transactionInsight.transaction_history,'HSBC')
+        self.assertEqual(len(list(recent_transactions.keys())),1)
+        self.assertEqual(len(list(recent_transactions_hsbc.keys())),1)
+
+        self.assertEqual(list(recent_transactions.keys())[0],'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(recent_transactions_hsbc.keys())[0],'HSBC')
+
+        self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),4)
+        self.assertEqual(len(recent_transactions_hsbc['HSBC']),2)
+
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£532.43')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['amount'],'£236.53')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['amount'],'£1014.28')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['amount'],'£658.53')
+
+        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['amount'],'£532.43')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['amount'],'£236.53')
 
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['date'],date.today())
 
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Bank Of Switzerland')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['merchant'],'Eat Tokyo')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['merchant'],'Burger and Lobster')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not provided')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['date'],date.today())
+        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['date'],date.today())
+
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not Provided')
+
+        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['merchant'],'Not Provided')
 
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['category'],['Transfer', 'Debit'])
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['category'],['Food and Drink', 'Restaurants', 'Fast Food'])
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['category'],['Transfer', 'Debit'])
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['category'],['Food and Drink', 'Restaurants'])
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['category'],['Transfer', 'Debit'])
 
+        self.assertEqual(recent_transactions_hsbc['HSBC'][0]['category'],['Payment', 'Credit Card'])
+        self.assertEqual(recent_transactions_hsbc['HSBC'][1]['category'],['Payment', 'Credit Card'])
+
+    #logic
+    def test_get_recent_transactions_with_one_institution_linked_and_today_dates(self):
+        self.recent_transactions = recent_transactions_dict
+        self.assertEqual(len(self.recent_transactions[0]),5)
+        self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.recent_transactions,0)
+        recent_transactions_made = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(recent_transactions_made.keys())[0],'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(len(recent_transactions_made[list(recent_transactions_made.keys())[0]]),5)
+
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£532.43')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['amount'],'£398.34')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['amount'],'£17.34')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['amount'],'£110.4')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][4]['amount'],'£19.91')
+
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today())
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['date'],date.today())
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['date'],date.today())
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['date'],date.today())
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][4]['date'],datetime.date(2022, 12, 16))
 
 
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Bank Of Switzerland')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['merchant'],'Eat Tokyo')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['merchant'],'Burger and Lobster')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['merchant'],'Not Provided')
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][4]['merchant'],'Not Provided')
+
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][0]['category'],['Transfer', 'Debit'])
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][1]['category'],['Food and Drink', 'Restaurants', 'Fast Food'])
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][2]['category'],['Food and Drink', 'Restaurants'])
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['category'],['Transfer', 'Debit'])
+        self.assertEqual(recent_transactions_made['Royal Bank of Scotland - Current Accounts'][3]['category'],['Transfer', 'Debit'])
 
     def test_get_correct_indexing_of_transactions_data_with_single_institution(self):
+        self.single_transaction_history = single_transaction_dict
         self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.single_transaction_history,0)
         insight_data = self.debit_card.get_insight_data()
 
         self.assertEqual(list(insight_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history),1)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['amount'], 500.0)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['iso_currency_code'], 'GBP')
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['name'], 'United Airlines')
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['transaction_type'], 'special')
+        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history),1)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 500.0)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['iso_currency_code'], 'GBP')
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['name'], 'United Airlines')
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['authorized_date'], [2022, 12, 16])
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['date'], [2022, 12, 16])
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['category'], ['Travel', 'Airlines and Aviation Services'])
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['merchant_name'], 'United Airlines')
 
-    def test_get_correct_indexing_of_transactions_data_with_multiple_institutions(self):
+    def test_get_correct_indexing_of_transactions_insight_data_with_multiple_institutions(self):
+        self.multiple_transaction_history = multiple_transactions_dict
 
         AccountType.objects.create(
             user = self.user,
@@ -573,17 +229,17 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
         self.assertEqual(list(insight_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(list(insight_data.keys())[1], 'HSBC')
-        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history),4)
-        self.assertEqual(len(insight_data['HSBC'].transaction_history),2)
+        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history),4)
+        self.assertEqual(len(insight_data['HSBC'].transactionInsight.transaction_history),2)
 
 
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['amount'], 896.65)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[1]['amount'], 398.34)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[2]['amount'], 1708.12)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[3]['amount'], 1109.01)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'],532.43 )
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'], 236.53)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[2]['amount'], 1014.28)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[3]['amount'], 658.53)
 
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[0]['amount'], 896.65)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transaction_history[1]['amount'], 398.34)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 532.43)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'],  236.53)
 
     def test_correct_instution_for_access_token(self):
         self.assertEqual(self.debit_card.plaid_wrapper.get_institution_name(self.debit_card.plaid_wrapper.ACCESS_TOKEN),'Royal Bank of Scotland - Current Accounts')
@@ -632,6 +288,10 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
         self.assertTrue(list(balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
         self.assertTrue(list(balances.keys())[1], 'Bank of America')
+
+        self.assertTrue(self.are_dicts_same(balances, same_balances))
+        self.assertTrue(len(balances) > 1)
+        self.assertTrue(len(same_balances) > 1)
 
     def test_refresh_api_with_incorrect_access_token(self):
         self.debit_card.plaid_wrapper.ACCESS_TOKEN = 'wrongaccesstokenstring'
@@ -696,7 +356,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         test_dir = os.path.dirname(os.path.abspath(__file__))
 
         # Specify the path to the json file relative to the test file directory
-        json_file_path = os.path.join(test_dir, 'account.json')
+        json_file_path = os.path.join(test_dir, 'account_balances.json')
 
 
         with open(json_file_path, 'r') as f:
@@ -710,6 +370,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
                 self.assertTrue(isinstance(reformatted_data[account]['type'], str))
                 self.assertTrue(isinstance(reformatted_data[account]['currency'], str))
 
+
     #attempt to incorporate set up in this
     def test_make_transaction_data_insight_with_one_access_token(self):
         user = User.objects.get(email='lillydoe@example.org')
@@ -718,12 +379,32 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user, ['transactions'])
         debit_card = DebitCard(plaid_wrapper, user)
-
         start_date = date.fromisoformat('2022-06-13')
-        end_date = date.fromisoformat('2022-12-16')
+        end_date = date.fromisoformat('2022-06-25')
         debit_card.make_graph_transaction_data_insight(start_date,end_date)
 
         insights = debit_card.get_insight_data()
-        self.assertTrue(insights is not None)
+        last_index = len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) - 1
+        self.assertEqual(len(insights.keys()),1)
         self.assertEqual(list(insights.keys())[0],'Royal Bank of Scotland - Current Accounts')
         self.assertTrue(isinstance(insights['Royal Bank of Scotland - Current Accounts'], BankGraphData))
+        self.assertTrue(insights['Royal Bank of Scotland - Current Accounts'] is not [{}])
+        if len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) != 0:
+            print('washed')
+            self.assertTrue(len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) > 0)
+
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 500.0)
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['iso_currency_code'], 'GBP')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['name'], 'United Airlines')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['authorized_date'], 'Not Provided')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['date'], [2022, 6, 19])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['category'], ['Travel', 'Airlines and Aviation Services'])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['merchant_name'], 'United Airlines')
+
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['amount'], 500.0)
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['iso_currency_code'], 'GBP')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['name'], 'Madison Bicycle Shop')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['authorized_date'], 'Not Provided')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['date'], [2022, 6, 13])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['category'],['Shops', 'Supermarkets and Groceries'])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['merchant_name'], 'Not Provided')

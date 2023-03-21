@@ -62,7 +62,23 @@ const Signup = () => {
         }
     }
     
+    let form1 = (
+        <div class="super-signup-container">
+        <div class="signup-container">
+            <form onSubmit={signupUser}>
+            <input type = "text" name = "email" placeholder='Enter email:' />
+            <input type = "text" name = "first_name" placeholder='Enter first name:' />
+            <input type = "text" name = "last_name" placeholder='Enter last name:' />
+            <input type = "password" name='password' placeholder='Enter password'/>
+            <input type = "submit"/>
+            </form>
+        </div>
+        </div>
+    )
+    
     let form2 = (
+        <div class="super-signup-container">
+        <div class="signup-container">
         <div>
             <Header 
                 heading = "Register your account"
@@ -94,6 +110,8 @@ const Signup = () => {
                     <FormAction handleSubmit={signupUser} text = "Register" />
                 </div>
             </form>
+        </div>
+        </div>
         </div>
     )
 
