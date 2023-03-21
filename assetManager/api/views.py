@@ -23,6 +23,7 @@ from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
 from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -366,9 +367,32 @@ def recent_transactions(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_linked_banks(request):
-    get_balances_wrapper(request.user)
+    
     account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
     institutions = []
     for account in account_types:
         institutions.append(account.account_institution_name)
     return Response(institutions, content_type='application/json',status = 200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_linked_stocks(request):
+    get_balances_wrapper(request.user)
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.STOCK)
+    stocks = []
+    for stock in account_types:
+        stocks.append(stock.account_institution_name)
+    return Response(stocks, content_type='application/json',status = 200)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_banks(request, institution):
+    
+    account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked bank account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
+
