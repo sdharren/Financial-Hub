@@ -108,7 +108,7 @@ class CategoriseTransactionsTestCase(TestCase):
 
     def test_get_ordered_categories_of_transactions(self):
         transactions = CategoriseTransactions(self.transaction_history)
-        self.assertEqual(transactions.getOrderCategories(self.transaction_history), [('Food and Drink', 21.99), ('Service', 15.99), ('Travel', 3.3)])
+        self.assertEqual(transactions.getOrderCategories(self.transaction_history), [{'name': 'Food and Drink', 'value': 21.99},{'name': 'Service', 'value': 15.99},{'name': 'Travel', 'value': 3.3}])
 
     def test_get_no_ordered_categories_of_transactions(self):
         transactions = CategoriseTransactions("")
