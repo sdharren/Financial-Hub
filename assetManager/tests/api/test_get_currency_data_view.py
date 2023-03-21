@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib import messages
 from assetManager.models import User
 import json
-from assetManager.api.views import reformat_balances_into_currency,delete_balances_cache,calculate_perentage_proportions_of_currency_data
+from assetManager.api.views import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings

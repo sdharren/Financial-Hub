@@ -384,9 +384,6 @@ def select_account(request):
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
 
-def delete_balances_cache(user):
-    cache.delete('balances' + user.email)
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def recent_transactions(request):

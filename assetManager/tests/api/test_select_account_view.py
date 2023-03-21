@@ -3,19 +3,23 @@ from django.urls import reverse
 from django.contrib import messages
 from assetManager.models import User
 import json
-from assetManager.api.views import reformatAccountBalancesData,delete_balances_cache
+from assetManager.api.views import reformatAccountBalancesData
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from django.conf import settings
 from assetManager.models import AccountTypeEnum,AccountType
+from django.core.cache import cache
 
 class SelectAccountViewsTestCase(TestCase):
     """Tests of the log in view."""
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]
+
+    def tearDown(self):
+        cache.clear()
 
     def setUp(self):
         self.url = reverse('select_account')
@@ -78,8 +82,6 @@ class SelectAccountViewsTestCase(TestCase):
 
         self.assertEqual(response_data[list(response_data.keys())[0]], 296.9002201027146)
         self.assertEqual(response_data[list(response_data.keys())[1]], 296.9002201027146)
-
-        delete_balances_cache(self.user)
 
     def test_get_select_account_url_for_multiple_institutions(self):
         settings.PLAID_DEVELOPMENT = False
@@ -149,9 +151,19 @@ class SelectAccountViewsTestCase(TestCase):
 
     def test_get_select_account_balances_without_having_first_queried_get_balances_data(self):
         settings.PLAID_DEVELOPMENT = False
-        delete_balances_cache(self.user)
         response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 303)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Balances not queried.')
+
+    def test_reformat_balances_data_duplicate_account_name(self):
+        settings.PLAID_DEVELOPMENT = False
+        duplicated_account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
+        institution_name = 'Royal Bank of Scotland - Current Accounts'
+        response_data_first = reformatAccountBalancesData(duplicated_account_balances,institution_name)
+        self.assertEqual(len(list(response_data_first.keys())),2)
+        self.assertTrue(list(response_data_first.keys())[0] == 'Checking')
+        self.assertTrue(list(response_data_first.keys())[1] == 'Checking_1')
+        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9002201027146)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9002201027146)

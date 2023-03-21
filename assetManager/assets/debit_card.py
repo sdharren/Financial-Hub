@@ -103,6 +103,21 @@ class DebitCard():
 
         return institution_name
 
+
+    def get_single_account_balances(self,token):
+        request_accounts = self.plaid_wrapper.get_accounts(token)
+        accounts = format_accounts_data(request_accounts)
+        return accounts
+
+    def get_single_transaction(self,start_date_input,end_date_input,token):
+        transaction_request = TransactionsGetRequest(
+            access_token=token,
+            start_date=start_date_input,
+            end_date=end_date_input,
+        )
+
+        transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+
     """
     @params:
 
@@ -113,8 +128,7 @@ class DebitCard():
     def get_account_balances(self):
         balances = {}
         for token in self.access_tokens:
-            request_accounts = self.plaid_wrapper.get_accounts(token)
-            accounts = format_accounts_data(request_accounts)
+            accounts = self.get_single_account_balances(token)
             balances[self.plaid_wrapper.get_institution_name(token)] = accounts
 
         return balances
@@ -130,14 +144,7 @@ class DebitCard():
         transactions = []
         for token in self.access_tokens:
             self.refresh_api(token)
-
-            transaction_request = TransactionsGetRequest(
-                access_token=token,
-                start_date=start_date_input,
-                end_date=end_date_input,
-            )
-
-            transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+            transaction_response = self.get_single_transaction(start_date_input,end_date_input,token)
             transactions.append(transaction_response['transactions'])
 
         return transactions

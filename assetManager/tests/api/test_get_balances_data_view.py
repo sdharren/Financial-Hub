@@ -4,9 +4,8 @@ from django.contrib import messages
 from assetManager.models import User
 import json
 from assetManager.api.views import reformatBalancesData
-
-from assetManager.api.views import get_balances_data,delete_balances_cache
-
+from django.core.cache import cache
+from assetManager.api.views import get_balances_data
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
@@ -18,6 +17,9 @@ class GetBalancesDataViewTestCase(TestCase):
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]
+
+    def tearDown(self):
+        cache.clear()
 
     def setUp(self):
         self.user = User.objects.get(email='johndoe@example.org')
@@ -76,7 +78,6 @@ class GetBalancesDataViewTestCase(TestCase):
         response_data = response.json()
         self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
         self.assertEqual(response.status_code,200)
-        delete_balances_cache(self.user)
 
     def test_get_balances_succesfully_for_multiple_accounts(self):
         plaid_wrapper = SandboxWrapper()
@@ -95,8 +96,8 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(account_balances[list(account_balances.keys())[0]], 25830.31914893617)
         self.assertEqual(account_balances[list(account_balances.keys())[1]], 593.8004402054293)
 
-        delete_balances_cache(self.user)
-
+    """
+    add this test in the location to be added for updating the cache when new institutions are added
     def test_get_balances_data_enforce_cache_delete_due_to_new_institution_linked_in_application(self):
         settings.PLAID_DEVELOPMENT = False
         before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
@@ -109,7 +110,7 @@ class GetBalancesDataViewTestCase(TestCase):
         self.assertEqual(list(account_balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
 
         self.assertEqual(account_balances[list(account_balances.keys())[0]], 593.8004402054293)
-        delete_balances_cache(self.user)
+    """
 
     def test_get_balances_data_from_the_cache(self):
         settings.PLAID_DEVELOPMENT = False
@@ -123,4 +124,3 @@ class GetBalancesDataViewTestCase(TestCase):
         response_data_second = response_second.json()
         self.assertTrue(response_data_second['Royal Bank of Scotland - Current Accounts'] != response_data['Royal Bank of Scotland - Current Accounts'])
         self.assertEqual(response_second.status_code,200)
-        delete_balances_cache(self.user)
