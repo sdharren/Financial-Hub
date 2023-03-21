@@ -43,22 +43,39 @@ export default function Navbar() {
         </ul>
     );
 
+    // let loggedInForm = (
+    //     <ul>
+    //         <li>
+    //             {user && <p>Hello, {firstName}</p>}
+    //         </li>
+    //         <li>
+    //             <Link to = "/balances">Bank accounts</Link>
+    //         </li>
+    //         <li>
+    //             <Link to = "/currency">Currencies</Link>
+    //         </li>
+    //         <li>
+    //             <Link to = "/list">Transactions</Link>
+    //         </li>
+    //         <li>
+    //             <Link to = "/bar_graph_display">Bar graph</Link>
+    //         </li>
+    //         <li>
+    //             <p className="nav-logout" onClick = {logoutUser}>Logout</p>
+    //         </li>
+    //     </ul>
+    // );
+
     let loggedInForm = (
         <ul>
             <li>
                 {user && <p>Hello, {firstName}</p>}
             </li>
             <li>
-                <Link to = "/balances">Bank accounts</Link>
+                <Link to = "/link_assets">Link assets</Link>
             </li>
             <li>
-                <Link to = "/currency">Currencies</Link>
-            </li>
-            <li>
-                <Link to = "/list">Transactions</Link>
-            </li>
-            <li>
-                <Link to = "/bar_graph_display">Bar graph</Link>
+                <Link to = "/accounts">Accounts</Link>
             </li>
             <li>
                 <p className="nav-logout" onClick = {logoutUser}>Logout</p>
