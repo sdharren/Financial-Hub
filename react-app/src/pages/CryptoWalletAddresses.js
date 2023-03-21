@@ -41,7 +41,7 @@ const SaveWalletAddresses = () => {
             </div>
 
             <button type="button" onClick={() => handleRemoveOption(option.id)}>Remove</button>
-            <button type="button" onClick={handleAddOption}>Add Option</button>
+            <button type="button" onClick={handleAddOption}>Add Address</button>
           </div>
         ))}
       </div>
