@@ -59,7 +59,7 @@ class getUsableCrypto:
 # When run collect data for all addresses listed
 def getAllCryptoData(addresses):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
-    data = {} # 2D Array where index 0 is actual data and index 1 is type (of coin)
+    data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
     btcAddresses = addresses.get("btc", None)
     ethAddresses = addresses.get("eth", None)
@@ -67,19 +67,23 @@ def getAllCryptoData(addresses):
     if(btcAddresses != None):
         for addr in btcAddresses:
             value = getCryptoAddressData.BTC_all(addr)
+            arrVal = [value, "btc"]
 
-            data.update(addr, value)
+            data.update(addr, arrVal)
 
     if(ethAddresses != None):
         for addr in ethAddresses:
             value = getCryptoAddressData.ETH_all(addr)
+            arrVal = [value, "eth"]
 
-            data.update(addr, value)
+            data.update(addr, arrVal)
+    
+    return data
 
 # Collect select data from api instead of requesting all data
 def getAlternateCryptoData(addresses, command):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
-    data = {} # 2D Array where index 0 is actual data and index 1 is type (of coin)
+    data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
     btcAddresses = ADDRESSES.get("btc", None)
     ethAddresses = ADDRESSES.get("eth", None)
@@ -101,8 +105,10 @@ def getAlternateCryptoData(addresses, command):
                     value = getUsableCrypto.getTotalSent(value, "btc")
                 case "txs":
                     value = getUsableCrypto.getTxs(value, "btc")
+                
+            arrVal = [value, "btc"]
 
-            data.update(addr, value)
+            data.update(addr, arrVal)
 
     if(ethAddresses != None):
         for addr in ethAddresses:
@@ -121,5 +127,9 @@ def getAlternateCryptoData(addresses, command):
                     value = getUsableCrypto.getTotalSent(value, "eth")
                 case "txs":
                     value = getUsableCrypto.getTxs(value, "eth")
+            
+            arrVal = [value, "eth"]
 
-            data.update(addr, value)
+            data.update(addr, arrVal)
+
+    return data

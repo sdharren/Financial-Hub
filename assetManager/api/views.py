@@ -5,7 +5,7 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from assetManager.models import User
+from assetManager.models import User, AccountType, AccountTypeEnum
 from assetManager.assets.debit_card import DebitCard
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -216,7 +216,22 @@ def retrieve_stock_getter(user):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def crypto_all_data(request):
-    get
+    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    data = getAllCryptoData(addresses=stored_addresses)
+
+    return Response(data, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_select_data(request):
+    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    if request.GET.get('param'):
+        data = getAlternateCryptoData(addresses=stored_addresses, command=(request.GET.get('param')))
+    else:
+        raise Exception
+        # should return bad request
+
+    return Response(data, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
