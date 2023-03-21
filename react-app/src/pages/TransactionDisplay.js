@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BarGraph from "./BarGraph";
+import DropDown from "./DropDown";
 
 function BarChartDisplay() {
     const [graph, setGraph] = useState(<BarGraph endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>);
@@ -32,6 +33,7 @@ function BarChartDisplay() {
                 Go Back
             </button>
             {graph}
+            <DropDown/>
         </div>
     );
 }
