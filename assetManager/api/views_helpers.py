@@ -98,6 +98,15 @@ def reformatAccountBalancesData(account_balances,institution_name):
 
     return accounts
 
+"""
+@params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
+
+@Description: -Iterates through all accounts for all linked institutions summing the total available amount in each account
+              -Creates a dictionary (key: name of the institution, value: amount in that all the accounts in that institution)
+              -Uses GBP as unique currency for quantifying amounts
+
+@return: Reformatted dictionary containing the institution name as the key and the sum of all account's available balance as the value
+"""
 def reformatBalancesData(account_balances):
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
@@ -116,10 +125,21 @@ def reformatBalancesData(account_balances):
 
     return balances
 
+
+"""
+@params:
+-user:models.User
+user making the query
+
+@Description: -Depending on the settings.PLAID_DEVELOPMENT either a development wrapper or sandbox wrapper for PLAID is returned
+
+@return: plaid_wrapper: [DevelopmentWrapper, SandboxWrapper]
+"""
 def get_balances_wrapper(user):
     if settings.PLAID_DEVELOPMENT:
         plaid_wrapper = DevelopmentWrapper()
     else:
+        #user is required to make a dummy access token for testing purposes
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token_custom_user()
         plaid_wrapper.exchange_public_token(public_token)
@@ -127,6 +147,18 @@ def get_balances_wrapper(user):
 
     return plaid_wrapper
 
+"""
+@params:
+-user:models.User
+user making the query
+
+-institution_name: String
+name of the institution being checked in the database
+
+@Description: -Checks whether the queried institution name is linked for the passed user
+
+@return: Boolean - whether or not the institution_name requested is linked for the passed user
+"""
 def check_institution_name_selected_exists(user,institution_name):
     instituitions = AccountType.objects.filter(user = user, account_asset_type = AccountTypeEnum.DEBIT)
 
@@ -155,7 +187,21 @@ def get_single_institution_balances(token,wrapper,user):
 
         balances[institution_name] = account_balances
 
+"""
+@params:
+- user: models.User
+  The user making the query
+- plaid_wrapper: [DevelopmentWrapper, SandboxWrapper]
+  The concrete types of PlaidWrapper used for the query
 
+@Description:
+This function creates a `DebitCard` object for making transactions using the provided `plaid_wrapper` and `user`.
+If there are no access tokens in the database for the user or no institutions linked by the user, the `DebitCard` object creation will fail and the function raises a custom `TransactionsNotLinkedException`.
+If the `DebitCard` object is successfully created, the function returns the `DebitCard` object.
+
+@return:
+A `DebitCard` object created using the provided `plaid_wrapper` and `user`.
+"""
 def make_debit_card(plaid_wrapper,user):
     try:
         debit_card = DebitCard(plaid_wrapper,user)
@@ -164,6 +210,21 @@ def make_debit_card(plaid_wrapper,user):
 
     return debit_card
 
+"""
+@params:
+- user: models.User
+  The user making the query
+- plaid_wrapper: Union[DevelopmentWrapper, SandboxWrapper]
+  The concrete types of PlaidWrapper used for the query
+
+@description:
+This function retrieves the account balances for all the linked institutions of the given `user` using the provided `plaid_wrapper`.
+It first calls the `make_debit_card` function to create a `DebitCard` object for the given `user` and `plaid_wrapper`. Then it calls the `get_account_balances` method of the `DebitCard` object to retrieve the account balances.
+If the account balances are successfully retrieved, the function returns them. If there is any error while querying the Plaid API, the function raises a custom `PlaidQueryException`.
+
+@return:
+A dictionary containing the account balances of all the linked institutions for the given `user`.
+"""
 def get_institutions_balances(plaid_wrapper,user):
     debit_card = make_debit_card(plaid_wrapper,user)
 
@@ -174,7 +235,18 @@ def get_institutions_balances(plaid_wrapper,user):
 
     return account_balances
 
+"""
+@params:
+- view_func: function
+  The view function to wrap
 
+@description:
+This function is a decorator that wraps a view function and catches two custom exceptions: TransactionsNotLinkedException and PlaidQueryException.
+If either exception is raised, it returns a JSON response object with the corresponding error message and status code. Otherwise, it calls the original view function.
+
+@return:
+The wrapped view function that catches and handles the custom exceptions.
+"""
 def handle_plaid_errors(view_func):
     @wraps(view_func)
     def wrapped_view(request, *args, **kwargs):
