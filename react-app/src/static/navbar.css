@@ -1,0 +1,22 @@
+.nav .nav-logout:hover {
+  cursor: pointer;
+}
+
+.nav li > a::after,
+.nav-logout::after {
+  content: "";
+  display: block;
+  margin: auto;
+  height: 3px;
+  width: 0;
+  top: 5px;
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.nav li > a:hover::after,
+li > a.active-nav::after,
+.nav li > .nav-logout:hover::after {
+  width: 100%;
+  background: white;
+}

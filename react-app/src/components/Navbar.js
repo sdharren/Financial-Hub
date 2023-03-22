@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { Link } from "react-router-dom"
 import AuthContext from '../context/AuthContext';
+import '../static/navbar.css';
 
 export default function Navbar() {
     let {user, logoutUser, authTokens} = useContext(AuthContext);
@@ -46,7 +47,7 @@ export default function Navbar() {
     let loggedInForm = (
         <ul className='flex w-full justify-end gap-10 items-center'>
             <li>
-                {user && <p>Hello, {firstName}</p>}
+                {user && <p className='text-green-500'>Hello, {firstName}!</p>}
             </li>
             <li>
                 <Link to = "/balances">Bank accounts</Link>
@@ -74,4 +75,5 @@ export default function Navbar() {
             </div>
         </nav>
     )
+    // decide on size for the main application window
 }
