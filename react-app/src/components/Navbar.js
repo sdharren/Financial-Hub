@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { Link } from "react-router-dom"
 import AuthContext from '../context/AuthContext';
+import '../static/navbar.css'
 
 export default function Navbar() {
     let {user, logoutUser, authTokens} = useContext(AuthContext);
@@ -75,10 +76,19 @@ export default function Navbar() {
                 <Link to = "/link_assets">Link assets</Link>
             </li>
             <li>
-                <Link to = "/accounts">Accounts</Link>
+                <Link to = "/accounts">Managed linked assets</Link>
             </li>
             <li>
-                <p className="nav-logout" onClick = {logoutUser}>Logout</p>
+                <div className='nb_dropdown'>
+                    <button className='nb_dropbtn'>My account</button>
+                    <div className='nb_dropcontent'>
+                        <div>
+                            <a href='#'>Settings</a>
+                        </div>
+                        <hr className='hrbreak'></hr>
+                        <p className="nav-logout" onClick = {logoutUser}>Logout</p>
+                    </div>
+                </div>
             </li>
         </ul>
     );
