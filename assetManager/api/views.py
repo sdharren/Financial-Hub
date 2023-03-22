@@ -1,4 +1,5 @@
 import json
+from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.cache import cache
@@ -22,6 +23,7 @@ from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
+from django.http import HttpRequest
 from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -303,15 +305,25 @@ def transaction_data_getter(user):
 
     debitCards = DebitCard(plaid_wrapper,user)
     #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-
+    if False==cache.has_key('access_token' + user.email):
+        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    else:
+        access_token = cache.get('access_token'+user.email)
+        debitCards.make_graph_transaction_data_insight_with_access_token(datetime.date(2000,12,16),datetime.date(2050,12,17),access_token)
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
     return accountData[first_key]
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_bank_access_token(request):
+    data = request.body
+    decoded_data = data.decode('utf-8')
+    parsed_data = json.loads(decoded_data)
+    access_token = parsed_data['selectedOption']
+    cache.set('access_token'+request.user.email,access_token)
+    cache.delete('transactions' + request.user.email)
     return Response(status=200)
 
 """
