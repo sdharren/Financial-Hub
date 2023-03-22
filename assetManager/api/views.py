@@ -143,9 +143,10 @@ def link_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
-    products_selected = ['transactions'] #NOTE: hardcoded for now
-    #TODO: uncomment line below for prod
-    #products_selected = cache.get('product_link' + request.user.email)
+    if cache.has_key('product_link' + request.user.email):
+        products_selected = cache.get('product_link' + request.user.email)
+    else:
+        return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
     wrapper = DevelopmentWrapper()
     public_token = request.POST.get('public_token')
