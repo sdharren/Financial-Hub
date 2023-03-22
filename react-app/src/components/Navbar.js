@@ -30,7 +30,7 @@ export default function Navbar() {
     }
 
     let defaultForm = (
-        <ul>
+        <ul className='flex w-full justify-end gap-10 items-center'>
             <li>
                 <Link to="/about">About</Link>
             </li>
@@ -44,7 +44,7 @@ export default function Navbar() {
     );
 
     let loggedInForm = (
-        <ul>
+        <ul className='flex w-full justify-end gap-10 items-center'>
             <li>
                 {user && <p>Hello, {firstName}</p>}
             </li>
@@ -67,9 +67,9 @@ export default function Navbar() {
     );
 
     return (
-        <nav className="nav">
-            <div className='navbarContents'>
-                <Link to = {user ? "/dashboard" : "/"} className="site-title">Financial Hub</Link>
+        <nav className="nav border-black border-b-4">
+            <div className='navbarContents text-white flex pt-5 pb-3 px-2'>
+                <Link to = {user ? "/dashboard" : "/"} className="site-title text-4xl font-bold">DASH.</Link>
                 {user ? loggedInForm : defaultForm}
             </div>
         </nav>
