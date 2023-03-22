@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.cache import cache
 from assetManager.assets.debit_card import DebitCard
 from assetManager.transactionInsight.bank_graph_data import BankGraphData,get_currency_converter
 import datetime
@@ -17,6 +18,7 @@ class TransactionsNotLinkedException(Exception):
 
 class PlaidQueryException(Exception):
     pass
+
 
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
@@ -184,3 +186,23 @@ def handle_plaid_errors(view_func):
             return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
 
     return wrapped_view
+
+# Caches investment data for a given user
+# Returns: True if cached, False if investments aren't linked
+def cache_investments(user):
+    if settings.PLAID_DEVELOPMENT:
+        wrapper = DevelopmentWrapper()
+    else:
+        wrapper = SandboxWrapper()
+    stock_getter = StocksGetter(wrapper)
+    try:
+        stock_getter.query_investments(user)
+    except InvestmentsNotLinked:
+        return False
+    cache.set('investments' + user.email, stock_getter.investments)
+    return True
+
+# Deletes a users cached investments if they exist
+def delete_cached(cache_type_string, user):
+    if cache.has_key(cache_type_string + user.email):
+        cache.delete(cache_type_string + user.email)

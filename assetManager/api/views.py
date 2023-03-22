@@ -162,24 +162,19 @@ def exchange_public_token(request):
     #check duplicate for institution should be done in save access_token
     return Response(status=200)
 
-@api_view(['PUT', 'DELETE']) #NOTE: Is GET appropriate for this type of request?
+@api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
 def cache_assets(request):
     if request.method == 'PUT':
         user = request.user
-        if settings.PLAID_DEVELOPMENT:
+        if settings.PLAID_DEVELOPMENT: # TODO: remove wrapper from here later they should be created within each methods
             wrapper = DevelopmentWrapper()
         else:
             wrapper = SandboxWrapper()
-        #TODO: same thing for bank stuff
-        #NOTE: do we need this for crypto? yh
-        stock_getter = StocksGetter(wrapper)
-        try:
-            stock_getter.query_investments(user)
-        except InvestmentsNotLinked:
+
+        if not cache_investments(user): #try to cache investments
             return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
-        cache.set('investments' + user.email, stock_getter.investments)
 
         #caching of bank related investements
         #Balances
@@ -189,17 +184,11 @@ def cache_assets(request):
 
     elif request.method == 'DELETE':
         user = request.user
-        if cache.has_key('investments' + user.email):
-            cache.delete('investments' + user.email)
+        delete_cached('investments', user)
+        delete_cached('transactions', user)
+        delete_cached('currency', user)
+        delete_cached('balances', user)
 
-        if cache.has_key('transactions' + user.email):
-            cache.delete('transactions' + user.email)
-
-        if cache.has_key('currency' + user.email):
-            cache.delete('currency' + user.email)
-
-        if cache.has_key('balances' + user.email):
-            cache.delete('balances' + user.email)
     return Response(status=200)
 
 @api_view(['GET'])
