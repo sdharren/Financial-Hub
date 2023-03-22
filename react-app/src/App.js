@@ -28,7 +28,7 @@ import Accounts from './pages/Accounts';
 
 function App() {
   return (
-    <div>
+    <div className = "bg-[url('./images/background-image.png')]">
       <Router>
         <AuthProvider>
           <Navbar />
