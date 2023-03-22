@@ -192,7 +192,6 @@ def cache_assets(request):
         if cache.has_key('investments' + user.email):
             cache.delete('investments' + user.email)
 
-        #test in api views -> augusto
         if cache.has_key('transactions' + user.email):
             cache.delete('transactions' + user.email)
 
@@ -323,15 +322,15 @@ def transaction_data_getter(user):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user, ['transactions'])
 
-    try:
-        debitCards = DebitCard(plaid_wrapper,user)
-    except PublicTokenNotExchanged:
-        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+    #try:
+    debitCards = DebitCard(plaid_wrapper,user)
+    #except PublicTokenNotExchanged:
+    #    return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
     #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    try:
-        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-    except Exception:
-        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+    #try:
+    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    #except Exception:
+    #    return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
 
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
@@ -346,9 +345,9 @@ def transaction_data_getter(user):
 """
 def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+        cache.set('transactions' + user.email, transaction_data_getter(user).transactionInsight.transaction_history)
 
-    return (json.loads(cache.get('transactions' + user.email)))
+    return (cache.get('transactions' + user.email))
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -430,6 +429,7 @@ def recent_transactions(request):
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
         bank_graph_data_insight = cacheBankTransactionData(user)
+
         if(check_institution_name_selected_exists(user,institution_name) is False):
             return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
         concrete_wrapper = DevelopmentWrapper()

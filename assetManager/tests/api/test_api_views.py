@@ -10,10 +10,10 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import InvestmentsNotLinked
 from assetManager.tests.investments.test_stocks import _create_stock_getter_with_fake_data
 from assetManager.api.views import *
-
+from assetManager.api.views import reformat_balances_into_currency
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
-
+from assetManager.tests.bankcard_asset.single_transaction import single_transaction_dict
 
 class APIViewsTestCase(TestCase):
     fixtures = [
@@ -21,6 +21,7 @@ class APIViewsTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.user = User.objects.get(email='johndoe@example.org')
         self.stock_getter = _create_stock_getter_with_fake_data()
 
@@ -140,12 +141,39 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('currency' in balances['Vanguard'][all_accounts])
 
 
-
+    #extend this
     def test_delete_cache_assets_works(self):
+        account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
+        cache.set('balances' + self.user.email,account_balances)
+        balances = reformat_balances_into_currency(account_balances)
+        cache.set('currency' + self.user.email,balances)
+        reformatted_transactions = BankGraphData(single_transaction_dict)
+        cache.set('transactions' + self.user.email,reformatted_transactions.transactionInsight.transaction_history)
+
         self.assertTrue(cache.has_key('investments' + self.user.email))
+        self.assertTrue(cache.has_key('balances' + self.user.email))
+        self.assertTrue(cache.has_key('currency' + self.user.email))
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
+
         response = self.client.delete('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
         self.assertFalse(cache.has_key('investments' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+        self.assertFalse(cache.has_key('currency' + self.user.email))
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+
+    def test_delete_cache_assets_works_for_some_loaded_keys(self):
+        account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
+        cache.set('balances' + self.user.email,account_balances)
+
+        self.assertTrue(cache.has_key('investments' + self.user.email))
+        self.assertTrue(cache.has_key('balances' + self.user.email))
+
+        response = self.client.delete('/api/cache_assets/')
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(cache.has_key('investments' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+
 
     def test_cache_assets_works_with_development(self):
         settings.PLAID_DEVELOPMENT = True

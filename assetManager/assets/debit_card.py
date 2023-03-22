@@ -160,7 +160,7 @@ class DebitCard():
     @return:
     """
     def make_bank_graph_data_dict(self,token,transactions,transaction_count):
-        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
+        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])#.transactionInsight.transaction_history
 
     """
     @params: start_date_input,end_date_input datetime.date objects representing the start and end date range for transaction retrieval

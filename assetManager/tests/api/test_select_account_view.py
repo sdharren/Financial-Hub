@@ -22,6 +22,7 @@ class SelectAccountViewsTestCase(TestCase):
         cache.clear()
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.url = reverse('select_account')
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
@@ -84,7 +85,6 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[1]], 296.9002201027146)
 
     def test_get_select_account_url_for_multiple_institutions(self):
-        settings.PLAID_DEVELOPMENT = False
         before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
@@ -120,7 +120,6 @@ class SelectAccountViewsTestCase(TestCase):
 
 
     def test_get_select_account_url_without_giving_param_field_a_value(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/select_account/?param=')
         self.assertEqual(response.status_code, 303)
 
@@ -130,7 +129,6 @@ class SelectAccountViewsTestCase(TestCase):
 
 
     def test_get_select_accounts_url_with_incorrect_key(self):
-        settings.PLAID_DEVELOPMENT = False
         self.balances = self.client.get(reverse('get_balances_data'), follow=True)
         response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 200)
@@ -150,7 +148,6 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Invalid Insitution ID.')
 
     def test_get_select_account_balances_without_having_first_queried_get_balances_data(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 303)
         response_data = response.json()
@@ -158,7 +155,6 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Balances not queried.')
 
     def test_reformat_balances_data_duplicate_account_name(self):
-        settings.PLAID_DEVELOPMENT = False
         duplicated_account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
         institution_name = 'Royal Bank of Scotland - Current Accounts'
         response_data_first = reformatAccountBalancesData(duplicated_account_balances,institution_name)

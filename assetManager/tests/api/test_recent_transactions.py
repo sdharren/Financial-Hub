@@ -12,6 +12,7 @@ from django.conf import settings
 from assetManager.models import AccountTypeEnum,AccountType
 from django.core.cache import cache
 from datetime import datetime, date
+from assetManager.api.views import reformatBalancesData
 
 class RecentTransactionsViewsTestCase(TestCase):
     """Tests of the log in view."""
@@ -31,6 +32,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
+    
     def test_recent_transactions_url(self):
         self.assertEqual(self.url,'/api/recent_transactions/')
 
@@ -60,7 +62,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Selected Is Not Linked.')
-        
+
     def test_get_recent_transactions_with_correctly_linked_institution(self):
         settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
@@ -74,3 +76,24 @@ class RecentTransactionsViewsTestCase(TestCase):
         #self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['date'],'2023-03-16')
         #self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['category'],['Travel', 'Airlines and Aviation Services'])
         #self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'United Airlines')
+
+    def test_recent_transactions_data_with_incorrectly_saved_token_causing_an_error(self):
+        account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
+        balances = reformatBalancesData(account_balances)
+
+        cache.set('transactions' + self.user.email,balances)
+
+        settings.PLAID_DEVELOPMENT = True
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            account_institution_name = 'HSBC',
+        )
+
+        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')

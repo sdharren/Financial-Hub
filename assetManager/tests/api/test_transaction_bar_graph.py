@@ -109,7 +109,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
 
     def test_cache_bank_transaction_data(self):
         bankgraphdata = BankGraphData(cacheBankTransactionData(self.user))
-        cached_data = json.loads(cache.get('transactions' + self.user.email))
+        cached_data = cache.get('transactions' + self.user.email)
         correct_data = bankgraphdata.transactionInsight.transaction_history
         self.assertNotEqual(correct_data,"")
         self.assertNotEqual(cached_data,"")

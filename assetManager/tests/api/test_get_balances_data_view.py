@@ -22,6 +22,7 @@ class GetBalancesDataViewTestCase(TestCase):
         cache.clear()
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
         self.client.login(email=self.user.email, password='Password123')
@@ -45,7 +46,6 @@ class GetBalancesDataViewTestCase(TestCase):
             reformatBalancesData(incorrect_account_balances)
 
     def test_get_reformatted_balances_data_correctly(self):
-        settings.PLAID_DEVELOPMENT = False
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
         balances = reformatBalancesData(account_balances)
         self.assertEqual(len(balances),1)
@@ -73,7 +73,6 @@ class GetBalancesDataViewTestCase(TestCase):
 
 
     def test_get_balances_succesfully(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url, follow=True)
         response_data = response.json()
         self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
@@ -84,7 +83,6 @@ class GetBalancesDataViewTestCase(TestCase):
         public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(self.user, ['transactions'])
-        settings.PLAID_DEVELOPMENT = False
 
         response = self.client.get(self.url, follow = True)
         self.assertEqual(response.status_code, 200)
@@ -113,7 +111,6 @@ class GetBalancesDataViewTestCase(TestCase):
     """
 
     def test_get_balances_data_from_the_cache(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url, follow=True)
         response_data = response.json()
         self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
@@ -124,3 +121,28 @@ class GetBalancesDataViewTestCase(TestCase):
         response_data_second = response_second.json()
         self.assertTrue(response_data_second['Royal Bank of Scotland - Current Accounts'] != response_data['Royal Bank of Scotland - Current Accounts'])
         self.assertEqual(response_second.status_code,200)
+
+    def test_get_balances_data_without_any_access_tokens_saved_with_development_wrapper(self):
+        settings.PLAID_DEVELOPMENT = True
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Transactions Not Linked.')
+
+    def test_get_balances_data_with_incorrectly_saved_token_causing_an_error(self):
+        settings.PLAID_DEVELOPMENT = True
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            account_institution_name = 'HSBC',
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
