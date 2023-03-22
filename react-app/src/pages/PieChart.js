@@ -41,8 +41,30 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         else if (response.status === 303) {
             //TODO: redirect to plaid link investments
             if (data['error'] === 'Investments not linked.') {
-                navigate('/plaid_link')
+                redirectToLink('investments');
             }
+            else if (data['error'] === 'Transactions Not Linked.') {
+                redirectToLink('transactions');
+            }
+        }
+    }
+
+    let redirectToLink = async(assetType) => {
+        let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
+            {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            }
+        )
+        let data = await response.json();
+        if (response.status === 200) {
+            navigate('/plaid_link', {
+                state: {link_token: data['link_token']},
+                replace: true
+            });
         }
     }
 
