@@ -21,7 +21,7 @@ from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
-from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
+from .views_helpers import *
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -154,11 +154,17 @@ def exchange_public_token(request):
         wrapper.exchange_public_token(public_token)
     except InvalidPublicToken as e:
         return Response({'error': 'Bad request. Invalid public token.'}, status=400)
+
     wrapper.save_access_token(request.user, products_selected)
+    #update balances cache if it exists
+    token = wrapper.get_access_token()
+    #single institution thingy
+    #check duplicate for institution should be done in save access_token
     return Response(status=200)
 
 @api_view(['PUT', 'DELETE']) #NOTE: Is GET appropriate for this type of request?
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def cache_assets(request):
     if request.method == 'PUT':
         user = request.user
@@ -167,7 +173,7 @@ def cache_assets(request):
         else:
             wrapper = SandboxWrapper()
         #TODO: same thing for bank stuff
-        #NOTE: do we need this for crypto?
+        #NOTE: do we need this for crypto? yh
         stock_getter = StocksGetter(wrapper)
         try:
             stock_getter.query_investments(user)
@@ -177,14 +183,8 @@ def cache_assets(request):
 
         #caching of bank related investements
         #Balances
-        try:
-            debit_card = DebitCard(wrapper,request.user)
-        except PublicTokenNotExchanged:
-            return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
-
-        account_balances = debit_card.get_account_balances()
+        account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances)
-
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
@@ -351,6 +351,7 @@ def cacheBankTransactionData(user):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def get_currency_data(request):
     user = request.user
 
@@ -359,16 +360,7 @@ def get_currency_data(request):
     if cache.has_key('currency' + user.email):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
-    try:
-        debit_card = DebitCard(plaid_wrapper,user)
-    except PublicTokenNotExchanged:
-        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
-    #try catch to ensure data is returned
-
-    try:
-        account_balances = debit_card.get_account_balances()
-    except Exception:
-        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+    account_balances = get_institutions_balances(plaid_wrapper,user)
 
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
@@ -378,6 +370,7 @@ def get_currency_data(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def get_balances_data(request):
     user = request.user
 
@@ -387,15 +380,7 @@ def get_balances_data(request):
         account_balances = cache.get('balances' + user.email)
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
-    try:
-        debit_card = DebitCard(plaid_wrapper,user)
-    except PublicTokenNotExchanged:
-        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
-
-    try:
-        account_balances = debit_card.get_account_balances()
-    except Exception:
-        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+    account_balances = get_institutions_balances(plaid_wrapper,user)
 
     balances = reformatBalancesData(account_balances)
     cache.set('balances' + user.email, account_balances)
@@ -424,6 +409,7 @@ def select_account(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def recent_transactions(request):
     user = request.user
     if request.GET.get('param'):
@@ -434,10 +420,7 @@ def recent_transactions(request):
             return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
         concrete_wrapper = DevelopmentWrapper()
 
-        try:
-            debit_card = DebitCard(concrete_wrapper,user)
-        except PublicTokenNotExchanged:
-            return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+        debit_card = make_debit_card(concrete_wrapper,user)
 
         try:
             recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)

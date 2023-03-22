@@ -8,6 +8,15 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from forex_python.converter import CurrencyRates
+from functools import wraps
+from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from rest_framework.response import Response
+
+class TransactionsNotLinkedException(Exception):
+    pass
+
+class PlaidQueryException(Exception):
+    pass
 
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
@@ -124,3 +133,54 @@ def check_institution_name_selected_exists(user,institution_name):
             return True
 
     return False
+
+def get_single_institution_balances(token,wrapper,user):
+    #try catch this
+    debit_card = DebitCard(wrapper,user)
+
+    try:
+        account_balances = debit_card.get_single_account_balances(token)
+    except Exception:
+        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+
+    institution_name = wrapper.get_institution_name(token)
+
+    if(cache.has_key('balances' + user.email) is False):
+        cache.set('balances' + user.email, {institution_name:account_balances})
+    else:
+        balances = cache.get('balances' + user.email)
+        cache.delete('balances' + user.email)
+
+        balances[institution_name] = account_balances
+
+
+def make_debit_card(plaid_wrapper,user):
+    try:
+        debit_card = DebitCard(plaid_wrapper,user)
+    except PublicTokenNotExchanged:
+        raise TransactionsNotLinkedException('Transactions Not Linked.')
+
+    return debit_card
+
+def get_institutions_balances(plaid_wrapper,user):
+    debit_card = make_debit_card(plaid_wrapper,user)
+
+    try:
+        account_balances = debit_card.get_account_balances()
+    except Exception:
+        raise PlaidQueryException('Something went wrong querying PLAID.')
+
+    return account_balances
+
+
+def handle_plaid_errors(view_func):
+    @wraps(view_func)
+    def wrapped_view(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except TransactionsNotLinkedException:
+            return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+        except PlaidQueryException:
+            return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+
+    return wrapped_view
