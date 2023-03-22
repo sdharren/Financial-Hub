@@ -1,7 +1,7 @@
 
 import './App.css';
 import React from 'react';
-import './styles.css'
+// import './styles.css'
 import Navbar from './components/Navbar';
 import About from './pages/About';
 import Login from './pages/Login';
