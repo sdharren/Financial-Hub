@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.cache import cache
 from assetManager.assets.debit_card import DebitCard
 from assetManager.transactionInsight.bank_graph_data import BankGraphData,get_currency_converter
 import datetime
@@ -8,6 +9,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from forex_python.converter import CurrencyRates
+
 
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
@@ -124,3 +126,23 @@ def check_institution_name_selected_exists(user,institution_name):
             return True
 
     return False
+
+# Caches investment data for a given user
+# Returns: True if cached, False if investments aren't linked
+def cache_investments(user):
+    if settings.PLAID_DEVELOPMENT:
+        wrapper = DevelopmentWrapper()
+    else:
+        wrapper = SandboxWrapper()
+    stock_getter = StocksGetter(wrapper)
+    try:
+        stock_getter.query_investments(user)
+    except InvestmentsNotLinked:
+        return False
+    cache.set('investments' + user.email, stock_getter.investments)
+    return True
+
+# Deletes a users cached investments if they exist
+def delete_cached_investments(user):
+    if cache.has_key('investments' + user.email):
+        cache.delete('investments' + user.email)

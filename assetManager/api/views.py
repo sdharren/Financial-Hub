@@ -21,7 +21,7 @@ from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
-from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
+from .views_helpers import *
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -157,23 +157,18 @@ def exchange_public_token(request):
     wrapper.save_access_token(request.user, products_selected)
     return Response(status=200)
 
-@api_view(['PUT', 'DELETE']) #NOTE: Is GET appropriate for this type of request?
+@api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def cache_assets(request):
     if request.method == 'PUT':
         user = request.user
-        if settings.PLAID_DEVELOPMENT:
+        if settings.PLAID_DEVELOPMENT: # TODO: remove wrapper from here later they should be created within each methods
             wrapper = DevelopmentWrapper()
         else:
             wrapper = SandboxWrapper()
-        #TODO: same thing for bank stuff
-        #NOTE: do we need this for crypto?
-        stock_getter = StocksGetter(wrapper)
-        try:
-            stock_getter.query_investments(user)
-        except InvestmentsNotLinked:
+
+        if not cache_investments(user): #try to cache investments
             return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
-        cache.set('investments' + user.email, stock_getter.investments)
 
         #caching of bank related investements
         #Balances
@@ -189,8 +184,8 @@ def cache_assets(request):
 
     elif request.method == 'DELETE':
         user = request.user
-        if cache.has_key('investments' + user.email):
-            cache.delete('investments' + user.email)
+
+        delete_cached_investments(user)
 
         if cache.has_key('transactions' + user.email):
             cache.delete('transactions' + user.email)
@@ -454,3 +449,6 @@ def get_linked_assets(request):
     account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
     reformatted = [account_type.account_institution_name]
     return Response(reformatted, content_type='application/json',status = 200)
+
+
+
