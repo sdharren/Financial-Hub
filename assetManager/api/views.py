@@ -381,7 +381,6 @@ The function uses a Plaid API wrapper object and a user object to access the dat
 If the balance data has already been retrieved and cached, the function returns the cached data.
 Otherwise, the function retrieves the data and formats it before caching it for future use.
 
-
 @return:
 A Response object containing the cached balance data if it exists
 A Response object containing the formatted balance data if it does not exist in the cache
