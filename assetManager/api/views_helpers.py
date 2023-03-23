@@ -49,13 +49,7 @@ def reformat_balances_into_currency(account_balances):
 
     return currency_total
 
-"""
-@params: No params
 
-@Description: -Depending on the settings.PLAID_DEVELOPMENT variable, either DEVELOPMENT for today's exhange rates or the SANDBOX for the fixed 2014 exchange rates for testing
-
-@return: input_date, datetime object for returning corresponding exchange rate
-"""
 def calculate_perentage_proportions_of_currency_data(currency_total):
     proportions = {}
     total_money = sum(currency_total.values())
@@ -98,6 +92,7 @@ def reformatAccountBalancesData(account_balances,institution_name):
 
     return accounts
 
+
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
 
@@ -125,40 +120,23 @@ def reformatBalancesData(account_balances):
 
     return balances
 
-
-"""
-@params:
--user:models.User
-user making the query
-
-@Description: -Depending on the settings.PLAID_DEVELOPMENT either a development wrapper or sandbox wrapper for PLAID is returned
-
-@return: plaid_wrapper: [DevelopmentWrapper, SandboxWrapper]
-"""
-def get_balances_wrapper(user):
+def get_plaid_wrapper(user,type):
     if settings.PLAID_DEVELOPMENT:
         plaid_wrapper = DevelopmentWrapper()
     else:
         #user is required to make a dummy access token for testing purposes
         plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token_custom_user()
+        if(type == 'transactions'):
+            public_token = plaid_wrapper.create_public_token()
+        else:
+            public_token = plaid_wrapper.create_public_token_custom_user()
+
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(user, ['transactions'])
 
     return plaid_wrapper
 
 
-def get_transactions_wrapper(user):
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        #user is required to make a dummy access token for testing purposes
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
-    return plaid_wrapper
 """
 @params:
 -user:models.User
@@ -358,7 +336,7 @@ def cacheBankTransactionData(user):
         cache.set('transactions' + user.email, transaction_data_getter(user))
 
 """
-@params: 
+@params:
 user: Object containing user authentication information
 institution_name: name of an a bank institution (string)
 
@@ -388,7 +366,7 @@ Then returns the transactions correlating to the institution name.
 """
 def getCachedInstitutionCachedData(user):
     if False == cache.has_key('access_token'+user.email):
-        plaid_wrapper = get_transactions_wrapper(user)
+        plaid_wrapper = get_plaid_wrapper(user,'transactions')
         debitCards = DebitCard(plaid_wrapper,user)
         token = debitCards.access_tokens[0]
         cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
@@ -408,7 +386,7 @@ def getCachedInstitutionCachedData(user):
 @return: An array of dictionaries with the key being the institution name and the value being its transaction data (an array of dictionaries of each transaction)
 """
 def transaction_data_getter(user):
-    plaid_wrapper = get_transactions_wrapper(user)
+    plaid_wrapper = get_plaid_wrapper(user,'transactions')
     debitCards = DebitCard(plaid_wrapper,user)
     debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
     return debitCards.get_insight_data()

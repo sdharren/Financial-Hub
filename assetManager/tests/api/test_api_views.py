@@ -39,7 +39,7 @@ class APIViewsTestCase(TestCase):
         cache.delete('balancesjohndoe@example.org')
         cache.delete('transactionsjohndoe@example.org')
         cache.delete('currencyjohndoe@example.org')
-
+    
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 200)
@@ -239,7 +239,53 @@ class APIViewsTestCase(TestCase):
         response = self.client.post('/api/exchange_public_token/')
         self.assertEqual(response.status_code, 400)
         cache.delete('product_link' + self.user.email)
-    """
+
+    def test_post_exchange_public_token_updating_existing_cache(self):
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+        self.assertFalse(cache.has_key('currency' + self.user.email))
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+
+        cache.set('currency' + self.user.email,{'GBP': 75.0, 'USD':25.0})
+        cache.set('balances' + self.user.email,{'HSBC':{'BPq1BWz6ydUQXr1p53L8ugoWqKrjpafzQj8r9':{'name': 'Custom Account Checking', 'available_amount': 1000.0, 'current_amount': 1000.0, 'type': 'depository', 'currency': 'EUR'}}})
+        cache.set('product_link' + self.user.email, ['transactions'])
+
+        before_count = AccountType.objects.count()
+        wrapper = SandboxWrapper()
+        public_token = wrapper.create_public_token()
+        response = self.client.post('/api/exchange_public_token/', {'public_token': public_token}, format='json')
+        self.assertEqual(response.status_code, 200)
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count + 1,after_count)
+        self.assertFalse(cache.has_key('product_link' + self.user.email))
+        self.assertTrue(cache.has_key('balances' + self.user.email))
+        self.assertTrue(cache.has_key('currency' + self.user.email))
+
+        currency = cache.get('currency' + self.user.email)
+        balances = cache.get('balances' + self.user.email)
+
+
+        self.assertEqual(len(list(currency.keys())),2)
+        self.assertEqual(list(currency.keys())[0],'EUR')
+        self.assertEqual(list(currency.keys())[1],'GBP')
+
+        self.assertEqual(currency['EUR'],1.83)
+        self.assertEqual(currency['GBP'],98.17)
+
+        self.assertEqual(len(list(balances.keys())),2)
+        self.assertEqual(list(balances.keys())[1],'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(balances.keys())[0],'HSBC')
+
+        self.assertTrue(balances['HSBC']['BPq1BWz6ydUQXr1p53L8ugoWqKrjpafzQj8r9'] == {'name': 'Custom Account Checking', 'available_amount': 1000.0, 'current_amount': 1000.0, 'type': 'depository', 'currency': 'EUR'})
+        for account in balances['HSBC']:
+            self.assertTrue('name' in balances['HSBC'][account])
+            self.assertTrue('available_amount' in balances['HSBC'][account])
+            self.assertTrue('current_amount' in balances['HSBC'][account])
+            self.assertTrue('type' in balances['HSBC'][account])
+            self.assertTrue('currency' in balances['HSBC'][account])
+
+        self.assertEqual(len(balances['Royal Bank of Scotland - Current Accounts']),9)
+
+
     def test_post_exchange_public_token_correclty_caches_all_data_without_previously_cached_data(self):
         before_count = AccountType.objects.count()
 
@@ -247,7 +293,7 @@ class APIViewsTestCase(TestCase):
         self.assertFalse(cache.has_key('balances' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
 
-        cache.set('product_link' + self.user.email, 'transactions')
+        cache.set('product_link' + self.user.email, ['transactions'])
         wrapper = SandboxWrapper()
         public_token = wrapper.create_public_token()
         response = self.client.post('/api/exchange_public_token/', {'public_token': public_token}, format='json')
@@ -256,10 +302,24 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(before_count + 1,after_count)
         self.assertFalse(cache.has_key('product_link' + self.user.email))
 
-        print(cache.get('currency' + self.user.email))
-        print(cache.get('balances' + self.user.email))
-    """
+        self.assertTrue(cache.has_key('balances' + self.user.email))
+        self.assertTrue(cache.has_key('currency' + self.user.email))
 
+        currency = cache.get('currency' + self.user.email)
+        balances = cache.get('balances' + self.user.email)
+
+        self.assertEqual(len(list(currency.keys())),1)
+        self.assertEqual(list(currency.keys())[0],'GBP')
+        self.assertEqual(currency['GBP'],100.0)
+
+        self.assertEqual(len(list(balances.keys())),1)
+        self.assertEqual(list(balances.keys())[0],'Royal Bank of Scotland - Current Accounts')
+        for account in balances['Royal Bank of Scotland - Current Accounts']:
+            self.assertTrue('name' in balances['Royal Bank of Scotland - Current Accounts'][account])
+            self.assertTrue('available_amount' in balances['Royal Bank of Scotland - Current Accounts'][account])
+            self.assertTrue('current_amount' in balances['Royal Bank of Scotland - Current Accounts'][account])
+            self.assertTrue('type' in balances['Royal Bank of Scotland - Current Accounts'][account])
+            self.assertTrue('currency' in balances['Royal Bank of Scotland - Current Accounts'][account])
 
     def test_retrieve_stock_getter_works(self):
         stock_getter = retrieve_stock_getter(self.user)

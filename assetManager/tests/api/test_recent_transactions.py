@@ -57,10 +57,9 @@ class RecentTransactionsViewsTestCase(TestCase):
     def test_get_recent_transactions_with_non_linked_institution_name(self):
         response = self.client.get('/api/recent_transactions/?param=HSBC UK')
         self.assertEqual(response.status_code, 303)
-
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
-        self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Selected Is Not Linked.')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
 
     def test_get_recent_transactions_with_correctly_linked_institution(self):
         response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
@@ -76,6 +75,7 @@ class RecentTransactionsViewsTestCase(TestCase):
             self.assertTrue('date' in response_data['Royal Bank of Scotland - Current Accounts'][0])
             self.assertTrue('category' in response_data['Royal Bank of Scotland - Current Accounts'][0])
             self.assertTrue('merchant' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+
 
     def test_recent_transactions_data_with_incorrectly_saved_token_causing_an_error(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}

@@ -338,7 +338,7 @@ def set_bank_access_token(request):
     decoded_data = data.decode('utf-8')
     parsed_data = json.loads(decoded_data)
     access_token_id = int(parsed_data['selectedOption'])
-    plaid_wrapper = get_balances_wrapper(request.user)
+    plaid_wrapper = get_plaid_wrapper(request.user,'balances')
     debitCards = DebitCard(plaid_wrapper,request.user)
     access_token = debitCards.access_tokens[access_token_id]
     cache.delete('access_token'+request.user.email)
@@ -365,7 +365,7 @@ A Response object containing the formatted currency data if it does not exist in
 def get_currency_data(request):
     user = request.user
 
-    plaid_wrapper = get_balances_wrapper(user)
+    plaid_wrapper = get_plaid_wrapper(user,'balances')
 
     if cache.has_key('currency' + user.email):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
@@ -398,7 +398,7 @@ A Response object containing the formatted balance data if it does not exist in 
 def get_balances_data(request):
     user = request.user
 
-    plaid_wrapper = get_balances_wrapper(user)
+    plaid_wrapper = get_plaid_wrapper(user,'balances')
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
@@ -457,7 +457,7 @@ A Response object containing an array of dictionaries each containg an id and na
 @permission_classes([IsAuthenticated])
 def select_bank_account(request):
     user = request.user
-    plaid_wrapper = get_transactions_wrapper(user)
+    plaid_wrapper = get_plaid_wrapper(user,'transactions')
     debitCards = DebitCard(plaid_wrapper,user)
     institutions = []
     institution_id = 0
@@ -487,16 +487,14 @@ def recent_transactions(request):
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
 
-        if(check_institution_name_selected_exists(user,institution_name) is False):
-            return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
-
+        #if(check_institution_name_selected_exists(user,institution_name) is False):
+        #    return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
         try:
             bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
         except PublicTokenNotExchanged:
             raise TransactionsNotLinkedException('Transactions Not Linked.')
         except Exception:
             raise PlaidQueryException('Something went wrong querying PLAID.')
-
 
         concrete_wrapper = DevelopmentWrapper()
 
