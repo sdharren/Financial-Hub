@@ -40,8 +40,8 @@ function InvestmentGraphs() {
     // update the GraphSelect options (called every time a graph is rendered/re-rendered)
     async function updateOptions() {
         let options = {
-            'investments': [],
-            'categories': []
+            'investments': investmentOptions,
+            'categories': categoryOptions
         }
         // on the first render investmentOptions and categoryOptions are not set
         // if we are in first render - fetch them from the API and return a JSON at the same time as the useState variables would only be usable on next render
@@ -80,8 +80,7 @@ function InvestmentGraphs() {
     // render a graph based on the endpoint supplied
     // endpoint_parameter is optional and is a parameter for the API request
     async function changeGraph(endpoint, endpoint_parameter) {
-        const options = await updateOptions(); 
-        changeTabActive(endpoint);
+        const options = await updateOptions();
 
         switch(endpoint) {
             case 'investment_categories':
@@ -93,31 +92,48 @@ function InvestmentGraphs() {
                         updateGraph={handleGraphUpdate}
                     />
                 );
+                changeTabActive(endpoint);
                 break;
 
             case 'investment_category_breakdown':
-                setLastCategory(endpoint_parameter);
-                setGraph(
-                    <PieChart 
-                        endpoint={endpoint} 
-                        endpoint_parameter={endpoint_parameter} 
-                        loadNext={handleLoadNext} 
-                        updateGraph={handleGraphUpdate} 
-                        selectOptions={ categoryOptions.length === 0 ? options['categories'] : categoryOptions}
-                    />
-                );
+                if (!options['categories'].includes(endpoint_parameter)) {
+                    setGraph(
+                        <p>Sorry we cannot get data for {endpoint_parameter}.</p>
+                    );
+                }
+                else {
+                    setLastCategory(endpoint_parameter);
+                    setGraph(
+                        <PieChart 
+                            endpoint={endpoint} 
+                            endpoint_parameter={endpoint_parameter} 
+                            loadNext={handleLoadNext} 
+                            updateGraph={handleGraphUpdate} 
+                            selectOptions={options['categories'] }
+                        />
+                    );
+                    changeTabActive(endpoint);
+                }
                 break;
 
             case 'stock_history':
-                setLastStock(endpoint_parameter);
-                setGraph(
-                        <LineGraph 
-                            endpoint={endpoint} 
-                            updateGraph={handleGraphUpdate} 
-                            endpoint_parameter={endpoint_parameter} 
-                            selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
-                        />
-                );
+                if (!options['investments'].includes(endpoint_parameter)) {
+                    setGraph(
+                        <p>Sorry we cannot get data for {endpoint_parameter}.</p>
+                    );
+                }
+                else {
+                    setLastStock(endpoint_parameter);
+                    setGraph(
+                            <LineGraph 
+                                endpoint={endpoint} 
+                                updateGraph={handleGraphUpdate} 
+                                endpoint_parameter={endpoint_parameter} 
+                                selectOptions={ options['investments'] } 
+                            />
+                    );
+                    changeTabActive(endpoint);
+                }
                 break;
         }
     }

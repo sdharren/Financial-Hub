@@ -46,10 +46,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     }
 
     if (error !== null) {
-        if (error === 'Internal Server Error') {
-            alert('Something went wrong. Please try again later.');
-        }
-        else {
+        if (error !== 'Internal Server Error') {
             let errorMessage = JSON.parse(error)['error'];
             if (errorMessage === 'Investments not linked.') {
                 redirectToLink('investments');

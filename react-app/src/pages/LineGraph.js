@@ -33,11 +33,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
     }
 
     if (error !== null) {
-        if (error === 'Internal Server Error') {
-            alert('This option cannot be displayed. Please try a different one or try again later.');
-            return;
-        }
-        else {
+        if (error !== 'Internal Server Error') {
             let errorMessage = JSON.parse(error)['error'];
             if (errorMessage === 'Investments not linked.') {
                 redirectToLink('investments');
