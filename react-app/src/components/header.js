@@ -7,13 +7,13 @@ export default function Header({
     linkUrl="#"
 }){
     return(
-        <div className="mb-10">
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-white-900">
+        <div className="mb-10 mt-5">
+            <h2 className="text-center text-3xl font-bold text-white">
                 {heading}
             </h2>
-            <p className="mt-2 text-center text-sm text-white-600 mt-5">
+            <p className="text-center text-white mt-5">
             {paragraph} {' '}
-            <Link to={linkUrl} className="font-medium text-orange-600 hover:text-purple-500">
+            <Link to={linkUrl} className="font-medium text-orange-600 hover:text-hover-color">
                 {linkName}
             </Link>
             </p>

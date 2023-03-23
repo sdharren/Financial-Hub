@@ -18,7 +18,7 @@ const Login = () => {
   let {loginUser} = useContext(AuthContext);
 
   let form2 = (
-    <div class="signup-container">
+    <div class="login-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
         <Header
             heading = "Login to your account"
             paragraph= "Don't have an account yet? "
