@@ -371,6 +371,21 @@ def get_currency_data(request):
 
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
+"""
+@params:
+request: an HTTP request object containing user authentication information
+user: a user object containing the user's email address and Plaid account information
+
+@Description: This function retrieves and formats balance data associated with a given user.
+The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+If the balance data has already been retrieved and cached, the function returns the cached data.
+Otherwise, the function retrieves the data and formats it before caching it for future use.
+
+
+@return:
+A Response object containing the cached balance data if it exists
+A Response object containing the formatted balance data if it does not exist in the cache
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -389,6 +404,19 @@ def get_balances_data(request):
     cache.set('balances' + user.email, account_balances)
     return Response(balances, content_type='application/json', status = 200)
 
+"""
+@param:
+request: an HTTP request object containing user authentication information
+
+@Description: This function retrieves account balance data for a specific institution associated with a given user.
+The function uses a user object to access the data through a caching system.
+If the balance data has not been retrieved and cached, an error response is returned.
+If the institution name is not valid, another error response is returned. Otherwise, the function formats the data and returns it.
+
+@Return:
+A Response object containing the formatted account balance data for a specific institution if the institution name is valid
+An error Response object if the institution name is not valid or if the balance data has not been retrieved and cached
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
@@ -409,7 +437,21 @@ def select_account(request):
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
+"""
+@params:
+request: Request object containing information about the request.
 
+@Description:
+    This function retrieves recent transactions of a user's bank account from the Plaid API.
+    At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
+
+@returns:
+    If the institution name is provided in the request, the function returns the recent transactions of that institution in JSON format with a status code of 200.
+
+    If the institution name is not provided in the request, the function returns an error message indicating that the institution name is not selected with a status code of 303.
+
+    If an exception occurs while querying the Plaid API, the function raises a custom exception named PlaidQueryException.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
