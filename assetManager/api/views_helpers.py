@@ -168,24 +168,6 @@ def check_institution_name_selected_exists(user,institution_name):
 
     return False
 
-def get_single_institution_balances(token,wrapper,user):
-    #try catch this
-    debit_card = DebitCard(wrapper,user)
-
-    try:
-        account_balances = debit_card.get_single_account_balances(token)
-    except Exception:
-        return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
-
-    institution_name = wrapper.get_institution_name(token)
-
-    if(cache.has_key('balances' + user.email) is False):
-        cache.set('balances' + user.email, {institution_name:account_balances})
-    else:
-        balances = cache.get('balances' + user.email)
-        cache.delete('balances' + user.email)
-
-        balances[institution_name] = account_balances
 
 """
 @params:
@@ -237,6 +219,41 @@ def get_institutions_balances(plaid_wrapper,user):
 
 """
 @params:
+
+token: a Plaid token used to access the Plaid API
+wrapper: a Plaid API wrapper object
+user: a user object containing the user's email address
+
+@Description: This function retrieves the account balances for a single institution associated with a given user.
+It uses a Plaid token and a user object to access the data through the Plaid API.
+The account balances are stored in a cache for future use.
+
+Returns:
+Raises a PlaidQueryException if an error occurs while querying the Plaid API
+None if the function executes successfully and stores the account balances in the cache
+"""
+def get_single_institution_balances(token,wrapper,user):
+    #try catch this
+    debit_card = make_debit_card(wrapper,user)
+
+    try:
+        account_balances = debit_card.get_single_account_balances(token)
+    except Exception:
+        raise PlaidQueryException('Something went wrong querying PLAID.')
+
+    institution_name = wrapper.get_institution_name(token)
+
+    if(cache.has_key('balances' + user.email) is False):
+        cache.set('balances' + user.email, {institution_name:account_balances})
+    else:
+        balances = cache.get('balances' + user.email)
+        cache.delete('balances' + user.email)
+
+        balances[institution_name] = account_balances
+
+
+"""
+@params:
 - view_func: function
   The view function to wrap
 
@@ -259,8 +276,20 @@ def handle_plaid_errors(view_func):
 
     return wrapped_view
 
-# Caches investment data for a given user
-# Returns: True if cached, False if investments aren't linked
+"""
+@params:
+-user: a user object containing the user's email address and Plaid account information
+
+@Description:
+This function retrieves a user's investment data from Plaid and stores it in a cache for future use.
+It uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+The function returns a boolean value indicating whether the data retrieval and caching process was successful.
+
+
+@return:
+True if the function executes successfully and stores the user's investment data in the cache
+False if the function encounters an error while querying the Plaid API for investment data
+"""
 def cache_investments(user):
     if settings.PLAID_DEVELOPMENT:
         wrapper = DevelopmentWrapper()
@@ -274,7 +303,16 @@ def cache_investments(user):
     cache.set('investments' + user.email, stock_getter.investments)
     return True
 
-# Deletes a users cached investments if they exist
+"""
+@params:
+cache_type_string: a string representing the type of cached data to be deleted
+user: a user object containing the user's email address
+
+@Description: This function deletes cached data associated with a specified cache type string and user.
+If the specified cache data exists in the cache, it is deleted.
+
+@returns: None
+"""
 def delete_cached(cache_type_string, user):
     if cache.has_key(cache_type_string + user.email):
         cache.delete(cache_type_string + user.email)

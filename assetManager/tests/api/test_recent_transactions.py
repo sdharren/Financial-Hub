@@ -24,6 +24,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         cache.clear()
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.url = reverse('recent_transactions')
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
@@ -46,7 +47,6 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response.status_code,405)
 
     def test_get_recent_transactions_without_institution_name_param(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/recent_transactions/?param=')
         self.assertEqual(response.status_code, 303)
 
@@ -55,7 +55,6 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Name Not Selected')
 
     def test_get_recent_transactions_with_non_linked_institution_name(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/recent_transactions/?param=HSBC UK')
         self.assertEqual(response.status_code, 303)
 
@@ -64,7 +63,6 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Selected Is Not Linked.')
 
     def test_get_recent_transactions_with_correctly_linked_institution(self):
-        settings.PLAID_DEVELOPMENT = False
         response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 200)
 

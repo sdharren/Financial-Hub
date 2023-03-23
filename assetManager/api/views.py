@@ -414,7 +414,8 @@ def recent_transactions(request):
         try:
             recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
         except Exception:
-            return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+            #return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
+            raise PlaidQueryException('Something went wrong querying PLAID.')
 
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
