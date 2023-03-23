@@ -10,6 +10,8 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
     const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
     let {authTokens, logoutUser} = useContext(AuthContext);
     const navigate = useNavigate();
+    console.log(lineChartData);
+    console.log(error)
 
     let redirectToLink = async(assetType) => {
         let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
@@ -31,12 +33,18 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
     }
 
     if (error !== null) {
-        let errorMessage = JSON.parse(error)['error'];
-        if (errorMessage === 'Investments not linked.') {
-            redirectToLink('investments');
+        if (error === 'Internal Server Error') {
+            alert('This option cannot be displayed. Please try a different one or try again later.');
+            return;
         }
-        else if (errorMessage === 'Transactions Not Linked.') {
-            redirectToLink('transactions');
+        else {
+            let errorMessage = JSON.parse(error)['error'];
+            if (errorMessage === 'Investments not linked.') {
+                redirectToLink('investments');
+            }
+            else if (errorMessage === 'Transactions Not Linked.') {
+                redirectToLink('transactions');
+            }
         }
     }
 
@@ -140,8 +148,11 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
                 ? null
                 : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
             }
-            {lineChartData == null ? <p>Loading...</p> :
-            <Chart options={options} series={series} type = "area" />}
+            {
+            lineChartData === null ?
+            <p>Loading...</p> :
+            <Chart options={options} series={series} type = "area" />
+            }
         </div>
       )
     }

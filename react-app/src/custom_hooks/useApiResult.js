@@ -11,7 +11,7 @@ const useApiResult = ({request, endpoint}) => {
         setData(await response.json());
         setError(null);
       } else {
-        setError(await response.text());
+        setError(response.statusText);
       }
     })
     .catch((err) => {

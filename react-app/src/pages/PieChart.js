@@ -27,7 +27,6 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     const navigate = useNavigate()
 
     let redirectToLink = async(assetType) => {
-        console.log("here")
         let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
             {
                 method:'GET',
@@ -47,12 +46,17 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     }
 
     if (error !== null) {
-        let errorMessage = JSON.parse(error)['error'];
-        if (errorMessage === 'Investments not linked.') {
-            redirectToLink('investments');
+        if (error === 'Internal Server Error') {
+            alert('Something went wrong. Please try again later.');
         }
-        else if (errorMessage === 'Transactions Not Linked.') {
-            redirectToLink('transactions');
+        else {
+            let errorMessage = JSON.parse(error)['error'];
+            if (errorMessage === 'Investments not linked.') {
+                redirectToLink('investments');
+            }
+            else if (errorMessage === 'Transactions Not Linked.') {
+                redirectToLink('transactions');
+            }
         }
     }
 
