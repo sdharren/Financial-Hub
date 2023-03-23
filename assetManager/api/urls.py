@@ -28,6 +28,8 @@ urlpatterns = [
     path('get_balances_data/', views.get_balances_data, name='get_balances_data'),
     path('select_account/', views.select_account, name='select_account'),
     path('currency_data/', views.get_currency_data, name='currency_data'),
+    #path('crypto_data/', views.crypto_all_data, name=''),
+    path('link_crypto_wallet/', views.link_crypto_wallet, name='link_crypto_wallet')
     #path('recent_transactions/', views.recent_transactions, name='recent_transactions'),
     #path('crypto_addresses/', views.getCryptoAddresses, name='crypto_addresses') // commented out for now bc the view is not yet defined
 

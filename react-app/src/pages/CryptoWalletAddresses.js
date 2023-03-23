@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { all } from 'axios';
+import { useState, useContext} from 'react';
+import AuthContext from '../context/AuthContext';
 
 function CryptoWalletAddresses() {
-  const [addresses, setAddresses] = useState([{address: '', type: 'btc'}]);
+  const [addresses, setAddresses] = useState([{address: '', type: ''}]);
+  let {authTokens, logoutUser} = useContext(AuthContext);
 
   function handleAddressChange(index, key, value) {
     const newAddresses = [...addresses];
@@ -10,7 +13,7 @@ function CryptoWalletAddresses() {
   }
 
   function handleAddAddress() {
-    setAddresses([...addresses, {address: '', type: 'btc'}]);
+    setAddresses([...addresses, {address: '', type: ''}]);
   }
 
   function handleRemoveAddress(index) {
@@ -21,7 +24,20 @@ function CryptoWalletAddresses() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    
+    const allAddresses = [...addresses];
+
+    for(let i = 0; i < allAddresses.length; i++) {
+        if(/^0x[a-fA-F0-9]{40}$/.test(allAddresses[i].address) || /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(allAddresses[i].address)) {  // Test regex matches eth or btc format
+            let saveUrl = 'http://127.0.0.1:8000/api/link_crypto_wallet/?param=' + allAddresses[i].address;
+            fetch(saveUrl, {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            });
+        }
+    };
     
   }
 

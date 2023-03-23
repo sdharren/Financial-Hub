@@ -147,9 +147,21 @@ def link_token(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def link_crypto_wallet(request):
-    try
+    user = request.user
+    address = request.GET.get('param')
+    
+    save_wallet_address(user, address)
+
+    return Response(status=200)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_crypto_wallets(request):
+    user = request.user
+    allWallets = get_wallets(user)
+
+    return Response(allWallets, content_type='application/json', status=200)
 
 
 @api_view(['POST'])
