@@ -352,7 +352,10 @@ def getCachedInstitutionData(user,institution_name):
     else:
         cacheBankTransactionData(user)
         cachedInstitutions = cache.get('transactions' + user.email)
-    return cachedInstitutions[institution_name]
+    for institution in cachedInstitutions:
+        if institution_name in institution:
+            return institution.get(institution_name)
+    return None
 
 """
 @params: Object containing user authentication information
@@ -376,7 +379,7 @@ def getCachedInstitutionCachedData(user):
     else:
         cacheBankTransactionData(user)
         cachedInstitutions = cache.get('transactions' + user.email)
-    return cachedInstitutions[institution_name]
+    return cachedInstitutions.get(institution_name)
 
 """
 @params: Object containing user authentication information
