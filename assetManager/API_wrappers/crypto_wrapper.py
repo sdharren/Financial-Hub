@@ -86,7 +86,7 @@ def save_wallet_address(user, address):
             account_asset_type = AccountTypeEnum("CRYPTO"),
             account_date_linked = make_aware_date(datetime.now()),
             access_token = address,
-            account_institution_name = "Ethereum" if address[0:2] == "0x" else "Bitcoin"
+            account_institution_name = "eth" if address[0:2] == "0x" else "btc"
         )
     except IntegrityError:
         return # if there is an integrity error the address this user already linked this address

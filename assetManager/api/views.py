@@ -21,6 +21,7 @@ from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkToke
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
 from forex_python.converter import CurrencyRates
 from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
 
@@ -141,6 +142,14 @@ def link_token(request):
     link_token = wrapper.get_link_token()
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def link_crypto_wallet(request):
+    try
+
+
 
 
 @api_view(['POST'])

@@ -21,8 +21,7 @@ function CryptoWalletAddresses() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    // Handle submission of addresses here
-    const allAddresses = [...addresses];
+    
     
   }
 
@@ -37,16 +36,6 @@ function CryptoWalletAddresses() {
               value={address.address}
               onChange={(event) => handleAddressChange(index, 'address', event.target.value)}
             />
-          </label>
-          <label>
-            Type:
-            <select
-              value={address.type}
-              onChange={(event) => handleAddressChange(index, 'type', event.target.value)}
-            >
-              <option value="btc">Bitcoin</option>
-              <option value="eth">Ethereum</option>
-            </select>
           </label>
           <button type="button" className="remove-button" onClick={() => handleRemoveAddress(index)}>
             Remove
