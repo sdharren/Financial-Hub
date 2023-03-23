@@ -141,10 +141,17 @@ def exchange_public_token(request):
     else:
         return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
-    wrapper = DevelopmentWrapper()
-    public_token = request.POST.get('public_token')
+
+    #wrapper = DevelopmentWrapper()
+    if settings.PLAID_DEVELOPMENT:
+        wrapper = DevelopmentWrapper()
+    else:
+        wrapper = SandboxWrapper()
+
+    public_token = request.data.get('public_token')
     if public_token is None:
         return Response({'error': 'Bad request. Public token not specified.'}, status=400)
+
     try:
         wrapper.exchange_public_token(public_token)
     except InvalidPublicToken as e:
@@ -152,9 +159,11 @@ def exchange_public_token(request):
 
     #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
-    #update balances cache if it exists
-    token = wrapper.get_access_token()
-    set_single_institution_balances(token,wrapper,request.user)
+
+    if('transactions' in products_selected):
+        #update balances cache if it exists
+        token = wrapper.get_access_token()
+        set_single_institution_balances_and_currency(token,wrapper,request.user)
 
     #write a function in helpers it takes an access token, queries plaid for that access token and if
     #single institution thingy
@@ -176,7 +185,7 @@ def cache_assets(request):
             return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
 
         #caching of bank related investements
-        #Balances
+        #Balances ##SERGY THESE ARE THE ONES TO MOVE
         account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances)
         cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))

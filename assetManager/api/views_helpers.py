@@ -232,7 +232,7 @@ Returns:
 Raises a PlaidQueryException if an error occurs while querying the Plaid API
 None if the function executes successfully and stores the account balances in the cache
 """
-def set_single_institution_balances(token,wrapper,user):
+def set_single_institution_balances_and_currency(token,wrapper,user):
     debit_card = make_debit_card(wrapper,user)
 
     try:
@@ -250,6 +250,7 @@ def set_single_institution_balances(token,wrapper,user):
         balances[institution_name] = account_balances
         cache.set('balances' + user.email,balances)
 
+    cache.set('currency' + user.email, calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(cache.get('balances' + user.email))))
 
 """
 @params:

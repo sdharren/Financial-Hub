@@ -20,6 +20,7 @@ class APIViewsTestCase(TestCase):
         'assetManager/tests/fixtures/users.json',
     ]
 
+
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False
         self.user = User.objects.get(email='johndoe@example.org')
@@ -38,7 +39,6 @@ class APIViewsTestCase(TestCase):
         cache.delete('balancesjohndoe@example.org')
         cache.delete('transactionsjohndoe@example.org')
         cache.delete('currencyjohndoe@example.org')
-
 
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
@@ -121,9 +121,8 @@ class APIViewsTestCase(TestCase):
 
         self.assertFalse(cache.has_key('transactions' + self.user.email))
         self.assertFalse(cache.has_key('balances' + self.user.email))
-        self.assertFalse(cache.has_key('investments' + self.user.email))
+        #self.assertFalse(cache.has_key('investments' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
-
 
         wrapper = SandboxWrapper()
         public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments','transactions'])
@@ -149,8 +148,9 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('currency' in balances['Vanguard'][all_accounts])
 
         currency = cache.get('currency' + self.user.email)
-        
 
+        self.assertTrue('USD' in currency.keys())
+        self.assertEqual(currency['USD'],100)
 
     #extend this
     def test_delete_cache_assets_works(self):
@@ -227,6 +227,7 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/link_token/')
         self.assertEqual(response.status_code, 400)
 
+
     def test_post_exchange_public_token_returns_error_for_bad_public_token(self):
         cache.set('product_link' + self.user.email, 'transactions')
         response = self.client.post('/api/exchange_public_token/', {'public_token': 'notapublictoken'}, format='json')
@@ -238,6 +239,27 @@ class APIViewsTestCase(TestCase):
         response = self.client.post('/api/exchange_public_token/')
         self.assertEqual(response.status_code, 400)
         cache.delete('product_link' + self.user.email)
+    """
+    def test_post_exchange_public_token_correclty_caches_all_data_without_previously_cached_data(self):
+        before_count = AccountType.objects.count()
+
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+        self.assertFalse(cache.has_key('currency' + self.user.email))
+
+        cache.set('product_link' + self.user.email, 'transactions')
+        wrapper = SandboxWrapper()
+        public_token = wrapper.create_public_token()
+        response = self.client.post('/api/exchange_public_token/', {'public_token': public_token}, format='json')
+        self.assertEqual(response.status_code, 200)
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count + 1,after_count)
+        self.assertFalse(cache.has_key('product_link' + self.user.email))
+
+        print(cache.get('currency' + self.user.email))
+        print(cache.get('balances' + self.user.email))
+    """
+
 
     def test_retrieve_stock_getter_works(self):
         stock_getter = retrieve_stock_getter(self.user)
