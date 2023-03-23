@@ -348,16 +348,26 @@ def delete_cached(cache_type_string, user):
         cache.delete(cache_type_string + user.email)
 
 """
-@params: user
+@params: Object containing user authentication information
 
-@Description: if the transactions for the user have already been cached then it returns the transaction otherwise it caches the transaction data
-
-@return: json of transaction data for the account
+@Description: If the transactions for a user have not been cached then cache them.
+The format that the cache is stored is 'transactions' + user.email as the key and the return of transaction_data_getter(user) as the value
 """
 def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
         cache.set('transactions' + user.email, transaction_data_getter(user))
 
+"""
+@params: 
+user: Object containing user authentication information
+institution_name: name of an a bank institution (string)
+
+@Description: Gets the transactions for the user from the cache.
+If the user does not have any transactions cached then it gets cached by getting the data from Plaid and caching it.
+Then returns the transactions correlating to the institution name.
+
+@return: Returns an array of dictionaries each containing a singular transaction for that institution
+"""
 def getCachedInstitutionData(user,institution_name):
     if cache.has_key('transactions' + user.email):
         cachedInstitutions = cache.get('transactions' + user.email)
@@ -366,6 +376,16 @@ def getCachedInstitutionData(user,institution_name):
         cachedInstitutions = cache.get('transactions' + user.email)
     return cachedInstitutions[institution_name]
 
+"""
+@params: Object containing user authentication information
+
+@Description: Gets the institution name from cache and then gets the transactions for the user from the cache.
+If the institution name is not stored within cache then it caches the institution name of the first access token.
+If the user does not have any transactions cached then it gets cached by getting the data from Plaid and caching it.
+Then returns the transactions correlating to the institution name.
+
+@return: Returns an array of dictionaries each containing a singular transaction for that institution
+"""
 def getCachedInstitutionCachedData(user):
     if False == cache.has_key('access_token'+user.email):
         plaid_wrapper = get_transactions_wrapper(user)
@@ -381,16 +401,14 @@ def getCachedInstitutionCachedData(user):
     return cachedInstitutions[institution_name]
 
 """
-@params: user
+@params: Object containing user authentication information
 
-@Description: Sets the correct wrapper depending on the PLAID_DEVELOPMENT setting and then if it sets the SandboxWrapper it creates all the necessary tokens.
-    Then queries plaid for all the transactions from the access tokens stored, and inserts them into a BankGraphData object and returns the relevant object
+@Description: Creates the transaction data for each institution which is to be cached
 
-@return: BankGraphDataObject with the users transaction history stored inside
+@return: An array of dictionaries with the key being the institution name and the value being its transaction data (an array of dictionaries of each transaction)
 """
 def transaction_data_getter(user):
     plaid_wrapper = get_transactions_wrapper(user)
-
     debitCards = DebitCard(plaid_wrapper,user)
     debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
     return debitCards.get_insight_data()
