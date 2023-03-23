@@ -390,7 +390,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertTrue(isinstance(insights['Royal Bank of Scotland - Current Accounts'], BankGraphData))
         self.assertTrue(insights['Royal Bank of Scotland - Current Accounts'] is not [{}])
         if len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) != 0:
-            print('washed')
             self.assertTrue(len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) > 0)
 
             self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 500.0)

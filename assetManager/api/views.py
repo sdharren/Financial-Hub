@@ -1,4 +1,6 @@
 import json
+from django.shortcuts import redirect
+from django.http import JsonResponse
 from django.conf import settings
 from django.core.cache import cache
 from rest_framework.response import Response
@@ -12,7 +14,8 @@ from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from .views_helpers import *
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -308,14 +311,26 @@ def transaction_data_getter(user):
     #except PublicTokenNotExchanged:
     #    return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
     #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    #try:
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-    #except Exception:
-    #    return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
-
+    if False==cache.has_key('access_token' + user.email):
+        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    else:
+        access_token_id = cache.get('access_token'+user.email)
+        access_token = debitCards.access_tokens[int(access_token_id)]
+        debitCards.make_graph_transaction_data_insight_with_access_token(datetime.date(2000,12,16),datetime.date(2050,12,17),access_token)
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
     return accountData[first_key]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_bank_access_token(request):
+    data = request.body
+    decoded_data = data.decode('utf-8')
+    parsed_data = json.loads(decoded_data)
+    access_token_id = parsed_data['selectedOption']
+    cache.set('access_token'+request.user.email,access_token_id)
+    return Response(status=200)
 
 """
 @params: user
@@ -325,10 +340,24 @@ def transaction_data_getter(user):
 @return: json of transaction data for the account
 """
 def cacheBankTransactionData(user):
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, transaction_data_getter(user).transactionInsight.transaction_history)
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
 
-    return (cache.get('transactions' + user.email))
+    debitCards = DebitCard(plaid_wrapper,user)
+
+    if False==cache.has_key('access_token' + user.email):
+        cache.set('access_token' + user.email, 0)
+    access_token = cache.get('access_token' + user.email)
+
+    if False==cache.has_key('transactions' + str(access_token) + user.email):
+        cache.set('transactions' + str(access_token) + user.email, transaction_data_getter(user).transactionInsight.transaction_history)
+
+    return (cache.get('transactions' + str(access_token) + user.email))
 
 """
 @params:
@@ -428,10 +457,28 @@ def select_account(request):
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
-"""
-@params:
-request: Request object containing information about the request.
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_bank_account(request):
+    user = request.user
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
 
+    debitCards = DebitCard(plaid_wrapper,user)
+    institutions = []
+    institution_id = 0
+    for tokens in debitCards.access_tokens:
+        account ={"id":institution_id, "name": debitCards.get_institution_name_from_db(tokens)}
+        institutions.append(account)
+        institution_id = institution_id + 1
+    return Response(institutions,status=200)
+
+"""
 @Description:
     This function retrieves recent transactions of a user's bank account from the Plaid API.
     At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
@@ -450,7 +497,13 @@ def recent_transactions(request):
     user = request.user
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
-        bank_graph_data_insight = cacheBankTransactionData(user)
+
+        try:
+            bank_graph_data_insight = cacheBankTransactionData(user)
+        except PublicTokenNotExchanged:
+            raise TransactionsNotLinkedException('Transactions Not Linked.')
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
 
         if(check_institution_name_selected_exists(user,institution_name) is False):
             return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)

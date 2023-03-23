@@ -176,6 +176,27 @@ class DebitCard():
             self.make_bank_graph_data_dict(token,transactions,transaction_count)
             transaction_count = transaction_count + 1
 
+    def make_graph_transaction_data_insight_with_access_token(self,start_date_input,end_date_input,access_token):
+        transactions = self.get_transactions_by_date_with_access_token(start_date_input,end_date_input,access_token)
+        for token in self.access_tokens:
+            self.make_bank_graph_data_dict(token,transactions,0)
+
+    def get_transactions_by_date_with_access_token(self,start_date_input,end_date_input,access_token):
+        transactions = []
+        for token in self.access_tokens:
+            if token==access_token:
+                self.refresh_api(token)
+                transaction_request = TransactionsGetRequest(
+                    access_token=token,
+                    start_date=start_date_input,
+                    end_date=end_date_input,
+                )
+
+                transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+                transactions.append(transaction_response['transactions'])
+
+        return transactions
+
     """
     @params:
 
