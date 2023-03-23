@@ -150,9 +150,13 @@ def exchange_public_token(request):
     except InvalidPublicToken as e:
         return Response({'error': 'Bad request. Invalid public token.'}, status=400)
 
+    #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
     #update balances cache if it exists
     token = wrapper.get_access_token()
+
+
+    #write a function in helpers it takes an access token, queries plaid for that access token and if
     #single institution thingy
     #check duplicate for institution should be done in save access_token
     return Response(status=200)
@@ -517,7 +521,7 @@ def recent_transactions(request):
         except Exception:
             #return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
             raise PlaidQueryException('Something went wrong querying PLAID.')
-        
+
 
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:

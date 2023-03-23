@@ -248,7 +248,7 @@ def get_single_institution_balances(token,wrapper,user):
         balances = cache.get('balances' + user.email)
         cache.delete('balances' + user.email)
         balances[institution_name] = account_balances
-        cache.set('balances' + user.email)
+        cache.set('balances' + user.email,balances)
 
 
 """

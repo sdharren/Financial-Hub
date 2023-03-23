@@ -177,10 +177,9 @@ class DebitCard():
             transaction_count = transaction_count + 1
 
     def make_graph_transaction_data_insight_with_access_token(self,start_date_input,end_date_input,access_token):
-        transactions = self.get_transactions_by_date_with_access_token(start_date_input,end_date_input,access_token)
-        for token in self.access_tokens:
-            self.make_bank_graph_data_dict(token,transactions,0)
-
+        transactions = self.get_single_transaction(start_date_input,end_date_input,access_token)#get_transactions_by_date_with_access_token(start_date_input,end_date_input,access_token)
+        self.make_bank_graph_data_dict(token,transactions,0)
+    """
     def get_transactions_by_date_with_access_token(self,start_date_input,end_date_input,access_token):
         transactions = []
         for token in self.access_tokens:
@@ -196,6 +195,7 @@ class DebitCard():
                 transactions.append(transaction_response['transactions'])
 
         return transactions
+    """
 
     """
     @params:
