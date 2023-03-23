@@ -233,7 +233,6 @@ Raises a PlaidQueryException if an error occurs while querying the Plaid API
 None if the function executes successfully and stores the account balances in the cache
 """
 def get_single_institution_balances(token,wrapper,user):
-    #try catch this
     debit_card = make_debit_card(wrapper,user)
 
     try:
@@ -248,8 +247,8 @@ def get_single_institution_balances(token,wrapper,user):
     else:
         balances = cache.get('balances' + user.email)
         cache.delete('balances' + user.email)
-
         balances[institution_name] = account_balances
+        cache.set('balances' + user.email)
 
 
 """

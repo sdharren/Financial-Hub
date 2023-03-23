@@ -338,6 +338,20 @@ def cacheBankTransactionData(user):
 
     return (cache.get('transactions' + user.email))
 
+"""
+@params:
+request: an HTTP request object containing user authentication information
+user: a user object containing the user's email address and Plaid account information
+
+@Description: This function retrieves and formats currency data associated with a given user.
+The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+If the currency data has already been retrieved and cached, the function returns the cached data.
+Otherwise, the function retrieves the data and formats it into percentage proportions before caching it for future use.
+
+@return:
+A Response object containing the cached currency data if it exists
+A Response object containing the formatted currency data if it does not exist in the cache
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors

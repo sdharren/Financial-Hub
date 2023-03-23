@@ -71,6 +71,12 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertTrue(0 < len(response_data['Royal Bank of Scotland - Current Accounts']) <= 5)
         self.assertTrue(datetime.strptime(response_data['Royal Bank of Scotland - Current Accounts'][0]['date'], '%Y-%m-%d').date() <= date.today())
 
+        if(len(response_data['Royal Bank of Scotland - Current Accounts']) > 0):
+            self.assertTrue('amount' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+            self.assertTrue('date' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+            self.assertTrue('category' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+            self.assertTrue('merchant' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+
     def test_recent_transactions_data_with_incorrectly_saved_token_causing_an_error(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
         balances = reformatBalancesData(account_balances)
