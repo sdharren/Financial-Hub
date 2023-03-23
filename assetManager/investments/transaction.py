@@ -6,3 +6,4 @@ class Transaction:
         self.amount = transaction_json['amount']
         self.security_id = transaction_json['security_id']
         self.ticker = ticker
+        self.date = transaction_json['date']

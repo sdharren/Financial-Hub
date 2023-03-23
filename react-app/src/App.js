@@ -12,7 +12,7 @@ import Dashboard from './pages/Dashboard';
 import BalancesDisplay from './pages/Balances';
 import BarChartDisplay from './pages/BarChartDisplay';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
-import GraphDisplay from './pages/GraphDisplay';
+import InvestmentGraphs from './pages/InvestmentGraphs';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
@@ -21,6 +21,11 @@ import TransactionTable from './pages/RecentTransactionsDisplay';
 import LineGraph from './pages/LineGraph';
 
 // ask matthew about how margins are lined
+import SectorSpending from './pages/SectorSpending';
+import LinkAssets from './pages/LinkAssets';
+import Accounts from './pages/Accounts';
+// import { Sector } from 'recharts';
+//import AssetBank from './pages/bankAssets';
 
 function App() {
   return (
@@ -28,29 +33,30 @@ function App() {
       <Router>
         <AuthProvider>
           <Navbar />
-          <div className="min-h-full  flex items-center justify-center py-36 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md w-full space-y-8">
-          <div className="container">
+
             <Routes>
               <Route element={<PrivateRoutes/>}>
                 <Route element={<HomePage/>} path = "/homepage" exact />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/bar_graph_display" element={<BarChartDisplay />} />
+                <Route path="/sector_spending" element={<SectorSpending/>} />
+
+                {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
+                <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
+
+                <Route path="/balances" element={<BalancesDisplay />} />
+                <Route path="/currency" element={<Currency />} />
+                <Route path="/list" element={<TransactionTable />} />
+                <Route path="/link_assets" element={<LinkAssets />} />
+                <Route path="/accounts" element={<Accounts />} />
+                {/* <Route path="/bankassets" element={<AssetBank />} /> */}
               </Route>
-              <Route element={<Login/>} path="/login"/>
+              <Route path="/login" element={<Login/>} />
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/graph_display" element={<GraphDisplay />} />
-              <Route path="/display" element={<BarChartDisplay />} />
-              <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
-              <Route path="/balances" element={<BalancesDisplay />} />
-              <Route path="/currency" element={<Currency />} />
-              <Route path="/list" element={<TransactionTable />} />
-              <Route path = "/linegraph" element = {<LineGraph />} />
             </Routes>
-          </div>
-          </div>
-          </div>
+
         </AuthProvider>
       </Router>
     </div>

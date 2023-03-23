@@ -2,11 +2,13 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from plaid.model.investments_holdings_get_request import InvestmentsHoldingsGetRequest
 from plaid.model.investments_transactions_get_request import InvestmentsTransactionsGetRequest
 import json
-from datetime import date
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
+from operator import attrgetter
 
 class TransactionsNotDefined(Exception):
     pass
@@ -21,7 +23,7 @@ class StocksGetter():
     def __init__(self, concrete_wrapper):
         self.wrapper = concrete_wrapper
         self.investments = []
-        self.transactions = defaultdict(list)
+        self.transactions = []
         self.yfinance_wrapper = YFinanceWrapper()
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
@@ -51,17 +53,12 @@ class StocksGetter():
 
     def format_transactions(self, unformatted_transactions):
         for transaction in unformatted_transactions['investment_transactions']:
-            shouldSkip = False
             if str(transaction['type']) == 'buy':
                 for security in unformatted_transactions['securities']:
                     if security['security_id'] == transaction['security_id']:
                         ticker = security['ticker_symbol']
-                        if security['type'] != 'equity' and security['type'] != 'etf':
-                            shouldSkip = True
-                        security_id = transaction['security_id']
                         break
-                if not shouldSkip:
-                    self.transactions[security_id].append(Transaction(transaction, ticker))
+                self.transactions.append(Transaction(transaction, ticker))
 
     def format_investments(self, unformatted_investments):
         for current_investment in unformatted_investments:
@@ -135,6 +132,7 @@ class StocksGetter():
                     continue
         return returns
 
+    # Returns a dictionary - {category: total_price}
     def get_investment_category(self, category):
         category_dict = defaultdict(float)
         for investment in self.investments:
@@ -143,8 +141,55 @@ class StocksGetter():
                 category_dict[investment.get_name()] += investment.get_total_price()
         return category_dict
     
+    # Returns the stock ticker for associated with a name if one exists
     def get_stock_ticker(self, stock_name):
         for investment in self.investments:
             if investment.get_name() == stock_name:
                 return investment.get_ticker()
         return 'Cannot get stock ticker for ' + stock_name
+    
+    # Returns the day-by-day portfolio history for a specified period in months (only 1, 3, 6 months accepted)
+    # The return is a dict of the form {date: portfolio vaue}
+    def get_portfolio_history(self, months=6):
+        end_date = date.today()
+        start_date = end_date - relativedelta(months=months)
+        
+        portfolio_history = defaultdict(float)
+        stock_histories = []
+
+        for investment in self.investments:
+            if investment.get_ticker() is not None:
+                try:
+                    stock_history = self.yfinance_wrapper.get_stock_history_for_period(investment.get_ticker(), months)
+                except TickerNotSupported:
+                    continue
+                stock_histories.append(stock_history)
+
+        for current_date in (start_date + timedelta(days=n) for n in range(months*31)):
+            current_sum = 0
+            skipDay = False
+            for stock_history in stock_histories:
+                try:
+                    current_sum += stock_history[current_date.strftime('%Y-%m-%d')]
+                except KeyError: # key error means it's a weekend so there is no price data
+                    skipDay = True
+                    break
+            if not skipDay:
+                portfolio_history[current_date.strftime('%Y-%m-%d')] = current_sum
+        return portfolio_history
+
+    def get_supported_investments(self):
+        stocks = set()
+        for investment in self.investments:
+            if investment.get_ticker() and self.is_ticker_supported(investment.get_ticker()) is not None:
+                stocks.add(investment.get_name())
+        return stocks
+
+    def get_categories(self):
+        categories = set()
+        for investment in self.investments:
+            categories.add(investment.get_category())
+        return categories
+
+    def is_ticker_supported(self, ticker):
+        return self.yfinance_wrapper.is_ticker_supported(ticker)

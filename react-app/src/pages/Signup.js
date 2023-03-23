@@ -4,6 +4,7 @@ import { signupFields } from '../components/formFields';
 import Input from '../components/input'
 import FormAction from '../components/formAction';
 import Header from '../components/header';
+import '../static/errors.css';
 
 // need to add confirmation that passwords match
 
@@ -15,8 +16,20 @@ const Signup = () => {
 
     let {loginUser} = useContext(AuthContext);
 
+    let checkPassword = (e) => {
+        if (e.target.password.value !== e.target.confirm_password.value) {
+            document.querySelector(".password-error").innerHTML = "Passwords do not match"
+            document.querySelector(".password-error").style.display = "block"
+            return false
+        }
+        return true
+    }
+
     let signupUser = async (e) => {
         e.preventDefault();
+        if (!checkPassword(e)) {
+            return
+        }
         let response = await fetch('http://127.0.0.1:8000/api/signup/', {
             method : 'POST',
             headers : {
@@ -37,15 +50,21 @@ const Signup = () => {
         }
         else if (response.status === 400) {
             for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    alert(data[key])
+                if (key === "email") {
+                    document.querySelector(".email-error").innerHTML = data[key];
+                    document.querySelector(".email_error").style.display = "block";
+                }
+                if (key === "password") {
+                    document.querySelector(".password-error").innerHTML = data[key];
+                    document.querySelector(".password_error").style.display = "block";
                 }
             }
         }
     }
     
     let form1 = (
-        <div>
+        <div class="super-signup-container">
+        <div class="signup-container">
             <form onSubmit={signupUser}>
             <input type = "text" name = "email" placeholder='Enter email:' />
             <input type = "text" name = "first_name" placeholder='Enter first name:' />
@@ -54,9 +73,12 @@ const Signup = () => {
             <input type = "submit"/>
             </form>
         </div>
+        </div>
     )
     
     let form2 = (
+        <div class="super-signup-container">
+        <div class="signup-container">
         <div>
             <Header 
                 heading = "Register your account"
@@ -68,22 +90,28 @@ const Signup = () => {
                 <div className=''>
                     {
                         fields.map(field =>
-                            <Input 
-                                key = {field.id}
-                                handleChange = {null}
-                                labelText = {field.labelText}
-                                labelFor = {field.labelFor}
-                                id = {field.id}
-                                name = {field.name}
-                                type = {field.type}
-                                isRequired = {field.isRequired}
-                                placeholder = {field.placeholder}
-                            />
+                            <div>
+                                <Input 
+                                    key = {field.id}
+                                    handleChange = {null}
+                                    labelText = {field.labelText}
+                                    labelFor = {field.labelFor}
+                                    id = {field.id}
+                                    name = {field.name}
+                                    type = {field.type}
+                                    isRequired = {field.isRequired}
+                                    placeholder = {field.placeholder}
+                                />
+                                <p class = {"error " + field.name + "-error"}>hello</p>
+
+                            </div>
                         )
                     }
                     <FormAction handleSubmit={signupUser} text = "Register" />
                 </div>
             </form>
+        </div>
+        </div>
         </div>
     )
 
