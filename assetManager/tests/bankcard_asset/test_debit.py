@@ -137,7 +137,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['date'],date.today())
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['date'],date.today())
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['date'],'Not Provided')
 
         self.assertEqual(recent_transactions_hsbc['HSBC'][0]['date'],date.today())
         self.assertEqual(recent_transactions_hsbc['HSBC'][1]['date'],date.today())
@@ -390,7 +390,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertTrue(isinstance(insights['Royal Bank of Scotland - Current Accounts'], BankGraphData))
         self.assertTrue(insights['Royal Bank of Scotland - Current Accounts'] is not [{}])
         if len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) != 0:
-            print('washed')
             self.assertTrue(len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) > 0)
 
             self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 500.0)

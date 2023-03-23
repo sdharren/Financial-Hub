@@ -1,4 +1,5 @@
 import json
+from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.cache import cache
@@ -9,19 +10,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
-from dateutil.tz import tzlocal
-import datetime
-from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User
-from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
-from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
-from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from forex_python.converter import CurrencyRates
 from .views_helpers import *
+from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -142,9 +136,10 @@ def link_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
-    products_selected = ['transactions'] #NOTE: hardcoded for now
-    #TODO: uncomment line below for prod
-    #products_selected = cache.get('product_link' + request.user.email)
+    if cache.has_key('product_link' + request.user.email):
+        products_selected = cache.get('product_link' + request.user.email)
+    else:
+        return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
     wrapper = DevelopmentWrapper()
     public_token = request.POST.get('public_token')
@@ -316,14 +311,26 @@ def transaction_data_getter(user):
     #except PublicTokenNotExchanged:
     #    return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
     #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    #try:
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-    #except Exception:
-    #    return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
-
+    if False==cache.has_key('access_token' + user.email):
+        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    else:
+        access_token_id = cache.get('access_token'+user.email)
+        access_token = debitCards.access_tokens[int(access_token_id)]
+        debitCards.make_graph_transaction_data_insight_with_access_token(datetime.date(2000,12,16),datetime.date(2050,12,17),access_token)
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
     return accountData[first_key]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_bank_access_token(request):
+    data = request.body
+    decoded_data = data.decode('utf-8')
+    parsed_data = json.loads(decoded_data)
+    access_token_id = parsed_data['selectedOption']
+    cache.set('access_token'+request.user.email,access_token_id)
+    return Response(status=200)
 
 """
 @params: user
@@ -333,11 +340,39 @@ def transaction_data_getter(user):
 @return: json of transaction data for the account
 """
 def cacheBankTransactionData(user):
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, transaction_data_getter(user).transactionInsight.transaction_history)
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
 
-    return (cache.get('transactions' + user.email))
+    debitCards = DebitCard(plaid_wrapper,user)
 
+    if False==cache.has_key('access_token' + user.email):
+        cache.set('access_token' + user.email, 0)
+    access_token = cache.get('access_token' + user.email)
+
+    if False==cache.has_key('transactions' + str(access_token) + user.email):
+        cache.set('transactions' + str(access_token) + user.email, transaction_data_getter(user).transactionInsight.transaction_history)
+
+    return (cache.get('transactions' + str(access_token) + user.email))
+
+"""
+@params:
+request: an HTTP request object containing user authentication information
+user: a user object containing the user's email address and Plaid account information
+
+@Description: This function retrieves and formats currency data associated with a given user.
+The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+If the currency data has already been retrieved and cached, the function returns the cached data.
+Otherwise, the function retrieves the data and formats it into percentage proportions before caching it for future use.
+
+@return:
+A Response object containing the cached currency data if it exists
+A Response object containing the formatted currency data if it does not exist in the cache
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -357,6 +392,20 @@ def get_currency_data(request):
 
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
+"""
+@params:
+request: an HTTP request object containing user authentication information
+user: a user object containing the user's email address and Plaid account information
+
+@Description: This function retrieves and formats balance data associated with a given user.
+The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+If the balance data has already been retrieved and cached, the function returns the cached data.
+Otherwise, the function retrieves the data and formats it before caching it for future use.
+
+@return:
+A Response object containing the cached balance data if it exists
+A Response object containing the formatted balance data if it does not exist in the cache
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -375,6 +424,19 @@ def get_balances_data(request):
     cache.set('balances' + user.email, account_balances)
     return Response(balances, content_type='application/json', status = 200)
 
+"""
+@param:
+request: an HTTP request object containing user authentication information
+
+@Description: This function retrieves account balance data for a specific institution associated with a given user.
+The function uses a user object to access the data through a caching system.
+If the balance data has not been retrieved and cached, an error response is returned.
+If the institution name is not valid, another error response is returned. Otherwise, the function formats the data and returns it.
+
+@Return:
+A Response object containing the formatted account balance data for a specific institution if the institution name is valid
+An error Response object if the institution name is not valid or if the balance data has not been retrieved and cached
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
@@ -395,7 +457,39 @@ def select_account(request):
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_bank_account(request):
+    user = request.user
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
 
+    debitCards = DebitCard(plaid_wrapper,user)
+    institutions = []
+    institution_id = 0
+    for tokens in debitCards.access_tokens:
+        account ={"id":institution_id, "name": debitCards.get_institution_name_from_db(tokens)}
+        institutions.append(account)
+        institution_id = institution_id + 1
+    return Response(institutions,status=200)
+
+"""
+@Description:
+    This function retrieves recent transactions of a user's bank account from the Plaid API.
+    At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
+
+@returns:
+    If the institution name is provided in the request, the function returns the recent transactions of that institution in JSON format with a status code of 200.
+
+    If the institution name is not provided in the request, the function returns an error message indicating that the institution name is not selected with a status code of 303.
+
+    If an exception occurs while querying the Plaid API, the function raises a custom exception named PlaidQueryException.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -403,7 +497,13 @@ def recent_transactions(request):
     user = request.user
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
-        bank_graph_data_insight = cacheBankTransactionData(user)
+
+        try:
+            bank_graph_data_insight = cacheBankTransactionData(user)
+        except PublicTokenNotExchanged:
+            raise TransactionsNotLinkedException('Transactions Not Linked.')
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
 
         if(check_institution_name_selected_exists(user,institution_name) is False):
             print('invalid institution name')
@@ -423,9 +523,95 @@ def recent_transactions(request):
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
 
+
+"""
+    @params:
+        request (HttpRequest): the HTTP request object.
+
+    @Description:
+        Retrieve the linked banks for the authenticated user.
+
+    @return:
+        Response: the HTTP response object containing a list of institution names in JSON format.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_linked_assets(request):
-    account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
-    reformatted = [account_type.account_institution_name]
-    return Response(reformatted, content_type='application/json',status = 200)
+def get_linked_banks(request):
+
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
+    institutions = []
+    for account in account_types:
+        institutions.append(account.account_institution_name)
+    return Response(institutions, content_type='application/json',status = 200)
+
+"""
+    @params:
+        request (HttpRequest): the HTTP request object.
+
+    @Description:
+        Retrieve the linked brokerages for the authenticated user.
+
+    @return:
+        Response: the HTTP response object containing a list of brokerage names in JSON format.
+
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def linked_brokerage(request):
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.STOCK)
+    brokerages = []
+    for brokerage in account_types:
+        brokerages.append(brokerage.account_institution_name)
+    return Response(brokerages, content_type='application/json',status = 200)
+
+
+"""
+    @params:
+        request: The HTTP request object that contains information about the current request.
+        institution: The name of the linked institution account to be deleted.
+
+    @Description:
+        This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
+
+    @return:
+        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+        A HttpResponseBadRequest object with an error message if the account was not found.
+
+"""
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_banks(request, institution):
+
+    account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked bank account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
+
+
+"""
+    @params:
+        request: The HTTP request object that contains information about the current request.
+        brokerage: The name of the linked brokerage account to be deleted.
+
+    @Description:
+        This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
+
+    @return:
+        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+        A HttpResponseBadRequest object with an error message if the account was not found.
+
+"""
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_brokerage(request, brokerage):
+
+    account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
