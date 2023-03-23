@@ -159,6 +159,7 @@ def exchange_public_token(request):
 
     #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
+    token = wrapper.get_access_token()
 
     if('transactions' in products_selected):
         #update balances cache if it exists
@@ -240,7 +241,7 @@ def retrieve_stock_getter(user):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def company_spending(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     if request.GET.get('param'):
         sector = request.GET.get('param')
     else:
@@ -252,14 +253,14 @@ def company_spending(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sector_spending(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     graphData = transactions.orderedCategorisedSpending()
     return Response(graphData, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
@@ -274,7 +275,7 @@ def yearlyGraph(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
@@ -294,7 +295,7 @@ def monthlyGraph(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
@@ -303,37 +304,6 @@ def weeklyGraph(request):
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
 
-"""
-@params: user
-
-@Description: Sets the correct wrapper depending on the PLAID_DEVELOPMENT setting and then if it sets the SandboxWrapper it creates all the necessary tokens.
-    Then queries plaid for all the transactions from the access tokens stored, and inserts them into a BankGraphData object and returns the relevant object
-
-@return: BankGraphDataObject with the users transaction history stored inside
-"""
-def transaction_data_getter(user):
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
-    #try:
-    debitCards = DebitCard(plaid_wrapper,user)
-    #except PublicTokenNotExchanged:
-    #    return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
-    #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    if False==cache.has_key('access_token' + user.email):
-        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-    else:
-        access_token_id = cache.get('access_token'+user.email)
-        access_token = debitCards.access_tokens[int(access_token_id)]
-        debitCards.make_graph_transaction_data_insight_with_access_token(datetime.date(2000,12,16),datetime.date(2050,12,17),access_token)
-    accountData = debitCards.get_insight_data()
-    first_key = next(iter(accountData))
-    return accountData[first_key]
 
 
 @api_view(['POST'])
@@ -342,36 +312,13 @@ def set_bank_access_token(request):
     data = request.body
     decoded_data = data.decode('utf-8')
     parsed_data = json.loads(decoded_data)
-    access_token_id = parsed_data['selectedOption']
-    cache.set('access_token'+request.user.email,access_token_id)
+    access_token_id = int(parsed_data['selectedOption'])
+    plaid_wrapper = get_balances_wrapper(request.user)
+    debitCards = DebitCard(plaid_wrapper,request.user)
+    access_token = debitCards.access_tokens[access_token_id]
+    cache.delete('access_token'+request.user.email)
+    cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
     return Response(status=200)
-
-"""
-@params: user
-
-@Description: if the transactions for the user have already been cached then it returns the transaction otherwise it caches the transaction data
-
-@return: json of transaction data for the account
-"""
-def cacheBankTransactionData(user):
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
-    debitCards = DebitCard(plaid_wrapper,user)
-
-    if False==cache.has_key('access_token' + user.email):
-        cache.set('access_token' + user.email, 0)
-    access_token = cache.get('access_token' + user.email)
-
-    if False==cache.has_key('transactions' + str(access_token) + user.email):
-        cache.set('transactions' + str(access_token) + user.email, transaction_data_getter(user).transactionInsight.transaction_history)
-
-    return (cache.get('transactions' + str(access_token) + user.email))
 
 """
 @params:
