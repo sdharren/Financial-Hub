@@ -308,7 +308,8 @@ def transaction_data_getter(user):
     if False==cache.has_key('access_token' + user.email):
         debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
     else:
-        access_token = cache.get('access_token'+user.email)
+        access_token_id = cache.get('access_token'+user.email)
+        access_token = debitCards.access_tokens[int(access_token_id)]
         debitCards.make_graph_transaction_data_insight_with_access_token(datetime.date(2000,12,16),datetime.date(2050,12,17),access_token)
     accountData = debitCards.get_insight_data()
     first_key = next(iter(accountData))
@@ -321,9 +322,8 @@ def set_bank_access_token(request):
     data = request.body
     decoded_data = data.decode('utf-8')
     parsed_data = json.loads(decoded_data)
-    access_token = parsed_data['selectedOption']
-    cache.set('access_token'+request.user.email,access_token)
-    cache.delete('transactions' + request.user.email)
+    access_token_id = parsed_data['selectedOption']
+    cache.set('access_token'+request.user.email,access_token_id)
     return Response(status=200)
 
 """
@@ -334,10 +334,24 @@ def set_bank_access_token(request):
 @return: json of transaction data for the account
 """
 def cacheBankTransactionData(user):
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
 
-    return (json.loads(cache.get('transactions' + user.email)))
+    debitCards = DebitCard(plaid_wrapper,user)
+
+    if False==cache.has_key('access_token' + user.email):
+        cache.set('access_token' + user.email, 0)
+    access_token = cache.get('access_token' + user.email)
+
+    if False==cache.has_key('transactions' + str(access_token) + user.email):
+        cache.set('transactions' + str(access_token) + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+
+    return (json.loads(cache.get('transactions' + str(access_token) + user.email)))
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -416,7 +430,13 @@ def select_bank_account(request):
         plaid_wrapper.save_access_token(user, ['transactions'])
 
     debitCards = DebitCard(plaid_wrapper,user)
-    return Response(debitCards.access_tokens,status=200)
+    institutions = []
+    institution_id = 0
+    for tokens in debitCards.access_tokens:
+        account ={"id":institution_id, "name": debitCards.get_institution_name_from_db(tokens)}
+        institutions.append(account)
+        institution_id = institution_id + 1
+    return Response(institutions,status=200)
 
 def delete_balances_cache(user):
     cache.delete('balances' + user.email)

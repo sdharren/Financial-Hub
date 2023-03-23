@@ -46,7 +46,7 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
   }
 
   const options = data.map((item, index) => (
-    <option key={index} value={item}>{item}</option>
+    <option key={item.id} value={item.id}>{item.name}</option>
   ));
 
   return (

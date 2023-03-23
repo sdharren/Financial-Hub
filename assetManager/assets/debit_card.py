@@ -131,7 +131,7 @@ class DebitCard():
         transactions = []
         for token in self.access_tokens:
             self.refresh_api(token)
-
+            print("plaid call")
             transaction_request = TransactionsGetRequest(
                 access_token=token,
                 start_date=start_date_input,
@@ -153,7 +153,7 @@ class DebitCard():
     @return:
     """
     def make_bank_graph_data_dict(self,token,transactions,transaction_count):
-        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
+        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[0])
 
     """
     @params: start_date_input,end_date_input datetime.date objects representing the start and end date range for transaction retrieval
@@ -180,7 +180,7 @@ class DebitCard():
             if token==access_token:
                 print(access_token)
                 self.refresh_api(token)
-
+                print("here")
                 transaction_request = TransactionsGetRequest(
                     access_token=token,
                     start_date=start_date_input,

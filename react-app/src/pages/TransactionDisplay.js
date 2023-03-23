@@ -26,6 +26,12 @@ function BarChartDisplay() {
         );
     }
 
+    function handleOnChange(event) {
+        setGraph(
+            <BarGraph endpoint={'yearly_graphs'} endpoint_parameter={'yearly_graphs'} loadNext={handleLoadNext}/>
+        );
+    }
+
 
     return (
         <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
@@ -33,7 +39,7 @@ function BarChartDisplay() {
                 Go Back
             </button>
             {graph}
-            <DropDown/>
+            <DropDown onChange={handleOnChange}/>
         </div>
     );
 }
