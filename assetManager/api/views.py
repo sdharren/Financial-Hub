@@ -1,5 +1,4 @@
 import json
-from django.http import JsonResponse
 from django.conf import settings
 from django.core.cache import cache
 from rest_framework.response import Response
@@ -9,20 +8,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
-from dateutil.tz import tzlocal
-import datetime
-from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User,AccountType,AccountTypeEnum
-from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
-from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
-from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from forex_python.converter import CurrencyRates
 from .views_helpers import *
-from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponse
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):

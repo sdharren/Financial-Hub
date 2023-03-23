@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.cache import cache
 from assetManager.assets.debit_card import DebitCard
-from assetManager.transactionInsight.bank_graph_data import BankGraphData,get_currency_converter
+from assetManager.transactionInsight.bank_graph_data import get_currency_converter
 import datetime
 from assetManager.models import User,AccountType,AccountTypeEnum
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
