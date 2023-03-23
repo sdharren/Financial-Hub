@@ -232,7 +232,7 @@ Returns:
 Raises a PlaidQueryException if an error occurs while querying the Plaid API
 None if the function executes successfully and stores the account balances in the cache
 """
-def get_single_institution_balances(token,wrapper,user):
+def set_single_institution_balances(token,wrapper,user):
     debit_card = make_debit_card(wrapper,user)
 
     try:

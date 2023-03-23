@@ -37,6 +37,7 @@ class APIViewsTestCase(TestCase):
         cache.delete('investmentsjohndoe@example.org')
         cache.delete('balancesjohndoe@example.org')
         cache.delete('transactionsjohndoe@example.org')
+        cache.delete('currencyjohndoe@example.org')
 
 
     def test_investment_categories_returns_categories(self):
@@ -117,6 +118,13 @@ class APIViewsTestCase(TestCase):
     def test_put_cache_assets_works(self):
         #cache.delete('investments' + self.user.email)
         # setup investments
+
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+        self.assertFalse(cache.has_key('investments' + self.user.email))
+        self.assertFalse(cache.has_key('currency' + self.user.email))
+
+
         wrapper = SandboxWrapper()
         public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments','transactions'])
         wrapper.exchange_public_token(public_token)
@@ -139,6 +147,9 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('current_amount' in balances['Vanguard'][all_accounts])
             self.assertTrue('type' in balances['Vanguard'][all_accounts])
             self.assertTrue('currency' in balances['Vanguard'][all_accounts])
+
+        currency = cache.get('currency' + self.user.email)
+        
 
 
     #extend this

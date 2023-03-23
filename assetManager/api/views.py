@@ -154,7 +154,7 @@ def exchange_public_token(request):
     wrapper.save_access_token(request.user, products_selected)
     #update balances cache if it exists
     token = wrapper.get_access_token()
-
+    set_single_institution_balances(token,wrapper,request.user)
 
     #write a function in helpers it takes an access token, queries plaid for that access token and if
     #single institution thingy
@@ -179,6 +179,7 @@ def cache_assets(request):
         #Balances
         account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances)
+        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
