@@ -1,57 +1,100 @@
-import React, { useState, useContext } from 'react';
-import AuthContext from '../context/AuthContext';
-import DebitAccounts from './DebitAccounts';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function Accounts() {
-  const [selectedInstitution, setSelectedInstitution] = useState(null);
-  let {authTokens, logoutUser} = useContext(AuthContext);
-
-  async function handleDeleteBank(institution)  {
-    let url = `http://127.0.0.1:8000/api/delete_linked_bank/${institution}/`
-    try {
-        let response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
+function AccountTable() {
+    const [banks, setBanks] = useState([]);
+    const [brokerages, setBrokerages] = useState([]);
+    
+    let getAccounts = async () => {
+      try {
+        
+        const bankurl = 'http://127.0.0.1:8000/api/get_linked_banks/';
+        const bankresponse = await fetch(bankurl, {
+          method: 'GET',
+          headers: {
             'Content-Type': 'application/json',
-            'Authorization':'Bearer ' + String(authTokens.access)
-        },
-        })
-        if (response.ok) {
-            setSelectedInstitution(null); // Clear the selected institution
-        } else {
-            throw new Error('Failed to delete linked bank account');
-        }
-    } catch (error) {
-      console.error(error);
+            'Authorization': 'Bearer ' + String(authTokens.access)
+          }
+        });
+        const bankdata = await bankresponse.json();
+        setBanks(bankdata);
+    
+        const stockurl = 'http://127.0.0.1:8000/api/linked_brokerage/';
+        const stockresponse = await fetch(stockurl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + String(authTokens.access)
+          }
+        });
+        const stockdata = await stockresponse.json();
+        setBrokerages(stockdata);
+    
+      } catch (error) {
+        console.error(error);
+      }
     }
-  }
+    
+    useEffect(() => {
+      // Call the async function `getAccounts` to fetch the linked accounts
+      getAccounts();
+    }, []);
 
-  const linkedBanks = <DebitAccounts setSelectedInstitution={setSelectedInstitution} />; // Render the list of linked banks
+  const handleRemoveBank = (institution) => {
+    // Send DELETE request to unlink bank account
+    axios.delete(`/api/delete_linked_banks/${institution}/`)
+      .then(response => {
+        // Remove bank from list of linked banks
+        setBanks(banks.filter(bank => bank !== institution));
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  const handleRemoveBrokerage = (brokerage) => {
+    // Send DELETE request to unlink brokerage account
+    axios.delete(`/api/delete_linked_brokerage/${brokerage}/`)
+      .then(response => {
+        // Remove brokerage from list of linked brokerages
+        setBrokerages(brokerages.filter(b => b !== brokerage));
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
 
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Unlink</th>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        {banks.map(bank => (
+          <tr key={bank}>
+            <td>{bank}</td>
+            <td>Institution</td>
+            <td>
+              <button onClick={() => handleRemoveBank(bank)}>Remove</button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {linkedBanks.map((institution, index) => (
-            <tr key={index}>
-              <td>{institution}</td>
-              <td>Bank</td>
-              <td>
-                <button onClick={() => handleDeleteBank(institution)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+        {brokerages.map(brokerage => (
+          <tr key={brokerage}>
+            <td>{brokerage}</td>
+            <td>Brokerage</td>
+            <td>
+              <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
-export default Accounts;
+export default AccountTable;
