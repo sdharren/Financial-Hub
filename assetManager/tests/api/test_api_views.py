@@ -156,12 +156,16 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_post_exchange_public_token_returns_error_for_bad_public_token(self):
+        cache.set('product_link' + self.user.email, 'transactions')
         response = self.client.post('/api/exchange_public_token/', {'public_token': 'notapublictoken'}, format='json')
         self.assertEqual(response.status_code, 400)
+        cache.delete('product_link' + self.user.email)
 
     def test_post_exchange_public_token_returns_error_code_with_no_public_token(self):
+        cache.set('product_link' + self.user.email, 'transactions')
         response = self.client.post('/api/exchange_public_token/')
         self.assertEqual(response.status_code, 400)
+        cache.delete('product_link' + self.user.email)
 
     def test_retrieve_stock_getter_works(self):
         stock_getter = retrieve_stock_getter(self.user)
