@@ -13,7 +13,7 @@ from dateutil.tz import tzlocal
 import datetime
 from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User
+from assetManager.models import User,AccountType,AccountTypeEnum
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
@@ -22,7 +22,7 @@ from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from forex_python.converter import CurrencyRates
 from .views_helpers import *
-
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -142,9 +142,10 @@ def link_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
-    products_selected = ['transactions'] #NOTE: hardcoded for now
-    #TODO: uncomment line below for prod
-    #products_selected = cache.get('product_link' + request.user.email)
+    if cache.has_key('product_link' + request.user.email):
+        products_selected = cache.get('product_link' + request.user.email)
+    else:
+        return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
     wrapper = DevelopmentWrapper()
     public_token = request.POST.get('public_token')
@@ -476,9 +477,95 @@ def recent_transactions(request):
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
 
+
+"""
+    @params:
+        request (HttpRequest): the HTTP request object.
+
+    @Description:
+        Retrieve the linked banks for the authenticated user.
+
+    @return:
+        Response: the HTTP response object containing a list of institution names in JSON format.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_linked_assets(request):
-    account_type = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
-    reformatted = [account_type.account_institution_name]
-    return Response(reformatted, content_type='application/json',status = 200)
+def get_linked_banks(request):
+
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
+    institutions = []
+    for account in account_types:
+        institutions.append(account.account_institution_name)
+    return Response(institutions, content_type='application/json',status = 200)
+
+"""
+    @params:
+        request (HttpRequest): the HTTP request object.
+
+    @Description:
+        Retrieve the linked brokerages for the authenticated user.
+
+    @return:
+        Response: the HTTP response object containing a list of brokerage names in JSON format.
+
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def linked_brokerage(request):
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.STOCK)
+    brokerages = []
+    for brokerage in account_types:
+        brokerages.append(brokerage.account_institution_name)
+    return Response(brokerages, content_type='application/json',status = 200)
+
+
+"""
+    @params:
+        request: The HTTP request object that contains information about the current request.
+        institution: The name of the linked institution account to be deleted.
+
+    @Description:
+        This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
+
+    @return:
+        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+        A HttpResponseBadRequest object with an error message if the account was not found.
+
+"""
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_banks(request, institution):
+
+    account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked bank account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
+
+
+"""
+    @params:
+        request: The HTTP request object that contains information about the current request.
+        brokerage: The name of the linked brokerage account to be deleted.
+
+    @Description:
+        This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
+
+    @return:
+        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+        A HttpResponseBadRequest object with an error message if the account was not found.
+
+"""
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_brokerage(request, brokerage):
+
+    account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)

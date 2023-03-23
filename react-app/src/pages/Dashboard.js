@@ -102,12 +102,7 @@ function Dashboard() {
                 ))}
               </div>
 
-              <div className="right-menu" hidden={stocksActive}>
-                <select value={selectedPieAccount} onChange={handlePieAccountChange}>
-                  <option value="All Accounts">All Accounts</option>
-                  <option value="Account 1">Account 1</option>
-                </select>
-              </div>
+              
 
             </div>
           </div>
