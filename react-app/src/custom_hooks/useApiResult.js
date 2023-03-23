@@ -17,7 +17,7 @@ const useApiResult = ({request, endpoint}) => {
     .catch((err) => {
       setError(err.message);
     });
-  }, [endpoint]);
+  }, [request, endpoint]);
   return [data, error];
 };
 

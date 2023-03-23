@@ -10,12 +10,6 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
     const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
     const navigate = useNavigate();
 
-    let handleSelectionUpdate = async(nextParam) => {
-        updateGraph({
-            'endpoint': endpoint,
-            'param': nextParam
-        });
-
     var chartCategories = [], chartSeries = [];
     for (var key in lineChartData) {
         if ( ! lineChartData.hasOwnProperty(key)) {
@@ -25,13 +19,20 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
         chartCategories.push(key.slice(0, 10));
     }
 
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
+    }
+
     // Set the options for the chart
     const options = {
         chart: {
             id: 'area-datetime',
-            height: 350,
+            height: 100,
             zoom: {
-                autoScaleYaxis: false
+                autoScaleYaxis: true
             },
         },
         title: {
@@ -95,24 +96,24 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             },
     };
 
-    let redirectToLink = async(assetType) => {
-        let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
-            {
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/json',
-                    'Authorization':'Bearer ' + String(authTokens.access)
-                }
-            }
-        )
-        let data = await response.json();
-        if (response.status === 200) {
-            navigate('/plaid_link', {
-                state: {link_token: data['link_token']},
-                replace: true
-            });
-        }
-    }
+    // let redirectToLink = async(assetType) => {
+    //     let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
+    //         {
+    //             method:'GET',
+    //             headers:{
+    //                 'Content-Type':'application/json',
+    //                 'Authorization':'Bearer ' + String(authTokens.access)
+    //             }
+    //         }
+    //     )
+    //     let data = await response.json();
+    //     if (response.status === 200) {
+    //         navigate('/plaid_link', {
+    //             state: {link_token: data['link_token']},
+    //             replace: true
+    //         });
+    //     }
+    // }
     
         // Set the series data for the chart
         const series = [{
@@ -128,11 +129,11 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
                 ? null
                 : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
             }
-            lineChartData == null ? <p>Loading...</p> :
-            <Chart options={options} series={series} type = "area" />
+            {lineChartData == null ? <p>Loading...</p> :
+            <Chart options={options} series={series} type = "area" />}
         </div>
       )
     }
-}
+
 
 export default LineGraph;

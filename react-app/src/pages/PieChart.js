@@ -12,6 +12,7 @@ import {
 
 import { Pie, getElementsAtEvent } from 'react-chartjs-2';
 import GraphSelect from '../components/GraphSelect';
+import usePlaid from '../custom_hooks/usePlaid';
 
 
 ChartJS.register(
@@ -22,32 +23,35 @@ ChartJS.register(
 )
 function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
     let {authTokens, logoutUser} = useContext(AuthContext);
-    const [pieChartData, setPieChartData] = useState(null);
+    const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
+    console.log(pieChartData)
+    //const [pieChartData, setPieChartData] = useState(null);
     const navigate = useNavigate()
 
-    let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
-        let response = await fetch(url, {
-            method:'GET',
-            headers:{
-                'Content-Type':'application/json',
-                'Authorization':'Bearer ' + String(authTokens.access)
-            }
-        });
-        let data = await response.json();
-        if (response.status === 200) {
-            setPieChartData(data);
-        }
-        else if (response.status === 303) {
-            //TODO: redirect to plaid link investments
-            if (data['error'] === 'Investments not linked.') {
-                redirectToLink('investments');
-            }
-            else if (data['error'] === 'Transactions Not Linked.') {
-                redirectToLink('transactions');
-            }
-        }
-    }
+    // let get_data = async() =>  {
+    //     let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
+    //     let response = await fetch(url, {
+    //         method:'GET',
+    //         headers:{
+    //             'Content-Type':'application/json',
+    //             'Authorization':'Bearer ' + String(authTokens.access)
+    //         }
+    //     });
+
+    //     let data = await response.json();
+    //     if (response.status === 200) {
+    //         setPieChartData(data);
+    //     }
+    //     else if (response.status === 303) {
+    //         //TODO: redirect to plaid link investments
+    //         if (data['error'] === 'Investments not linked.') {
+    //             redirectToLink('investments');
+    //         }
+    //         else if (data['error'] === 'Transactions Not Linked.') {
+    //             redirectToLink('transactions');
+    //         }
+    //     }
+    // }
 
     let redirectToLink = async(assetType) => {
         let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
@@ -76,9 +80,9 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         });
     }
 
-    useEffect(() => {
-        get_data();
-    }, [endpoint, endpoint_parameter]);
+    // useEffect(() => {
+    //     get_data();
+    // }, [endpoint, endpoint_parameter]);
 
     let pie_data = new Array();
     let pie_labels = new Array();
@@ -133,7 +137,11 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
                 ? <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
                 : null
             }
-            <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+            {
+                pieChartData === null ? 
+                <p>Loading...</p> :  
+                <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+            }
         </div>
         
     ) 
