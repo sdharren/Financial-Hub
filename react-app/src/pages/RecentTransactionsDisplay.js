@@ -87,21 +87,15 @@ function RecentTransactions() {
       }
     
       const data = await response.json();
-      console.log(data);
-      const transactionList = Object.values(data)[0].flatMap((category) =>
-        category.map((transaction) => ({ ...transaction }))
-      );
-      if (Array.isArray(transactionList)) {
-        setTransactions(transactionList);
-      } else {
-        console.error(`Failed to fetch recent transactions: transactionList is not an array`);
-      }
+      setTransactions(data['Royal Bank of Scotland - Current Accounts']);
+      
     }
 
     fetchTransactions();
-  }, []);
+  }, [transactions]);
 
   return (
+    <div>
     <table>
       <thead>
         <tr>
@@ -111,19 +105,18 @@ function RecentTransactions() {
           <th>Amount</th>
         </tr>
       </thead>
-      {transactions.length > 0 ? (
-        <tbody>
+      <tbody>
           {transactions.map(transaction => (
-            <tr key={transaction.id}>
-              <td>{transaction.amount}</td>
-              <td>{transaction.category}</td>
-              <td>{transaction.date}</td>
+            <tr key={transaction.merchant}>
+              <td>{transaction.date.toDateString()}</td>
               <td>{transaction.merchant}</td>
+              <td>{transaction.category.join(', ')}</td>
+              <td>{transaction.amount}</td>
             </tr>
           ))}
-        </tbody>
-      ) : null}
+      </tbody>
     </table>
+    </div>
   );
 }
 
