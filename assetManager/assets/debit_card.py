@@ -110,6 +110,7 @@ class DebitCard():
         return accounts
 
     def get_single_transaction(self,start_date_input,end_date_input,token):
+        self.refresh_api(token)
         transaction_request = TransactionsGetRequest(
             access_token=token,
             start_date=start_date_input,
@@ -144,7 +145,6 @@ class DebitCard():
     def get_transactions_by_date(self,start_date_input,end_date_input):
         transactions = []
         for token in self.access_tokens:
-            self.refresh_api(token)
             transaction_response = self.get_single_transaction(start_date_input,end_date_input,token)
             transactions.append(transaction_response['transactions'])
 

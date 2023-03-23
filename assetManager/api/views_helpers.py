@@ -147,6 +147,18 @@ def get_balances_wrapper(user):
 
     return plaid_wrapper
 
+
+def get_transactions_wrapper(user):
+    if settings.PLAID_DEVELOPMENT:
+        plaid_wrapper = DevelopmentWrapper()
+    else:
+        #user is required to make a dummy access token for testing purposes
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(user, ['transactions'])
+
+    return plaid_wrapper
 """
 @params:
 -user:models.User
@@ -250,6 +262,23 @@ def set_single_institution_balances(token,wrapper,user):
         balances[institution_name] = account_balances
         cache.set('balances' + user.email,balances)
 
+def set_single_institution_transactions(token,wrapper,user):
+    debit_card = make_debit_card(wrapper,user)
+
+    try:
+        account_transactions = debit_card.get_single_transaction(token)
+    except Exception:
+        raise PlaidQueryException('Something went wrong querying PLAID.')
+
+    institution_name = wrapper.get_institution_name(token)
+
+    if(cache.has_key('transactions' + user.email) is False):
+        cache.set('transactions' + user.email, {institution_name:account_transactions})
+    else:
+        balances = cache.get('transactions' + user.email)
+        cache.delete('transactions' + user.email)
+        balances[institution_name] = account_transactions
+        cache.set('transactions' + user.email,balances)
 
 """
 @params:
@@ -315,3 +344,51 @@ If the specified cache data exists in the cache, it is deleted.
 def delete_cached(cache_type_string, user):
     if cache.has_key(cache_type_string + user.email):
         cache.delete(cache_type_string + user.email)
+
+"""
+@params: user
+
+@Description: if the transactions for the user have already been cached then it returns the transaction otherwise it caches the transaction data
+
+@return: json of transaction data for the account
+"""
+def cacheBankTransactionData(user):
+    if False==cache.has_key('transactions' + user.email):
+        cache.set('transactions' + user.email, transaction_data_getter(user))
+
+def getCachedInstitutionData(user,institution_name):
+    if cache.has_key('transactions' + user.email):
+        cachedInstitutions = cache.get('transactions' + user.email)
+    else:
+        cacheBankTransactionData(user)
+        cachedInstitutions = cache.get('transactions' + user.email)
+    return cachedInstitutions[institution_name]
+
+def getCachedInstitutionCachedData(user):
+    if False == cache.has_key('access_token'+user.email):
+        plaid_wrapper = get_transactions_wrapper(user)
+        debitCards = DebitCard(plaid_wrapper,user)
+        token = debitCards.access_tokens[0]
+        cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
+    institution_name = cache.get('access_token'+user.email)
+    if cache.has_key('transactions' + user.email):
+        cachedInstitutions = cache.get('transactions' + user.email)
+    else:
+        cacheBankTransactionData(user)
+        cachedInstitutions = cache.get('transactions' + user.email)
+    return cachedInstitutions[institution_name]        
+
+"""
+@params: user
+
+@Description: Sets the correct wrapper depending on the PLAID_DEVELOPMENT setting and then if it sets the SandboxWrapper it creates all the necessary tokens.
+    Then queries plaid for all the transactions from the access tokens stored, and inserts them into a BankGraphData object and returns the relevant object
+
+@return: BankGraphDataObject with the users transaction history stored inside
+"""
+def transaction_data_getter(user):
+    plaid_wrapper = get_transactions_wrapper(user)
+
+    debitCards = DebitCard(plaid_wrapper,user)
+    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+    return debitCards.get_insight_data()
