@@ -406,6 +406,7 @@ def recent_transactions(request):
         bank_graph_data_insight = cacheBankTransactionData(user)
 
         if(check_institution_name_selected_exists(user,institution_name) is False):
+            print('invalid institution name')
             return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
         concrete_wrapper = DevelopmentWrapper()
 
@@ -416,6 +417,7 @@ def recent_transactions(request):
         except Exception:
             #return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
             raise PlaidQueryException('Something went wrong querying PLAID.')
+        
 
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
