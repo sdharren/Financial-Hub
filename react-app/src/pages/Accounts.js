@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import AuthContext from '../context/AuthContext';
 
-function AccountTable() {
+function Accounts() {
     const [banks, setBanks] = useState([]);
     const [brokerages, setBrokerages] = useState([]);
+    let {authTokens, logoutUser} = useContext(AuthContext);
     
     let getAccounts = async () => {
       try {
@@ -40,28 +42,45 @@ function AccountTable() {
       getAccounts();
     }, []);
 
-  const handleRemoveBank = (institution) => {
-    // Send DELETE request to unlink bank account
-    axios.delete(`/api/delete_linked_banks/${institution}/`)
-      .then(response => {
+    const handleRemoveBank = async (institution) => {
+      try {
+        // Send DELETE request to unlink bank account
+        const response = await fetch(`/api/delete_linked_banks/${institution}/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + String(authTokens.access)
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to remove bank: ${response.status} ${response.statusText}`);
+        }
         // Remove bank from list of linked banks
         setBanks(banks.filter(bank => bank !== institution));
-      })
-      .catch(error => {
+      } catch (error) {
         console.error(error);
-      });
-  };
+      }
+    };
 
-  const handleRemoveBrokerage = (brokerage) => {
+  const handleRemoveBrokerage = async (brokerage) => {
     // Send DELETE request to unlink brokerage account
-    axios.delete(`/api/delete_linked_brokerage/${brokerage}/`)
-      .then(response => {
-        // Remove brokerage from list of linked brokerages
-        setBrokerages(brokerages.filter(b => b !== brokerage));
-      })
-      .catch(error => {
-        console.error(error);
+    try {
+      
+      const response = await fetch(`/api/delete_linked_brokerage/${brokerage}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + String(authTokens.access)
+        }
       });
+      if (!response.ok) {
+        throw new Error(`Failed to remove bank: ${response.status} ${response.statusText}`);
+      }
+      // Remove bank from list of linked banks
+      setBrokerages(brokerages.filter(b => b !== brokerage));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -97,4 +116,4 @@ function AccountTable() {
   );
 }
 
-export default AccountTable;
+export default Accounts;
