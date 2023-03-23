@@ -1,7 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ApexCharts from 'apexcharts-react';
 
-const BubbleChart = () => {
+function BubbleChart () {
+  useEffect(() => {
+    const getData = async() => {
+      // get stock data
+      
+
+
+
+
+      // get bank data
+
+
+
+      // get crypto data
+
+
+    }
+  })
+  
   const options = {
     chart: {
       type: 'bubble',
