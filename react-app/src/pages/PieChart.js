@@ -24,36 +24,10 @@ ChartJS.register(
 function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
-    console.log(pieChartData)
-    //const [pieChartData, setPieChartData] = useState(null);
     const navigate = useNavigate()
 
-    // let get_data = async() =>  {
-    //     let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
-    //     let response = await fetch(url, {
-    //         method:'GET',
-    //         headers:{
-    //             'Content-Type':'application/json',
-    //             'Authorization':'Bearer ' + String(authTokens.access)
-    //         }
-    //     });
-
-    //     let data = await response.json();
-    //     if (response.status === 200) {
-    //         setPieChartData(data);
-    //     }
-    //     else if (response.status === 303) {
-    //         //TODO: redirect to plaid link investments
-    //         if (data['error'] === 'Investments not linked.') {
-    //             redirectToLink('investments');
-    //         }
-    //         else if (data['error'] === 'Transactions Not Linked.') {
-    //             redirectToLink('transactions');
-    //         }
-    //     }
-    // }
-
     let redirectToLink = async(assetType) => {
+        console.log("here")
         let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
             {
                 method:'GET',
@@ -72,6 +46,16 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         }
     }
 
+    if (error !== null) {
+        let errorMessage = JSON.parse(error)['error'];
+        if (errorMessage === 'Investments not linked.') {
+            redirectToLink('investments');
+        }
+        else if (errorMessage === 'Transactions Not Linked.') {
+            redirectToLink('transactions');
+        }
+    }
+
     // if a user selects a different option from select dropdown - tell parent to update this graph
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
@@ -79,10 +63,6 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
             'param': nextParam
         });
     }
-
-    // useEffect(() => {
-    //     get_data();
-    // }, [endpoint, endpoint_parameter]);
 
     let pie_data = new Array();
     let pie_labels = new Array();
