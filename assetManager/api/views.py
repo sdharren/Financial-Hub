@@ -232,9 +232,10 @@ def retrieve_stock_getter(user):
     return stock_getter
 
 """
-@params: request
+@params: an HTTP request object containing user authentication information
 
-@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+@Description: Gets the users transaction data from cache then inputs it into BankGraphData.
+Then gets the sector as a parameter from the GET request and then gets the spending per company in that sector
 
 @return: Response: returns a response containing a json that contains the data to display on the bar graph
 """
@@ -250,6 +251,13 @@ def company_spending(request):
     graphData = transactions.companySpendingPerSector(sector)
     return Response(graphData, content_type='application/json')
 
+"""
+@params: an HTTP request object containing user authentication information
+
+@Description: Gets the users transaction data from cache then inputs it into BankGraphData that then gets the spending per sector
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sector_spending(request):
@@ -257,6 +265,13 @@ def sector_spending(request):
     graphData = transactions.orderedCategorisedSpending()
     return Response(graphData, content_type='application/json')
 
+"""
+@params: an HTTP request object containing user authentication information
+
+@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
@@ -265,7 +280,7 @@ def yearlyGraph(request):
     return Response(graphData, content_type='application/json')
 
 """
-@params: request
+@params: an HTTP request object containing user authentication information
 
 @Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
      to be displayed by the graph
@@ -285,7 +300,7 @@ def monthlyGraph(request):
     return Response(graphData, content_type='application/json')
 
 """
-@params: request
+@params: an HTTP request object containing user authentication information
 
 @Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
      to be displayed by the graph
@@ -305,7 +320,17 @@ def weeklyGraph(request):
     return Response(graphData, content_type='application/json')
 
 
+"""
+@params:
+request: an HTTP request object containing user authentication information
 
+@Description: This function retrives the data from the request body and decodes it.
+Then indexes the user's access tokens to find the corresponding token to the one selected by the user.
+It then deletes the previous cached instiution name and caches a new one to correlate to the change in institution selected
+
+@return:
+A Response object returning that the status is 200
+"""
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_bank_access_token(request):
@@ -418,18 +443,21 @@ def select_account(request):
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
+"""
+@param:
+request: an HTTP request object containing user authentication information
+
+@Description: This function retrieves institution names associated with a given user's access tokens.
+The function then gives each institution its own id
+
+@Return:
+A Response object containing an array of dictionaries each containg an id and name
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_bank_account(request):
     user = request.user
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
+    plaid_wrapper = get_transactions_wrapper(user)
     debitCards = DebitCard(plaid_wrapper,user)
     institutions = []
     institution_id = 0
