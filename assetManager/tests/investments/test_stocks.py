@@ -203,6 +203,11 @@ class StocksTestCase(TestCase):
         returns = self.stock_getter.get_category_returns('etf')
         self.assertEqual(returns, {})
 
+    def test_get_category_returns_nothing_with_wrong_category(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        etf_returns = self.stock_getter.get_category_returns('afdafdsfda')
+        self.assertEqual(etf_returns, {})
+
     def test_get_overall_returns_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         overall_returns = self.stock_getter.get_overall_returns()
