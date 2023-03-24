@@ -215,6 +215,25 @@ class StocksGetter():
         for investment in self.investments:
             if investment.get_name() == stock_name:
                 return investment.get_returns()
+        return {}
+
+    def get_category_returns(self, category):
+        returns = defaultdict(float)
+        for investment in self.investments:
+            if investment.get_category() == category and investment.get_returns() != {}:
+                returns['1'] += investment.get_returns()['1']
+                returns['5'] += investment.get_returns()['5']
+                returns['30'] += investment.get_returns()['30']
+        return returns
+
+    def get_overall_returns(self):
+        returns = defaultdict(float)
+        for investment in self.investments:
+            if investment.get_returns() != {}:
+                returns['1'] += investment.get_returns()['1']
+                returns['5'] += investment.get_returns()['5']
+                returns['30'] += investment.get_returns()['30']
+        return returns
 
 def _calculate_percentage_diff(old, current):
     percentage = ((current - old) / current) * 100
