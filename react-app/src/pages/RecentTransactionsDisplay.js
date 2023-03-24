@@ -40,19 +40,19 @@ function RecentTransactions() {
     <table>
       <thead>
         <tr>
-          <th>Date</th>
           <th>Merchant</th>
           <th>Category</th>
           <th>Amount</th>
+          <th>Date</th>
         </tr>
       </thead>
       <tbody>
           {transactions.map(transaction => (
             <tr key={transaction.merchant}>
-              <td>{transaction.date}</td>
               <td>{transaction.merchant}</td>
               <td>{transaction.category.join(', ')}</td>
               <td>{transaction.amount}</td>
+              <td>{transaction.date}</td>
             </tr>
           ))}
       </tbody>
