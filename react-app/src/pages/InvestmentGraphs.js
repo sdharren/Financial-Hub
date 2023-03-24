@@ -110,13 +110,35 @@ function InvestmentGraphs() {
 
             case 'stock_history':
                 setLastStock(endpoint_parameter);
+                let response = await fetch('http://127.0.0.1:8000/api/returns/?param=' + endpoint_parameter,
+                {
+                    method:'GET',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization':'Bearer ' + String(authTokens.access)
+                    }
+                }
+                );
+                let data = await response.json();
                 setGraph(
+                        <div>
+                            {
+                                data['1'] !== undefined ? 
+                                <div>
+                                    <p className={data['30'] > 0 ? 'investment-return-positive' : 'investment-return-negative'}>30d: {data['30']+'%'}</p>
+                                    <p className={data['5'] > 0 ? 'investment-return-positive' : 'investment-return-negative'}>5d: {data['5']+'%'}</p>
+                                    <p className={data['1'] > 0 ? 'investment-return-positive' : 'investment-return-negative'}>1d: {data['1']+'%'}</p>
+                                </div>
+                                : null
+                            }
+                            
                         <LineGraph 
                             endpoint={endpoint} 
                             updateGraph={handleGraphUpdate} 
                             endpoint_parameter={endpoint_parameter} 
                             selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
                         />
+                        </div>
                 );
                 break;
         }

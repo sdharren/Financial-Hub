@@ -124,6 +124,21 @@ def supported_investments(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def returns(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    if request.GET.get('param'):
+        stock_name = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
+    returns = stock_getter.get_returns(stock_name)
+    return Response(returns, status=200, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')

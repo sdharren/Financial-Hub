@@ -211,6 +211,11 @@ class StocksGetter():
         investment.returns = returns
         return investment
 
+    def get_returns(self, stock_name):
+        for investment in self.investments:
+            if investment.get_name() == stock_name:
+                return investment.get_returns()
+
 def _calculate_percentage_diff(old, current):
     percentage = ((current - old) / current) * 100
     return round(percentage, 2)
