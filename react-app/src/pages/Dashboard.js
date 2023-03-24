@@ -27,6 +27,7 @@ const tabGraphData = {
     { name: 'Pie Chart', content: `Content for crypto 1 in Crypto tab goes here.` },
     { name: 'Line Graph', content: `Content for crypto 2 in Crypto tab goes here.` },
     { name: 'Time Scatter Graph', content: `Content for crypto 3 in Crypto tab goes here.` },
+    { name: 'Transactions Table', content: `Table with all transactions.` },
     { name: 'Additional Data', content: `Table with dropwdown next to it to select what additional data ('notx', 'sent', etc.)` },
   ],
 };
