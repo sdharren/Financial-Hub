@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.cache import cache
 from assetManager.assets.debit_card import DebitCard
-from assetManager.transactionInsight.bank_graph_data import get_currency_converter
+from assetManager.transactionInsight.bank_graph_data import get_currency_converter,create_forex_rates
 import datetime
 from assetManager.models import User,AccountType,AccountTypeEnum
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
@@ -31,18 +31,13 @@ class PlaidQueryException(Exception):
 @return: Reformatted dictionary containing the percentage amount of liquidity overall categorised by currency for all accounts in all linked institutions
 """
 def reformat_balances_into_currency(account_balances):
-    warnings.filterwarnings('ignore')
-
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
 
     currency_total = {}
 
     input_date = get_currency_converter()
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
-
-    response = requests.get(url,verify=False)
-    rates = json.loads(response.content.decode('utf-8'))['rates']
+    rates = create_forex_rates(input_date)
 
     for institution in account_balances.keys():
         for account in account_balances[institution].keys():
@@ -77,8 +72,6 @@ def calculate_perentage_proportions_of_currency_data(currency_total):
 @return: Reformatted dictionary containing all accounts and corresponding amount in that account
 """
 def reformatAccountBalancesData(account_balances,institution_name):
-    warnings.filterwarnings('ignore')
-
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
 
@@ -86,11 +79,7 @@ def reformatAccountBalancesData(account_balances,institution_name):
         raise Exception("passed institution_name is not account balances dictionary")
 
     input_date = get_currency_converter()
-
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
-
-    response = requests.get(url,verify=False)
-    rates = json.loads(response.content.decode('utf-8'))['rates']
+    rates = create_forex_rates(input_date)
 
     accounts = {}
     duplicates = 0
@@ -117,19 +106,11 @@ def reformatAccountBalancesData(account_balances,institution_name):
 @return: Reformatted dictionary containing the institution name as the key and the sum of all account's available balance as the value
 """
 def reformatBalancesData(account_balances):
-    warnings.filterwarnings('ignore')
-
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
 
-
-
     input_date = get_currency_converter()
-
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
-
-    response = requests.get(url,verify=False)
-    rates = json.loads(response.content.decode('utf-8'))['rates']
+    rates = create_forex_rates(input_date)
 
     balances = {}
     for institution_name in account_balances.keys():

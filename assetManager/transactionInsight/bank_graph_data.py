@@ -9,9 +9,17 @@ import json
 """
 Class of methods to produce data to pass to the frontend to create the graphs
 for bank data.
-author: Pavan Rana
+author: Pavan Rana + Augusto Favero
 """
 
+def create_forex_rates(input_date):
+    warnings.filterwarnings('ignore')
+
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+
+    response = requests.get(url,verify=False)
+    rates = json.loads(response.content.decode('utf-8'))['rates']
+    return rates
 
 """
 @params: No params
@@ -22,7 +30,6 @@ author: Pavan Rana
 """
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
-        #input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
         input_date = datetime.datetime(2014, 5, 23)
     else:
         input_date = datetime.datetime.today()
@@ -72,11 +79,8 @@ def handle_case(account,rates):
 """
 def format_transactions(transactions):
     input_date = get_currency_converter()
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
 
-    response = requests.get(url,verify=False)
-    rates = json.loads(response.content.decode('utf-8'))['rates']
-
+    rates = create_forex_rates(input_date)
     reformatted_transactions = []
     try:
         for account in transactions:
