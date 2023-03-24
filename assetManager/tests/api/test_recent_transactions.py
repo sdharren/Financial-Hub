@@ -62,6 +62,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
 
     def test_get_recent_transactions_with_correctly_linked_institution(self):
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
         response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 200)
 

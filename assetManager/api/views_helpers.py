@@ -12,7 +12,9 @@ from forex_python.converter import CurrencyRates
 from functools import wraps
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from rest_framework.response import Response
-
+import requests
+import warnings
+import json
 class TransactionsNotLinkedException(Exception):
     pass
 
@@ -29,13 +31,18 @@ class PlaidQueryException(Exception):
 @return: Reformatted dictionary containing the percentage amount of liquidity overall categorised by currency for all accounts in all linked institutions
 """
 def reformat_balances_into_currency(account_balances):
+    warnings.filterwarnings('ignore')
+
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
 
     currency_total = {}
-    currency_rates =  CurrencyRates()
 
     input_date = get_currency_converter()
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+
+    response = requests.get(url,verify=False)
+    rates = json.loads(response.content.decode('utf-8'))['rates']
 
     for institution in account_balances.keys():
         for account in account_balances[institution].keys():
@@ -44,7 +51,7 @@ def reformat_balances_into_currency(account_balances):
             if currency_type not in currency_total.keys():
                 currency_total[currency_type] = 0
 
-            result = currency_rates.convert(currency_type, 'GBP', amount,input_date)
+            result = amount / rates[currency_type]
             currency_total[currency_type] +=  result
 
     return currency_total
@@ -70,19 +77,26 @@ def calculate_perentage_proportions_of_currency_data(currency_total):
 @return: Reformatted dictionary containing all accounts and corresponding amount in that account
 """
 def reformatAccountBalancesData(account_balances,institution_name):
+    warnings.filterwarnings('ignore')
+
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
 
     if institution_name not in account_balances.keys():
         raise Exception("passed institution_name is not account balances dictionary")
 
-    currency_rates =  CurrencyRates()
     input_date = get_currency_converter()
+
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+
+    response = requests.get(url,verify=False)
+    rates = json.loads(response.content.decode('utf-8'))['rates']
+
     accounts = {}
     duplicates = 0
     for account in account_balances[institution_name].keys():
         total = 0
-        total += currency_rates.convert(account_balances[institution_name][account]['currency'], 'GBP',account_balances[institution_name][account]['available_amount'],input_date)
+        total += (account_balances[institution_name][account]['available_amount']) / (rates[account_balances[institution_name][account]['currency']])
 
         if account_balances[institution_name][account]['name'] in accounts.keys():
             duplicates += 1
@@ -103,22 +117,30 @@ def reformatAccountBalancesData(account_balances,institution_name):
 @return: Reformatted dictionary containing the institution name as the key and the sum of all account's available balance as the value
 """
 def reformatBalancesData(account_balances):
+    warnings.filterwarnings('ignore')
+
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
 
-    balances = {}
 
-    currency_rates =  CurrencyRates()
+
     input_date = get_currency_converter()
 
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+
+    response = requests.get(url,verify=False)
+    rates = json.loads(response.content.decode('utf-8'))['rates']
+
+    balances = {}
     for institution_name in account_balances.keys():
         total = 0
         for account_id in account_balances[institution_name].keys():
-            total += currency_rates.convert(account_balances[institution_name][account_id]['currency'], 'GBP', account_balances[institution_name][account_id]['available_amount'],input_date)
+            total += (account_balances[institution_name][account_id]['available_amount']) / (rates[account_balances[institution_name][account_id]['currency']])
 
         balances[institution_name] = total
 
     return balances
+
 
 def get_plaid_wrapper(user,type):
     if settings.PLAID_DEVELOPMENT:
@@ -363,9 +385,10 @@ def getCachedInstitutionData(user,institution_name):
     else:
         cacheBankTransactionData(user)
         cachedInstitutions = cache.get('transactions' + user.email)
+
     for institution in cachedInstitutions:
-        if institution_name in institution:
-            return institution.get(institution_name)
+        if institution_name == institution:
+            return cachedInstitutions[institution_name]
     return None
 
 """

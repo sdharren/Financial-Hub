@@ -114,8 +114,8 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(list(response_data_second.keys())[1] , 'Plaid Saving')
         self.assertEqual(list(response_data_second.keys())[4] , 'Plaid Money Market')
 
-        self.assertEqual(response_data_second[list(response_data_second.keys())[0]],59.38004402054292)
-        self.assertEqual(response_data_second[list(response_data_second.keys())[1]],118.76008804108584)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[0]],59.380044020542925)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[1]],118.76008804108585)
         self.assertEqual(response_data_second[list(response_data_second.keys())[4]],25652.179016874543)
 
 

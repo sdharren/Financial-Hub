@@ -489,12 +489,14 @@ def recent_transactions(request):
 
         #if(check_institution_name_selected_exists(user,institution_name) is False):
         #    return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
-        try:
-            bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
-        except PublicTokenNotExchanged:
-            raise TransactionsNotLinkedException('Transactions Not Linked.')
-        except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
+        #try:
+        bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
+        #except PublicTokenNotExchanged:
+        #    print('here')
+        #    raise TransactionsNotLinkedException('Transactions Not Linked.')
+        #except Exception:
+        #    print('here 1')
+        #    raise PlaidQueryException('Something went wrong querying PLAID.')
 
         concrete_wrapper = DevelopmentWrapper()
 

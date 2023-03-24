@@ -2,6 +2,9 @@ from forex_python.converter import CurrencyRates
 from django.conf import settings
 import datetime
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
+import requests
+import warnings
+import json
 
 """
 Class of methods to produce data to pass to the frontend to create the graphs
@@ -19,7 +22,8 @@ author: Pavan Rana
 """
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
+        #input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
+        input_date = datetime.datetime(2014, 5, 23)
     else:
         input_date = datetime.datetime.today()
 
@@ -38,10 +42,8 @@ def check_value_is_none(value_in_dict):
     else:
         return value_in_dict
 
-def handle_case(account):
-    input_date = get_currency_converter()
-    currency_rates = CurrencyRates()
-    converted_amount = round(currency_rates.convert(account['iso_currency_code'], 'GBP', account['amount'],input_date),2)
+def handle_case(account,rates):
+    converted_amount = round(account['amount'] / rates[account['iso_currency_code']],2)
 
     if(account['authorized_date'] is None):
         authorized_date = 'Not Provided'
@@ -69,10 +71,16 @@ def handle_case(account):
 @return: transactions: json or reformatted_transactions: json
 """
 def format_transactions(transactions):
+    input_date = get_currency_converter()
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+
+    response = requests.get(url,verify=False)
+    rates = json.loads(response.content.decode('utf-8'))['rates']
+
     reformatted_transactions = []
     try:
         for account in transactions:
-            case = handle_case(account)
+            case = handle_case(account,rates)
             reformatted_transactions.append(case)
 
         return reformatted_transactions
@@ -143,7 +151,7 @@ class BankGraphData():
         for i in range(1,6):
             weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
         return weeklySpending
-    
+
     def companySpendingPerSector(self,sector):
         original_list = self.transactionInsight.getCompaniesPerSector(sector)
         new_list = []
