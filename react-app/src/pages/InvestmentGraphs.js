@@ -2,6 +2,7 @@ import PieChart from "./PieChart";
 import LineGraph from "./LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
+import ReturnDisplay from "../components/ReturnDisplay";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
@@ -85,59 +86,49 @@ function InvestmentGraphs() {
 
         switch(endpoint) {
             case 'investment_categories':
+                let overall_returns = await getReturns('overall_returns');
                 setGraph(
-                    <PieChart 
-                        endpoint={endpoint} 
-                        endpoint_parameter={endpoint_parameter} 
-                        loadNext={handleLoadNext} 
-                        updateGraph={handleGraphUpdate}
-                    />
+                    <div>
+                        <ReturnDisplay returns={overall_returns}/>
+                        <PieChart 
+                            endpoint={endpoint} 
+                            endpoint_parameter={endpoint_parameter} 
+                            loadNext={handleLoadNext} 
+                            updateGraph={handleGraphUpdate}
+                        />
+                    </div>
                 );
                 break;
 
             case 'investment_category_breakdown':
+                let category_returns = await getReturns('category_returns', endpoint_parameter);
                 setLastCategory(endpoint_parameter);
                 setGraph(
-                    <PieChart 
-                        endpoint={endpoint} 
-                        endpoint_parameter={endpoint_parameter} 
-                        loadNext={handleLoadNext} 
-                        updateGraph={handleGraphUpdate} 
-                        selectOptions={ categoryOptions.length === 0 ? options['categories'] : categoryOptions}
-                    />
+                    <div>
+                        <ReturnDisplay returns={category_returns}/>
+                        <PieChart 
+                            endpoint={endpoint} 
+                            endpoint_parameter={endpoint_parameter} 
+                            loadNext={handleLoadNext} 
+                            updateGraph={handleGraphUpdate} 
+                            selectOptions={ categoryOptions.length === 0 ? options['categories'] : categoryOptions}
+                        />
+                    </div>
                 );
                 break;
 
             case 'stock_history':
+                let returns = await getReturns('returns', endpoint_parameter);
                 setLastStock(endpoint_parameter);
-                let response = await fetch('http://127.0.0.1:8000/api/returns/?param=' + endpoint_parameter,
-                {
-                    method:'GET',
-                    headers:{
-                        'Content-Type':'application/json',
-                        'Authorization':'Bearer ' + String(authTokens.access)
-                    }
-                }
-                );
-                let data = await response.json();
                 setGraph(
                         <div>
-                            {
-                                data['1'] !== undefined ? 
-                                <div>
-                                    <p className={data['30'] > 0 ? 'investment-return-positive' : 'investment-return-negative'}>30d: {data['30']+'%'}</p>
-                                    <p className={data['5'] > 0 ? 'investment-return-positive' : 'investment-return-negative'}>5d: {data['5']+'%'}</p>
-                                    <p className={data['1'] > 0 ? 'investment-return-positive' : 'investment-return-negative'}>1d: {data['1']+'%'}</p>
-                                </div>
-                                : null
-                            }
-                            
-                        <LineGraph 
-                            endpoint={endpoint} 
-                            updateGraph={handleGraphUpdate} 
-                            endpoint_parameter={endpoint_parameter} 
-                            selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
-                        />
+                            <ReturnDisplay returns={returns}/>
+                            <LineGraph 
+                                endpoint={endpoint} 
+                                updateGraph={handleGraphUpdate} 
+                                endpoint_parameter={endpoint_parameter} 
+                                selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
+                            />
                         </div>
                 );
                 break;
@@ -165,6 +156,20 @@ function InvestmentGraphs() {
 
     async function callApi(endpoint) {
         let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + '/',
+            {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            }
+        );
+        let data = await response.json();
+        return data;
+    }
+
+    async function getReturns(endpoint, param) {
+        let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + (endpoint==='overall_returns'?'/':'/?param='+param),
             {
                 method:'GET',
                 headers:{

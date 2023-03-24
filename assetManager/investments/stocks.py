@@ -224,6 +224,9 @@ class StocksGetter():
                 returns['1'] += investment.get_returns()['1']
                 returns['5'] += investment.get_returns()['5']
                 returns['30'] += investment.get_returns()['30']
+        returns['1'] = round(returns['1'], 1)
+        returns['5'] = round(returns['5'], 1)
+        returns['30'] = round(returns['30'], 1)
         return returns
 
     def get_overall_returns(self):
@@ -233,8 +236,11 @@ class StocksGetter():
                 returns['1'] += investment.get_returns()['1']
                 returns['5'] += investment.get_returns()['5']
                 returns['30'] += investment.get_returns()['30']
+        returns['1'] = round(returns['1'], 1)
+        returns['5'] = round(returns['5'], 1)
+        returns['30'] = round(returns['30'], 1)
         return returns
 
 def _calculate_percentage_diff(old, current):
     percentage = ((current - old) / current) * 100
-    return round(percentage, 2)
+    return round(percentage, 1)
