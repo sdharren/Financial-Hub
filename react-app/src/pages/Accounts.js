@@ -39,6 +39,7 @@ function Accounts() {
     useEffect(() => {
       // Call the async function `getAccounts` to fetch the linked accounts
       getAccounts();
+      console.log(banks);
     }, []);
 
     const handleRemoveBank = async (institution) => {
