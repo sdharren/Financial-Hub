@@ -487,16 +487,12 @@ def recent_transactions(request):
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
 
-        #if(check_institution_name_selected_exists(user,institution_name) is False):
-        #    return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
-        #try:
-        bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
-        #except PublicTokenNotExchanged:
-        #    print('here')
-        #    raise TransactionsNotLinkedException('Transactions Not Linked.')
-        #except Exception:
-        #    print('here 1')
-        #    raise PlaidQueryException('Something went wrong querying PLAID.')
+        try:
+            bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
+        except TransactionsNotLinkedException:
+            raise TransactionsNotLinkedException('Transactions Not Linked.')
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
 
         concrete_wrapper = DevelopmentWrapper()
 
@@ -505,7 +501,6 @@ def recent_transactions(request):
         try:
             recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
         except Exception:
-            #return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
             raise PlaidQueryException('Something went wrong querying PLAID.')
 
 

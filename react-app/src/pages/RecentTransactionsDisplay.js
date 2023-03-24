@@ -73,6 +73,7 @@ function RecentTransactions() {
 
   useEffect(() => {
     async function fetchTransactions() {
+      //let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
       let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
       const response = await fetch(transactionURL, {
         method: 'GET',
@@ -85,10 +86,10 @@ function RecentTransactions() {
         console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);
         return;
       }
-    
+
       const data = await response.json();
       setTransactions(data['Royal Bank of Scotland - Current Accounts']);
-      
+
     }
 
     fetchTransactions();

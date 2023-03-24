@@ -58,8 +58,8 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertTrue(list(balances.keys())[0] == 'Checking')
         self.assertTrue(list(balances.keys())[1] == 'Savings')
 
-        self.assertEqual(balances[list(balances.keys())[0]], 296.9002201027146)
-        self.assertEqual(balances[list(balances.keys())[1]], 296.9002201027146)
+        self.assertEqual(balances[list(balances.keys())[0]], 296.9)
+        self.assertEqual(balances[list(balances.keys())[1]], 296.9)
 
     def test_make_post_request_to_select_account_url(self):
         response = self.client.post(self.url, follow = True)
@@ -81,8 +81,8 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertTrue(list(response_data.keys())[0] == 'Savings' or list(response_data.keys())[0] == 'Checking')
         self.assertTrue(list(response_data.keys())[1] == 'Savings' or list(response_data.keys())[1] == 'Checking')
 
-        self.assertEqual(response_data[list(response_data.keys())[0]], 296.9002201027146)
-        self.assertEqual(response_data[list(response_data.keys())[1]], 296.9002201027146)
+        self.assertEqual(response_data[list(response_data.keys())[0]], 296.9)
+        self.assertEqual(response_data[list(response_data.keys())[1]], 296.9)
 
     def test_get_select_account_url_for_multiple_institutions(self):
         before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
@@ -103,8 +103,8 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertTrue(list(response_data_first.keys())[0] == 'Savings' or list(response_data_first.keys())[0] == 'Checking')
         self.assertTrue(list(response_data_first.keys())[1] == 'Savings' or list(response_data_first.keys())[1] == 'Checking')
 
-        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9002201027146)
-        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9002201027146)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9)
 
         response_second = self.client.get('/api/select_account/?param=Bank of America')
         self.assertEqual(response_second.status_code, 200)
@@ -114,9 +114,9 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(list(response_data_second.keys())[1] , 'Plaid Saving')
         self.assertEqual(list(response_data_second.keys())[4] , 'Plaid Money Market')
 
-        self.assertEqual(response_data_second[list(response_data_second.keys())[0]],59.380044020542925)
-        self.assertEqual(response_data_second[list(response_data_second.keys())[1]],118.76008804108585)
-        self.assertEqual(response_data_second[list(response_data_second.keys())[4]],25652.179016874543)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[0]],59.38)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[1]],118.76)
+        self.assertEqual(response_data_second[list(response_data_second.keys())[4]],25652.18)
 
 
     def test_get_select_account_url_without_giving_param_field_a_value(self):
@@ -137,8 +137,8 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertTrue(list(response_data_first.keys())[0] == 'Savings' or list(response_data_first.keys())[0] == 'Checking')
         self.assertTrue(list(response_data_first.keys())[1] == 'Savings' or list(response_data_first.keys())[1] == 'Checking')
 
-        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9002201027146)
-        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9002201027146)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9)
 
         response_second = self.client.get('/api/select_account/?param=HSBC (UK)')
         self.assertEqual(response_second.status_code, 303)
@@ -161,5 +161,5 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(len(list(response_data_first.keys())),2)
         self.assertTrue(list(response_data_first.keys())[0] == 'Checking')
         self.assertTrue(list(response_data_first.keys())[1] == 'Checking_1')
-        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9002201027146)
-        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9002201027146)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[0]], 296.9)
+        self.assertEqual(response_data_first[list(response_data_first.keys())[1]], 296.9)

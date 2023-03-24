@@ -33,7 +33,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
-
+    
     def test_recent_transactions_url(self):
         self.assertEqual(self.url,'/api/recent_transactions/')
 
@@ -98,3 +98,28 @@ class RecentTransactionsViewsTestCase(TestCase):
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
+
+    def test_recent_transactions_with_no_cache_incorrect_access_token(self):
+        settings.PLAID_DEVELOPMENT = True
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            account_institution_name = 'HSBC',
+        )
+
+        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
+
+    def test_recent_transactions_with_no_cache_no_access_token(self):
+        settings.PLAID_DEVELOPMENT = True
+        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Transactions Not Linked.')

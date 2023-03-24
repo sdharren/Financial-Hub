@@ -85,7 +85,7 @@ def reformatAccountBalancesData(account_balances,institution_name):
     duplicates = 0
     for account in account_balances[institution_name].keys():
         total = 0
-        total += (account_balances[institution_name][account]['available_amount']) / (rates[account_balances[institution_name][account]['currency']])
+        total += round((account_balances[institution_name][account]['available_amount']) / (rates[account_balances[institution_name][account]['currency']]),2)
 
         if account_balances[institution_name][account]['name'] in accounts.keys():
             duplicates += 1
@@ -116,7 +116,7 @@ def reformatBalancesData(account_balances):
     for institution_name in account_balances.keys():
         total = 0
         for account_id in account_balances[institution_name].keys():
-            total += (account_balances[institution_name][account_id]['available_amount']) / (rates[account_balances[institution_name][account_id]['currency']])
+            total += round((account_balances[institution_name][account_id]['available_amount']) / (rates[account_balances[institution_name][account_id]['currency']]),2)
 
         balances[institution_name] = total
 
@@ -385,7 +385,7 @@ Then returns the transactions correlating to the institution name.
 def getCachedInstitutionCachedData(user):
     if False == cache.has_key('access_token'+user.email):
         plaid_wrapper = get_plaid_wrapper(user,'transactions')
-        debitCards = DebitCard(plaid_wrapper,user)
+        debitCards = make_debit_card(plaid_wrapper,user)
         token = debitCards.access_tokens[0]
         cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
     institution_name = cache.get('access_token'+user.email)
@@ -405,6 +405,6 @@ def getCachedInstitutionCachedData(user):
 """
 def transaction_data_getter(user):
     plaid_wrapper = get_plaid_wrapper(user,'transactions')
-    debitCards = DebitCard(plaid_wrapper,user)
+    debitCards = make_debit_card(plaid_wrapper,user)
     debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
     return debitCards.get_insight_data()
