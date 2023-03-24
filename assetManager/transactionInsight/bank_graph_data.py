@@ -2,13 +2,24 @@ from forex_python.converter import CurrencyRates
 from django.conf import settings
 import datetime
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
+import requests
+import warnings
+import json
 
 """
 Class of methods to produce data to pass to the frontend to create the graphs
 for bank data.
-author: Pavan Rana
+author: Pavan Rana + Augusto Favero
 """
 
+def create_forex_rates(input_date):
+    warnings.filterwarnings('ignore')
+
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+
+    response = requests.get(url,verify=False)
+    rates = json.loads(response.content.decode('utf-8'))['rates']
+    return rates
 
 """
 @params: No params
@@ -19,7 +30,7 @@ author: Pavan Rana
 """
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23, 18, 36, 28, 151012)
+        input_date = datetime.datetime(2014, 5, 23)
     else:
         input_date = datetime.datetime.today()
 
@@ -38,10 +49,8 @@ def check_value_is_none(value_in_dict):
     else:
         return value_in_dict
 
-def handle_case(account):
-    input_date = get_currency_converter()
-    currency_rates = CurrencyRates()
-    converted_amount = round(currency_rates.convert(account['iso_currency_code'], 'GBP', account['amount'],input_date),2)
+def handle_case(account,rates):
+    converted_amount = round(account['amount'] / rates[account['iso_currency_code']],2)
 
     if(account['authorized_date'] is None):
         authorized_date = 'Not Provided'
@@ -69,10 +78,13 @@ def handle_case(account):
 @return: transactions: json or reformatted_transactions: json
 """
 def format_transactions(transactions):
+    input_date = get_currency_converter()
+
+    rates = create_forex_rates(input_date)
     reformatted_transactions = []
     try:
         for account in transactions:
-            case = handle_case(account)
+            case = handle_case(account,rates)
             reformatted_transactions.append(case)
 
         return reformatted_transactions
@@ -95,17 +107,17 @@ class BankGraphData():
 
     """
     @Description: Calculates the yearly spending for the given `transaction_history`.
-        For each year in the range of years, it calls the `getYearlySpending()` method from `transactionInsight` to get the total spending for that year and appends the year and spending to a list of dictionaries named `yearlySpending`.
+        For each year in the range of years, it calls the `get_yearly_spending()` method from `transactionInsight` to get the total spending for that year and appends the year and spending to a list of dictionaries named `yearlySpending`.
 
     @Return: yearlySpending, a list of dictionaries where each dictionary represents the yearly spending for a year.
         Each dictionary has two keys, 'name' and 'value', where 'name' is the year as a string and 'value' is the yearly spending as a float.
     """
     def yearlySpending(self):
         yearlySpending = []
-        rangeOfYears = self.transactionInsight.getRangeOfYears()
+        rangeOfYears = self.transactionInsight.get_range_of_years()
         if len(rangeOfYears) != 0:
             for year in range(rangeOfYears[0],rangeOfYears[1]+1):
-                yearlySpending.append({'name':str(year),'value': self.transactionInsight.getYearlySpending(year)})
+                yearlySpending.append({'name':str(year),'value': self.transactionInsight.get_yearly_spending(year)})
         return yearlySpending
 
     """
@@ -122,7 +134,7 @@ class BankGraphData():
         monthlySpending = []
         months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         for i in range(1,13):
-            monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.getMonthlySpending(i,year)})
+            monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.get_monthly_spending(i,year)})
         return monthlySpending
 
     """
@@ -141,11 +153,11 @@ class BankGraphData():
         month, year = date.split()
         year = int(year)
         for i in range(1,6):
-            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
+            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.get_weekly_spending(i,self.getMonth(month),year)})
         return weeklySpending
-    
+
     def companySpendingPerSector(self,sector):
-        original_list = self.transactionInsight.getCompaniesPerSector(sector)
+        original_list = self.transactionInsight.get_companies_per_sector(sector)
         new_list = []
         for item in original_list:
             if item not in new_list:
@@ -153,7 +165,7 @@ class BankGraphData():
         return new_list
 
     def orderedCategorisedSpending(self):
-        return self.transactionInsight.getOrderCategories(self.transactionInsight.transaction_history)
+        return self.transactionInsight.get_order_categories(self.transactionInsight.transaction_history)
 
     """
     @params: month (string), year (int)
@@ -164,8 +176,8 @@ class BankGraphData():
     @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given month and year)
     """
     def orderedCategorisedMonthlySpending(self,month,year):
-        monthlyTransactions = self.transactionInsight.getMonthlyTransactions(month,year)
-        return self.transactionInsight.getOrderCategories(monthlyTransactions)
+        monthlyTransactions = self.transactionInsight.get_monthly_transactions(month,year)
+        return self.transactionInsight.get_order_categories(monthlyTransactions)
 
     """
     @params: week(int), month (int), year (int)
@@ -176,8 +188,8 @@ class BankGraphData():
     @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given month and year)
     """
     def orderedCategorisedWeeklySpending(self,week,month,year):
-        weeklyTransactions = self.transactionInsight.getWeeklyTransactions(week,month,year)
-        return self.transactionInsight.getOrderCategories(weeklyTransactions)
+        weeklyTransactions = self.transactionInsight.get_weekly_transactions(week,month,year)
+        return self.transactionInsight.get_order_categories(weeklyTransactions)
 
     """
     @params:
