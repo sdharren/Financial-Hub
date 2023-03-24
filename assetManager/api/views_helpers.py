@@ -366,9 +366,9 @@ def getCachedInstitutionData(user,institution_name):
     else:
         cacheBankTransactionData(user)
         cachedInstitutions = cache.get('transactions' + user.email)
-    for institution in cachedInstitutions:
-        if institution_name in institution:
-            return institution(institution_name)
+
+    if institution_name in cachedInstitutions:
+        return cachedInstitutions[institution_name]
     return None
 
 """

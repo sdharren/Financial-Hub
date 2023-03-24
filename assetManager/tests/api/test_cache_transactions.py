@@ -41,18 +41,18 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         cache.clear()
 
     def test_cache_bank_transaction_data_already_cached(self):
-        correct_data = "test_transactions"
-        cache.set('transactions'+self.user.email,[{"test_institution":correct_data}])
+        correct_data = {"test_transactions_name":"test_transactions_data"}
+        cache.set('transactions'+self.user.email,{"test_institution":[correct_data]})
         cacheBankTransactionData(self.user)
-        self.assertEqual(cache.get('transactions'+self.user.email),[{"test_institution":correct_data}])
+        self.assertEqual(cache.get('transactions'+self.user.email),{"test_institution":[correct_data]})
 
     def test_cache_bank_transaction_data_not_already_cached(self):
         cacheBankTransactionData(self.user)
         self.assertNotEqual(cache.get('transactions'+self.user.email),None)
 
     def test_get_cached_data_gets_cached_data(self):
-        correct_data = "test_transactions"
-        cache.set('transactions'+self.user.email,[{"test_institution":correct_data}])
+        correct_data = [{"test_transactions_name":"test_transactions_data"}]
+        cache.set('transactions'+self.user.email,{"test_institution":correct_data})
         cached_data = getCachedInstitutionData(self.user,"test_institution")
         self.assertEqual(cached_data,correct_data)
 
@@ -82,9 +82,10 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         self.assertNotEqual(transaction_data_getter(self.user),None)
     
     def test_recache_transaction_data(self):
-        oldCachedData = [{"test_institution":"test_transactions"}]
-        cache.set('transactions'+self.user.email, oldCachedData)
+        oldCachedData = {"test_transactions_name":"test_transactions_data"}
+        correct_data = {"test_institution":[oldCachedData]}
+        cache.set('transactions'+self.user.email,correct_data)
         recacheTransactionData(self.user)
         newCachedData = cache.get('transactions'+self.user.email)
-        self.assertNotEqual(oldCachedData, newCachedData)
+        self.assertNotEqual(correct_data, newCachedData)
         self.assertNotEqual(newCachedData,None)
