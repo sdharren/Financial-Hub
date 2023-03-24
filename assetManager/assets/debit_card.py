@@ -74,7 +74,6 @@ class DebitCard():
         self.access_tokens = self.plaid_wrapper.retrieve_access_tokens(self.user,'transactions')
         self.bank_graph_data = {}
 
-
     """
     @params: token for plaid_wrapper
 
@@ -104,6 +103,23 @@ class DebitCard():
 
         return institution_name
 
+
+    def get_single_account_balances(self,token):
+        request_accounts = self.plaid_wrapper.get_accounts(token)
+        accounts = format_accounts_data(request_accounts)
+        return accounts
+
+    def get_single_transaction(self,start_date_input,end_date_input,token):
+        self.refresh_api(token)
+        transaction_request = TransactionsGetRequest(
+            access_token=token,
+            start_date=start_date_input,
+            end_date=end_date_input,
+        )
+
+        transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+        return transaction_response
+
     """
     @params:
 
@@ -114,8 +130,7 @@ class DebitCard():
     def get_account_balances(self):
         balances = {}
         for token in self.access_tokens:
-            request_accounts = self.plaid_wrapper.get_accounts(token)
-            accounts = format_accounts_data(request_accounts)
+            accounts = self.get_single_account_balances(token)
             balances[self.plaid_wrapper.get_institution_name(token)] = accounts
 
         return balances
@@ -130,15 +145,7 @@ class DebitCard():
     def get_transactions_by_date(self,start_date_input,end_date_input):
         transactions = []
         for token in self.access_tokens:
-            self.refresh_api(token)
-
-            transaction_request = TransactionsGetRequest(
-                access_token=token,
-                start_date=start_date_input,
-                end_date=end_date_input,
-            )
-
-            transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
+            transaction_response = self.get_single_transaction(start_date_input,end_date_input,token)
             transactions.append(transaction_response['transactions'])
 
         return transactions
@@ -153,7 +160,7 @@ class DebitCard():
     @return:
     """
     def make_bank_graph_data_dict(self,token,transactions,transaction_count):
-        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count])
+        self.bank_graph_data[self.get_institution_name_from_db(token)] = BankGraphData(transactions[transaction_count]).transactionInsight.transaction_history
 
     """
     @params: start_date_input,end_date_input datetime.date objects representing the start and end date range for transaction retrieval

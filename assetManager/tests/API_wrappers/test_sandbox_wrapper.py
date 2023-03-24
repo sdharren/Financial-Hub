@@ -176,3 +176,29 @@ class SandboxWrapperTestCase(TestCase):
         self.wrapper.exchange_public_token(public_token)
         institution_name = self.wrapper.get_institution_name(self.wrapper.ACCESS_TOKEN)
         self.assertEqual(institution_name,'Bank of America')
+
+    def test_get_tem_id_correctly(self):
+        public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115616', products_chosen = ['transactions'])
+        self.wrapper.exchange_public_token(public_token)
+        self.assertTrue(self.wrapper.get_item_id() != None)
+
+    """
+    #supposed to fail, must merge with shek's branch
+    def test_force_intergrity_error_in_database(self):
+        public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115616', products_chosen = ['transactions'])
+        self.wrapper.exchange_public_token(public_token)
+
+        access_token = self.wrapper.get_access_token()
+
+        before_count = AccountType.objects.count()
+        self.wrapper.save_access_token(self.user, ['transactions'])
+        after_count = AccountType.objects.count()
+
+        self.assertEqual(before_count + 1,after_count)
+
+        self.wrapper.save_access_token(self.user, ['transactions'])
+
+        new_count = AccountType.objects.count()
+
+        self.assertEqual(new_count,after_count)
+    """

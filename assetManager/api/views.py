@@ -1,29 +1,21 @@
 import json
+from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from assetManager.assets.debit_card import DebitCard
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
-from dateutil.tz import tzlocal
-import datetime
-from django.http import JsonResponse
 from .serializers import UserSerializer
-from assetManager.models import User,AccountType,AccountTypeEnum
-from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
-from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
-from assetManager.assets.debit_card import DebitCard
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from forex_python.converter import CurrencyRates
-from .views_helpers import reformat_balances_into_currency,calculate_perentage_proportions_of_currency_data,reformatAccountBalancesData,reformatBalancesData,get_balances_wrapper,check_institution_name_selected_exists
-from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
+from .views_helpers import *
+from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -149,38 +141,64 @@ def exchange_public_token(request):
     else:
         return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
-    wrapper = DevelopmentWrapper()
-    public_token = request.POST.get('public_token')
+
+    #wrapper = DevelopmentWrapper()
+    if settings.PLAID_DEVELOPMENT:
+        wrapper = DevelopmentWrapper()
+    else:
+        wrapper = SandboxWrapper()
+
+    public_token = request.data.get('public_token')
     if public_token is None:
         return Response({'error': 'Bad request. Public token not specified.'}, status=400)
+
     try:
         wrapper.exchange_public_token(public_token)
     except InvalidPublicToken as e:
         return Response({'error': 'Bad request. Invalid public token.'}, status=400)
+
+    #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
+    token = wrapper.get_access_token()
+
+    if('transactions' in products_selected):
+        #update balances cache if it exists
+        token = wrapper.get_access_token()
+        set_single_institution_balances_and_currency(token,wrapper,request.user)
+
+    #write a function in helpers it takes an access token, queries plaid for that access token and if
+    #single institution thingy
+    #check duplicate for institution should be done in save access_token
     return Response(status=200)
 
-@api_view(['PUT', 'DELETE']) #NOTE: Is GET appropriate for this type of request?
+@api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def cache_assets(request):
     if request.method == 'PUT':
         user = request.user
-        if settings.PLAID_DEVELOPMENT:
+        if settings.PLAID_DEVELOPMENT: # TODO: remove wrapper from here later they should be created within each methods
             wrapper = DevelopmentWrapper()
         else:
             wrapper = SandboxWrapper()
-        #TODO: same thing for bank stuff
-        #NOTE: do we need this for crypto?
-        stock_getter = StocksGetter(wrapper)
-        try:
-            stock_getter.query_investments(user)
-        except InvestmentsNotLinked:
+
+        if not cache_investments(user): #try to cache investments
             return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
-        cache.set('investments' + user.email, stock_getter.investments)
+
+        #caching of bank related investements
+        #Balances ##SERGY THESE ARE THE ONES TO MOVE
+        account_balances = get_institutions_balances(wrapper,request.user)
+        cache.set('balances' + user.email, account_balances)
+        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
+        #cacheBankTransactionData(request.user) #transactions
+
     elif request.method == 'DELETE':
         user = request.user
-        if cache.has_key('investments' + user.email):
-            cache.delete('investments' + user.email)
+        delete_cached('investments', user)
+        delete_cached('transactions', user)
+        delete_cached('currency', user)
+        delete_cached('balances', user)
+
     return Response(status=200)
 
 @api_view(['GET'])
@@ -214,16 +232,17 @@ def retrieve_stock_getter(user):
     return stock_getter
 
 """
-@params: request
+@params: an HTTP request object containing user authentication information
 
-@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+@Description: Gets the users transaction data from cache then inputs it into BankGraphData.
+Then gets the sector as a parameter from the GET request and then gets the spending per company in that sector
 
 @return: Response: returns a response containing a json that contains the data to display on the bar graph
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def company_spending(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     if request.GET.get('param'):
         sector = request.GET.get('param')
     else:
@@ -232,22 +251,36 @@ def company_spending(request):
     graphData = transactions.companySpendingPerSector(sector)
     return Response(graphData, content_type='application/json')
 
+"""
+@params: an HTTP request object containing user authentication information
+
+@Description: Gets the users transaction data from cache then inputs it into BankGraphData that then gets the spending per sector
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sector_spending(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     graphData = transactions.orderedCategorisedSpending()
     return Response(graphData, content_type='application/json')
 
+"""
+@params: an HTTP request object containing user authentication information
+
+@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     graphData = transactions.yearlySpending()
     return Response(graphData, content_type='application/json')
 
 """
-@params: request
+@params: an HTTP request object containing user authentication information
 
 @Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
      to be displayed by the graph
@@ -257,7 +290,7 @@ def yearlyGraph(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monthlyGraph(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
@@ -267,7 +300,7 @@ def monthlyGraph(request):
     return Response(graphData, content_type='application/json')
 
 """
-@params: request
+@params: an HTTP request object containing user authentication information
 
 @Description: Gets the users transaction data from cache then receives the date from the GET request parameter and returns the relevant transactions for that date
      to be displayed by the graph
@@ -277,7 +310,7 @@ def monthlyGraph(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def weeklyGraph(request):
-    transactions = BankGraphData(cacheBankTransactionData(request.user))
+    transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
@@ -286,57 +319,58 @@ def weeklyGraph(request):
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
 
-"""
-@params: user
-
-@Description: Sets the correct wrapper depending on the PLAID_DEVELOPMENT setting and then if it sets the SandboxWrapper it creates all the necessary tokens.
-    Then queries plaid for all the transactions from the access tokens stored, and inserts them into a BankGraphData object and returns the relevant object
-
-@return: BankGraphDataObject with the users transaction history stored inside
-"""
-def transaction_data_getter(user):
-    if settings.PLAID_DEVELOPMENT:
-        plaid_wrapper = DevelopmentWrapper()
-    else:
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-
-    debitCards = DebitCard(plaid_wrapper,user)
-    #debitCards.make_graph_transaction_data_insight(datetime.date(2022,6,13),datetime.date(2022,12,16))
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-
-    accountData = debitCards.get_insight_data()
-    first_key = next(iter(accountData))
-    return accountData[first_key]
 
 """
-@params: user
+@params:
+request: an HTTP request object containing user authentication information
 
-@Description: if the transactions for the user have already been cached then it returns the transaction otherwise it caches the transaction data
+@Description: This function retrives the data from the request body and decodes it.
+Then indexes the user's access tokens to find the corresponding token to the one selected by the user.
+It then deletes the previous cached instiution name and caches a new one to correlate to the change in institution selected
 
-@return: json of transaction data for the account
+@return:
+A Response object returning that the status is 200
 """
-def cacheBankTransactionData(user):
-    if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, json.dumps(transaction_data_getter(user).transactionInsight.transaction_history))
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_bank_access_token(request):
+    data = request.body
+    decoded_data = data.decode('utf-8')
+    parsed_data = json.loads(decoded_data)
+    access_token_id = int(parsed_data['selectedOption'])
+    plaid_wrapper = get_plaid_wrapper(request.user,'balances')
+    debitCards = DebitCard(plaid_wrapper,request.user)
+    access_token = debitCards.access_tokens[access_token_id]
+    cache.delete('access_token'+request.user.email)
+    cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
+    return Response(status=200)
 
-    return (json.loads(cache.get('transactions' + user.email)))
+"""
+@params:
+request: an HTTP request object containing user authentication information
+user: a user object containing the user's email address and Plaid account information
 
+@Description: This function retrieves and formats currency data associated with a given user.
+The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+If the currency data has already been retrieved and cached, the function returns the cached data.
+Otherwise, the function retrieves the data and formats it into percentage proportions before caching it for future use.
+
+@return:
+A Response object containing the cached currency data if it exists
+A Response object containing the formatted currency data if it does not exist in the cache
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def get_currency_data(request):
     user = request.user
 
-    plaid_wrapper = get_balances_wrapper(user)
+    plaid_wrapper = get_plaid_wrapper(user,'balances')
 
     if cache.has_key('currency' + user.email):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
-    debit_card = DebitCard(plaid_wrapper,user)
-    #try catch to ensure data is returned
-    account_balances = debit_card.get_account_balances()
+    account_balances = get_institutions_balances(plaid_wrapper,user)
 
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
@@ -344,30 +378,51 @@ def get_currency_data(request):
 
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
+"""
+@params:
+request: an HTTP request object containing user authentication information
+user: a user object containing the user's email address and Plaid account information
+
+@Description: This function retrieves and formats balance data associated with a given user.
+The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
+If the balance data has already been retrieved and cached, the function returns the cached data.
+Otherwise, the function retrieves the data and formats it before caching it for future use.
+
+@return:
+A Response object containing the cached balance data if it exists
+A Response object containing the formatted balance data if it does not exist in the cache
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def get_balances_data(request):
     user = request.user
 
-    plaid_wrapper = get_balances_wrapper(user)
+    plaid_wrapper = get_plaid_wrapper(user,'balances')
 
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
-        #if(len(list(account_balances.keys()))) != len(plaid_wrapper.retrieve_access_tokens(user,'transactions')):
-        #    delete_balances_cache(user)
-        #else:
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
 
-    try:
-        debit_card = DebitCard(plaid_wrapper,user)
-    except PublicTokenNotExchanged:
-        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+    account_balances = get_institutions_balances(plaid_wrapper,user)
 
-    account_balances = debit_card.get_account_balances()
     balances = reformatBalancesData(account_balances)
     cache.set('balances' + user.email, account_balances)
     return Response(balances, content_type='application/json', status = 200)
 
+"""
+@param:
+request: an HTTP request object containing user authentication information
+
+@Description: This function retrieves account balance data for a specific institution associated with a given user.
+The function uses a user object to access the data through a caching system.
+If the balance data has not been retrieved and cached, an error response is returned.
+If the institution name is not valid, another error response is returned. Otherwise, the function formats the data and returns it.
+
+@Return:
+A Response object containing the formatted account balance data for a specific institution if the institution name is valid
+An error Response object if the institution name is not valid or if the balance data has not been retrieved and cached
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
@@ -388,33 +443,77 @@ def select_account(request):
     else:
         return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
+"""
+@param:
+request: an HTTP request object containing user authentication information
 
-def delete_balances_cache(user):
-    cache.delete('balances' + user.email)
+@Description: This function retrieves institution names associated with a given user's access tokens.
+The function then gives each institution its own id
 
+@Return:
+A Response object containing an array of dictionaries each containg an id and name
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def select_bank_account(request):
+    user = request.user
+    plaid_wrapper = get_plaid_wrapper(user,'transactions')
+    debitCards = DebitCard(plaid_wrapper,user)
+    institutions = []
+    institution_id = 0
+    for tokens in debitCards.access_tokens:
+        account ={"id":institution_id, "name": debitCards.get_institution_name_from_db(tokens)}
+        institutions.append(account)
+        institution_id = institution_id + 1
+    return Response(institutions,status=200)
+
+"""
+@Description:
+    This function retrieves recent transactions of a user's bank account from the Plaid API.
+    At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
+
+@returns:
+    If the institution name is provided in the request, the function returns the recent transactions of that institution in JSON format with a status code of 200.
+
+    If the institution name is not provided in the request, the function returns an error message indicating that the institution name is not selected with a status code of 303.
+
+    If an exception occurs while querying the Plaid API, the function raises a custom exception named PlaidQueryException.
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@handle_plaid_errors
 def recent_transactions(request):
     user = request.user
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
-        bank_graph_data_insight = cacheBankTransactionData(user)
-        if(check_institution_name_selected_exists(user,institution_name) is False):
-            return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
-        concrete_wrapper = DevelopmentWrapper()
-        debit_card = DebitCard(concrete_wrapper,user)
 
-        recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
+        try:
+            bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
+        except TransactionsNotLinkedException:
+            raise TransactionsNotLinkedException('Transactions Not Linked.')
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
+
+        concrete_wrapper = DevelopmentWrapper()
+
+        debit_card = make_debit_card(concrete_wrapper,user)
+
+        try:
+            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
+
+
         return Response(recent_transactions,content_type='application/json',status = 200)
     else:
         return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
 
 
 """
-    @params: 
+    @params:
         request (HttpRequest): the HTTP request object.
 
-    @Description: 
+    @Description:
         Retrieve the linked banks for the authenticated user.
 
     @return:
@@ -423,7 +522,7 @@ def recent_transactions(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_linked_banks(request):
-    
+
     account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.DEBIT)
     institutions = []
     for account in account_types:
@@ -433,8 +532,8 @@ def get_linked_banks(request):
 """
     @params:
         request (HttpRequest): the HTTP request object.
-    
-    @Description: 
+
+    @Description:
         Retrieve the linked brokerages for the authenticated user.
 
     @return:
@@ -455,8 +554,8 @@ def linked_brokerage(request):
     @params:
         request: The HTTP request object that contains information about the current request.
         institution: The name of the linked institution account to be deleted.
-    
-    @Description: 
+
+    @Description:
         This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
 
     @return:
@@ -467,7 +566,7 @@ def linked_brokerage(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_linked_banks(request, institution):
-    
+
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
 
     if not account_type:
@@ -481,8 +580,8 @@ def delete_linked_banks(request, institution):
     @params:
         request: The HTTP request object that contains information about the current request.
         brokerage: The name of the linked brokerage account to be deleted.
-    
-    @Description: 
+
+    @Description:
         This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
 
     @return:
@@ -493,7 +592,7 @@ def delete_linked_banks(request, institution):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_linked_brokerage(request, brokerage):
-    
+
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
 
     if not account_type:

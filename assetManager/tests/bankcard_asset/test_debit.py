@@ -65,7 +65,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
     def test_get_recent_transactions_one_institution_linked_without_five_transactions_retrieved(self):
         self.multiple_transaction_history = multiple_transactions_dict
         self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.multiple_transaction_history,0)
-        recent_transactions = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
+        recent_transactions = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'],'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),4)
 
     """
@@ -94,7 +94,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Uber')
 
     """
-    #fix logic
+
     def test_get_recent_transactions_with_multiple_institutions(self):
         before_accountype_objects_count = AccountType.objects.count()
         AccountType.objects.create(
@@ -115,8 +115,8 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[0],self.multiple_recent_transactions,0)
         new_debit_card.make_bank_graph_data_dict(new_debit_card.access_tokens[1],self.multiple_recent_transactions,1)
 
-        recent_transactions = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
-        recent_transactions_hsbc = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data()['HSBC'].transactionInsight.transaction_history,'HSBC')
+        recent_transactions = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'],'Royal Bank of Scotland - Current Accounts')
+        recent_transactions_hsbc = new_debit_card.get_recent_transactions(new_debit_card.get_insight_data()['HSBC'],'HSBC')
         self.assertEqual(len(list(recent_transactions.keys())),1)
         self.assertEqual(len(list(recent_transactions_hsbc.keys())),1)
 
@@ -137,7 +137,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][1]['date'],date.today())
         self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][2]['date'],date.today())
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['date'],date.today())
+        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][3]['date'],'Not Provided')
 
         self.assertEqual(recent_transactions_hsbc['HSBC'][0]['date'],date.today())
         self.assertEqual(recent_transactions_hsbc['HSBC'][1]['date'],date.today())
@@ -158,12 +158,12 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_hsbc['HSBC'][0]['category'],['Payment', 'Credit Card'])
         self.assertEqual(recent_transactions_hsbc['HSBC'][1]['category'],['Payment', 'Credit Card'])
 
-    #logic
+
     def test_get_recent_transactions_with_one_institution_linked_and_today_dates(self):
         self.recent_transactions = recent_transactions_dict
         self.assertEqual(len(self.recent_transactions[0]),5)
         self.debit_card.make_bank_graph_data_dict(self.debit_card.access_tokens[0],self.recent_transactions,0)
-        recent_transactions_made = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
+        recent_transactions_made = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'],'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(list(recent_transactions_made.keys())[0],'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(len(recent_transactions_made[list(recent_transactions_made.keys())[0]]),5)
 
@@ -198,14 +198,14 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         insight_data = self.debit_card.get_insight_data()
 
         self.assertEqual(list(insight_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history),1)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 500.0)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['iso_currency_code'], 'GBP')
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['name'], 'United Airlines')
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['authorized_date'], [2022, 12, 16])
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['date'], [2022, 12, 16])
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['category'], ['Travel', 'Airlines and Aviation Services'])
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['merchant_name'], 'United Airlines')
+        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts']),1)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['amount'], 500.0)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['iso_currency_code'], 'GBP')
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['name'], 'United Airlines')
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['authorized_date'], [2022, 12, 16])
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['date'], [2022, 12, 16])
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['category'], ['Travel', 'Airlines and Aviation Services'])
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['merchant_name'], 'United Airlines')
 
     def test_get_correct_indexing_of_transactions_insight_data_with_multiple_institutions(self):
         self.multiple_transaction_history = multiple_transactions_dict
@@ -229,17 +229,17 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
         self.assertEqual(list(insight_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(list(insight_data.keys())[1], 'HSBC')
-        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history),4)
-        self.assertEqual(len(insight_data['HSBC'].transactionInsight.transaction_history),2)
+        self.assertEqual(len(insight_data['Royal Bank of Scotland - Current Accounts']),4)
+        self.assertEqual(len(insight_data['HSBC']),2)
 
 
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'],532.43 )
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'], 236.53)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[2]['amount'], 1014.28)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[3]['amount'], 658.53)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['amount'],532.43 )
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][1]['amount'], 236.53)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][2]['amount'], 1014.28)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][3]['amount'], 658.53)
 
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 532.43)
-        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[1]['amount'],  236.53)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][0]['amount'], 532.43)
+        self.assertEqual(insight_data['Royal Bank of Scotland - Current Accounts'][1]['amount'],  236.53)
 
     def test_correct_instution_for_access_token(self):
         self.assertEqual(self.debit_card.plaid_wrapper.get_institution_name(self.debit_card.plaid_wrapper.ACCESS_TOKEN),'Royal Bank of Scotland - Current Accounts')
@@ -384,27 +384,26 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         debit_card.make_graph_transaction_data_insight(start_date,end_date)
 
         insights = debit_card.get_insight_data()
-        last_index = len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) - 1
+        last_index = len(insights['Royal Bank of Scotland - Current Accounts']) - 1
         self.assertEqual(len(insights.keys()),1)
         self.assertEqual(list(insights.keys())[0],'Royal Bank of Scotland - Current Accounts')
-        self.assertTrue(isinstance(insights['Royal Bank of Scotland - Current Accounts'], BankGraphData))
+        #self.assertTrue(insights['Royal Bank of Scotland - Current Accounts'] is list)
         self.assertTrue(insights['Royal Bank of Scotland - Current Accounts'] is not [{}])
-        if len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) != 0:
-            print('washed')
-            self.assertTrue(len(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history) > 0)
+        if len(insights['Royal Bank of Scotland - Current Accounts']) != 0:
+            self.assertTrue(len(insights['Royal Bank of Scotland - Current Accounts']) > 0)
 
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['amount'], 500.0)
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['iso_currency_code'], 'GBP')
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['name'], 'United Airlines')
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['authorized_date'], 'Not Provided')
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['date'], [2022, 6, 19])
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['category'], ['Travel', 'Airlines and Aviation Services'])
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[0]['merchant_name'], 'United Airlines')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['amount'], 500.0)
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['iso_currency_code'], 'GBP')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['name'], 'United Airlines')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['authorized_date'], 'Not Provided')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['date'], [2022, 6, 19])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['category'], ['Travel', 'Airlines and Aviation Services'])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][0]['merchant_name'], 'United Airlines')
 
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['amount'], 500.0)
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['iso_currency_code'], 'GBP')
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['name'], 'Madison Bicycle Shop')
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['authorized_date'], 'Not Provided')
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['date'], [2022, 6, 13])
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['category'],['Shops', 'Supermarkets and Groceries'])
-            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history[last_index]['merchant_name'], 'Not Provided')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['amount'], 500.0)
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['iso_currency_code'], 'GBP')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['name'], 'Madison Bicycle Shop')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['authorized_date'], 'Not Provided')
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['date'], [2022, 6, 13])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['category'],['Shops', 'Supermarkets and Groceries'])
+            self.assertEqual(insights['Royal Bank of Scotland - Current Accounts'][last_index]['merchant_name'], 'Not Provided')

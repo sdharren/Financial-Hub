@@ -140,20 +140,20 @@ class StocksGetter():
                 # maybe get quantity and multiply by current price? need to know if plaid updates data freqeuntly or at all
                 category_dict[investment.get_name()] += investment.get_total_price()
         return category_dict
-    
+
     # Returns the stock ticker for associated with a name if one exists
     def get_stock_ticker(self, stock_name):
         for investment in self.investments:
             if investment.get_name() == stock_name:
                 return investment.get_ticker()
         return 'Cannot get stock ticker for ' + stock_name
-    
+
     # Returns the day-by-day portfolio history for a specified period in months (only 1, 3, 6 months accepted)
     # The return is a dict of the form {date: portfolio vaue}
     def get_portfolio_history(self, months=6):
         end_date = date.today()
         start_date = end_date - relativedelta(months=months)
-        
+
         portfolio_history = defaultdict(float)
         stock_histories = []
 

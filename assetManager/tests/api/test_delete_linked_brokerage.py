@@ -41,23 +41,23 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
 
     def test_delete_linked_brokerage_with_valid_institution(self):
         settings.PLAID_DEVELOPMENT = False
-        
+
         institutions_number_change = self.client.get(reverse("linked_brokerage"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
         institutions_2 = institutions_number_change.json()
-        
+
         self.assertEqual(len(institutions_2), 1)
-        
+
 
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': self.brokerage})
         response = self.client.delete(url)
 
-        
+
         institutions_number_change = self.client.get(reverse("linked_brokerage"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
         institutions_2 = institutions_number_change.json()
         self.assertEqual(len(institutions_2), 0)
-        
+
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
@@ -86,7 +86,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
-    
+
     def test_add_delete_brokerage(self):
         settings.PLAID_DEVELOPMENT = False
         # Add institution
@@ -109,13 +109,12 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-       
-    
+
+
 
 
         # Check number of linked institutions after deleting
         response = self.client.get(reverse("linked_brokerage"), format="json")
         self.assertEqual(response.status_code, 200)
         institutions = response.json()
-        print(institutions)
         self.assertEqual(len(institutions), 1)

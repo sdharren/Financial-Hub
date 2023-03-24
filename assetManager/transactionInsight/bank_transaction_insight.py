@@ -17,7 +17,7 @@ class CategoriseTransactions():
 
     @return: A list of dictionaries representing the transaction history, where each dictionary contains information about a single transaction, including its date, amount, category, and description.
     """
-    def getTransactionHistory(self):
+    def get_transaction_history(self):
         return self.transaction_history
 
     """
@@ -28,20 +28,20 @@ class CategoriseTransactions():
 
     @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given week, month, and year)
     """
-    def getOrderCategories(self,transactionHistory):
-        categories = self.getCategorisedSpending(transactionHistory)
-        orderedListOfCategories = sorted(categories.items(), key=lambda x: x[1],reverse=True)
-        orderedDictionaryOfCategories = []
-        for item in orderedListOfCategories:
-            orderedDictionaryOfCategories.append({'name': item[0],'value': item[1]})
-        return orderedDictionaryOfCategories
+    def get_order_categories(self,transaction_history):
+        categories = self.get_categorised_spending(transaction_history)
+        ordered_list_of_categories = sorted(categories.items(), key=lambda x: x[1],reverse=True)
+        ordered_dictionary_of_categories = []
+        for item in ordered_list_of_categories:
+            ordered_dictionary_of_categories.append({'name': item[0],'value': item[1]})
+        return ordered_dictionary_of_categories
 
     """
     @Description: Calculates the total amount spent (excluding deposits) by summing the amount of each transaction in the transaction_history
 
     @return: amount (float), the total amount spent (excluding deposits)
     """
-    def getTotalSpending(self):
+    def get_total_spending(self):
         amount = 0
         for item in self.transaction_history:
             if item['amount'] > 0:
@@ -52,19 +52,19 @@ class CategoriseTransactions():
     @Description: This method fetches the earliest and latest year for which transactions exist in the transaction history.
     It iterates through the transaction history, checks the year for each transaction, and updates the range of years accordingly.
 
-    @return: rangeOfYears, a list containing two integers representing the earliest and latest year for which transactions exist in the transaction history.
+    @return: range_of_years, a list containing two integers representing the earliest and latest year for which transactions exist in the transaction history.
     """
-    def getRangeOfYears(self):
-        rangeOfYears = []
+    def get_range_of_years(self):
+        range_of_years = []
         for item in self.transaction_history:
-            if len(rangeOfYears) == 0:
-                rangeOfYears.append(item['date'][0])
-                rangeOfYears.append(item['date'][0])
-            elif item['date'][0] < rangeOfYears[0]:
-                rangeOfYears[0] = item['date'][0]
-            elif item['date'][0] > rangeOfYears[1]:
-                rangeOfYears[1] = item['date'][0]
-        return rangeOfYears
+            if len(range_of_years) == 0:
+                range_of_years.append(item['date'][0])
+                range_of_years.append(item['date'][0])
+            elif item['date'][0] < range_of_years[0]:
+                range_of_years[0] = item['date'][0]
+            elif item['date'][0] > range_of_years[1]:
+                range_of_years[1] = item['date'][0]
+        return range_of_years
 
     """
     @params: year (int)
@@ -73,7 +73,7 @@ class CategoriseTransactions():
 
     @return: amount (float), representing the total spending in the given year.
     """
-    def getYearlySpending(self,year):
+    def get_yearly_spending(self,year):
         amount = 0
         for item in self.transaction_history:
             if item['amount'] > 0 and item['date'][0] == year:
@@ -87,7 +87,7 @@ class CategoriseTransactions():
 
     @return: amount (float), representing the total amount spent in the given month and year
     """
-    def getMonthlySpending(self,month,year):
+    def get_monthly_spending(self,month,year):
         amount = 0
         for item in self.transaction_history:
             if item['amount'] > 0 and item['date'][1] == month and item['date'][0] == year:
@@ -102,7 +102,7 @@ class CategoriseTransactions():
 
     @return: amount (float), representing the total spending in the given week
     """
-    def getWeeklySpending(self,week,month,year):
+    def get_weekly_spending(self,week,month,year):
         amount = 0
         for item in self.transaction_history:
             if item['amount'] > 0 and item['date'][2]//7 == week and item['date'][1] == month and item['date'][0] == year:
@@ -116,15 +116,15 @@ class CategoriseTransactions():
 
         @return: amount (float), representing the total amount spent on transactions with the given company name.
         """
-    def getCompaniesPerSector(self,sector):
+    def get_companies_per_sector(self,sector):
         companies = []
         for item in self.transaction_history:
             if item['category'][0] == sector:
-                companies.append({"name": item['name'],"value": self.getSpendingForCompany(item['name'])})
+                companies.append({"name": item['name'],"value": self.get_spending_for_company(item['name'])})
         return companies
 
     # return total spending for the company name passed in
-    def getSpendingForCompany(self,company):
+    def get_spending_for_company(self,company):
         amount = 0
         for item in self.transaction_history:
             if item['amount'] > 0 and item['name'] == company:
@@ -132,19 +132,19 @@ class CategoriseTransactions():
         return amount
 
     """
-    @params: transactionHistory, a list of dictionaries containing transaction details with keys: 'name' (string, representing the name of the transaction), 'amount' (float, representing the transaction amount), 'category' (list of strings, representing the category/categories that the transaction belongs to), and 'date' (list of integers, representing the year, month and day of the transaction)
+    @params: transaction_history, a list of dictionaries containing transaction details with keys: 'name' (string, representing the name of the transaction), 'amount' (float, representing the transaction amount), 'category' (list of strings, representing the category/categories that the transaction belongs to), and 'date' (list of integers, representing the year, month and day of the transaction)
 
     @Description: Categorizes the transactions by category and returns a dictionary with the category names as keys and the corresponding total spending in that category as values.
 
-    @return: spenditurePerCategory, a dictionary with category names as keys (strings) and their corresponding total spending as values (floats).
+    @return: spenditure_per_category, a dictionary with category names as keys (strings) and their corresponding total spending as values (floats).
     """
-    def getCategorisedSpending(self,transactionHistory):
-        spenditurePerCategory = {}
-        for item in transactionHistory:
+    def get_categorised_spending(self,transaction_history):
+        spenditure_per_category = {}
+        for item in transaction_history:
             if item['amount'] > 0:
-                currentValue = spenditurePerCategory.get(item['category'][0]) or 0
-                spenditurePerCategory[item['category'][0]] = currentValue + item['amount']
-        return spenditurePerCategory
+                currentValue = spenditure_per_category.get(item['category'][0]) or 0
+                spenditure_per_category[item['category'][0]] = currentValue + item['amount']
+        return spenditure_per_category
 
     """
     @params:
@@ -157,12 +157,12 @@ class CategoriseTransactions():
     @returns:
         A list of dictionaries representing each transaction in the given year
     """
-    def getYearlyTransactions(self,year):
-        yearlyTransactions = []
+    def get_yearly_transactions(self,year):
+        yearly_transactions = []
         for item in self.transaction_history:
             if item['amount'] > 0 and item['date'][0] == year:
-                yearlyTransactions.append(item)
-        return yearlyTransactions
+                yearly_transactions.append(item)
+        return yearly_transactions
 
     """
     @params:
@@ -175,12 +175,12 @@ class CategoriseTransactions():
     @return:
         A list of transaction dictionaries that occurred in the given month and year.
     """
-    def getMonthlyTransactions(self,month,year):
-        monthlyTransactions = []
+    def get_monthly_transactions(self,month,year):
+        monthly_transactions = []
         for item in self.transaction_history:
             if item['amount'] > 0 and item['date'][1] == month and item['date'][0] == year:
-                monthlyTransactions.append(item)
-        return monthlyTransactions
+                monthly_transactions.append(item)
+        return monthly_transactions
 
     """
     @params:
@@ -194,9 +194,9 @@ class CategoriseTransactions():
     @return:
         A list of transaction dictionaries that occurred in the given week, month and year.
     """
-    def getWeeklyTransactions(self,week,month,year):
-        weeklyTransactions = []
+    def get_weekly_transactions(self,week,month,year):
+        weekly_transactions = []
         for item in self.transaction_history:
             if item['amount'] > 0 and item['date'][2] <= week*7 and item['date'][1] == month and item['date'][0] == year:
-                weeklyTransactions.append(item)
-        return weeklyTransactions
+                weekly_transactions.append(item)
+        return weekly_transactions
