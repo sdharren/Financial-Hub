@@ -11,7 +11,6 @@ from django.core.cache import cache
 from dateutil.tz import tzlocal
 import datetime
 from django.http import JsonResponse
-from assetManager.investments.reactstuff import NumberShow
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 #remove after testing purposes are finished
 from assetManager.models import User
@@ -102,9 +101,6 @@ def connect_investments(request):
         del request.session['products_chosen']
         return redirect('home_page')
 
-def number_view(request):
-    data = {'number': NumberShow.getNumber()}
-    return HttpResponse(json.dumps(data), content_type='application/json')
 
 def link_sandbox_investments(request):
     user = request.user

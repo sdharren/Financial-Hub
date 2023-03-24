@@ -9,8 +9,10 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
+import BarGraph from './pages/BarGraph';
+import TransactionDisplay from './pages/TransactionDisplay';
+import PieChart from './pages/PieChart';
 import BalancesDisplay from './pages/Balances';
-import BarChartDisplay from './pages/BarChartDisplay';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
 import InvestmentGraphs from './pages/InvestmentGraphs';
 import PrivateRoutes from './utils/PrivateRoute';
@@ -38,7 +40,7 @@ function App() {
               <Route element={<PrivateRoutes/>}>
                 <Route element={<HomePage/>} path = "/homepage" exact />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/bar_graph_display" element={<BarChartDisplay />} />
+                <Route path="/transactions" element={<TransactionDisplay />} />
                 <Route path="/sector_spending" element={<SectorSpending/>} />
 
                 {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
