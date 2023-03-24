@@ -1,7 +1,6 @@
 import React, { useRef, useContext } from 'react';
 import usePlaid from '../custom_hooks/usePlaid';
-import AuthContext from '../context/AuthContext';
-
+import { Bar, getElementsAtEvent } from 'react-chartjs-2';
 import{ Chart as ChartJS,
   BarElement,
   CategoryScale,
@@ -9,8 +8,9 @@ import{ Chart as ChartJS,
   Tooltip,
   Legend,
   Colors
-} from 'chart.js'
-import { Bar, getElementsAtEvent } from 'react-chartjs-2';
+} from 'chart.js';
+
+
 ChartJS.register(
   BarElement,
   CategoryScale,
@@ -32,7 +32,6 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   }
   // console.log(bar_labels);
   // console.log(bar_data);
-
 
   const options = {
       plugins: {

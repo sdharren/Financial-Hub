@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import AuthContext from '../context/AuthContext';
-import {useNavigate} from 'react-router-dom';
-
+import { Pie, getElementsAtEvent } from 'react-chartjs-2';
+import GraphSelect from '../components/GraphSelect';
+import usePlaid from '../custom_hooks/usePlaid';
+import useHandleError from '../custom_hooks/useHandleError';
 import {
     Chart as ChartJS,
     ArcElement,
     Tooltip,
     Legend,
     Colors
-} from 'chart.js'
-
-import { Pie, getElementsAtEvent } from 'react-chartjs-2';
-import GraphSelect from '../components/GraphSelect';
-import usePlaid from '../custom_hooks/usePlaid';
+} from 'chart.js';
 
 
 ChartJS.register(
@@ -22,40 +19,9 @@ ChartJS.register(
     Colors
 )
 function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
-    let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
-    const navigate = useNavigate()
 
-    let redirectToLink = async(assetType) => {
-        let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
-            {
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/json',
-                    'Authorization':'Bearer ' + String(authTokens.access)
-                }
-            }
-        )
-        let data = await response.json();
-        if (response.status === 200) {
-            navigate('/plaid_link', {
-                state: {link_token: data['link_token']},
-                replace: true
-            });
-        }
-    }
-
-    if (error !== null) {
-        if (error !== 'Internal Server Error') {
-            let errorMessage = JSON.parse(error)['error'];
-            if (errorMessage === 'Investments not linked.') {
-                redirectToLink('investments');
-            }
-            else if (errorMessage === 'Transactions Not Linked.') {
-                redirectToLink('transactions');
-            }
-        }
-    }
+    useHandleError(error);
 
     // if a user selects a different option from select dropdown - tell parent to update this graph
     let handleSelectionUpdate = async(nextParam) => {
