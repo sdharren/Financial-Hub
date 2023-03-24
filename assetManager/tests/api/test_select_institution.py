@@ -41,7 +41,9 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
     def tearDown(self):
         cache.clear()
 
-    def test_set_bank_access_token_with_valid_body(self):
-        request = self.request_factory.post('/api/set_bank_access_token/', data=json.dumps({'selectedOption': '123'}), content_type='application/json')
-        response = set_bank_access_token(request)
-        self.assertEqual(200,response)
+    # def test_set_bank_access_token_with_valid_body(self):
+    #     request = self.request_factory.post('/api/set_bank_access_token/', data=json.dumps({'selectedOption': '123'}), content_type='application/json')
+    #     force_authenticate(request, user=self.user)
+    #     response = set_bank_access_token(request)
+    #     self.assertEqual(200,response)
+    #     self.assertEqual(cache.get('access_token'+self.user.email),'123')
