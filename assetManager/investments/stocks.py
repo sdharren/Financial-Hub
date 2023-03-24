@@ -66,7 +66,7 @@ class StocksGetter():
                 security_id = holding['security_id']
                 for security in current_investment['securities']:
                     if security['security_id'] == security_id:
-                        self.investments.append(Investment(holding, security))
+                        self.investments.append(self.set_investment_returns(Investment(holding, security)))
                         break
 
     #Returns total investment sum within the account
@@ -193,3 +193,24 @@ class StocksGetter():
 
     def is_ticker_supported(self, ticker):
         return self.yfinance_wrapper.is_ticker_supported(ticker)
+
+    def set_investment_returns(self, investment):
+        ticker = investment.get_ticker()
+        returns = {}
+        if ticker is not None:
+            try:
+                history = list(self.yfinance_wrapper.get_stock_history_for_period(ticker, 1).values())
+            except TickerNotSupported:
+                return investment
+            else:
+                history.reverse()
+                current_price = history[0]
+                returns['1'] = _calculate_percentage_diff(history[1], current_price)
+                returns['5'] = _calculate_percentage_diff(history[5], current_price)
+                returns['30'] = _calculate_percentage_diff(history[len(history)-1], current_price)
+        investment.returns = returns
+        return investment
+
+def _calculate_percentage_diff(old, current):
+    percentage = ((current - old) / current) * 100
+    return round(percentage, 2)

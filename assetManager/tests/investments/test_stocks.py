@@ -155,6 +155,29 @@ class StocksTestCase(TestCase):
         for key in data:
             self.assertTrue(data[key] > 0)
         
+    def test_set_investment_returns(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        investment = self.stock_getter.investments[1]
+        result = self.stock_getter.set_investment_returns(investment)
+        self.assertTrue('1' in result.returns)
+        self.assertTrue('5' in result.returns)
+        self.assertTrue('30' in result.returns)
+
+    def test_set_investment_returns_does_nothing_for_unsupported_investment(self):
+        self.stock_getter = StocksGetter(None)
+        security = {
+            'name': 'adsf',
+            'ticker_symbol': 'adfhsjkhaiufhkadjfsjlh',
+            'type': 'equity'
+        }
+        holding = {
+            'quantity': 1,
+            'institution_value': 100,
+            'security_id': '1234'
+        }
+        investment = Investment(holding, security)
+        result = self.stock_getter.set_investment_returns(investment)
+        self.assertEqual(result.returns, {})
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()
