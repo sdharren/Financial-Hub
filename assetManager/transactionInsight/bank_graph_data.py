@@ -95,17 +95,17 @@ class BankGraphData():
 
     """
     @Description: Calculates the yearly spending for the given `transaction_history`.
-        For each year in the range of years, it calls the `getYearlySpending()` method from `transactionInsight` to get the total spending for that year and appends the year and spending to a list of dictionaries named `yearlySpending`.
+        For each year in the range of years, it calls the `get_yearly_spending()` method from `transactionInsight` to get the total spending for that year and appends the year and spending to a list of dictionaries named `yearlySpending`.
 
     @Return: yearlySpending, a list of dictionaries where each dictionary represents the yearly spending for a year.
         Each dictionary has two keys, 'name' and 'value', where 'name' is the year as a string and 'value' is the yearly spending as a float.
     """
     def yearlySpending(self):
         yearlySpending = []
-        rangeOfYears = self.transactionInsight.getRangeOfYears()
+        rangeOfYears = self.transactionInsight.get_range_of_years()
         if len(rangeOfYears) != 0:
             for year in range(rangeOfYears[0],rangeOfYears[1]+1):
-                yearlySpending.append({'name':str(year),'value': self.transactionInsight.getYearlySpending(year)})
+                yearlySpending.append({'name':str(year),'value': self.transactionInsight.get_yearly_spending(year)})
         return yearlySpending
 
     """
@@ -122,7 +122,7 @@ class BankGraphData():
         monthlySpending = []
         months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         for i in range(1,13):
-            monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.getMonthlySpending(i,year)})
+            monthlySpending.append({'name':months[i]+" "+str(year),'value': self.transactionInsight.get_monthly_spending(i,year)})
         return monthlySpending
 
     """
@@ -141,11 +141,11 @@ class BankGraphData():
         month, year = date.split()
         year = int(year)
         for i in range(1,6):
-            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.getWeeklySpending(i,self.getMonth(month),year)})
+            weeklySpending.append({'name': "Week " + str(i),'value': self.transactionInsight.get_weekly_spending(i,self.getMonth(month),year)})
         return weeklySpending
     
     def companySpendingPerSector(self,sector):
-        original_list = self.transactionInsight.getCompaniesPerSector(sector)
+        original_list = self.transactionInsight.get_companies_per_sector(sector)
         new_list = []
         for item in original_list:
             if item not in new_list:
@@ -153,7 +153,7 @@ class BankGraphData():
         return new_list
 
     def orderedCategorisedSpending(self):
-        return self.transactionInsight.getOrderCategories(self.transactionInsight.transaction_history)
+        return self.transactionInsight.get_order_categories(self.transactionInsight.transaction_history)
 
     """
     @params: month (string), year (int)
@@ -164,8 +164,8 @@ class BankGraphData():
     @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given month and year)
     """
     def orderedCategorisedMonthlySpending(self,month,year):
-        monthlyTransactions = self.transactionInsight.getMonthlyTransactions(month,year)
-        return self.transactionInsight.getOrderCategories(monthlyTransactions)
+        monthlyTransactions = self.transactionInsight.get_monthly_transactions(month,year)
+        return self.transactionInsight.get_order_categories(monthlyTransactions)
 
     """
     @params: week(int), month (int), year (int)
@@ -176,8 +176,8 @@ class BankGraphData():
     @return: orderedCategories, a list of dictionaries with each dictionary containing a 'name' key (string, representing the category name) and a 'value' key (float, representing the total spending in that category for the given month and year)
     """
     def orderedCategorisedWeeklySpending(self,week,month,year):
-        weeklyTransactions = self.transactionInsight.getWeeklyTransactions(week,month,year)
-        return self.transactionInsight.getOrderCategories(weeklyTransactions)
+        weeklyTransactions = self.transactionInsight.get_weekly_transactions(week,month,year)
+        return self.transactionInsight.get_order_categories(weeklyTransactions)
 
     """
     @params:

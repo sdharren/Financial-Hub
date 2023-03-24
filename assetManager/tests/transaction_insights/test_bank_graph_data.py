@@ -1,4 +1,3 @@
-# from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from dateutil.tz import tzlocal
 import datetime
