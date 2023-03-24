@@ -368,7 +368,7 @@ def getCachedInstitutionData(user,institution_name):
         cachedInstitutions = cache.get('transactions' + user.email)
     for institution in cachedInstitutions:
         if institution_name in institution:
-            return institution[institution_name]
+            return institution(institution_name)
     return None
 
 """
