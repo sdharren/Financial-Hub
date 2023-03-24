@@ -8,13 +8,13 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
-from forex_python.converter import CurrencyRates
 from functools import wraps
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from rest_framework.response import Response
 import requests
 import warnings
 import json
+
 class TransactionsNotLinkedException(Exception):
     pass
 
@@ -138,29 +138,6 @@ def get_plaid_wrapper(user,type):
         plaid_wrapper.save_access_token(user, ['transactions'])
 
     return plaid_wrapper
-
-
-"""
-@params:
--user:models.User
-user making the query
-
--institution_name: String
-name of the institution being checked in the database
-
-@Description: -Checks whether the queried institution name is linked for the passed user
-
-@return: Boolean - whether or not the institution_name requested is linked for the passed user
-"""
-def check_institution_name_selected_exists(user,institution_name):
-    instituitions = AccountType.objects.filter(user = user, account_asset_type = AccountTypeEnum.DEBIT)
-
-    for account in instituitions:
-        if account.account_institution_name == institution_name:
-            return True
-
-    return False
-
 
 """
 @params:

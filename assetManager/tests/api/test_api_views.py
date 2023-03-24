@@ -39,7 +39,7 @@ class APIViewsTestCase(TestCase):
         cache.delete('balancesjohndoe@example.org')
         cache.delete('transactionsjohndoe@example.org')
         cache.delete('currencyjohndoe@example.org')
-    
+
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 200)
@@ -115,7 +115,34 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertEqual(response.content.decode('utf-8'), '{"error":"Transactions Not Linked."}')
 
-    def test_put_cache_assets_works(self):
+    def test_get_single_institution_balances_and_currency_invalid_access_token(self):
+        settings.PLAID_DEVELOPMENT = True
+        wrapper = DevelopmentWrapper()
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+        self.assertFalse(cache.has_key('currency' + self.user.email))
+
+        access_token = 'access-development-8ab976e6-64bc-4b38-98f7-731e7a349971'
+
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = access_token,
+            account_institution_name = 'HSBC',
+        )
+
+        before_count = AccountType.objects.count()
+
+        with self.assertRaises(PlaidQueryException) as e:
+            set_single_institution_balances_and_currency(access_token,wrapper,self.user)
+
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count,after_count)
+
+
+
+
+    def test_put_cache_assets_works_sandbox_environment(self):
         #cache.delete('investments' + self.user.email)
         # setup investments
 
@@ -240,7 +267,17 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         cache.delete('product_link' + self.user.email)
 
-    def test_post_exchange_public_token_updating_existing_cache(self):
+    def test_post_exchange_public_token_no_product_link(self):
+        self.assertFalse(cache.has_key('product_link' + self.user.email))
+        response = self.client.post('/api/exchange_public_token/')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Link was not initialised correctly.')
+
+
+    def test_post_exchange_public_token_updating_existing_cache_sandbox_environment(self):
         self.assertFalse(cache.has_key('balances' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
         self.assertFalse(cache.has_key('transactions' + self.user.email))
@@ -284,7 +321,6 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('currency' in balances['HSBC'][account])
 
         self.assertEqual(len(balances['Royal Bank of Scotland - Current Accounts']),9)
-
 
     def test_post_exchange_public_token_correclty_caches_all_data_without_previously_cached_data(self):
         before_count = AccountType.objects.count()

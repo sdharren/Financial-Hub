@@ -1,4 +1,3 @@
-from forex_python.converter import CurrencyRates
 from django.conf import settings
 import datetime
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
@@ -15,7 +14,7 @@ author: Pavan Rana + Augusto Favero
 def create_forex_rates(input_date):
     warnings.filterwarnings('ignore')
 
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
 
     response = requests.get(url,verify=False)
     rates = json.loads(response.content.decode('utf-8'))['rates']

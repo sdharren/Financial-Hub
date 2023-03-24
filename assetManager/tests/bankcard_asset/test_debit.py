@@ -68,32 +68,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         recent_transactions = self.debit_card.get_recent_transactions(self.debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'],'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),4)
 
-    """
-    def test_get_recent_transactions_from_returned_transactions_get(self):
-        user = User.objects.get(email='lillydoe@example.org')
-        plaid_wrapper = SandboxWrapper()
-        public_token = plaid_wrapper.create_public_token()
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
-        debit_card = DebitCard(plaid_wrapper, user)
-
-        self.assertEqual(len(debit_card.access_tokens),1)
-
-        start_date = date.today()
-        end_date = date.today()
-        transactions = debit_card.make_graph_transaction_data_insight(start_date,end_date)
-
-        recent_transactions = debit_card.get_recent_transactions(debit_card.get_insight_data()['Royal Bank of Scotland - Current Accounts'].transactionInsight.transaction_history,'Royal Bank of Scotland - Current Accounts')
-
-        self.assertEqual(len(recent_transactions['Royal Bank of Scotland - Current Accounts']),1)
-        self.assertEqual(list(recent_transactions.keys())[0],'Royal Bank of Scotland - Current Accounts')
-
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['amount'],'£6.33')
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['date'],date.today() - timedelta(days=1))
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['category'],['Travel', 'Taxi'])
-        self.assertEqual(recent_transactions['Royal Bank of Scotland - Current Accounts'][0]['merchant'],'Uber')
-
-    """
 
     def test_get_recent_transactions_with_multiple_institutions(self):
         before_accountype_objects_count = AccountType.objects.count()
