@@ -335,6 +335,17 @@ def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
         cache.set('transactions' + user.email, transaction_data_getter(user))
 
+
+"""
+@params: Object containing user authentication information
+
+@Description: Takes in a user and the deletes their old cached transaction data.
+Then recaches new data that is to be gotten from Plaid
+"""
+def recacheTransactionData(user):
+    delete_cached("transactions",user)
+    cacheBankTransactionData(user)
+
 """
 @params:
 user: Object containing user authentication information

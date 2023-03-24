@@ -80,3 +80,11 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
 
     def test_transaction_data_getter(self):
         self.assertNotEqual(transaction_data_getter(self.user),None)
+    
+    def test_recache_transaction_data(self):
+        oldCachedData = [{"test_institution":"test_transactions"}]
+        cache.set('transactions'+self.user.email, oldCachedData)
+        recacheTransactionData(self.user)
+        newCachedData = cache.get('transactions'+self.user.email)
+        self.assertNotEqual(oldCachedData, newCachedData)
+        self.assertNotEqual(newCachedData,None)
