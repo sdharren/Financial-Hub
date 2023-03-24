@@ -93,4 +93,7 @@ def save_wallet_address(user, address):
 
 def get_wallets(user):
     accounts = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO")
-    return accounts
+    wallets = []
+    for wallet in accounts:
+        wallets.append(wallet.access_token)
+    return wallets

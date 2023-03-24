@@ -24,7 +24,7 @@ class CryptoWraperTestCase(TestCase):
         account_type = AccountType.objects.filter(user = self.user, account_asset_type="CRYPTO")[0]
         self.assertEqual(account_type.access_token, self.eth_address)
         self.assertEqual(account_type.account_asset_type, 'CRYPTO')
-        self.assertEqual(account_type.account_institution_name, 'Ethereum')
+        self.assertEqual(account_type.account_institution_name, 'eth')
 
     def test_save_wallet_address_works_with_btc(self):
         count_before = AccountType.objects.all().count()
@@ -35,7 +35,7 @@ class CryptoWraperTestCase(TestCase):
         account_type = AccountType.objects.filter(user = self.user, account_asset_type="CRYPTO")[0]
         self.assertEqual(account_type.access_token, self.btc_address)
         self.assertEqual(account_type.account_asset_type, 'CRYPTO')
-        self.assertEqual(account_type.account_institution_name, 'Bitcoin')
+        self.assertEqual(account_type.account_institution_name, 'btc')
 
     def test_saving_duplicate_address_does_nothing(self):
         save_wallet_address(self.user, self.eth_address)
@@ -49,7 +49,7 @@ class CryptoWraperTestCase(TestCase):
         save_wallet_address(self.user, self.eth_address)
         wallets = get_wallets(self.user)
         self.assertEqual(len(wallets), 1)
-        self.assertEqual(wallets[0].access_token, self.eth_address)
+        self.assertEqual(wallets[0], self.eth_address)
 
     def test_get_wallets_works_for_multiple_wallets(self):
         save_wallet_address(self.user, self.eth_address)

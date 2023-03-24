@@ -148,7 +148,10 @@ def link_token(request):
 @permission_classes([IsAuthenticated])
 def link_crypto_wallet(request):
     user = request.user
-    address = request.GET.get('param')
+    if request.GET.get('param'):
+        address = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Product not specified.'}, status=400)
     
     save_wallet_address(user, address)
 
