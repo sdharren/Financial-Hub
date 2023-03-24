@@ -21,7 +21,7 @@ body {
     gap: 2rem;
     padding: 0 1rem;
     border-style: solid;
-    border-color: black;
+    border-color: #000000;
     border-bottom-width: 4px;
 
 }
@@ -444,10 +444,7 @@ max-width: 120%;
     overflow: hidden;
     width: 10rem;
     margin-top: 10px;
-    margin-to: 0.625rem;
-}
-
-.select-option {
+    margin-top: 0.625rem;
 }
  
 .about-page {
@@ -510,3 +507,56 @@ max-width: 120%;
   width: 100%;
   height: 100%;
 }
+
+.accounts-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 4rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.accounts-table {
+  border-collapse: collapse;
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 50px;
+}
+
+.accounts-column, .accounts-head {
+  text-align: center;
+  padding: 8px;
+}
+
+.accounts-head {
+  border-left: 2px solid #00008b ;
+  border-left-width: 4px;
+  border-right: 2px solid #00008b ;
+  border-right-width: 4px;
+}
+
+.accounts-row, .accounts-column{
+  border-top: 2px solid #00008b ;
+  border-top-width: 4px;
+  border-left: 2px solid #00008b ;
+  border-left-width: 4px;
+  border-right: 2px solid #00008b ;
+  border-right-width: 4px;
+}
+
+.accounts-removebutton {
+  background-color: #d61616;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.accounts-removebutton:hover {
+  background-color: #ff0000;
+}
+

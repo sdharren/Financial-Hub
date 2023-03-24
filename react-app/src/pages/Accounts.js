@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
 function Accounts() {
@@ -45,7 +44,8 @@ function Accounts() {
     const handleRemoveBank = async (institution) => {
       try {
         // Send DELETE request to unlink bank account
-        const response = await fetch(`/api/delete_linked_banks/${institution}/`, {
+        const delstockurl = `http://127.0.0.1:8000/api/delete_linked_bank/${institution}/`
+        const response = await fetch(delstockurl, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -65,8 +65,8 @@ function Accounts() {
   const handleRemoveBrokerage = async (brokerage) => {
     // Send DELETE request to unlink brokerage account
     try {
-      
-      const response = await fetch(`/api/delete_linked_brokerage/${brokerage}/`, {
+      const delbrokerageurl = `http://127.0.0.1:8000/api/delete_linked_brokerage/${brokerage}/`
+      const response = await fetch(delbrokerageurl, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -84,35 +84,38 @@ function Accounts() {
   };
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Remove</th>
-        </tr>
-      </thead>
-      <tbody>
-        {banks.map(bank => (
-          <tr key={bank}>
-            <td>{bank}</td>
-            <td>Institution</td>
-            <td>
-              <button onClick={() => handleRemoveBank(bank)}>Remove</button>
-            </td>
+    <div>
+      <h1 className='accounts-name'>Accounts</h1>
+      <table className='accounts-table'>
+        <thead className='accounts-head'>
+          <tr className='accounts-row'>
+            <th className='accounts-head'>Name</th>
+            <th className='accounts-head'>Type</th>
+            <th className='accounts-head'>Remove</th>
           </tr>
-        ))}
-        {brokerages.map(brokerage => (
-          <tr key={brokerage}>
-            <td>{brokerage}</td>
-            <td>Brokerage</td>
-            <td>
-              <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {banks.map(bank => (
+            <tr  key={bank}>
+              <td className='accounts-column'>{bank}</td>
+              <td className='accounts-column'>Institution</td>
+              <td className='accounts-column'>
+                <button className='accounts-removebutton' onClick={() => handleRemoveBank(bank)}>Remove</button>
+              </td>
+            </tr>
+          ))}
+          {brokerages.map(brokerage => (
+            <tr  key={brokerage}>
+              <td className='accounts-column'>{brokerage}</td>
+              <td className='accounts-column'>Brokerage</td>
+              <td className='accounts-column'>
+                <button className='accounts-removebutton' onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

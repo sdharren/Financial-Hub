@@ -69,30 +69,30 @@ import AuthContext from '../context/AuthContext';
 function RecentTransactions() {
   let {authTokens, logoutUser} = useContext(AuthContext);
   const [transactions, setTransactions] = useState([]);
-  const [institutionName, setInstitutionName] = useState('');
 
-  useEffect(() => {
-    async function fetchTransactions() {
-      let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
-      const response = await fetch(transactionURL, {
-        method: 'GET',
-        headers: {
-          'Content-Type':'application/json',
-          'Authorization':'Bearer ' + String(authTokens.access)
-        },
-      });
-      if (!response.ok) {
-        console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);
-        return;
-      }
-    
-      const data = await response.json();
-      setTransactions(data['Royal Bank of Scotland - Current Accounts']);
-      
+
+  let get_data = async() =>  {
+    let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
+    let response = await fetch(transactionURL, {
+        method:'GET',
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }
+    });
+    let data = await response.json();
+    if (response.status === 200) {
+        setTransactions(data['Royal Bank of Scotland - Current Accounts']);
     }
-
-    fetchTransactions();
-  }, [transactions]);
+    else {
+      console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);
+    }
+  
+    }
+  useEffect(() => {
+    get_data();
+    console.log(transactions);
+  }, []);
 
   return (
     <div>
