@@ -44,6 +44,12 @@ def getFirstName(request):
     serializer = UserSerializer(user)
     return Response(serializer.data)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def total_assets(request):
+    data = {"Bank Assets": 5, "Investment Assets": 5, "Crypto Assets": 5}
+    return Response(data, content_type='application/json', status=200)
+
 class SignupView(APIView):
     def post(self, request):
         serializer = UserSerializer(data = request.data)

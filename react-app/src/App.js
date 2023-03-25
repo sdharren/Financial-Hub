@@ -9,7 +9,7 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import BarGraph from './pages/BarGraph';
+import TotalAssetsDisplay from './pages/TotalAssets'
 import TransactionDisplay from './pages/TransactionDisplay';
 import PieChart from './pages/PieChart';
 import BalancesDisplay from './pages/Balances';
@@ -39,7 +39,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/transactions" element={<TransactionDisplay />} />
                 <Route path="/sector_spending" element={<SectorSpending/>} />
-
+                <Route path="/total_assets" element={<TotalAssetsDisplay/>} />
                 {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
                 <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
 

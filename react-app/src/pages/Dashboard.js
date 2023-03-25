@@ -4,11 +4,12 @@ import Balances from './Balances';
 import Transactions from './RecentTransactionsDisplay';
 import Currency from './Currency';
 import BarChart from './TransactionDisplay';
+import TotalAssetsDisplay from './TotalAssets';
 
 
 const tabGraphData = {
   Overall: [
-    { name: 'Graph 1', content: `Content for Graph 1 in Overall tab goes here.` },
+    { name: 'Graph 1', content:<TotalAssetsDisplay/> },
     { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
     { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
@@ -53,7 +54,7 @@ function Dashboard() {
     setActiveGraphPie(graphName);
   };
 
-  
+
 
 
 
