@@ -119,7 +119,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'build')],
+        'DIRS': [os.path.join(BASE_DIR, 'react-app/build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -184,7 +184,7 @@ STATIC_URL = 'static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'build/static')
+    os.path.join(BASE_DIR, 'react-app/build/static')
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
