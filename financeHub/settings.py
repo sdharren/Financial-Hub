@@ -21,7 +21,7 @@ from datetime import timedelta
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l_e^udcu74vj-m^0ns566umxcfdw5)m6zniz6&vjllpca7f+%s'
+SECRET_KEY = '@dg8+*g#1p%854*36rgr!=l4x$-l3&j7$p%!km10#dk37$a=d%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
