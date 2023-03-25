@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn Financial-Hub.wsgi --log-file -
+web: gunicorn financeHub.wsgi --log-file -
