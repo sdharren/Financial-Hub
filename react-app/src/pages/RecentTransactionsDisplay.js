@@ -10,58 +10,58 @@ const transactionss = {
       category: ['Transfer', 'Debit'],
       merchant: 'Bank Of Switzerland'
     },
-    // {
-    //   amount: '£398.34',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants', 'Fast Food'],
-    //   merchant: 'Eat Tokyo'
-    // },
-    // {
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },{
-    //   amount: '₹1708.12',
-    //   date: new Date(2023, 2, 12),
-    //   category: ['Food and Drink', 'Restaurants'],
-    //   merchant: 'Burger and Lobster'
-    // },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },{
+      amount: '₹1708.12',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants'],
+      merchant: 'Burger and Lobster'
+    },
     {
       amount: '1109.01',
       date: new Date(2023, 2, 12),
@@ -88,10 +88,10 @@ export default function RecentTransactions() {
     return transactions.map(({ amount, date, category, merchant }) => {
 
       return (
-        <tr className='hover:bg-neutral-100' key={merchant}>
-          <td className='text-left py-3 px-4'>{merchant}</td>
+        <tr className='' key={merchant}>
+          <td className='text-left py-3 px-4 text-white'>{merchant}</td>
           <td className='text-left py-3 px-4'>{category.join(', ')}</td>
-          <td className='text-left py-3 px-4'>{amount}</td>
+          <td className='text-left py-3 px-4 text-white'>{amount}</td>
           <td className='text-left py-3 px-4'>{date}</td>
         </tr>
       );
@@ -126,12 +126,12 @@ export default function RecentTransactions() {
 
 
   return (
-    <div className='shadow overflow-hidden rounded border-b border-gray-200'>
-      <table className="transaction-table min-w-full bg-white">
+    <div className='overflow-hidden rounded border-gray-200'>
+      <table className="transaction-table min-w-full bg-transparent">
         <thead className='bg-gray-800 text-white'>
           {renderTableHeader()}
         </thead>
-        <tbody className='text-gray-700'>
+        <tbody className='text-violet-300'>
           {renderTableData()}
         </tbody>
       </table>

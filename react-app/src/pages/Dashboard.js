@@ -4,6 +4,7 @@ import Balances from './Balances';
 import Transactions from './RecentTransactionsDisplay';
 import Currency from './Currency';
 import BarChart from './TransactionDisplay';
+import BarChartDisplay from './SectorSpending';
 
 
 const tabGraphData = {
@@ -15,9 +16,10 @@ const tabGraphData = {
   ],
   Banks: [
     { name: 'Balance', content: <Balances /> },
-    { name: 'Transaction', content: <Transactions /> },
+    { name: 'Recent Transactions', content: <Transactions /> },
     { name: 'Currency', content: <Currency /> },
     { name: 'Bar Chart', content: <BarChart /> },
+    { name: 'Sector Spending', content: <BarChartDisplay /> }
   ],
   Stocks: [
     { name: 'Graph 1', content: <InvestmentGraphs/>}
@@ -143,12 +145,12 @@ function Dashboard() {
                 ))}
             </div>
             <div className='graph-container flex flex-row'>
-                <div className='graph-names flex flex-col mr-2'>
+                <div className='graph-names flex flex-col mr-2 w-40'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
                         hidden={stocksActive}
                         key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-8 align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
+                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[4.25rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
                         onClick={() => handlePieGraphClick(graph.name)}
                       >
                         {graph.name}
@@ -169,4 +171,5 @@ function Dashboard() {
     return page2
 }
 
+// keep the main dashboard element the same size, calculate the rem, make the table scroll, make eveyr other graph fit in
 export default Dashboard;

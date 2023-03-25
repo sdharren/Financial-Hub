@@ -29,7 +29,7 @@ import Accounts from './pages/Accounts';
 function App() {
   return (
     <div className = "bg-[url('./images/background-image.png')]">
-      <div className= 'w-9/10 ml-auto mr-auto max-w-7xl min-h-screen'>
+      <div className= 'mx-20 max-w-full min-h-screen'>
       <Router>
         <AuthProvider>
           <Navbar />
