@@ -14,10 +14,13 @@ author: Pavan Rana + Augusto Favero
 
 def create_forex_rates(input_date):
     warnings.filterwarnings('ignore')
+    try:
+        url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+        response = requests.get(url,verify=False)
+    except Exception:
+        error_rates = {'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1}
+        return error_rates
 
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
-
-    response = requests.get(url,verify=False)
     rates = json.loads(response.content.decode('utf-8'))['rates']
 
     if 'GBP' not in rates.keys():

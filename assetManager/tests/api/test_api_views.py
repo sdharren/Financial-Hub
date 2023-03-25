@@ -259,6 +259,15 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         cache.delete('product_link' + self.user.email)
 
+    def test_development_bad_cache_assets_request(self):
+        settings.PLAID_DEVELOPMENT = True
+        cache.set('product_link' + self.user.email, ['transactions'])
+        response = self.client.post('/api/exchange_public_token/', {'public_token': 'invalid_token'}, format='json')
+        self.assertEqual(response.status_code, 400)
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Bad request. Invalid public token.')
+
     def test_post_exchange_public_token_returns_error_code_with_no_public_token(self):
         cache.set('product_link' + self.user.email, 'transactions')
         response = self.client.post('/api/exchange_public_token/')
