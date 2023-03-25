@@ -4,6 +4,7 @@ from assetManager.transactionInsight.bank_transaction_insight import CategoriseT
 import requests
 import warnings
 import json
+from datetime import date
 
 """
 Class of methods to produce data to pass to the frontend to create the graphs
@@ -18,6 +19,10 @@ def create_forex_rates(input_date):
 
     response = requests.get(url,verify=False)
     rates = json.loads(response.content.decode('utf-8'))['rates']
+
+    if 'GBP' not in rates.keys():
+        rates['GBP'] = 1
+
     return rates
 
 """
@@ -29,9 +34,9 @@ def create_forex_rates(input_date):
 """
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23)
+        input_date = datetime.date(2014, 5, 23)
     else:
-        input_date = datetime.datetime.today()
+        input_date = date.today()
 
     return input_date
 

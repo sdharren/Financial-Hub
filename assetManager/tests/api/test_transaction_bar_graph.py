@@ -22,6 +22,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     """Tests of the views for transactions bar graph."""
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
         User = get_user_model()
         users = User.objects.all()

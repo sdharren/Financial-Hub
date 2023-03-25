@@ -6,7 +6,6 @@ import json
 from assetManager.api.views import reformatAccountBalancesData
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
-from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from django.conf import settings
 from assetManager.models import AccountTypeEnum,AccountType

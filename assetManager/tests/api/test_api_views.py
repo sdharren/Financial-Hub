@@ -1,10 +1,8 @@
 import json
 import re
-
 from django.test import TestCase
 from django.core.cache import cache
 from django.conf import settings
-
 from assetManager.models import User
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import InvestmentsNotLinked

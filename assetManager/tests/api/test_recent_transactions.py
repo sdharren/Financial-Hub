@@ -8,7 +8,6 @@ from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from django.conf import settings
 from assetManager.models import AccountTypeEnum,AccountType
 from django.core.cache import cache
 from datetime import datetime, date
@@ -33,7 +32,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
-    
+
     def test_recent_transactions_url(self):
         self.assertEqual(self.url,'/api/recent_transactions/')
 

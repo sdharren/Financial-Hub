@@ -8,6 +8,7 @@ from assetManager.investments.investment import Investment
 from assetManager.API_wrappers.yfinance_wrapper import TickerNotSupported
 import json
 import os
+from django.conf import settings
 
 class StocksTestCase(TestCase):
     fixtures = [
@@ -15,6 +16,7 @@ class StocksTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.stock_getter = None
         self.user = User.objects.get(email='johndoe@example.org')
 
@@ -50,7 +52,7 @@ class StocksTestCase(TestCase):
         self.stock_getter = _create_stock_getter_with_fake_data()
         total_sum = self.stock_getter.get_total_investment_sum()
         self.assertEqual(total_sum, 10580.3)
-    
+
     def test_get_investment_categories(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         categories = self.stock_getter.get_investment_categories()
@@ -154,7 +156,7 @@ class StocksTestCase(TestCase):
         self.assertTrue(len(data) > 100)
         for key in data:
             self.assertTrue(data[key] > 0)
-        
+
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()

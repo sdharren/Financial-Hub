@@ -15,6 +15,7 @@ from assetManager.api.views_helpers import *
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
+from django.conf import settings
 
 from assetManager.tests.helpers import LogInTester
 
@@ -22,6 +23,7 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
     """Tests of the views for transactions bar graph."""
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
         User = get_user_model()
         users = User.objects.all()
@@ -80,7 +82,7 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
 
     def test_transaction_data_getter(self):
         self.assertNotEqual(transaction_data_getter(self.user),None)
-    
+
     def test_recache_transaction_data(self):
         oldCachedData = {"test_transactions_name":"test_transactions_data"}
         correct_data = {"test_institution":[oldCachedData]}
