@@ -179,3 +179,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication
 AUTH_USER_MODEL = 'assetManager.User'
+
+# Deployment stuff
+import django_heroku
+import dotenv
+import dj_database_url
+import os
+django_heroku.settings(locals())
+
+# Setup DB config
+BASE_DIR = os.path.abspath('.')
+
+dotenv_file = os.path.join(BASE_DIR, ".env")
+print(BASE_DIR)
+print(dotenv_file)
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+
+options = DATABASES['default'].get('OPTIONS', {})
+options.pop('sslmode', None)
