@@ -1,4 +1,4 @@
-
+blockcypher==1.0.93
 asgiref==3.6.0
 backports.zoneinfo==0.2.1;python_version<"3.9"
 chartjs==1.2
