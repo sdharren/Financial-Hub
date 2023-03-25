@@ -31,6 +31,10 @@ const tabGraphData = {
   ],
 };
 
+const lastGraphBorder = (tabName) => {
+    // if (tabName === '')
+}
+
 function Dashboard() {
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
@@ -119,16 +123,36 @@ function Dashboard() {
 
     let page2 = (
         <div className='dashboard-container my-10px py-10 px-5'>
-            <div className='dashboard-catagories flex flex-row justify-between'>
+            <div className='dashboard-catagories flex flex-row justify-between mb-10'>
                 {Object.keys(tabGraphData).map((tabName) => (
                     <div
                       key={tabName}
-                      className={`piechart-tab ${activeTabPie === tabName ? 'active bg-gradient-to-t from-violet-500 to-transparent' : ''} text-white text-center text-lg w-full cursor-pointer border-b-2 pb-2 ${tabName == 'Crypto' ? '' : 'border-r-2'}`}
+                      className={`piechart-tab ${activeTabPie === tabName ? 'active bg-gradient-to-t from-violet-500 to-transparent' : ''} text-white text-center text-lg w-full cursor-pointer border-b-2 pb-2 ${tabName == Object.keys(tabGraphData)[Object.keys(tabGraphData).length - 1] ? '' : 'border-r-2'}`}
                       onClick={() => handlePieTabClick(tabName)}
                     >
                       {tabName}
                     </div>
                 ))}
+            </div>
+            <div className='graph-container flex flex-row'>
+                <div className='graph-names flex flex-col mr-2'>
+                    {tabGraphData[activeTabPie].map((graph) => (
+                      <div
+                        hidden={stocksActive}
+                        key={graph.name}
+                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-8 align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
+                        onClick={() => handlePieGraphClick(graph.name)}
+                      >
+                        {graph.name}
+                      </div>
+                    ))}
+                </div>
+                <div className='graph ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-10'>
+                    {tabGraphData[activeTabPie].map((graph) => (
+                      activeGraphPie === graph.name && <div key={graph.name}>{graph.content}</div>
+                    ))}
+                </div>
+
             </div>
 
         </div>
