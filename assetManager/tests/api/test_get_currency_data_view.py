@@ -31,6 +31,7 @@ class GetCurrencyDataViewTestCase(TestCase):
         jwt = str(response.data['access'])
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
+    
     def test_balances_url(self):
         self.assertEqual(self.url,'/api/currency_data/')
 
@@ -180,11 +181,10 @@ class GetCurrencyDataViewTestCase(TestCase):
     def test_get_currenccy_succesfully_with_existing_cache(self):
         response = self.client.get(self.url, follow=True)
         response_2 = self.client.get(self.url, follow=True)
-        response_json = json.loads(response_2.content)
-        response_data = response.json()
-        self.assertEqual(list(response_data.keys())[0], "USD")
-        self.assertEqual(response_data['USD'], 100)
-        self.assertEqual(response.status_code,200)
+        response_json = response_2.json()
+        self.assertEqual(list(response_json.keys())[0], "USD")
+        self.assertEqual(response_json['USD'], 100)
+        self.assertEqual(response_2.status_code,200)
 
     def test_get_currencies_for_multiple_institution(self):
         before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
@@ -196,7 +196,6 @@ class GetCurrencyDataViewTestCase(TestCase):
         response = self.client.get(self.url, follow=True)
         after_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
         self.assertEqual(after_count, before_count + 2)
-        response_json = json.loads(response.content)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0], "USD")
         self.assertEqual(response_data['USD'], 100)
