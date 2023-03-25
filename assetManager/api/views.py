@@ -375,16 +375,19 @@ A Response object returning that the status is 200
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_bank_access_token(request):
-    data = request.body
-    decoded_data = data.decode('utf-8')
-    parsed_data = json.loads(decoded_data)
-    access_token_id = int(parsed_data['selectedOption'])
-    plaid_wrapper = get_plaid_wrapper(request.user,'balances')
-    debitCards = DebitCard(plaid_wrapper,request.user)
-    access_token = debitCards.access_tokens[access_token_id]
-    cache.delete('access_token'+request.user.email)
-    cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
-    return Response(status=200)
+    try:
+        data = request.body
+        decoded_data = data.decode('utf-8')
+        parsed_data = json.loads(decoded_data)
+        access_token_id = int(parsed_data['selectedOption'])
+        plaid_wrapper = get_plaid_wrapper(request.user,'balances')
+        debitCards = DebitCard(plaid_wrapper,request.user)
+        access_token = debitCards.access_tokens[access_token_id]
+        cache.delete('access_token'+request.user.email)
+        cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
+        return Response(status=200)
+    except:
+        return Response(status=400)
 
 """
 @params:
