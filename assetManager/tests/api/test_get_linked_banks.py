@@ -3,15 +3,14 @@ from django.urls import reverse
 from django.contrib import messages
 from assetManager.models import User
 import json
-
 from assetManager.api.views import get_linked_banks
-
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import AccountTypeEnum,AccountType
 from assetManager.assets.debit_card import DebitCard
+from django.conf import settings
 
 class GetLinkedBankViewsTestCase(TestCase):
     """Tests of the log in view."""
@@ -20,7 +19,7 @@ class GetLinkedBankViewsTestCase(TestCase):
     ]
 
     def setUp(self):
-
+        settings.PLAID_DEVELOPMENT = False
         self.url = reverse('get_linked_banks')
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
@@ -41,7 +40,7 @@ class GetLinkedBankViewsTestCase(TestCase):
         response = self.client.post(self.url, follow = True)
         self.assertEqual(response.status_code,405)
 
-    
+
 
     def test_get_linked_institution_name(self):
         settings.PLAID_DEVELOPMENT = False
@@ -63,7 +62,7 @@ class GetLinkedBankViewsTestCase(TestCase):
         institution_name = response.json()
         self.assertEqual(institution_name,[])
 
-        
+
     def test_get_multiple_linked_institution_names(self):
         settings.PLAID_DEVELOPMENT = False
         AccountType.objects.create(

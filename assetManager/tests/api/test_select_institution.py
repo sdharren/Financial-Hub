@@ -15,13 +15,14 @@ from assetManager.api.views_helpers import *
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
-
+from django.conf import settings
 from assetManager.tests.helpers import LogInTester
 
 class CacheTransactionsViewTestCase(TestCase, LogInTester):
     """Tests of the views for dropdown menu."""
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
         User = get_user_model()
         users = User.objects.all()
