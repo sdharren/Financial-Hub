@@ -11,29 +11,26 @@ function Dashboard() {
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
 
-  const [activeGraphPie, setActiveGraphPie] = useState('Graph 1');
+  const [activeGraphPie, setActiveGraphPie] = useState('Total Asset Breakdown');
 
   const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
 
   function handleClicked(event){
     console.log(event.next)
     if (event.next==="Bank Assets"){
-      s('Banks')
+      handlePieTabClick('Banks')
     }
     else if (event.next==="Crypto Assets"){
-      s('Crypto')
+      handlePieTabClick('Crypto')
     }
     else{
-      s('Stocks')
+      handlePieTabClick('Stocks')
     }
   }
   
   const tabGraphData = {
     Overall: [
-      { name: 'Graph 1', content:<TotalAssetsDisplay handleClicked={handleClicked}/> },
-      { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
-      { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
-      { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
+      { name: 'Total Asset Breakdown', content:<TotalAssetsDisplay handleClicked={handleClicked}/> },
     ],
     Stocks: [
       { name: 'Graph 1', content: <InvestmentGraphs/>}
@@ -65,12 +62,6 @@ function Dashboard() {
   const handlePieGraphClick = (graphName) => {
     setActiveGraphPie(graphName);
   };
-
-  const s = (tab) => {
-    setActiveTabPie(tab);
-    setActiveGraphPie(tabGraphData[tab][0].name);
-  };
-
 
 
 
