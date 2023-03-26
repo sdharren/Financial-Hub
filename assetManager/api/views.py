@@ -232,6 +232,7 @@ def exchange_public_token(request):
         #update balances cache if it exists
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
+        # set_single_institution_transactions(token,wrapper,request.user)
 
     #write a function in helpers it takes an access token, queries plaid for that access token and if
     #single institution thingy

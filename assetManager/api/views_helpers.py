@@ -302,6 +302,21 @@ def set_single_institution_balances_and_currency(token,wrapper,user):
 
     cache.set('currency' + user.email, calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(cache.get('balances' + user.email))))
 
+"""
+@params:
+
+token: a Plaid token used to access the Plaid API
+wrapper: a Plaid API wrapper object
+user: a user object containing the user's email address
+
+@Description: This function retrieves the account transactions for a single institution associated with a given user.
+It uses a Plaid token and a user object to access the data through the Plaid API.
+The account transactions are stored in a cache for future use.
+
+Returns:
+Raises a PlaidQueryException if an error occurs while querying the Plaid API
+None if the function executes successfully and stores the account transactions in the cache
+"""
 def set_single_institution_transactions(token,wrapper,user):
     debit_card = make_debit_card(wrapper,user)
 
