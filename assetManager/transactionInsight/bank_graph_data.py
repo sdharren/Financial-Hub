@@ -12,6 +12,19 @@ for bank data.
 author: Pavan Rana + Augusto Favero
 """
 
+"""
+@Params:
+input_date (datetime.date): The date for which to retrieve foreign exchange rates.
+
+@Description:
+Retrieves the foreign exchange rates for a specified date from theforexapi.com.
+Rates are returned relative to the British pound (GBP).
+
+@Return:
+rates (dict): A dictionary containing foreign exchange rates, where the keys are ISO currency codes
+and the values are the conversion rate relative to the British pound (GBP).
+If an error occurs during the retrieval process, default rates are returned instead.
+"""
 def create_forex_rates(input_date):
     warnings.filterwarnings('ignore')
     try:
@@ -56,6 +69,24 @@ def check_value_is_none(value_in_dict):
     else:
         return value_in_dict
 
+"""
+@Params:
+account: a dictionary containing information about a single account transaction
+rates: a dictionary containing exchange rates for different currencies
+
+@Description: This function takes in an account dictionary and a rates dictionary as input and returns a new dictionary with the account data converted to the user's currency based on the provided exchange rates.
+The function also formats the dates and checks for missing values in the input dictionary.
+
+@Returns:
+A dictionary containing the following keys:
+authorized_date: a formatted date for when the transaction was authorized
+date: a formatted date for when the transaction occurred
+amount: the transaction amount converted to the user's currency based on the provided exchange rates
+category: the category of the transaction
+name: the name of the transaction
+iso_currency_code: the currency code for the transaction
+merchant_name: the name of the merchant where the transaction occurred
+"""
 def handle_case(account,rates):
     converted_amount = round(account['amount'] / rates[account['iso_currency_code']],2)
 

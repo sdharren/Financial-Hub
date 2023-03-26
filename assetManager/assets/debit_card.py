@@ -196,8 +196,6 @@ class DebitCard():
 
     @return: recent_transactions, dictionary, key: passed insitution name, values: list of all transactions made recently (today)
     """
-    #add try catches in view functionalities
-    #if returned transactions is empty then make sure that something is returned to the front end
     def get_recent_transactions(self,bank_graph_data,institution):
         if(not bank_graph_data):
             raise bankDataEmpty()
@@ -211,7 +209,6 @@ class DebitCard():
             else:
                 date = account['date']
 
-            #    if(date == date.today() or date == (date.today() - timedelta(days=1))):
             case = {'amount': '£' + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':account['merchant_name']}
 
             all_transactions.append(case)
