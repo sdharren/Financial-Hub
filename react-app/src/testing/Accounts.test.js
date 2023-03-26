@@ -1,80 +1,70 @@
-// import React from 'react';
-// import { render, fireEvent } from '@testing-library/react';
-// import Accounts from '../pages/Accounts';
-// import { BrowserRouter } from 'react-router-dom';
-// import { AuthProvider } from '../context/AuthContext';
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import Accounts from '../pages/Accounts';
+import AuthContext from '../context/AuthContext';
 
-// describe('Accounts', () => {
-//   // Define some sample data to use for testing
-//   const banks = ['Bank A', 'Bank B'];
-//   const brokerages = ['Brokerage A', 'Brokerage B'];
+const mockAuthContextValue = {
+  authTokens: {
+    access: 'mock-access-token'
+  },
+  logoutUser: jest.fn()
+};
 
-//   it('renders the component with the correct headings', () => {
-//     const { getByText } = render( 
-//       <BrowserRouter>
-//         <AuthProvider>
-//             <Accounts />
-//         </AuthProvider>
-//       </BrowserRouter>);
-//     expect(getByText('Accounts')).toBeInTheDocument();
-//     expect(getByText('Name')).toBeInTheDocument();
-//     expect(getByText('Type')).toBeInTheDocument();
-//     expect(getByText('Remove')).toBeInTheDocument();
-//   });
+jest.mock('../context/AuthContext', () => ({
+  __esModule: true,
+  default: jest.fn(() => mockAuthContextValue)
+}));
 
-//   it('renders a table row for each bank in the list', () => {
-//     const { getByText } = render( 
-//     <BrowserRouter>
-//         <AuthProvider>
-//             <Accounts banks={banks}/>
-//         </AuthProvider>
-//       </BrowserRouter>);
-//     banks.forEach((bank) => {
-//       expect(getByText(bank)).toBeInTheDocument();
-//       expect(getByText('Institution')).toBeInTheDocument();
-//       expect(getByText('Remove')).toBeInTheDocument();
-//     });
-//   });
-
-//   it('renders a table row for each brokerage in the list', () => {
-//     const { getByText } = render(
-//     <BrowserRouter>
-//         <AuthProvider>
-//             <Accounts brokerages={brokerages}/>
-//         </AuthProvider>
-//       </BrowserRouter>);
-//     brokerages.forEach((brokerage) => {
-//       expect(getByText(brokerage)).toBeInTheDocument();
-//       expect(getByText('Brokerage')).toBeInTheDocument();
-//       expect(getByText('Remove')).toBeInTheDocument();
-//     });
-//   });
-
-//   it('removes a bank from the list when the remove button is clicked', () => {
-//     const { getByText, queryByText } = render(
-//        <BrowserRouter>
-//         <AuthProvider>
-//             <Accounts banks={banks} handleRemoveBank={() => {}} />
-//         </AuthProvider>
-//       </BrowserRouter>
+describe('Accounts', () => {
+    test('renders Accounts component', async () => {
+        const authTokens = { access: 'test_access_token' }; // Set the authentication context value
+        const { getByText } = render(
+          <AuthContext.Provider value={{ authTokens }}>
+            <Accounts />
+          </AuthContext.Provider>
+        );
       
-//     );
-//     const bankToRemove = banks[0];
-//     fireEvent.click(getByText(`Remove`, { selector: 'button' }));
-//     expect(queryByText(bankToRemove)).not.toBeInTheDocument();
+        const header = getByText(/Accounts/i);
+        expect(header).toBeInTheDocument();
+  });
+
+//   test('can remove bank', async () => {
+//     // Mock fetch request
+//     global.fetch = jest.fn().mockResolvedValue({
+//       ok: true,
+//       json: jest.fn()
+//     });
+
+//     render(<Accounts />);
+
+//     // Wait for accounts data to load
+//     await waitFor(() => screen.getByText('Accounts'));
+
+//     // Click remove button for first bank in list
+//     const removeButton = screen.getAllByText('Remove')[0];
+//     removeButton.click();
+
+//     // Check that bank is removed from list
+//     await waitFor(() => expect(screen.queryByText('Bank A')).not.toBeInTheDocument());
 //   });
 
-//   it('removes a brokerage from the list when the remove button is clicked', () => {
-//     const { getByText, queryByText } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//             <Accounts brokerages={brokerages} handleRemoveBrokerage={() => {}} />
-//         </AuthProvider>
-//       </BrowserRouter>
-//     );
-//     const brokerageToRemove = brokerages[0];
-//     fireEvent.click(getByText(`Remove`, { selector: 'button' }));
-//     expect(queryByText(brokerageToRemove)).not.toBeInTheDocument();
-//   });
-// });
+//   test('can remove brokerage', async () => {
+//     // Mock fetch request
+//     global.fetch = jest.fn().mockResolvedValue({
+//       ok: true,
+//       json: jest.fn()
+//     });
 
+//     render(<Accounts />);
+
+//     // Wait for accounts data to load
+//     await waitFor(() => screen.getByText('Accounts'));
+
+//     // Click remove button for first brokerage in list
+//     const removeButton = screen.getAllByText('Remove')[1];
+//     removeButton.click();
+
+//     // Check that brokerage is removed from list
+//     await waitFor(() => expect(screen.queryByText('Brokerage A')).not.toBeInTheDocument());
+//   });
+});

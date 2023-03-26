@@ -65,7 +65,7 @@ function Dashboard() {
 
 
   return (
-    <div>
+    <div data-testid= 'dashboardtest'>
       
       <div className="dashboard-container">
         <div className="piechart-box">
