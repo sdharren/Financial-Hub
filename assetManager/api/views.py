@@ -47,10 +47,10 @@ def getFirstName(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def total_assets(request):
-    wrapper = get_plaid_wrapper(request.user,'balances')
-    # bank_assets = sum_instiution_balances(wrapper, request.user)
-    bank_assets = 100
-    investment_assets = 100
+    user = request.user
+    wrapper = get_plaid_wrapper(user,'balances')
+    bank_assets = sum_instiution_balances(wrapper, request.user)
+    investment_assets = sum_instiution_balances(wrapper,user)
     crypto_assets = 100
     data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
     return Response(data, content_type='application/json', status=200)
@@ -267,21 +267,6 @@ def sandbox_investments(request):
     stock_getter.query_investments(user)
     cache.set('investments' + user.email, stock_getter.investments)
     return Response(status=200)
-
-def retrieve_stock_getter(user):
-    if cache.has_key('investments' + user.email):
-        stock_getter = StocksGetter(None)
-        data = cache.get('investments' + user.email)
-        stock_getter.investments = data
-    else:
-        if settings.PLAID_DEVELOPMENT:
-            wrapper = DevelopmentWrapper()
-        else:
-            wrapper = SandboxWrapper()
-        stock_getter = StocksGetter(wrapper)
-        stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
-        cache.set('investments' + user.email, stock_getter.investments)
-    return stock_getter
 
 """
 @params: an HTTP request object containing user authentication information

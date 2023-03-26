@@ -122,6 +122,20 @@ def reformatBalancesData(account_balances):
 
     return balances
 
+def retrieve_stock_getter(user):
+    if cache.has_key('investments' + user.email):
+        stock_getter = StocksGetter(None)
+        data = cache.get('investments' + user.email)
+        stock_getter.investments = data
+    else:
+        if settings.PLAID_DEVELOPMENT:
+            wrapper = DevelopmentWrapper()
+        else:
+            wrapper = SandboxWrapper()
+        stock_getter = StocksGetter(wrapper)
+        stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
+        cache.set('investments' + user.email, stock_getter.investments)
+    return stock_getter
 
 def get_plaid_wrapper(user,type):
     if settings.PLAID_DEVELOPMENT:
@@ -201,10 +215,10 @@ If the account balances are successfully retrieved, the function returns them. I
 A dictionary containing the account balances of all the linked institutions for the given `user`.
 """
 def get_institutions_balances(plaid_wrapper,user):
-    debit_card = make_debit_card(plaid_wrapper,user)
+    debit_card = make_debit_card(plaid_wrapper,user) # always use this first
 
     try:
-        account_balances = debit_card.get_account_balances()
+        account_balances = debit_card.get_account_balances() # always use this exception
     except Exception:
         raise PlaidQueryException('Something went wrong querying PLAID.')
 
@@ -229,6 +243,11 @@ def sum_instiution_balances(plaid_wrapper,user):
     data = get_institutions_balances(plaid_wrapper,user)
     available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
     return sum(available_amounts)
+
+
+def sum_investment_balance(plaid_wrapper,user):
+    stock_getter = retrieve_stock_getter(user)
+    return stock_getter.get_total_investment_sum()
 
 """
 @params:
@@ -403,10 +422,13 @@ Then returns the transactions correlating to the institution name.
 """
 def getCachedInstitutionCachedData(user):
     if False == cache.has_key('access_token'+user.email):
-        plaid_wrapper = get_plaid_wrapper(user,'transactions')
-        debitCards = make_debit_card(plaid_wrapper,user)
-        token = debitCards.access_tokens[0]
-        cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
+        try:
+            plaid_wrapper = get_plaid_wrapper(user,'transactions')
+            debitCards = make_debit_card(plaid_wrapper,user)
+            token = debitCards.access_tokens[0]
+            cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
     institution_name = cache.get('access_token'+user.email)
     if cache.has_key('transactions' + user.email):
         cachedInstitutions = cache.get('transactions' + user.email)
@@ -425,5 +447,8 @@ def getCachedInstitutionCachedData(user):
 def transaction_data_getter(user):
     plaid_wrapper = get_plaid_wrapper(user,'transactions')
     debitCards = make_debit_card(plaid_wrapper,user)
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-    return debitCards.get_insight_data()
+    try:
+        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+        return debitCards.get_insight_data()
+    except Exception:
+        raise PlaidQueryException('Something went wrong querying PLAID.')
