@@ -206,7 +206,7 @@ class APIViewsTestCase(TestCase):
         response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
-        response = client.get('/api/investment_category_breakdown/?param=NFLX')
+        response = client.get('/api/stock_history/?param=NFLX')
         self.assertEqual(response.status_code, 303)
 
     def test_get_stock_history_returns_bad_request_without_param(self):
@@ -321,6 +321,11 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('type' in balances['Royal Bank of Scotland - Current Accounts'][account])
             self.assertTrue('currency' in balances['Royal Bank of Scotland - Current Accounts'][account])
 
+    def test_post_exchange_public_token_redirects_with_no_cached_products(self):
+        cache.clear()
+        response = self.client.post('/api/exchange_public_token/')
+        self.assertEqual(response.status_code, 303)
+
     def test_retrieve_stock_getter_works(self):
         stock_getter = retrieve_stock_getter(self.user)
         self.assertEqual(len(self.stock_getter.investments), len(stock_getter.investments))
@@ -348,3 +353,76 @@ class APIViewsTestCase(TestCase):
         with self.assertRaises(InvestmentsNotLinked):
             retrieve_stock_getter(self.user)
         settings.PLAID_DEVELOPMENT = False
+
+    def test_investment_category_names_works(self):
+        response = self.client.get('/api/investment_category_names/')
+        self.assertEqual(response.status_code, 200)
+        categories = response.data['categories']
+        self.assertEqual(categories, {'cash', 'mutual fund', 'derivative', 'equity', 'etf'})
+
+    def test_investment_category_names_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/investment_category_names/')
+        self.assertEqual(response.status_code, 303)
+
+    def test_supported_investments_works(self):
+        response = self.client.get('/api/supported_investments/')
+        self.assertEqual(response.status_code, 200)
+        investments = response.data['investments']
+        self.assertEqual(investments, {'Matthews Pacific Tiger Fund Insti Class', 'Achillion Pharmaceuticals Inc.', 'Nflx Feb 0118 355 Call', 'Southside Bancshares Inc.', 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'iShares Inc MSCI Brazil', 'Bitcoin'})
+
+    def test_supported_investments_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/supported_investments/')
+        self.assertEqual(response.status_code, 303)
+
+    def test_get_returns_works(self):
+        response = self.client.get('/api/returns/?param=iShares%20Inc%20MSCI%20Brazil')
+        self.assertEqual(response.status_code, 200)
+        returns = response.data
+        self.assertTrue('1' in returns)
+        self.assertTrue('5' in returns)
+        self.assertTrue('30' in returns)
+
+    def test_get_returns_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/returns/?param=iShares%20Inc%20MSCI%20Brazil')
+        self.assertEqual(response.status_code, 303)
+
+    def test_get_returns_returns_bad_request_with_no_param(self):
+        response = self.client.get('/api/returns/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_category_returns_works(self):
+        response = self.client.get('/api/category_returns/?param=equity')
+        self.assertEqual(response.status_code, 200)
+        returns = response.data
+        self.assertTrue('1' in returns)
+        self.assertTrue('5' in returns)
+        self.assertTrue('30' in returns)
+
+    def test_get_category_returns_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/category_returns/?param=equity')
+        self.assertEqual(response.status_code, 303)
+
+    def test_get_category_returns_returns_bad_request_without_param(self):
+        response = self.client.get('/api/category_returns/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_overall_returns_works(self):
+        response = self.client.get('/api/overall_returns/')
+        self.assertEqual(response.status_code, 200)
+        returns = response.data
+        self.assertTrue('1' in returns)
+        self.assertTrue('5' in returns)
+        self.assertTrue('30' in returns)
+
+    def test_get_overall_returns_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/overall_returns/')
+        self.assertEqual(response.status_code, 303)
+    
+
+
+    
