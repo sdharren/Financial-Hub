@@ -222,6 +222,21 @@ class StocksTestCase(TestCase):
         returns = self.stock_getter.get_overall_returns()
         self.assertEqual(returns, {})
 
+    def test_get_supported_investments_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        supported_investments = self.stock_getter.get_supported_investments()
+        self.assertEqual(supported_investments, {'Nflx Feb 0118 355 Call', 'iShares Inc MSCI Brazil', 'Matthews Pacific Tiger Fund Insti Class', 'Bitcoin', 'Achillion Pharmaceuticals Inc.', 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'Southside Bancshares Inc.'})
+
+    def test_get_categories_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        categories = self.stock_getter.get_categories()
+        self.assertEqual(categories, {'mutual fund', 'cash', 'derivative', 'equity', 'etf'})
+
+    def test_is_ticker_supported_works(self):
+        self.stock_getter = StocksGetter(None)
+        self.assertTrue(self.stock_getter.is_ticker_supported('NFLX'))
+
+
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()
         # creating a sandbox public token for vanguard
