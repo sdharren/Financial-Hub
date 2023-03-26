@@ -7,29 +7,6 @@ import BarChart from './TransactionDisplay';
 import TotalAssetsDisplay from './TotalAssets';
 
 
-const tabGraphData = {
-  Overall: [
-    { name: 'Graph 1', content:<TotalAssetsDisplay/> },
-    { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
-    { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
-    { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
-  ],
-  Stocks: [
-    { name: 'Graph 1', content: <InvestmentGraphs/>}
-  ],
-  Banks: [
-    { name: 'Balance', content: <Balances /> },
-    { name: 'Transaction', content: <Transactions /> },
-    { name: 'Currency', content: <Currency /> },
-    { name: 'Bar Chart', content: <BarChart /> },
-  ],
-  Crypto: [
-    { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-    { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-    { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
-  ],
-};
-
 function Dashboard() {
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
@@ -38,6 +15,41 @@ function Dashboard() {
 
   const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
 
+  function handleClicked(event){
+    console.log(event.next)
+    if (event.next==="Bank Assets"){
+      s('Banks')
+    }
+    else if (event.next==="Crypto Assets"){
+      s('Crypto')
+    }
+    else{
+      s('Stocks')
+    }
+  }
+  
+  const tabGraphData = {
+    Overall: [
+      { name: 'Graph 1', content:<TotalAssetsDisplay handleClicked={handleClicked}/> },
+      { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
+      { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
+      { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
+    ],
+    Stocks: [
+      { name: 'Graph 1', content: <InvestmentGraphs/>}
+    ],
+    Banks: [
+      { name: 'Balance', content: <Balances /> },
+      { name: 'Transaction', content: <Transactions /> },
+      { name: 'Currency', content: <Currency /> },
+      { name: 'Bar Chart', content: <BarChart /> },
+    ],
+    Crypto: [
+      { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
+      { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
+      { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
+    ],
+  };
 
   const handlePieTabClick = (tabName) => {
     if (tabName === 'Stocks') {
@@ -54,16 +66,9 @@ function Dashboard() {
     setActiveGraphPie(graphName);
   };
 
-  const s = () => {
-    setActiveTabPie('Crypto');
-    setActiveGraphPie(tabGraphData['Crypto'][0].name);
-  };
-
-
-
-
-  const handlePieAccountChange = (event) => {
-    setSelectedPieAccount(event.target.value);
+  const s = (tab) => {
+    setActiveTabPie(tab);
+    setActiveGraphPie(tabGraphData[tab][0].name);
   };
 
 
@@ -102,7 +107,7 @@ function Dashboard() {
               
               <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
                 {tabGraphData[activeTabPie].map((graph) => (
-                  activeGraphPie === graph.name && <p key={graph.name} onClick={() => s(graph.name)}>{graph.content}</p>
+                  activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
                 ))}
               </div>
 
