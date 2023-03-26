@@ -23,8 +23,9 @@ import TransactionTable from './pages/RecentTransactionsDisplay';
 import SectorSpending from './pages/SectorSpending';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
-// import { Sector } from 'recharts';
-//import AssetBank from './pages/bankAssets';
+import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
+
+// ask matthew about how margins are lined
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
 
+              <Route path="/crypto_addresses" element={<CryptoWalletAddresses />} />
             </Routes>
 
         </AuthProvider>

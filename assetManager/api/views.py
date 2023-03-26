@@ -13,9 +13,10 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
-
+from assetManager.models import AccountType, AccountTypeEnum
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -174,22 +175,30 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
-"""
-@Params:
-request: Django request object
-@api_view(['POST]): decorator to indicate that the view only accepts POST HTTP requests.
-@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
-handle_plaid_errors: decorator that handles Plaid API errors.
 
-@Description:
-This function is an API endpoint that exchanges a public token for an access token using the Plaid API.
-It saves the access token for the authenticated user and the selected Plaid product types.
-If 'transactions' is among the product types selected, it also updates the cached balances and currency for the user's linked institution(s).
-The function returns a response with a status code indicating whether the operation was successful or not.
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def link_crypto_wallet(request):
+    user = request.user
+    if request.GET.get('param'):
+        address = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Product not specified.'}, status=400)
 
-@Returns:
-Response object with a status code indicating whether the operation was successful or not.
-"""
+    save_wallet_address(user, address)
+
+    return Response(status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_crypto_wallets(request):
+    user = request.user
+    allWallets = get_wallets(user)
+
+    return Response(allWallets, content_type='application/json', status=200)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):

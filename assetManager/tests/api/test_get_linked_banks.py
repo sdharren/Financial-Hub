@@ -68,13 +68,13 @@ class GetLinkedBankViewsTestCase(TestCase):
         AccountType.objects.create(
             user = self.user,
             account_asset_type = AccountTypeEnum.DEBIT,
-            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349111',
             account_institution_name = 'HSBC',
         )
         AccountType.objects.create(
             user = self.user,
             account_asset_type = AccountTypeEnum.DEBIT,
-            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349112',
             account_institution_name = 'Barclays',
         )
         response = self.client.get(self.url,follow = True)

@@ -6,6 +6,7 @@ from django.conf import settings
 from assetManager.models import User
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import InvestmentsNotLinked
+from assetManager.models import AccountType
 from assetManager.tests.investments.test_stocks import _create_stock_getter_with_fake_data
 from assetManager.api.views import *
 from assetManager.api.views import reformat_balances_into_currency
@@ -397,6 +398,32 @@ class APIViewsTestCase(TestCase):
             retrieve_stock_getter(self.user)
         settings.PLAID_DEVELOPMENT = False
 
+    def test_link_crypto_wallet_works(self):
+        response = self.client.get('/api/link_crypto_wallet/?param=0x312')
+        self.assertEqual(response.status_code, 200)
+        account = AccountType.objects.get(user=self.user)
+        self.assertEqual(account.access_token, '0x312')
+        self.assertEqual(account.account_asset_type, 'CRYPTO')
+        self.assertEqual(account.account_institution_name, 'eth')
+
+    def test_link_crypto_wallet_returns_bad_request_with_no_wallet(self):
+        response = self.client.get('/api/link_crypto_wallet/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_all_crypto_wallets_work_with_user_without_wallets(self):
+        response = self.client.get('/api/all_crypto_wallets/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_all_crypto_wallets_works(self):
+        self.client.get('/api/link_crypto_wallet/?param=0x312')
+        self.client.get('/api/link_crypto_wallet/?param=0adfs21')
+        response = self.client.get('/api/all_crypto_wallets/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertTrue('0x312' in response.data)
+        self.assertTrue('0adfs21' in response.data)
+
     def test_investment_category_names_works(self):
         response = self.client.get('/api/investment_category_names/')
         self.assertEqual(response.status_code, 200)
@@ -465,7 +492,3 @@ class APIViewsTestCase(TestCase):
         cache.clear()
         response = self.client.get('/api/overall_returns/')
         self.assertEqual(response.status_code, 303)
-    
-
-
-    

@@ -38,4 +38,6 @@ urlpatterns = [
     path('linked_brokerage/', views.linked_brokerage, name='linked_brokerage'),
     path('delete_linked_bank/<str:institution>/', views.delete_linked_banks, name='delete_linked_banks'),
     path('delete_linked_brokerage/<str:brokerage>/', views.delete_linked_brokerage, name='delete_linked_brokerage'),
+    path('link_crypto_wallet/', views.link_crypto_wallet, name='link_crypto_wallet'),
+    path('all_crypto_wallets/', views.all_crypto_wallets, name='all_crypto_wallets'),
 ]
