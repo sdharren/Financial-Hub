@@ -58,7 +58,7 @@ export default function Navbar() {
                 <Link to = "/list">Transactions</Link>
             </li>
             <li>
-                <Link to = "/bar_graph_display">Bar graph</Link>
+                <Link to = "/transactions">Bar graph</Link>
             </li>
             <li>
                 <p className="nav-logout" onClick = {logoutUser}>Logout</p>

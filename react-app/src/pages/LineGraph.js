@@ -3,10 +3,12 @@ import 'chart.js/auto';
 import { Line } from "react-chartjs-2";
 import AuthContext from '../context/AuthContext';
 import GraphSelect from '../components/GraphSelect';
+import { useNavigate } from 'react-router-dom';
 
 const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [lineGraphData, setLineGraphData] = useState(null);
+    const navigate = useNavigate();
 
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
@@ -27,6 +29,34 @@ const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) =
         let data = await response.json();
         if (response.status === 200) {
             setLineGraphData(data);
+        }
+        else if (response.status === 303) {
+            //TODO: redirect to plaid link investments
+            if (data['error'] === 'Investments not linked.') {
+                redirectToLink('investments');
+            }
+            else if (data['error'] === 'Transactions Not Linked.') {
+                redirectToLink('transactions');
+            }
+        }
+    }
+
+    let redirectToLink = async(assetType) => {
+        let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
+            {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            }
+        )
+        let data = await response.json();
+        if (response.status === 200) {
+            navigate('/plaid_link', {
+                state: {link_token: data['link_token']},
+                replace: true
+            });
         }
     }
 

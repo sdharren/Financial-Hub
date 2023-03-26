@@ -1,4 +1,4 @@
-
+blockcypher==1.0.93
 asgiref==3.6.0
 backports.zoneinfo==0.2.1;python_version<"3.9"
 chartjs==1.2
@@ -16,7 +16,6 @@ urllib3==1.26.14
 djangorestframework
 djangorestframework-simplejwt
 simplejson==3.18.4
-forex-python==1.8
 # yfinance and packages required for it
 # \/ \/ \/ \/
 appdirs==1.4.4
