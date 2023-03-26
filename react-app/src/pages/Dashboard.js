@@ -54,6 +54,10 @@ function Dashboard() {
     setActiveGraphPie(graphName);
   };
 
+  const s = () => {
+    setActiveTabPie('Crypto');
+    setActiveGraphPie(tabGraphData['Crypto'][0].name);
+  };
 
 
 
@@ -98,7 +102,7 @@ function Dashboard() {
               
               <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
                 {tabGraphData[activeTabPie].map((graph) => (
-                  activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
+                  activeGraphPie === graph.name && <p key={graph.name} onClick={() => s(graph.name)}>{graph.content}</p>
                 ))}
               </div>
 
