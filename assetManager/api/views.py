@@ -13,9 +13,10 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
-
+from assetManager.models import AccountType, AccountTypeEnum
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -200,6 +201,30 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def link_crypto_wallet(request):
+    user = request.user
+    if request.GET.get('param'):
+        address = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Product not specified.'}, status=400)
+
+    save_wallet_address(user, address)
+
+    return Response(status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_crypto_wallets(request):
+    user = request.user
+    allWallets = get_wallets(user)
+
+    return Response(allWallets, content_type='application/json', status=200)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
@@ -239,6 +264,20 @@ def exchange_public_token(request):
     #check duplicate for institution should be done in save access_token
     return Response(status=200)
 
+"""
+@params:
+request: Django request object
+@api_view(['PUT', 'DELETE']): decorator to indicate that the view only accepts PUT and DELETE HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
+@Description:
+
+This function is a Django view that either caches or deletes investment, bank balance, and currency data for an authenticated user.
+If the request is a PUT, the function first verifies that the user has linked investments, then proceeds to cache the user's investment data, bank balance data, and currency data.
+If the request is a DELETE, the function deletes all cached data related to the user's investments, transactions, currency, and balances.
+
+@return: A Response object with a status code of 200.
+"""
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -403,8 +442,10 @@ def set_bank_access_token(request):
 
 """
 @params:
-request: an HTTP request object containing user authentication information
-user: a user object containing the user's email address and Plaid account information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves and formats currency data associated with a given user.
 The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
@@ -436,8 +477,10 @@ def get_currency_data(request):
 
 """
 @params:
-request: an HTTP request object containing user authentication information
-user: a user object containing the user's email address and Plaid account information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves and formats balance data associated with a given user.
 The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
@@ -455,7 +498,6 @@ def get_balances_data(request):
     user = request.user
 
     plaid_wrapper = get_plaid_wrapper(user,'balances')
-
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
@@ -468,7 +510,10 @@ def get_balances_data(request):
 
 """
 @param:
-request: an HTTP request object containing user authentication information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves account balance data for a specific institution associated with a given user.
 The function uses a user object to access the data through a caching system.
@@ -501,7 +546,10 @@ def select_account(request):
 
 """
 @param:
-request: an HTTP request object containing user authentication information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves institution names associated with a given user's access tokens.
 The function then gives each institution its own id
@@ -524,6 +572,12 @@ def select_bank_account(request):
     return Response(institutions,status=200)
 
 """
+@params:
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
+
 @Description:
     This function retrieves recent transactions of a user's bank account from the Plaid API.
     At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
