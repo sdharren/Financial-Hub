@@ -17,6 +17,78 @@ const transactionss = {
       merchant: 'Eat Tokyo'
     },
     {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
+      amount: '£398.34',
+      date: new Date(2023, 2, 12),
+      category: ['Food and Drink', 'Restaurants', 'Fast Food'],
+      merchant: 'Eat Tokyo'
+    },
+    {
       amount: '₹1708.12',
       date: new Date(2023, 2, 12),
       category: ['Food and Drink', 'Restaurants'],
@@ -78,21 +150,23 @@ export default function RecentTransactions() {
   const renderTableHeader = () => {
     let headers = ["Merchant", "Catagory", "Amount", "Date"]
     return (
-      <tr>
+      <tr className='w-full table table-fixed'>
         {headers.map((header) => (<th className='text-left py-3 px-4 uppercase font-semibold text-sm'>{header}</th>))}
       </tr>
     );
   }
 
   const renderTableData = () => {
-    return transactions.map(({ amount, date, category, merchant }) => {
-
+    // return transactions.map(({ amount, date, category, merchant }) => {
+    return transactionss['Royal Bank of Scotland - Current Accounts'].map(({ amount, date, category, merchant}) => {
+    
       return (
-        <tr className='' key={merchant}>
+        <tr className='w-full table table-fixed' key={merchant}>
           <td className='text-left py-3 px-4 text-white'>{merchant}</td>
           <td className='text-left py-3 px-4'>{category.join(', ')}</td>
           <td className='text-left py-3 px-4 text-white'>{amount}</td>
-          <td className='text-left py-3 px-4'>{date}</td>
+          {/* <td className='text-left py-3 px-4'>{date}</td> */}
+          <td className='text-left py-3 px-4'>{date.toLocaleDateString()}</td>
         </tr>
       );
     })
@@ -127,11 +201,11 @@ export default function RecentTransactions() {
 
   return (
     <div className='overflow-hidden rounded border-gray-200'>
-      <table className="transaction-table min-w-full bg-transparent">
-        <thead className='bg-gray-800 text-white'>
+      <table className="transaction-table flex flex-col w-full h-[60vh] bg-transparent">
+        <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
           {renderTableHeader()}
         </thead>
-        <tbody className='text-violet-300'>
+        <tbody className='text-violet-300 flex-auto block overflow-y-scroll'>
           {renderTableData()}
         </tbody>
       </table>

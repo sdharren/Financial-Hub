@@ -144,13 +144,13 @@ function Dashboard() {
                     </div>
                 ))}
             </div>
-            <div className='graph-container flex flex-row'>
+            <div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
                 <div className='graph-names flex flex-col mr-2 w-40'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
                         hidden={stocksActive}
                         key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[4.25rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
+                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
                         onClick={() => handlePieGraphClick(graph.name)}
                       >
                         {graph.name}
@@ -159,7 +159,7 @@ function Dashboard() {
                 </div>
                 <div className='graph ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-10'>
                     {tabGraphData[activeTabPie].map((graph) => (
-                      activeGraphPie === graph.name && <div key={graph.name}>{graph.content}</div>
+                      activeGraphPie === graph.name && <div key={graph.name} className=''>{graph.content}</div>
                     ))}
                 </div>
 

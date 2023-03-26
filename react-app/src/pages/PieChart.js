@@ -111,7 +111,9 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
                     color: "white"
                 }
             }
-        }
+        },
+        responsive : true,
+        maintainAspectRatio : false,
     };
     const chartRef = useRef();
     const onClick = (event) => {
@@ -127,13 +129,13 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     };
 
     return (
-        <div>
+        <div className='inline-block min-h-[60vh] w-full'>
             {
                 selectOptions !== undefined 
                 ? <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
                 : null
             }
-            <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+            <Pie className='investment-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
         
     ) 
