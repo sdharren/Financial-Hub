@@ -6,7 +6,6 @@ import json
 from assetManager.api.views import reformatAccountBalancesData
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
-from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from django.conf import settings
 from assetManager.models import AccountTypeEnum,AccountType
@@ -17,6 +16,12 @@ class SelectAccountViewsTestCase(TestCase):
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]
+
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
 
     def tearDown(self):
         cache.clear()
@@ -71,7 +76,7 @@ class SelectAccountViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_get_select_account_url_succesfully_for_single_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+        self.create_public_token()
         self.balances = self.client.get(reverse('get_balances_data'), follow=True)
         response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
 
@@ -86,6 +91,7 @@ class SelectAccountViewsTestCase(TestCase):
 
     def test_get_select_account_url_for_multiple_institutions(self):
         before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.create_public_token()
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
         plaid_wrapper.exchange_public_token(public_token)
@@ -129,6 +135,7 @@ class SelectAccountViewsTestCase(TestCase):
 
 
     def test_get_select_accounts_url_with_incorrect_key(self):
+        self.create_public_token()
         self.balances = self.client.get(reverse('get_balances_data'), follow=True)
         response = self.client.get('/api/select_account/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 200)
