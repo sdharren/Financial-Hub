@@ -8,6 +8,7 @@ from assetManager.investments.investment import Investment
 from assetManager.API_wrappers.yfinance_wrapper import TickerNotSupported
 import json
 import os
+from django.conf import settings
 
 class StocksTestCase(TestCase):
     fixtures = [
@@ -15,6 +16,7 @@ class StocksTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.stock_getter = None
         self.user = User.objects.get(email='johndoe@example.org')
 
@@ -50,7 +52,7 @@ class StocksTestCase(TestCase):
         self.stock_getter = _create_stock_getter_with_fake_data()
         total_sum = self.stock_getter.get_total_investment_sum()
         self.assertEqual(total_sum, 10580.3)
-    
+
     def test_get_investment_categories(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         categories = self.stock_getter.get_investment_categories()
@@ -154,7 +156,7 @@ class StocksTestCase(TestCase):
         self.assertTrue(len(data) > 100)
         for key in data:
             self.assertTrue(data[key] > 0)
-        
+
     def test_set_investment_returns(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         investment = self.stock_getter.investments[1]
@@ -181,7 +183,7 @@ class StocksTestCase(TestCase):
 
     def test_get_returns_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
-        ewz_return = self.stock_getter.get_returns('iShares Inc MSCI Brazil') 
+        ewz_return = self.stock_getter.get_returns('iShares Inc MSCI Brazil')
         self.assertTrue(ewz_return['1'] != 0)
         self.assertTrue(ewz_return['5'] != 0)
         self.assertTrue(ewz_return['30'] != 0)
@@ -219,6 +221,21 @@ class StocksTestCase(TestCase):
         self.stock_getter = StocksGetter(None)
         returns = self.stock_getter.get_overall_returns()
         self.assertEqual(returns, {})
+
+    def test_get_supported_investments_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        supported_investments = self.stock_getter.get_supported_investments()
+        self.assertEqual(supported_investments, {'Nflx Feb 0118 355 Call', 'iShares Inc MSCI Brazil', 'Matthews Pacific Tiger Fund Insti Class', 'Bitcoin', 'Achillion Pharmaceuticals Inc.', 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'Southside Bancshares Inc.'})
+
+    def test_get_categories_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        categories = self.stock_getter.get_categories()
+        self.assertEqual(categories, {'mutual fund', 'cash', 'derivative', 'equity', 'etf'})
+
+    def test_is_ticker_supported_works(self):
+        self.stock_getter = StocksGetter(None)
+        self.assertTrue(self.stock_getter.is_ticker_supported('NFLX'))
+
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()

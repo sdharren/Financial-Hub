@@ -20,6 +20,7 @@ class GetLinkedBrokerageViewsTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.url = reverse('linked_brokerage')
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
@@ -40,7 +41,7 @@ class GetLinkedBrokerageViewsTestCase(TestCase):
         response = self.client.post(self.url, follow = True)
         self.assertEqual(response.status_code,405)
 
-    
+
 
     def test_get_linked_brokerage_name(self):
         settings.PLAID_DEVELOPMENT = False
@@ -55,7 +56,7 @@ class GetLinkedBrokerageViewsTestCase(TestCase):
         brokerage_name = response.json()
         self.assertEqual(brokerage_name,['Vanguard'])
 
-    
+
     def test_get_no_linked_institution(self):
         settings.PLAID_DEVELOPMENT = False
         response = self.client.get(self.url,follow = True)

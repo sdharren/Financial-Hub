@@ -1,10 +1,8 @@
 import json
 import re
-
 from django.test import TestCase
 from django.core.cache import cache
 from django.conf import settings
-
 from assetManager.models import User
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import InvestmentsNotLinked
@@ -39,7 +37,7 @@ class APIViewsTestCase(TestCase):
         cache.delete('balancesjohndoe@example.org')
         cache.delete('transactionsjohndoe@example.org')
         cache.delete('currencyjohndoe@example.org')
-    
+
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 200)
@@ -115,7 +113,34 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertEqual(response.content.decode('utf-8'), '{"error":"Transactions Not Linked."}')
 
-    def test_put_cache_assets_works(self):
+    def test_get_single_institution_balances_and_currency_invalid_access_token(self):
+        settings.PLAID_DEVELOPMENT = True
+        wrapper = DevelopmentWrapper()
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
+        self.assertFalse(cache.has_key('currency' + self.user.email))
+
+        access_token = 'access-development-8ab976e6-64bc-4b38-98f7-731e7a349971'
+
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = access_token,
+            account_institution_name = 'HSBC',
+        )
+
+        before_count = AccountType.objects.count()
+
+        with self.assertRaises(PlaidQueryException) as e:
+            set_single_institution_balances_and_currency(access_token,wrapper,self.user)
+
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count,after_count)
+
+
+
+
+    def test_put_cache_assets_works_sandbox_environment(self):
         #cache.delete('investments' + self.user.email)
         # setup investments
 
@@ -206,7 +231,7 @@ class APIViewsTestCase(TestCase):
         response = client.post('/api/token/', {'email': user.email, 'password': 'Password123'}, format='json')
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
-        response = client.get('/api/investment_category_breakdown/?param=NFLX')
+        response = client.get('/api/stock_history/?param=NFLX')
         self.assertEqual(response.status_code, 303)
 
     def test_get_stock_history_returns_bad_request_without_param(self):
@@ -234,13 +259,32 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         cache.delete('product_link' + self.user.email)
 
+    def test_development_bad_cache_assets_request(self):
+        settings.PLAID_DEVELOPMENT = True
+        cache.set('product_link' + self.user.email, ['transactions'])
+        response = self.client.post('/api/exchange_public_token/', {'public_token': 'invalid_token'}, format='json')
+        self.assertEqual(response.status_code, 400)
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Bad request. Invalid public token.')
+
     def test_post_exchange_public_token_returns_error_code_with_no_public_token(self):
         cache.set('product_link' + self.user.email, 'transactions')
         response = self.client.post('/api/exchange_public_token/')
         self.assertEqual(response.status_code, 400)
         cache.delete('product_link' + self.user.email)
 
-    def test_post_exchange_public_token_updating_existing_cache(self):
+    def test_post_exchange_public_token_no_product_link(self):
+        self.assertFalse(cache.has_key('product_link' + self.user.email))
+        response = self.client.post('/api/exchange_public_token/')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Link was not initialised correctly.')
+
+
+    def test_post_exchange_public_token_updating_existing_cache_sandbox_environment(self):
         self.assertFalse(cache.has_key('balances' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
         self.assertFalse(cache.has_key('transactions' + self.user.email))
@@ -285,7 +329,6 @@ class APIViewsTestCase(TestCase):
 
         self.assertEqual(len(balances['Royal Bank of Scotland - Current Accounts']),9)
 
-
     def test_post_exchange_public_token_correclty_caches_all_data_without_previously_cached_data(self):
         before_count = AccountType.objects.count()
 
@@ -321,6 +364,11 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('type' in balances['Royal Bank of Scotland - Current Accounts'][account])
             self.assertTrue('currency' in balances['Royal Bank of Scotland - Current Accounts'][account])
 
+    def test_post_exchange_public_token_redirects_with_no_cached_products(self):
+        cache.clear()
+        response = self.client.post('/api/exchange_public_token/')
+        self.assertEqual(response.status_code, 303)
+
     def test_retrieve_stock_getter_works(self):
         stock_getter = retrieve_stock_getter(self.user)
         self.assertEqual(len(self.stock_getter.investments), len(stock_getter.investments))
@@ -348,3 +396,76 @@ class APIViewsTestCase(TestCase):
         with self.assertRaises(InvestmentsNotLinked):
             retrieve_stock_getter(self.user)
         settings.PLAID_DEVELOPMENT = False
+
+    def test_investment_category_names_works(self):
+        response = self.client.get('/api/investment_category_names/')
+        self.assertEqual(response.status_code, 200)
+        categories = response.data['categories']
+        self.assertEqual(categories, {'cash', 'mutual fund', 'derivative', 'equity', 'etf'})
+
+    def test_investment_category_names_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/investment_category_names/')
+        self.assertEqual(response.status_code, 303)
+
+    def test_supported_investments_works(self):
+        response = self.client.get('/api/supported_investments/')
+        self.assertEqual(response.status_code, 200)
+        investments = response.data['investments']
+        self.assertEqual(investments, {'Matthews Pacific Tiger Fund Insti Class', 'Achillion Pharmaceuticals Inc.', 'Nflx Feb 0118 355 Call', 'Southside Bancshares Inc.', 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'iShares Inc MSCI Brazil', 'Bitcoin'})
+
+    def test_supported_investments_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/supported_investments/')
+        self.assertEqual(response.status_code, 303)
+
+    def test_get_returns_works(self):
+        response = self.client.get('/api/returns/?param=iShares%20Inc%20MSCI%20Brazil')
+        self.assertEqual(response.status_code, 200)
+        returns = response.data
+        self.assertTrue('1' in returns)
+        self.assertTrue('5' in returns)
+        self.assertTrue('30' in returns)
+
+    def test_get_returns_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/returns/?param=iShares%20Inc%20MSCI%20Brazil')
+        self.assertEqual(response.status_code, 303)
+
+    def test_get_returns_returns_bad_request_with_no_param(self):
+        response = self.client.get('/api/returns/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_category_returns_works(self):
+        response = self.client.get('/api/category_returns/?param=equity')
+        self.assertEqual(response.status_code, 200)
+        returns = response.data
+        self.assertTrue('1' in returns)
+        self.assertTrue('5' in returns)
+        self.assertTrue('30' in returns)
+
+    def test_get_category_returns_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/category_returns/?param=equity')
+        self.assertEqual(response.status_code, 303)
+
+    def test_get_category_returns_returns_bad_request_without_param(self):
+        response = self.client.get('/api/category_returns/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_overall_returns_works(self):
+        response = self.client.get('/api/overall_returns/')
+        self.assertEqual(response.status_code, 200)
+        returns = response.data
+        self.assertTrue('1' in returns)
+        self.assertTrue('5' in returns)
+        self.assertTrue('30' in returns)
+
+    def test_get_overall_returns_redirects_with_no_linked_investments(self):
+        cache.clear()
+        response = self.client.get('/api/overall_returns/')
+        self.assertEqual(response.status_code, 303)
+    
+
+
+    

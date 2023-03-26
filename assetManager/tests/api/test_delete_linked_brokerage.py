@@ -1,14 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from assetManager.models import User, AccountTypeEnum, AccountType
-
 from rest_framework.test import APIClient
 from rest_framework import status
-
 import json
-
 from assetManager.api.views import get_linked_banks
-
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
@@ -24,6 +20,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
         self.client.login(email=self.user.email, password='Password123')
