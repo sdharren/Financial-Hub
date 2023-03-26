@@ -44,6 +44,16 @@ def getFirstName(request):
     serializer = UserSerializer(user)
     return Response(serializer.data)
 
+"""
+@params: an HTTP request object containing user authentication information
+
+@description:
+This function checks cache to see if the total assets data has already been cached, if it has it returns it.
+if not this function retrives the total assets of Bank, Stocks and Crypto and adds them into a dictionary and then caches that
+
+@return:
+A dictionary with the sum of all assets for each of the three categories
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def total_assets(request):
@@ -52,11 +62,11 @@ def total_assets(request):
     #     wrapper = get_plaid_wrapper(user,'balances')
     #     bank_assets = sum_instiution_balances(wrapper, request.user)
     #     investment_assets = sum_investment_balance(user)
-    #     crypto_assets = 100
+    #     crypto_assets = sum_crypto_balances(user)
     #     data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
     #     cache.set('total_assets'+user.email, data)
     # else:
-    #     data = cache.get('total_assets'+user.email)
+    #     data = cache.get('total_assets'+user.email) // add this to delete cache
     data = {"Bank Assets": 100, "Investment Assets": 100, "Crypto Assets": 100}
     return Response(data, content_type='application/json', status=200)
 

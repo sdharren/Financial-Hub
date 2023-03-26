@@ -240,11 +240,26 @@ Then it sums all available_amounts and returns it
 An integer that is the overall balance across all accounts
 """
 def sum_instiution_balances(plaid_wrapper,user):
-    data = get_institutions_balances(plaid_wrapper,user)
-    available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
-    return sum(available_amounts)
+    try:
+        data = get_institutions_balances(plaid_wrapper,user)
+        available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
+        return sum(available_amounts)
+    except Exception:
+        return 0
 
+"""
+@params:
+- user: models.User
+  The user making the query
 
+@description:
+This function retrieves the account balances for all the linked investments of the given `user` using the provided `plaid_wrapper`.
+It first calls the `retrieve_stock_getter` function to get an object that has access to all stocks related to the user
+Then it calls get_total_investment_sum and returns it
+
+@return:
+An integer that is the overall balance across all investments
+"""
 def sum_investment_balance(user):
     try:
         stock_getter = retrieve_stock_getter(user)
