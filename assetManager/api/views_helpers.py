@@ -212,6 +212,26 @@ def get_institutions_balances(plaid_wrapper,user):
 
 """
 @params:
+- user: models.User
+  The user making the query
+- plaid_wrapper: Union[DevelopmentWrapper, SandboxWrapper]
+  The concrete types of PlaidWrapper used for the query
+
+@description:
+This function retrieves the account balances for all the linked institutions of the given `user` using the provided `plaid_wrapper`.
+It first calls the `get_institutions_balances` function to get all institution balances then access each institutions accounts and then their available_amount
+Then it sums all available_amounts and returns it
+
+@return:
+An integer that is the overall balance across all accounts
+"""
+def sum_instiution_balances(plaid_wrapper,user):
+    data = get_institutions_balances(plaid_wrapper,user)
+    available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
+    return sum(available_amounts)
+
+"""
+@params:
 
 token: a Plaid token used to access the Plaid API
 wrapper: a Plaid API wrapper object

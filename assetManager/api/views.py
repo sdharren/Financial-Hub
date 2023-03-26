@@ -47,7 +47,12 @@ def getFirstName(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def total_assets(request):
-    data = {"Bank Assets": 5, "Investment Assets": 5, "Crypto Assets": 5}
+    wrapper = get_plaid_wrapper(request.user,'balances')
+    # bank_assets = sum_instiution_balances(wrapper, request.user)
+    bank_assets = 100
+    investment_assets = 100
+    crypto_assets = 100
+    data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
     return Response(data, content_type='application/json', status=200)
 
 class SignupView(APIView):
