@@ -22,7 +22,7 @@ ChartJS.register(
 
 function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   
-  const barChartData = usePlaid({endpoint, endpoint_parameter, loadNext});
+  const [barChartData, error] = usePlaid({endpoint, endpoint_parameter, loadNext});
 
   let bar_data = [];
   let bar_labels = [];
@@ -30,8 +30,6 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
       bar_labels.push(barChartData[key].name);
       bar_data.push(barChartData[key].value);
   }
-  // console.log(bar_labels);
-  // console.log(bar_data);
 
   const options = {
       plugins: {

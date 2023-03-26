@@ -1,4 +1,4 @@
-import PieChart from "./PieChart";
+import PieChart from "../dahsboard_components/PieChart";
 import { useState } from "react";
 
 function BalancesDisplay() {
