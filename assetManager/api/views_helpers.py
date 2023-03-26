@@ -154,15 +154,7 @@ def get_plaid_wrapper(user,type):
     if settings.PLAID_DEVELOPMENT:
         plaid_wrapper = DevelopmentWrapper()
     else:
-        #user is required to make a dummy access token for testing purposes
         plaid_wrapper = SandboxWrapper()
-        if(type == 'transactions'):
-            public_token = plaid_wrapper.create_public_token()
-        else:
-            public_token = plaid_wrapper.create_public_token_custom_user()
-
-        plaid_wrapper.exchange_public_token(public_token)
-        plaid_wrapper.save_access_token(user, ['transactions'])
 
     return plaid_wrapper
 

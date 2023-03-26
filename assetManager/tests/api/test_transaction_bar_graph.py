@@ -21,6 +21,12 @@ from assetManager.tests.helpers import LogInTester
 class BarGraphViewTestCase(TestCase, LogInTester):
     """Tests of the views for transactions bar graph."""
 
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
@@ -44,6 +50,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for yearly graph view
 
     def test_yearly_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/yearly-graph/?param=2022')
         force_authenticate(request, user=self.user)
         response = yearlyGraph(request)
@@ -62,6 +69,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for monthly graph view
 
     def test_monthly_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/monthly-graph/?param=2022')
         force_authenticate(request, user=self.user)
         response = monthlyGraph(request)
@@ -86,6 +94,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for weekly graph view
 
     def test_weekly_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/weekly-graph/?param=May+2022')
         force_authenticate(request, user=self.user)
         response = weeklyGraph(request)
@@ -110,6 +119,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for cache bank transaction data view
 
     def test_cache_bank_transaction_data(self):
+        self.create_public_token()
         bankgraphdata = BankGraphData(getCachedInstitutionCachedData(self.user))
         cache.set('transactions' + self.user.email, bankgraphdata.transactionInsight.transaction_history)
         cached_data = cache.get('transactions' + self.user.email)
@@ -125,6 +135,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # test for transaction data getter view
 
     def test_transaction_data_getter(self):
+        self.create_public_token()
         json_data = transaction_data_getter(self.user)
         self.assertNotEqual(json_data,"")
         self.assertIsInstance(json_data, dict)

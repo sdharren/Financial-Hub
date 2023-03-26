@@ -18,6 +18,12 @@ class GetCurrencyDataViewTestCase(TestCase):
         'assetManager/tests/fixtures/users.json'
     ]
 
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
     def tearDown(self):
         cache.clear()
 
@@ -31,7 +37,7 @@ class GetCurrencyDataViewTestCase(TestCase):
         jwt = str(response.data['access'])
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
 
-    
+
     def test_balances_url(self):
         self.assertEqual(self.url,'/api/currency_data/')
 
@@ -171,6 +177,7 @@ class GetCurrencyDataViewTestCase(TestCase):
         self.assertEqual(response.status_code,405)
 
     def test_get_currenccy_succesfully_with_no_existing_cache(self):
+        self.create_public_token()
         response = self.client.get(self.url, follow=True)
         response_json = json.loads(response.content)
         response_data = response.json()
@@ -179,6 +186,7 @@ class GetCurrencyDataViewTestCase(TestCase):
         self.assertEqual(response.status_code,200)
 
     def test_get_currenccy_succesfully_with_existing_cache(self):
+        self.create_public_token()
         response = self.client.get(self.url, follow=True)
         response_2 = self.client.get(self.url, follow=True)
         response_json = response_2.json()
@@ -188,6 +196,7 @@ class GetCurrencyDataViewTestCase(TestCase):
 
     def test_get_currencies_for_multiple_institution(self):
         before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.create_public_token()
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
         plaid_wrapper.exchange_public_token(public_token)

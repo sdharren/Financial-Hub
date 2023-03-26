@@ -11,10 +11,10 @@ class SeedAndUnseedCommandTestCase(TestCase):
         before_user_count = User.objects.count()
 
         for account_type in accounttypes:
-            self.assertTrue(account_type.user.email != 'johndoe@example.org')
+            self.assertTrue(account_type.user.email != 'johnnydoe@example.org')
 
         for single_user in users:
-            self.assertTrue(single_user.email != 'johndoe@example.org')
+            self.assertTrue(single_user.email != 'johnnydoe@example.org')
 
         call_command('seed')
 
@@ -24,7 +24,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         self.assertEqual(before_user_count + 1, after_user_count)
         self.assertEqual(before_account_types_count + 4, after_account_types_count)
 
-        user_john = User.objects.get(email = 'johndoe@example.org')
+        user_john = User.objects.get(email = 'johnnydoe@example.org')
 
         bank_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.DEBIT)
         investment_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.STOCK)
@@ -44,7 +44,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
         self.assertEqual(after_user_count, before_user_count - 1)
         self.assertEqual(after_account_types_count, before_account_types_count - 4)
-        
+
         accounttypes = AccountType.objects.all()
         users = User.objects.all()
 
@@ -52,7 +52,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         before_user_count = User.objects.count()
 
         for account_type in accounttypes:
-            self.assertTrue(account_type.user.email != 'johndoe@example.org')
+            self.assertTrue(account_type.user.email != 'johnnydoe@example.org')
 
         for single_user in users:
-            self.assertTrue(single_user.email != 'johndoe@example.org')
+            self.assertTrue(single_user.email != 'johnnydoe@example.org')

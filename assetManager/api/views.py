@@ -433,7 +433,6 @@ def get_balances_data(request):
     user = request.user
 
     plaid_wrapper = get_plaid_wrapper(user,'balances')
-
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)

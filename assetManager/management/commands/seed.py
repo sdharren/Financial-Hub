@@ -10,7 +10,7 @@ class Command(BaseCommand):
     #seed the database with custom user to access the application
     def handle(self, *args, **options):
         user = User.objects.create_user(
-        email = 'johndoe@example.org',
+        email = 'johnnydoe@example.org',
         first_name = 'Johnny',
         last_name = 'Doe',
         password = 'Password123',
