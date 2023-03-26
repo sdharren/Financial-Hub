@@ -9,18 +9,23 @@ class Command(BaseCommand):
 
     #seed the database with custom user to access the application
     def handle(self, *args, **options):
-        user = User.objects.create_user(
-        email = 'johnnydoe@example.org',
-        first_name = 'Johnny',
-        last_name = 'Doe',
-        password = 'Password123',
-        )
+        users = User.objects.filter(email = 'johnnydoe@example.org')
 
-        wrapper = SandboxWrapper()
-        public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments','transactions'])
-        wrapper.exchange_public_token(public_token)
-        wrapper.save_access_token(user, ['investments','transactions'])
+        if(len(users) == 0):
+            user = User.objects.create_user(
+            email = 'johnnydoe@example.org',
+            first_name = 'Johnny',
+            last_name = 'Doe',
+            password = 'Password123',
+            )
 
-        second_public_token = wrapper.create_public_token(bank_id='ins_12', products_chosen=['investments','transactions'])
-        wrapper.exchange_public_token(second_public_token)
-        wrapper.save_access_token(user, ['transactions','investments'])
+            wrapper = SandboxWrapper()
+            public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments','transactions'])
+            wrapper.exchange_public_token(public_token)
+            wrapper.save_access_token(user, ['investments','transactions'])
+
+            second_public_token = wrapper.create_public_token(bank_id='ins_12', products_chosen=['investments','transactions'])
+            wrapper.exchange_public_token(second_public_token)
+            wrapper.save_access_token(user, ['transactions','investments'])
+        else:
+            return

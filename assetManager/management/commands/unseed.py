@@ -9,9 +9,9 @@ class Command(BaseCommand):
         users = User.objects.all()
 
         for account_type in accounttypes:
-            if account_type.user.email == 'johndoe@example.org':
+            if account_type.user.email == 'johnnydoe@example.org':
                 account_type.delete()
 
         for single_user in users:
-            if single_user.email == 'johndoe@example.org':
+            if single_user.email == 'johnnydoe@example.org':
                 single_user.delete()
