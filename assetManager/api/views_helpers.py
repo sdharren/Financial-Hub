@@ -245,9 +245,12 @@ def sum_instiution_balances(plaid_wrapper,user):
     return sum(available_amounts)
 
 
-def sum_investment_balance(plaid_wrapper,user):
-    stock_getter = retrieve_stock_getter(user)
-    return stock_getter.get_total_investment_sum()
+def sum_investment_balance(user):
+    try:
+        stock_getter = retrieve_stock_getter(user)
+        return stock_getter.get_total_investment_sum()
+    except Exception:
+        return 0
 
 """
 @params:
