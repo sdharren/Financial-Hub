@@ -22,18 +22,18 @@ class PlaidQueryException(Exception):
     pass
 
 
- """
-    @params:
-    account_balances (dict): A dictionary containing account balances for various institutions.
+"""
+@params:
+account_balances (dict): A dictionary containing account balances for various institutions.
 
-    @Description:
-    This function takes a dictionary of account balances for various institutions and reformats the balances into a
-    dictionary of currency totals. It uses a currency converter and forex rates to convert the balances to a common
-    currency (GBP) and then sums the balances for each currency.
+@Description:
+This function takes a dictionary of account balances for various institutions and reformats the balances into a
+dictionary of currency totals. It uses a currency converter and forex rates to convert the balances to a common
+currency (GBP) and then sums the balances for each currency.
 
-    @return:
-    currency_total (dict): A dictionary containing the total balance for each currency across all institutions using GBP as unique currency for all amounts.
-    """
+@return:
+currency_total (dict): A dictionary containing the total balance for each currency across all institutions using GBP as unique currency for all amounts.
+"""
 def reformat_balances_into_currency(account_balances):
     if type(account_balances) is not dict:
         raise TypeError("account balances must be of type dict")
@@ -137,18 +137,18 @@ def reformatBalancesData(account_balances):
 
     return balances
 
- """
-    @params:
-    user (User): An instance of the User model.
-    type (str): A string that specifies the type of Plaid wrapper to be used. Possible values are 'transactions' or
-    'balances'.
+"""
+@params:
+user (User): An instance of the User model.
+type (str): A string that specifies the type of Plaid wrapper to be used. Possible values are 'transactions' or
+'balances'.
 
-    @Description:
-    This function returns an instance of the Plaid wrapper that is used to make requests to the Plaid API.
-    First the settings.PLAID_DEVELOPMENT is checked to determine whether to return a wrapper of type Sandbox or Development
-    Second if SandboxWrapper is needed, the type variable 'transactions' or 'balances' creates a public token or custom public token respectively
+@Description:
+This function returns an instance of the Plaid wrapper that is used to make requests to the Plaid API.
+First the settings.PLAID_DEVELOPMENT is checked to determine whether to return a wrapper of type Sandbox or Development
+Second if SandboxWrapper is needed, the type variable 'transactions' or 'balances' creates a public token or custom public token respectively
 
-    @return: plaid_wrapper (PlaidWrapper): An instance of the Plaid wrapper.
+@return: plaid_wrapper (PlaidWrapper): An instance of the Plaid wrapper.
 """
 def get_plaid_wrapper(user,type):
     if settings.PLAID_DEVELOPMENT:
