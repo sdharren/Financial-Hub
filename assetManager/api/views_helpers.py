@@ -8,6 +8,8 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
+from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets
+
 from functools import wraps
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from rest_framework.response import Response
@@ -20,7 +22,6 @@ class TransactionsNotLinkedException(Exception):
 
 class PlaidQueryException(Exception):
     pass
-
 
 """
 @params:
@@ -420,3 +421,14 @@ def transaction_data_getter(user):
     debitCards = make_debit_card(plaid_wrapper,user)
     debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
     return debitCards.get_insight_data()
+
+
+def sum_crypto_balances(user):
+    wallets = get_wallets(user)
+    total = 0
+    data = getAlternateCryptoData(wallets, "balance")
+    for key in data.keys():
+        total += data[key][1]
+    
+    return total
+

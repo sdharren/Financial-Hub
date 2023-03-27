@@ -5,6 +5,11 @@ import Transactions from './RecentTransactionsDisplay';
 import Currency from './Currency';
 import BarChart from './TransactionDisplay';
 
+import { PieChart as cPie } from './CryptoGraphs/PieChart'
+import { ScatterGraph as cScatter } from './CryptoGraphs/ScatterGraph'
+import { RecentTransactionsDisplay as cRecentTransactionsDisplay } from './CryptoGraphs/RecentTransactionsDisplay'
+import { AdditionalData as cAdditional } from './CryptoGraphs/AdditionalData'
+
 
 const tabGraphData = {
   Overall: [
@@ -23,9 +28,10 @@ const tabGraphData = {
     { name: 'Bar Chart', content: <BarChart /> },
   ],
   Crypto: [
-    { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-    { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-    { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
+    { name: 'Pie Chart', content: <cPie /> },
+    { name: 'Time Scatter Graph', content: <cScatter /> },
+    { name: 'Transactions Table', content: <cRecentTransactionsDisplay /> },
+    { name: 'Additional Data', content: <cAdditional /> },
   ],
 };
 

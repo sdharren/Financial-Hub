@@ -6,14 +6,17 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
+
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
+
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, getUsableCrypto, getCryptoAddressData, save_wallet_address, get_wallets
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
 from assetManager.models import AccountType, AccountTypeEnum
@@ -354,6 +357,26 @@ def sector_spending(request):
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def crypto_all_data(request):
+    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    data = getAllCryptoData(addresses=stored_addresses)
+
+    return Response(data, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_select_data(request):
+    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    if request.GET.get('param'):
+        data = getAlternateCryptoData(addresses=stored_addresses, command=(request.GET.get('param')))
+    else:
+        raise Exception
+        # should return bad request
+
+    return Response(data, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def yearlyGraph(request):
     transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     graphData = transactions.yearlySpending()
@@ -455,6 +478,7 @@ def get_currency_data(request):
     account_balances = get_institutions_balances(plaid_wrapper,user)
 
     currency = reformat_balances_into_currency(account_balances)
+    
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
     cache.set('currency' + user.email, proportion_currencies)
 
@@ -512,22 +536,22 @@ An error Response object if the institution name is not valid or if the balance 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
-        if cache.has_key('balances' + request.user.email) is False:
-            return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+        if request.GET.get('param'):
+            institution_name = request.GET.get('param')
+            if cache.has_key('balances' + request.user.email) is False:
+                return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+            else:
+                account_balances = cache.get('balances' + request.user.email)
+
+            if institution_name not in list(account_balances.keys()):
+                return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
+
+            accounts = reformatAccountBalancesData(account_balances,institution_name)
+
+            return Response(accounts, content_type='application/json',status = 200)
+
         else:
-            account_balances = cache.get('balances' + request.user.email)
-
-        if institution_name not in list(account_balances.keys()):
-            return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
-
-        accounts = reformatAccountBalancesData(account_balances,institution_name)
-
-        return Response(accounts, content_type='application/json',status = 200)
-
-    else:
-        return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
+            return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
 """
 @param:
