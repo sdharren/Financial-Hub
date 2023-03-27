@@ -1,7 +1,7 @@
 import React from 'react';
 import ApexCharts from 'apexcharts';
 import { useState, useContext } from 'react';
-import { AuthContext } from '../..//context/AuthContext';
+import  AuthContext  from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const ScatterGraph = () => {
@@ -58,6 +58,8 @@ const ScatterGraph = () => {
                     amount: scatterChartData[key].outputs[i]['value']
                 })
         }
+        }
+    }, [transactions, chartRef]);
 
       const options = {
         chart: {
@@ -112,10 +114,9 @@ const ScatterGraph = () => {
       return () => {
         chart.destroy();
       };
-    }, [transactions]);
   
     return <div ref={chartRef} />;
-  };
+    };
   
   export default ScatterGraph;
   

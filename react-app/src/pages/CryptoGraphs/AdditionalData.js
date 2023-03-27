@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import AuthContext from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdditionalData = () => {
     let {authTokens, logoutUser} = useContext(AuthContext);
@@ -22,7 +24,7 @@ const AdditionalData = () => {
                 'Authorization':'Bearer ' + String(authTokens.access)
             }
         });
-        let data = await response.json();
+        let respData = await response.json();
         if (response.status === 200) {
             setAdditionalData(data);
         }
@@ -35,9 +37,12 @@ const AdditionalData = () => {
   
     React.useEffect(() => {
         get_data();
-        let data = new Object();
+        let data = new Array();
         for (let key in AdditionalData) {
-            data[key] = AdditionalData[key][1];
+            data.push ({
+                title: AdditionalData[key],
+                value: AdditionalData[key][1]
+            })
 
         }
 
