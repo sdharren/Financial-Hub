@@ -109,7 +109,7 @@ useEffect(() => {
   };
 
   return (
-    <div>
+    <div className='w-full max-h-[52.5vh] m-auto'>
       <Bar
       data = {data}
       options = {options}

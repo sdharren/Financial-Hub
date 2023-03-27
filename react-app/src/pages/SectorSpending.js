@@ -26,7 +26,7 @@ function BarChartDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className='pl-[2rem]'>
             <button onClick={handleLoadPrevious}>
                 Go Back
             </button>
