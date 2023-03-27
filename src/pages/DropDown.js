@@ -51,7 +51,7 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
 
   return (
     <div className="dropdown-content">
-      <select onChange={handleMenuClick}>
+      <select className='bg-transparent' onChange={handleMenuClick}>
         {options}
       </select>
     </div>

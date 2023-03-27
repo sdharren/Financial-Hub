@@ -1,5 +1,5 @@
-import PieChart from "./PieChart";
-import LineGraph from "./LineGraph";
+import PieChart from "../dahsboard_components/PieChart";
+import LineGraph from "../dahsboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
@@ -41,8 +41,8 @@ function InvestmentGraphs() {
     // update the GraphSelect options (called every time a graph is rendered/re-rendered)
     async function updateOptions() {
         let options = {
-            'investments': [],
-            'categories': []
+            'investments': investmentOptions,
+            'categories': categoryOptions
         }
         // on the first render investmentOptions and categoryOptions are not set
         // if we are in first render - fetch them from the API and return a JSON at the same time as the useState variables would only be usable on next render
@@ -81,14 +81,13 @@ function InvestmentGraphs() {
     // render a graph based on the endpoint supplied
     // endpoint_parameter is optional and is a parameter for the API request
     async function changeGraph(endpoint, endpoint_parameter) {
-        const options = await updateOptions(); 
-        changeTabActive(endpoint);
+        const options = await updateOptions();
 
         switch(endpoint) {
             case 'investment_categories':
                 let overall_returns = await getReturns('overall_returns');
                 setGraph(
-                    <div>
+                    <div className="inline-block min-h-[60vh] max-h-[60vh] w-full">
                         <ReturnDisplay returns={overall_returns}/>
                         <PieChart 
                             endpoint={endpoint} 
@@ -98,13 +97,17 @@ function InvestmentGraphs() {
                         />
                     </div>
                 );
+                changeTabActive(endpoint);
                 break;
 
             case 'investment_category_breakdown':
+                if (!options['categories'].includes(endpoint_parameter)) {
+                    break;
+                }
                 let category_returns = await getReturns('category_returns', endpoint_parameter);
                 setLastCategory(endpoint_parameter);
                 setGraph(
-                    <div>
+                    <div className="inline-block min-h-[60vh] max-h-[60vh] w-full">
                         <ReturnDisplay returns={category_returns}/>
                         <PieChart 
                             endpoint={endpoint} 
@@ -115,22 +118,27 @@ function InvestmentGraphs() {
                         />
                     </div>
                 );
+                changeTabActive(endpoint);
                 break;
 
             case 'stock_history':
+                if (!options['investments'].includes(endpoint_parameter)) {
+                    break;
+                }
                 let returns = await getReturns('returns', endpoint_parameter);
                 setLastStock(endpoint_parameter);
                 setGraph(
-                        <div>
+                        <div className="inline-block min-h-[60vh] max-h-[60vh] w-full">
                             <ReturnDisplay returns={returns}/>
                             <LineGraph 
                                 endpoint={endpoint} 
                                 updateGraph={handleGraphUpdate} 
                                 endpoint_parameter={endpoint_parameter} 
-                                selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
+                                selectOptions={ options['investments'] } 
                             />
                         </div>
-                );
+                    );
+                changeTabActive(endpoint);
                 break;
         }
     }
@@ -216,24 +224,25 @@ function InvestmentGraphs() {
 
 
     return (
-        <div className="investment-graphs">
-            <div className="tab">
-                <button className={"tablinks" + (overviewActive ? " active" : "") } onClick={() => handleTabClick('investment_categories')}>
+        <div className="investment-graphs flex flex-row min-h-[70vh] max-h-[70vh]">
+            <div className="tab graph-names flex flex-col mr-2 w-40">
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (overviewActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
                 </button>
-                <button className={"tablinks" + (categoryActive ? " active" : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (categoryActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
                     Category
                     </button>
-                <button className={"tablinks" + (stocksActive ? " active" : "") } onClick={() => handleTabClick('stock_history')}>
-                    Stocks?
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center" + (stocksActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('stock_history')}>
+                    Stock Breakdown
                 </button>
             </div>
 
-            <div className="tabcontent">
+            <div className="tabcontent ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-4">
                 {graph}
             </div>
         </div>
     );
-}
+
+};
 
 export default InvestmentGraphs;

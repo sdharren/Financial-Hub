@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BarGraph from "./BarGraph";
+import BarGraph from "../dahsboard_components/BarGraph";
 import DropDown from "./DropDown";
 
 function BarChartDisplay() {
@@ -34,12 +34,12 @@ function BarChartDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className='w-full'>
             <button onClick={handleLoadPrevious}>
                 Go Back
             </button>
             {graph}
-            <DropDown onChange={handleOnChange}/>
+            <DropDown className='' onChange={handleOnChange}/>
         </div>
     );
 }

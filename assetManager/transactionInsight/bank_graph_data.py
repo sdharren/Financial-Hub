@@ -1,10 +1,10 @@
-from forex_python.converter import CurrencyRates
 from django.conf import settings
 import datetime
 from assetManager.transactionInsight.bank_transaction_insight import CategoriseTransactions
 import requests
 import warnings
 import json
+from datetime import date
 
 """
 Class of methods to produce data to pass to the frontend to create the graphs
@@ -12,13 +12,33 @@ for bank data.
 author: Pavan Rana + Augusto Favero
 """
 
+"""
+@Params:
+input_date (datetime.date): The date for which to retrieve foreign exchange rates.
+
+@Description:
+Retrieves the foreign exchange rates for a specified date from theforexapi.com.
+Rates are returned relative to the British pound (GBP).
+
+@Return:
+rates (dict): A dictionary containing foreign exchange rates, where the keys are ISO currency codes
+and the values are the conversion rate relative to the British pound (GBP).
+If an error occurs during the retrieval process, default rates are returned instead.
+"""
 def create_forex_rates(input_date):
     warnings.filterwarnings('ignore')
+    try:
+        url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+        response = requests.get(url,verify=False)
+    except Exception:
+        error_rates = {'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1}
+        return error_rates
 
-    url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
-
-    response = requests.get(url,verify=False)
     rates = json.loads(response.content.decode('utf-8'))['rates']
+
+    if 'GBP' not in rates.keys():
+        rates['GBP'] = 1
+
     return rates
 
 """
@@ -30,9 +50,9 @@ def create_forex_rates(input_date):
 """
 def get_currency_converter():
     if settings.PLAID_DEVELOPMENT is False:
-        input_date = datetime.datetime(2014, 5, 23)
+        input_date = datetime.date(2014, 5, 23)
     else:
-        input_date = datetime.datetime.today()
+        input_date = date.today()
 
     return input_date
 
@@ -49,6 +69,24 @@ def check_value_is_none(value_in_dict):
     else:
         return value_in_dict
 
+"""
+@Params:
+account: a dictionary containing information about a single account transaction
+rates: a dictionary containing exchange rates for different currencies
+
+@Description: This function takes in an account dictionary and a rates dictionary as input and returns a new dictionary with the account data converted to the user's currency based on the provided exchange rates.
+The function also formats the dates and checks for missing values in the input dictionary.
+
+@Returns:
+A dictionary containing the following keys:
+authorized_date: a formatted date for when the transaction was authorized
+date: a formatted date for when the transaction occurred
+amount: the transaction amount converted to the user's currency based on the provided exchange rates
+category: the category of the transaction
+name: the name of the transaction
+iso_currency_code: the currency code for the transaction
+merchant_name: the name of the merchant where the transaction occurred
+"""
 def handle_case(account,rates):
     converted_amount = round(account['amount'] / rates[account['iso_currency_code']],2)
 

@@ -77,9 +77,7 @@ const Signup = () => {
     )
     
     let form2 = (
-        <div class="super-signup-container">
-        <div class="signup-container">
-        <div>
+        <div class="signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
             <Header 
                 heading = "Register your account"
                 paragraph = "Already have an account? "
@@ -87,7 +85,7 @@ const Signup = () => {
                 linkUrl='/login'
             />
             <form className = "mt-8 space-y-6" onSubmit={signupUser}>
-                <div className=''>
+                <div className='-space-y-px'>
                     {
                         fields.map(field =>
                             <div>
@@ -102,7 +100,7 @@ const Signup = () => {
                                     isRequired = {field.isRequired}
                                     placeholder = {field.placeholder}
                                 />
-                                <p class = {"error " + field.name + "-error"}>hello</p>
+                                <p class = {"error " + field.name + "-error"}></p>
 
                             </div>
                         )
@@ -110,8 +108,6 @@ const Signup = () => {
                     <FormAction handleSubmit={signupUser} text = "Register" />
                 </div>
             </form>
-        </div>
-        </div>
         </div>
     )
 

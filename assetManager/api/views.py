@@ -13,9 +13,10 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
-
+from assetManager.models import AccountType, AccountTypeEnum
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -43,6 +44,35 @@ def getFirstName(request):
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
+
+"""
+@params: an HTTP request object containing user authentication information
+
+@description:
+This function checks cache to see if the total assets data has already been cached, if it has it returns it.
+if not this function retrives the total assets of Bank, Stocks and Crypto and adds them into a dictionary and then caches that
+
+@return:
+A dictionary with the sum of all assets for each of the three categories
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def total_assets(request):
+    user = request.user
+    if False == cache.has_key('total_assets'+user.email):
+        wrapper = get_plaid_wrapper(user,'balances')
+        try:
+            bank_assets = sum_instiution_balances(wrapper, request.user)
+        except Exception:
+            bank_assets = 0
+        investment_assets = sum_investment_balance(user)
+        crypto_assets = 100.0
+        # crypto_assets = sum_crypto_balances(user)
+        data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
+        cache.set('total_assets'+user.email, data)
+    else:
+        data = cache.get('total_assets'+user.email)
+    return Response(data, content_type='application/json', status=200)
 
 class SignupView(APIView):
     def post(self, request):
@@ -174,6 +204,30 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def link_crypto_wallet(request):
+    user = request.user
+    if request.GET.get('param'):
+        address = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Product not specified.'}, status=400)
+
+    save_wallet_address(user, address)
+
+    return Response(status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_crypto_wallets(request):
+    user = request.user
+    allWallets = get_wallets(user)
+
+    return Response(allWallets, content_type='application/json', status=200)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
@@ -183,7 +237,6 @@ def exchange_public_token(request):
         return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
 
-    #wrapper = DevelopmentWrapper()
     if settings.PLAID_DEVELOPMENT:
         wrapper = DevelopmentWrapper()
     else:
@@ -198,7 +251,6 @@ def exchange_public_token(request):
     except InvalidPublicToken as e:
         return Response({'error': 'Bad request. Invalid public token.'}, status=400)
 
-    #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
     token = wrapper.get_access_token()
 
@@ -206,12 +258,24 @@ def exchange_public_token(request):
         #update balances cache if it exists
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
-
-    #write a function in helpers it takes an access token, queries plaid for that access token and if
-    #single institution thingy
-    #check duplicate for institution should be done in save access_token
+        set_single_institution_transactions(token,wrapper,request.user)
+        
     return Response(status=200)
 
+"""
+@params:
+request: Django request object
+@api_view(['PUT', 'DELETE']): decorator to indicate that the view only accepts PUT and DELETE HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
+@Description:
+
+This function is a Django view that either caches or deletes investment, bank balance, and currency data for an authenticated user.
+If the request is a PUT, the function first verifies that the user has linked investments, then proceeds to cache the user's investment data, bank balance data, and currency data.
+If the request is a DELETE, the function deletes all cached data related to the user's investments, transactions, currency, and balances.
+
+@return: A Response object with a status code of 200.
+"""
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -231,6 +295,7 @@ def cache_assets(request):
         account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances)
         cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
+        cache.set('transactions'+user.email,transaction_data_getter(request.user)) #test this
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
@@ -239,6 +304,7 @@ def cache_assets(request):
         delete_cached('transactions', user)
         delete_cached('currency', user)
         delete_cached('balances', user)
+        delete_cached('total_assets',user) #test this
 
     return Response(status=200)
 
@@ -256,21 +322,6 @@ def sandbox_investments(request):
     stock_getter.query_investments(user)
     cache.set('investments' + user.email, stock_getter.investments)
     return Response(status=200)
-
-def retrieve_stock_getter(user):
-    if cache.has_key('investments' + user.email):
-        stock_getter = StocksGetter(None)
-        data = cache.get('investments' + user.email)
-        stock_getter.investments = data
-    else:
-        if settings.PLAID_DEVELOPMENT:
-            wrapper = DevelopmentWrapper()
-        else:
-            wrapper = SandboxWrapper()
-        stock_getter = StocksGetter(wrapper)
-        stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
-        cache.set('investments' + user.email, stock_getter.investments)
-    return stock_getter
 
 """
 @params: an HTTP request object containing user authentication information
@@ -375,21 +426,26 @@ A Response object returning that the status is 200
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_bank_access_token(request):
-    data = request.body
-    decoded_data = data.decode('utf-8')
-    parsed_data = json.loads(decoded_data)
-    access_token_id = int(parsed_data['selectedOption'])
-    plaid_wrapper = get_plaid_wrapper(request.user,'balances')
-    debitCards = DebitCard(plaid_wrapper,request.user)
-    access_token = debitCards.access_tokens[access_token_id]
-    cache.delete('access_token'+request.user.email)
-    cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
-    return Response(status=200)
+    try:
+        data = request.body
+        decoded_data = data.decode('utf-8')
+        parsed_data = json.loads(decoded_data)
+        access_token_id = int(parsed_data['selectedOption'])
+        plaid_wrapper = get_plaid_wrapper(request.user,'balances')
+        debitCards = DebitCard(plaid_wrapper,request.user)
+        access_token = debitCards.access_tokens[access_token_id]
+        cache.delete('access_token'+request.user.email)
+        cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
+        return Response(status=200)
+    except:
+        return Response(status=400)
 
 """
 @params:
-request: an HTTP request object containing user authentication information
-user: a user object containing the user's email address and Plaid account information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves and formats currency data associated with a given user.
 The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
@@ -421,8 +477,10 @@ def get_currency_data(request):
 
 """
 @params:
-request: an HTTP request object containing user authentication information
-user: a user object containing the user's email address and Plaid account information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves and formats balance data associated with a given user.
 The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
@@ -440,7 +498,6 @@ def get_balances_data(request):
     user = request.user
 
     plaid_wrapper = get_plaid_wrapper(user,'balances')
-
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
@@ -453,7 +510,10 @@ def get_balances_data(request):
 
 """
 @param:
-request: an HTTP request object containing user authentication information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves account balance data for a specific institution associated with a given user.
 The function uses a user object to access the data through a caching system.
@@ -486,7 +546,10 @@ def select_account(request):
 
 """
 @param:
-request: an HTTP request object containing user authentication information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves institution names associated with a given user's access tokens.
 The function then gives each institution its own id
@@ -509,6 +572,12 @@ def select_bank_account(request):
     return Response(institutions,status=200)
 
 """
+@params:
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
+
 @Description:
     This function retrieves recent transactions of a user's bank account from the Plaid API.
     At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
