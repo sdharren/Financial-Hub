@@ -236,12 +236,13 @@ Then it sums all available_amounts and returns it
 An integer that is the overall balance across all accounts
 """
 def sum_instiution_balances(plaid_wrapper,user):
-    try:
+    if False == cache.has_key('balances'+user.email):    # test this
         data = get_institutions_balances(plaid_wrapper,user)
-        available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
-        return sum(available_amounts)
-    except Exception:
-        return 0
+        cache.set('balances'+user.email,data)
+    data = cache.get('balances'+user.email)
+    available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
+    return sum(available_amounts)
+    
 
 """
 @params:

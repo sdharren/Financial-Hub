@@ -177,6 +177,7 @@ class APIViewsTestCase(TestCase):
 
         self.assertTrue('USD' in currency.keys())
         self.assertEqual(currency['USD'],100)
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
 
     #extend this
     def test_delete_cache_assets_works(self):
@@ -293,6 +294,7 @@ class APIViewsTestCase(TestCase):
         cache.set('currency' + self.user.email,{'GBP': 75.0, 'USD':25.0})
         cache.set('balances' + self.user.email,{'HSBC':{'BPq1BWz6ydUQXr1p53L8ugoWqKrjpafzQj8r9':{'name': 'Custom Account Checking', 'available_amount': 1000.0, 'current_amount': 1000.0, 'type': 'depository', 'currency': 'EUR'}}})
         cache.set('product_link' + self.user.email, ['transactions'])
+        cache.set('transactions' + self.user.email, {'transactions':[{'transaction 1':'data'}]})
 
         before_count = AccountType.objects.count()
         wrapper = SandboxWrapper()
@@ -304,9 +306,11 @@ class APIViewsTestCase(TestCase):
         self.assertFalse(cache.has_key('product_link' + self.user.email))
         self.assertTrue(cache.has_key('balances' + self.user.email))
         self.assertTrue(cache.has_key('currency' + self.user.email))
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
 
         currency = cache.get('currency' + self.user.email)
         balances = cache.get('balances' + self.user.email)
+        transactions = cache.get('transactions' + self.user.email)
 
 
         self.assertEqual(len(list(currency.keys())),2)
@@ -315,6 +319,8 @@ class APIViewsTestCase(TestCase):
 
         self.assertEqual(currency['EUR'],1.83)
         self.assertEqual(currency['GBP'],98.17)
+
+        self.assertEqual(transactions, {'transactions':[{'transaction 1':'data'}]})
 
         self.assertEqual(len(list(balances.keys())),2)
         self.assertEqual(list(balances.keys())[1],'Royal Bank of Scotland - Current Accounts')

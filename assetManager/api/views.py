@@ -297,6 +297,7 @@ def cache_assets(request):
         account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances)
         cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
+        cache.set('transactions'+user.email,transaction_data_getter(request.user)) #test this
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
@@ -305,6 +306,7 @@ def cache_assets(request):
         delete_cached('transactions', user)
         delete_cached('currency', user)
         delete_cached('balances', user)
+        delete_cached('total_assets',user) #test this
 
     return Response(status=200)
 
