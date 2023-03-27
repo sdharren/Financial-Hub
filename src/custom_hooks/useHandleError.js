@@ -22,7 +22,7 @@ const useHandleError = (error) => {
     }
     
     async function redirectToLink (assetType) {
-        let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
+        let response = await fetch('api/link_token/?product=' + assetType,
                 {
                     method:'GET',
                     headers:{

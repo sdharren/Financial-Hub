@@ -10,7 +10,7 @@ const HomePage = () => {
     })
 
     let getFirstName = async() => {
-        let response = await fetch('http://127.0.0.1:8000/api/firstname/', {
+        let response = await fetch('api/firstname/', {
             method:'GET',
             headers:{
                 'Content-Type':'application/json',

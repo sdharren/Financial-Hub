@@ -28,7 +28,7 @@ function CryptoWalletAddresses() {
 
     for(let i = 0; i < allAddresses.length; i++) {
         if(/^0x[a-fA-F0-9]{40}$/.test(allAddresses[i].address) || /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(allAddresses[i].address)) {  // Test regex matches eth or btc format
-            let saveUrl = 'http://127.0.0.1:8000/api/link_crypto_wallet/?param=' + allAddresses[i].address;
+            let saveUrl = 'api/link_crypto_wallet/?param=' + allAddresses[i].address;
             fetch(saveUrl, {
                 method:'GET',
                 headers:{

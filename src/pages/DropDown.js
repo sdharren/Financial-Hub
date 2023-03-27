@@ -6,7 +6,7 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
   const [data, setData] = useState([]);
 
   async function getData() {
-    let url = 'http://127.0.0.1:8000/api/select_bank_account'
+    let url = 'api/select_bank_account'
     let response = await fetch(url, {
       method:'GET',
       headers:{
@@ -28,7 +28,7 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
     let selectedOption = event.target.value;
     console.log("Clicked item:", selectedOption);
   
-    let url = 'http://127.0.0.1:8000/api/set_bank_access_token/'
+    let url = 'api/set_bank_access_token/'
     let payload = {
       selectedOption: selectedOption,
     }
