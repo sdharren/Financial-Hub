@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
-import Balances from './Balances';
-import Transactions from './RecentTransactionsDisplay';
-import Currency from './Currency';
+import BalancesDisplay from './BalancesDisplay';
+import RecentTransactions from '../dahsboard_components/RecentTransactionsDisplay';
+import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import TotalAssetsDisplay from './TotalAssets';
 

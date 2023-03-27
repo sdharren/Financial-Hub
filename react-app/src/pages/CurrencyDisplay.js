@@ -1,7 +1,7 @@
-import PieChart from "./PieChart";
+import PieChart from "../dahsboard_components/PieChart";
 import { useState } from "react";
 
-function Currency() {
+function CurrencyDisplay() {
     const [graph, setGraph] = useState(<PieChart endpoint={"currency_data"} loadNext={handleLoadNext}/>);
 
     // JSON to know which API endpoint to query next
@@ -25,4 +25,4 @@ function Currency() {
     );
 }
 
-export default Currency;
+export default CurrencyDisplay;
