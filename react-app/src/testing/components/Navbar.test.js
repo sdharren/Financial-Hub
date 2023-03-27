@@ -1,103 +1,87 @@
-// import React from 'react';
-// import { render, screen, act } from '@testing-library/react';
-// import { BrowserRouter } from 'react-router-dom';
-// import { MemoryRouter } from 'react-router-dom';
-// import Navbar from '../components/Navbar';
-// import AuthContext from '../context/AuthContext';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
+import Navbar from '../../components/Navbar';
 
-// describe('Navbar', () => {
-//   const mockLogout = jest.fn();
-//   const mockContextValue = {
-//     user: { name: 'test' },
-//     logoutUser: mockLogout,
-//     authTokens: { access: 'test' },
-//   };
+describe('Navbar', () => {
+  const authTokens = { access: 'fakeToken' };
+  const logoutUser = jest.fn();
+  const user = {
+    name: 'testuser',
+    email: 'testuser@test.com',
+    id: 1,
+  };
 
-//   const mockAuthContext = {
-//     user: {
-//       id: 1,
-//       username: 'testuser',
-//       email: 'testuser@test.com',
-//     },
-//     logoutUser: jest.fn(),
-//     authTokens: {
-//       access: 'test_access_token',
-//       refresh: 'test_refresh_token',
-//     },
-//   };
+  beforeEach(() => {
+    jest.spyOn(window, 'fetch');
+    window.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ first_name: 'test' }),
+    });
+  });
 
-//   beforeEach(() => {
-//     jest.spyOn(window, 'fetch').mockImplementation(() =>
-//       Promise.resolve({
-//         json: () => Promise.resolve({ first_name: 'test' }),
-//         status: 200,
-//       })
-//     );
-//   });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-//   afterEach(() => {
-//     window.fetch.mockRestore();
-//   });
+  test('renders navbar contents', async () => {
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider value={{ user, authTokens, logoutUser }}>
+          <Navbar />
+        </AuthContext.Provider>
+      </MemoryRouter>
+    );
 
-//   it('renders the default navigation bar when user is not logged in', () => {
-//     act(() => {
-//         render(
-//           <MemoryRouter>
-//             <AuthContext.Provider value={{}}>
-//               <Navbar />
-//             </AuthContext.Provider>
-//           </MemoryRouter>
-//         );
-//     });
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+    expect(screen.getByText('Financial Hub')).toBeInTheDocument();
+    expect(screen.getByText('Bank accounts')).toBeInTheDocument();
+    expect(screen.getByText('Currencies')).toBeInTheDocument();
+    expect(screen.getByText('Transactions')).toBeInTheDocument();
+    expect(screen.getByText('Bar graph')).toBeInTheDocument();
+    expect(screen.getByText('Logout')).toBeInTheDocument();
+  });
 
-//     expect(screen.getByTestId('navbar')).toBeInTheDocument();
-//     expect(screen.getByText('About')).toBeInTheDocument();
-//     expect(screen.getByText('Sign Up')).toBeInTheDocument();
-//     expect(screen.getByText('Login')).toBeInTheDocument();
-//     expect(screen.queryByText('Hello, test')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Bank accounts')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Currencies')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Transactions')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Bar graph')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Logout')).not.toBeInTheDocument();
-//   });
+  test('renders default form when user is not logged in', async () => {
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider value={{ user: null }}>
+          <Navbar />
+        </AuthContext.Provider>
+      </MemoryRouter>
+    );
 
-//   it('renders the navigation bar with user information when user is logged in', async () => {
-//     act(() => {
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+    expect(screen.getByText('Financial Hub')).toBeInTheDocument();
+    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(screen.getByText('Sign Up')).toBeInTheDocument();
+    expect(screen.getByText('Login')).toBeInTheDocument();
+  });
+
+//   test('displays user first name when logged in', async () => {
 //     render(
-//       <BrowserRouter>
-//         <AuthContext.Provider value={mockContextValue}>
+//       <MemoryRouter>
+//         <AuthContext.Provider value={{ user, authTokens, logoutUser }}>
 //           <Navbar />
 //         </AuthContext.Provider>
-//       </BrowserRouter>
+//       </MemoryRouter>
 //     );
-//     });
 
-
-//     expect(screen.getByTestId('navbar')).toBeInTheDocument();
-//     expect(screen.queryByText('About')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Sign Up')).not.toBeInTheDocument();
-//     expect(screen.queryByText('Login')).not.toBeInTheDocument();
-//     //expect(screen.getByText('Hello, test')).toBeInTheDocument();
-//     expect(screen.getByText('Bank accounts')).toBeInTheDocument();
-//     expect(screen.getByText('Currencies')).toBeInTheDocument();
-//     expect(screen.getByText('Transactions')).toBeInTheDocument();
-//     expect(screen.getByText('Bar graph')).toBeInTheDocument();
-//     expect(screen.getByText('Logout')).toBeInTheDocument();
+//     expect(screen.getByText('test')).toBeInTheDocument();
 //   });
 
-// //   it('calls logoutUser when "Logout" is clicked', async () => {
-// //     act(() => {
-// //     const {container} =render(
-// //       <BrowserRouter>
-// //         <AuthContext.Provider value={mockContextValue}>
-// //           <Navbar />
-// //         </AuthContext.Provider>
-// //       </BrowserRouter>
-// //     );
-// //     expect(mockLogout).not.toHaveBeenCalled();
-// //     expect(container.querySelector('.nav-logout')).toBeInTheDocument();
-// //     logoutButton.click();
-// //     expect(mockLogout).toHaveBeenCalledTimes(1);
-// //   });
-// });
+  test('calls logoutUser function when "Logout" is clicked', async () => {
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider value={{ user, authTokens, logoutUser }}>
+          <Navbar />
+        </AuthContext.Provider>
+      </MemoryRouter>
+    );
+
+    userEvent.click(screen.getByText('Logout'));
+    expect(logoutUser).toHaveBeenCalled();
+  });
+});
