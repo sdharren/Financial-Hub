@@ -101,6 +101,9 @@ function InvestmentGraphs() {
                 break;
 
             case 'investment_category_breakdown':
+                if (!options['categories'].includes(endpoint_parameter)) {
+                    break;
+                }
                 let category_returns = await getReturns('category_returns', endpoint_parameter);
                 setLastCategory(endpoint_parameter);
                 setGraph(
@@ -119,6 +122,9 @@ function InvestmentGraphs() {
                 break;
 
             case 'stock_history':
+                if (!options['investments'].includes(endpoint_parameter)) {
+                    break;
+                }
                 let returns = await getReturns('returns', endpoint_parameter);
                 setLastStock(endpoint_parameter);
                 setGraph(
@@ -133,7 +139,6 @@ function InvestmentGraphs() {
                         </div>
                     );
                 changeTabActive(endpoint);
-
                 break;
         }
     }
