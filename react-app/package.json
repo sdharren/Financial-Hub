@@ -17,7 +17,8 @@
     "react-plaid-link": "^3.4.0",
     "react-router-dom": "^6.8.1",
     "react-scripts": "^5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "apexcharts": "3.37.2"
   },
   "scripts": {
     "start": "react-scripts start",

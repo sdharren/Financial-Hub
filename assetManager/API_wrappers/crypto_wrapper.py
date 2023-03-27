@@ -21,7 +21,7 @@ ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUB
 # ETH Docs available @ https://www.blockcypher.com/dev/ethereum/#address-balance-endpoint
 class getCryptoAddressData:
     def BTC_all(addr):
-        return get_address_full(address=addr, confirmations=3)
+        return get_address_full(address=addr, confirmations=3, api_key='9c75ffab7c524ab19cee9d749110a3b2')
 
     def ETH_all(addr):
         command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
@@ -39,25 +39,25 @@ def toBase(amount, type):
 
 class getUsableCrypto:
     def getAddress(data, type):
-        return (data[0].get("address"))
+        return (data.get("address"))
 
     def getBalance(data, type):
-        return toBase((data[0].get("final_balance")), type)
+        return toBase((data.get("final_balance")), type)
     
     def getNoTx(data, type):
-        return (data[0].get("n_tx"))
+        return (data.get("n_tx"))
 
     def getTotalReceived(data, type):
-        return toBase((data[0].get("total_received")), type)
+        return toBase((data.get("total_received")), type)
 
     def getTotalSent(data, type):
-        return toBase((data[0].get("total_sent")), type)
+        return toBase((data.get("total_sent")), type)
 
     def getTxs(data, type):
         if(type == "btc"):
-            value = data[0].get("txs")
+            value = data.get("txs")
         elif(type == "eth"):
-            value = data[0].get("txrefs")
+            value = data.get("txrefs")
         
         return value
 
@@ -85,28 +85,29 @@ def getAllCryptoData(addresses):
     return data
 
 # Collect select data from api instead of requesting all data
-def getAlternateCryptoData(addresses, alternate):
+def getAlternateCryptoData(user, command):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
-    btcAddresses = ADDRESSES.get("btc", None)
-    ethAddresses = ADDRESSES.get("eth", None)
-    
+    btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
+    ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
+    print(command)
     if(btcAddresses != None):
-        for addr in btcAddresses:
+        for account in btcAddresses:
+            addr = account.access_token
             value = getCryptoAddressData.BTC_all(addr)
 
-            if alternate == "address":
+            if command == "address":
                 value = getUsableCrypto.getAddress(value, "btc")
-            elif alternate == "balance":
+            elif command == "balance":
                 value = getUsableCrypto.getBalance(value, "btc")
-            elif alternate == "notx":
+            elif command == "notx":
                 value = getUsableCrypto.getNoTx(value, "btc")
-            elif alternate == "received":
+            elif command == "received":
                 value = getUsableCrypto.getTotalReceived(value, "btc")
-            elif alternate == "sent":
+            elif command == "sent":
                 value = getUsableCrypto.getTotalSent(value, "btc")
-            elif alternate == "txs":
+            elif command == "txs":
                 value = getUsableCrypto.getTxs(value, "btc")
                 
             arrVal = [value, "btc"]
@@ -115,19 +116,20 @@ def getAlternateCryptoData(addresses, alternate):
 
     if(ethAddresses != None):
         for addr in ethAddresses:
+            addr = account.access_token
             value = getCryptoAddressData.ETH_all(addr)
 
-            if alternate == "address":
+            if command == "address":
                 value = getUsableCrypto.getAddress(value, "eth")
-            elif alternate == "balance":
+            elif command == "balance":
                 value = getUsableCrypto.getBalance(value, "eth")
-            elif alternate == "notx":
+            elif command == "notx":
                 value = getUsableCrypto.getNoTx(value, "eth")
-            elif alternate == "received":
+            elif command == "received":
                 value = getUsableCrypto.getTotalReceived(value, "eth")
-            elif alternate == "sent":
+            elif command == "sent":
                 value = getUsableCrypto.getTotalSent(value, "eth")
-            elif alternate == "txs":
+            elif command == "txs":
                 value = getUsableCrypto.getTxs(value, "eth")
             
             arrVal = [value, "eth"]

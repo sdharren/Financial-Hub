@@ -20,13 +20,13 @@ ChartJS.register(
     Legend,
     Colors
 )
-function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
+function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [pieChartData, setPieChartData] = useState(null);
     const navigate = useNavigate()
 
     let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/crypto_select_data?param=balance/'
+        let url = 'http://127.0.0.1:8000/api/crypto_select_data/?param=balance'
         let response = await fetch(url, {
             method:'GET',
             headers:{
@@ -60,9 +60,9 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     let pie_data = new Array();
     let pie_labels = new Array();
     for (let key in pieChartData) {
-        let pieLabel = key + ' - ' + pieChartData[key][0]; 
+        let pieLabel = key + ' - ' + pieChartData[key][1]; 
         pie_labels.push(pieLabel);
-        var currVal = pieChartData[key][1];
+        var currVal = pieChartData[key][0];
         pie_data.push(currVal);
     }
 
@@ -107,11 +107,6 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
 
     return (
         <div>
-            {
-                endpoint==='crypto_select_data' 
-                ? null 
-                : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
-            }
             <Pie className='crypto-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
         
@@ -119,4 +114,4 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     
 }
 
-export default PieChart;
+export default CPie;

@@ -1,8 +1,9 @@
 import React, { useContext, useState } from "react";
 import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const AdditionalData = () => {
+const CAdditional = () => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [AdditionalData, setAdditionalData] = useState(null);
     const navigate = useNavigate()
@@ -35,8 +36,10 @@ const AdditionalData = () => {
         }
     }
   
-    React.useEffect(() => {
-        get_data();
+    useEffect(() => {
+      console.log("hello");  
+      get_data();
+        
         let data = new Array();
         for (let key in AdditionalData) {
             data.push ({
@@ -44,9 +47,10 @@ const AdditionalData = () => {
                 value: AdditionalData[key][1]
             })
 
+            setAdditionalData(data);
         }
 
-        }, [data]);
+        }, [AdditionalData]);
     
 
 
@@ -59,7 +63,7 @@ const AdditionalData = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(data).map(([key, value]) => (
+          {Object.entries(AdditionalData).map(([key, value]) => (
             <tr key={key}>
               <td>{key}</td>
               <td>{value}</td>
@@ -70,4 +74,4 @@ const AdditionalData = () => {
     );
   };
   
-  export default AdditionalData;
+  export default CAdditional;

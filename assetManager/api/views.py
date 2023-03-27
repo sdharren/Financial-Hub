@@ -356,17 +356,17 @@ def sector_spending(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def crypto_all_data(request):
-    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
-    data = getAllCryptoData(addresses=stored_addresses)
+    data = getAllCryptoData(user=request.user)
 
     return Response(data, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def crypto_select_data(request):
-    stored_addresses = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO) # Retrieve addresses from stored account type
+    print(request.GET.get('param'))
     if request.GET.get('param'):
-        data = getAlternateCryptoData(addresses=stored_addresses, command=(request.GET.get('param')))
+        
+        data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')))
     else:
         raise Exception
         # should return bad request

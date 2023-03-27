@@ -4,11 +4,11 @@ import Balances from './Balances';
 import Transactions from './RecentTransactionsDisplay';
 import Currency from './Currency';
 import BarChart from './TransactionDisplay';
-
-import { PieChart as cPie } from './CryptoGraphs/PieChart'
-import { ScatterGraph as cScatter } from './CryptoGraphs/ScatterGraph'
-import { RecentTransactionsDisplay as cRecentTransactionsDisplay } from './CryptoGraphs/RecentTransactionsDisplay'
-import { AdditionalData as cAdditional } from './CryptoGraphs/AdditionalData'
+import CPie from './CryptoGraphs/PieChart';
+import CScatter from './CryptoGraphs/ScatterGraph';
+import CRecentTransactionsDisplay from './CryptoGraphs/RecentTransactionsDisplay';
+import CAdditional from './CryptoGraphs/AdditionalData';
+import LineGraph from './LineGraph';
 
 
 const tabGraphData = {
@@ -28,10 +28,10 @@ const tabGraphData = {
     { name: 'Bar Chart', content: <BarChart /> },
   ],
   Crypto: [
-    { name: 'Pie Chart', content: <cPie /> },
-    { name: 'Time Scatter Graph', content: <cScatter /> },
-    { name: 'Transactions Table', content: <cRecentTransactionsDisplay /> },
-    { name: 'Additional Data', content: <cAdditional /> },
+    { name: 'Pie Chart', content: <CPie /> },
+    { name: 'Time Scatter Graph', content: <LineGraph endpoint={'crypto_select_data'} endpoint_parameter='txs' /> },
+    { name: 'Transactions Table', content: <CRecentTransactionsDisplay /> },
+    { name: 'Additional Data', content: <CAdditional /> },
   ],
 };
 

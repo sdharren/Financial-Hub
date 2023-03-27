@@ -3,8 +3,9 @@ import ApexCharts from 'apexcharts';
 import { useState, useContext } from 'react';
 import  AuthContext  from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
-const ScatterGraph = () => {
+const CScatter = () => {
     const chartRef = React.useRef(null);
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [scatterChartData, setScatterChartData] = useState(null);
@@ -20,7 +21,7 @@ const ScatterGraph = () => {
     */
 
     let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/crypto_select_data?param=txs/'
+        let url = 'http://127.0.0.1:8000/api/crypto_select_data/?param=txs'
         let response = await fetch(url, {
             method:'GET',
             headers:{
@@ -33,34 +34,36 @@ const ScatterGraph = () => {
             setScatterChartData(data);
         }
         else if (response.status === 303) {
-            if (data['error'] === 'Investments not linked.') {
-                navigate('/crypto_wallets')
-            }
+            navigate('/link_assets')
         }
     }
   
-    React.useEffect(() => {
+    useEffect(() => {
         get_data();
-        let transactions = new Array();
-        for (let key in scatterChartData) {
-            for(let i = 0; i < scatterChartData[key].inputs.length; i++) {
-                transactions.push({
-                    type: 'input',
-                    date: scatterChartData[key].inputs[i]['sequence'],
-                    amount: scatterChartData[key].inputs[i]['output_value']
-                });
-            }
+    }, []);
 
-            for(let i = 0; i < scatterChartData[key].outputs.length; i++) {
-                transactions.push({
-                    type: 'output',
-                    date: scatterChartData[key].outputs[i]['spent_by'],
-                    amount: scatterChartData[key].outputs[i]['value']
-                })
-        }
-        }
-    }, [transactions, chartRef]);
+    let transactions = new Array();
 
+    for (let key in scatterChartData) {
+        console.log(scatterChartData[key]);
+        for(let i = 0; i < scatterChartData[key].inputs.length; i++) {
+            transactions.push({
+                type: 'input',
+                date: scatterChartData[key].inputs[i]['receieved'],
+                amount: scatterChartData[key].inputs[i]['total']
+            });
+        }
+
+        for(let i = 0; i < scatterChartData[key].outputs.length; i++) {
+            transactions.push({
+                type: 'output',
+                date: scatterChartData[key].outputs[i]['receieved'],
+                amount: scatterChartData[key].outputs[i]['total']
+            })
+            
+        }
+    }
+    console.log(transactions);
       const options = {
         chart: {
           type: 'scatter',
@@ -81,17 +84,6 @@ const ScatterGraph = () => {
         },
       };
   
-      const data = {
-          labels: scatter_labels,
-          datasets: [
-              {
-                  label: '$$$',
-                  data: scatter_data,
-                  borderColor: 'black',
-                  link: pie_labels
-              }
-          ]
-      };
   
       const series = [
         {
@@ -111,12 +103,8 @@ const ScatterGraph = () => {
   
       chart.render();
   
-      return () => {
-        chart.destroy();
-      };
-  
-    return <div ref={chartRef} />;
+      return <div ref={chartRef} />;
     };
   
-  export default ScatterGraph;
+  export default CScatter;
   
