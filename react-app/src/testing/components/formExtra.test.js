@@ -1,23 +1,17 @@
 import React from 'react';
-import { shallow } from 'enzyme';
 import FormExtra from '../../components/formExtra';
+import { render, screen } from '@testing-library/react';
 
 describe('FormExtra', () => {
-  let wrapper;
+    test('renders the "Remember me" checkbox and "Forgot your password?" link', () => {
+        render(<FormExtra />);
+    
+       
+        const rememberMeCheckbox = screen.getByRole('checkbox', { name: /remember me/i });
+        expect(rememberMeCheckbox).toBeInTheDocument();
+        
 
-  beforeEach(() => {
-    wrapper = shallow(<FormExtra />);
-  });
-
-  it('renders a checkbox', () => {
-    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(true);
-  });
-
-  it('renders a label for the checkbox', () => {
-    expect(wrapper.find('label[htmlFor="remember-me"]').text()).toBe('Remember me');
-  });
-
-  it('renders a forgot password link', () => {
-    expect(wrapper.find('a[href="#"]').text()).toBe('Forgot your password?');
-  });
+        const forgotPasswordLink = screen.getByRole('link', { name: /forgot your password/i });
+        expect(forgotPasswordLink).toBeInTheDocument();
+      });
 });

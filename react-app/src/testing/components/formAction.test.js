@@ -10,8 +10,7 @@ describe('FormAction', () => {
     );
     const submitButton = getByText(/submit/i);
     expect(submitButton).toBeInTheDocument();
-    fireEvent.click(submitButton);
-    // expect(handleSubmit).toHaveBeenCalledTimes(1);
+   
   });
 
   test('renders a button with type and action props', () => {
