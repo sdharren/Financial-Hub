@@ -102,7 +102,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -168,4 +167,3 @@ bower_components
 psd
 thumb
 sketch
-.env
