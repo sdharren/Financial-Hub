@@ -42,7 +42,14 @@ class InstitutionSelectionViewTestCase(TestCase, LogInTester):
     def tearDown(self):
         cache.clear()
 
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
     def test_select_bank_account(self):
+        self.create_public_token()
         request = self.factory.get('/select_bank_account/')
         force_authenticate(request, user=self.user)
         response = select_bank_account(request)
@@ -58,6 +65,7 @@ class InstitutionSelectionViewTestCase(TestCase, LogInTester):
         self.assertEqual(response.data, {'detail': ErrorDetail(string='Authentication credentials were not provided.', code='not_authenticated')})
 
     def test_set_bank_access_token_with_correct_post_body(self):
+        self.create_public_token()
         url = reverse('set_bank_access_token')
         client = APIClient()
         client.force_authenticate(user=self.user)

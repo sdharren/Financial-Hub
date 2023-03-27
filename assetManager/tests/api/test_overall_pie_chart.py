@@ -40,13 +40,20 @@ class OverallGraphViewTestCase(TestCase, LogInTester):
     def tearDown(self):
         cache.clear()
 
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
     def test_overall_graph_when_logged_in(self):
+        self.create_public_token()
         request = self.factory.get('/dashboard')
         force_authenticate(request, user=self.user)
         response = total_assets(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        self.assertEqual(response.data,{'Bank Assets': 1000.0, 'Investment Assets': 0, 'Crypto Assets': 100})
+        self.assertEqual(response.data,{'Bank Assets': 43500.0, 'Investment Assets': 0, 'Crypto Assets': 100.0})
 
     def test_overall_graph_when_data_is_cached(self):
         cache.set('total_assets'+self.user.email,{'Bank Assets': 100.0, 'Investment Assets': 1000.0, 'Crypto Assets': 100})
@@ -65,9 +72,10 @@ class OverallGraphViewTestCase(TestCase, LogInTester):
         self.assertEqual(response.data,{'detail': ErrorDetail(string='Authentication credentials were not provided.', code='not_authenticated')})
 
     def test_sum_instiution_balances(self):
+        self.create_public_token()
         wrapper = get_plaid_wrapper(self.user,'balances')
         balance = sum_instiution_balances(wrapper,self.user)
-        self.assertEqual(balance,1000.0)
+        self.assertEqual(balance,43500.0)
 
     def test_sum_investment_balance(self):
         balance = sum_investment_balance(self.user)

@@ -58,17 +58,17 @@ A dictionary with the sum of all assets for each of the three categories
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def total_assets(request):
-    # user = request.user
-    # if False == cache.has_key('total_assets'+user.email):
-    #     wrapper = get_plaid_wrapper(user,'balances')
-    #     bank_assets = sum_instiution_balances(wrapper, request.user)
-    #     investment_assets = sum_investment_balance(user)
-    #     crypto_assets = sum_crypto_balances(user)
-    #     data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
-    #     cache.set('total_assets'+user.email, data)
-    # else:
-    #     data = cache.get('total_assets'+user.email) // add this to delete cache
-    data = {"Bank Assets": 100, "Investment Assets": 100, "Crypto Assets": 100}
+    user = request.user
+    if False == cache.has_key('total_assets'+user.email):
+        wrapper = get_plaid_wrapper(user,'balances')
+        bank_assets = sum_instiution_balances(wrapper, request.user)
+        investment_assets = sum_investment_balance(user)
+        crypto_assets = 100.0
+        # crypto_assets = sum_crypto_balances(user)
+        data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
+        cache.set('total_assets'+user.email, data)
+    else:
+        data = cache.get('total_assets'+user.email)
     return Response(data, content_type='application/json', status=200)
 
 class SignupView(APIView):
