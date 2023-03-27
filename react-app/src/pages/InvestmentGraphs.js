@@ -115,6 +115,7 @@ function InvestmentGraphs() {
                         />
                     </div>
                 );
+                changeTabActive(endpoint);
                 break;
 
             case 'stock_history':
@@ -127,11 +128,11 @@ function InvestmentGraphs() {
                                 endpoint={endpoint} 
                                 updateGraph={handleGraphUpdate} 
                                 endpoint_parameter={endpoint_parameter} 
-                                selectOptions={ options['categories'] } 
+                                selectOptions={ options['investments'] } 
                             />
                         </div>
                     );
-                    changeTabActive(endpoint);
+                changeTabActive(endpoint);
 
                 break;
         }
