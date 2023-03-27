@@ -67,7 +67,7 @@ export default function Navbar() {
     );
 
     return (
-        <nav className="nav">
+        <nav className="nav" data-testid= "navbar">
             <div className='navbarContents'>
                 <Link to = {user ? "/dashboard" : "/"} className="site-title">Financial Hub</Link>
                 {user ? loggedInForm : defaultForm}
