@@ -8,7 +8,6 @@ from django.urls import reverse
 from assetManager.models import User
 from django.test import TestCase, RequestFactory
 from rest_framework.test import APIRequestFactory
-from django.contrib.auth.models import User
 from rest_framework.test import force_authenticate
 from rest_framework.exceptions import ErrorDetail
 from assetManager.api.views import set_bank_access_token, select_bank_account
