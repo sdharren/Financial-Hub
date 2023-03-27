@@ -92,7 +92,7 @@ useEffect(() => {
       data : bar_data,
       borderColor : 'black',
       link: bar_labels,
-      backgroundColor : ['rgba(0,0,0,1)']
+      backgroundColor : ['#5fe35f']
     }]
   }
 

@@ -105,10 +105,10 @@ function Accounts() {
           </tr>
         ))}
         {brokerages.map(brokerage => (
-          <tr key={brokerage}>
-            <td>{brokerage}</td>
-            <td>Brokerage</td>
-            <td>
+          <tr key={brokerage} className='w-full table table-fixed'>
+            <td className='text-left py-3 px-4 text-white'>{brokerage}</td>
+            <td className='text-left py-3 px-4'>Brokerage</td>
+            <td className='text-left py-3 px-4 text-white'>
               <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
             </td>
           </tr>

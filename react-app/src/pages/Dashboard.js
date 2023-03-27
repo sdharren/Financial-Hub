@@ -144,7 +144,8 @@ function Dashboard() {
                     </div>
                 ))}
             </div>
-            <div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
+            {activeTabPie === 'Stocks' ? <InvestmentGraphs /> : 
+            (<div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
                 <div className='graph-names flex flex-col mr-2 w-40'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
@@ -162,8 +163,7 @@ function Dashboard() {
                       activeGraphPie === graph.name && <div key={graph.name} className=''>{graph.content}</div>
                     ))}
                 </div>
-
-            </div>
+            </div>)}
 
         </div>
     )  

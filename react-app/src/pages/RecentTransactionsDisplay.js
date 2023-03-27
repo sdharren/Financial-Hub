@@ -173,7 +173,7 @@ export default function RecentTransactions() {
   }
 
   let getTransactions = async () => {
-    let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
+    let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Fidelity';
     let response = await fetch(transactionURL, {
       method: 'GET',
       headers: {
@@ -183,7 +183,7 @@ export default function RecentTransactions() {
     });
     let data = await response.json();
     if (response.status === 200) {
-        setTransactions(data['Royal Bank of Scotland - Current Accounts']);
+        setTransactions(data['Fidelity']);
     }
     else {
       console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);

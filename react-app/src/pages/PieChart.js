@@ -129,7 +129,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     };
 
     return (
-        <div className='inline-block min-h-[60vh] w-full'>
+        <div className='inline-block min-h-[60vh] w-full max-h-[60vh]'>
             {
                 selectOptions !== undefined 
                 ? <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />

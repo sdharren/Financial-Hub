@@ -436,14 +436,14 @@ max-width: 120%;
   margin-right: 20px;
 }
 /* Investment Graphs Display */
-.tab {
+/* .tab {
     float: left;
     width: 10%;
     height: 500px;
     height: 31.25rem;
-}
+} */
     
-.tab button {
+/* .tab button {
     display: block;
     background-color: inherit;
     color: white;
@@ -455,17 +455,17 @@ max-width: 120%;
     cursor: pointer;
     transition: 0.3s;
     overflow: hidden;
-}
+} */
 
-.tab button:hover {
+/* .tab button:hover {
     background-color: #ddd;
 }
 
 .tab button.active {
     font-weight: bold;
-}
+} */
 
-.tabcontent {
+/* .tabcontent {
     float: left;
     padding: 0px 12px;
     border: 1px solid #ccc !important;
@@ -473,13 +473,13 @@ max-width: 120%;
     border-left: none;
     height: 500px;
     height: 31.25rem;
-}
+} */
 
-.investment-graphs {
+/* .investment-graphs {
     position: absolute;
     left: 5rem;
     right: 5rem;
-}
+} */
 
 /* .investment-pie {
     margin: auto;
