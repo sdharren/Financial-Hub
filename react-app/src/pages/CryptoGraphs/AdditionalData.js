@@ -26,10 +26,10 @@ const AdditionalData = () => {
         });
         let respData = await response.json();
         if (response.status === 200) {
-            setAdditionalData(data);
+            setAdditionalData(respData);
         }
         else if (response.status === 303) {
-            if (data['error'] === 'Investments not linked.') {
+            if (respData['error'] === 'Investments not linked.') {
                 navigate('/crypto_wallets')
             }
         }

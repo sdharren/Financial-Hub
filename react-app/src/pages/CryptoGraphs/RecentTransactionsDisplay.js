@@ -2,8 +2,10 @@ import React from 'react';
 import '../../table.css';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import AuthContext from '../../context/AuthContext';
 
-const [transactions, setTransactions] = useState([]);
+function RecentTransactionsDisplay() {
+  const [transactions, setTransactions] = useState([]);
 
 
 let getTransactions = async () => {
@@ -30,6 +32,8 @@ useEffect(() => {
   // Call the async function `getTransactions` to fetch the recent transactions
   getTransactions();
 }, []);
+
+}
 
 
 

@@ -8,6 +8,7 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
 from forex_python.converter import CurrencyRates
+from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets
 
 """
 @params: account_balances custom dictionary combining returned accounts request from PLAID API with the institution linked as the key
@@ -124,3 +125,13 @@ def check_institution_name_selected_exists(user,institution_name):
             return True
 
     return False
+
+
+def sum_crypto_balances(user):
+    wallets = get_wallets(user)
+    total = 0
+    data = getAlternateCryptoData(wallets, "balance")
+    for key in data.keys():
+        total += data[key][1]
+    
+    return total
