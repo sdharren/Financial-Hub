@@ -9,9 +9,9 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import BarGraph from './dahsboard_components/BarGraph';
+import BarGraph from './dashboard_components/BarGraph';
 import TransactionDisplay from './pages/TransactionDisplay';
-import PieChart from './dahsboard_components/PieChart';
+import PieChart from './dashboard_components/PieChart';
 import BalancesDisplay from './pages/BalancesDisplay';
 import BarChartDisplay from './pages/TransactionDisplay';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
@@ -21,7 +21,7 @@ import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
 import CurrencyDisplay from './pages/CurrencyDisplay';
 // import TransactionTable
-import LineGraph from './dahsboard_components/LineGraph';
+import LineGraph from './dashboard_components/LineGraph';
 
 // ask matthew about how margins are lined
 import SectorSpending from './pages/SectorSpendingDisplay';

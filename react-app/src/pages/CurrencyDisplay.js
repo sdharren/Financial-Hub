@@ -1,4 +1,4 @@
-import PieChart from "../dahsboard_components/PieChart";
+import PieChart from "../dashboard_components/PieChart";
 import { useState } from "react";
 
 function CurrencyDisplay() {

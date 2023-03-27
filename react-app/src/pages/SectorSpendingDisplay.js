@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BarGraph from "../dahsboard_components/BarGraph";
+import BarGraph from "../dashboard_components/BarGraph";
 
 function BarChartDisplay() {
     const [graph, setGraph] = useState(<BarGraph endpoint={"sector_spending"} loadNext={handleLoadNext}/>);
