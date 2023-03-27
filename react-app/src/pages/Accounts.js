@@ -92,37 +92,38 @@ function Accounts() {
   };
 
   return (
-    <div data-testid= 'accountstest'>
-      <h1 className='accounts-name'>Accounts</h1>
-      <table className='accounts-table'>
-        <thead className='accounts-head'>
-          <tr className='accounts-row'>
-            <th className='accounts-head'>Name</th>
-            <th className='accounts-head'>Type</th>
-            <th className='accounts-head'>Remove</th>
+    <div className='signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600'>
+    <div className='overflow-hidden rounded border-gray-200'>
+    <table className="transaction-table flex flex-col w-full h-[60vh] bg-transparent">
+    <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
+    <tr className='w-full table table-fixed'>
+          <th className='text-left py-3 px-4 uppercase font-semibold text-sm'>Name</th>
+          <th className='text-left py-3 px-4 uppercase font-semibold text-sm'>Type</th>
+          <th className='text-left py-3 px-4 uppercase font-semibold text-sm'>Remove</th>
+        </tr>
+      </thead>
+      <tbody className='text-violet-300 flex-auto block overflow-y-scroll'>
+        {banks.map(bank => (
+          <tr className='w-full table table-fixed' key={bank}>
+            <td className='text-left py-3 px-4 text-white'>{bank}</td>
+            <td className='text-left py-3 px-4'>Institution</td>
+            <td className='text-left py-3 px-4 text-white'>
+              <button onClick={() => handleRemoveBank(bank)}>Remove</button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {banks.map(bank => (
-            <tr  key={bank}>
-              <td className='accounts-column'>{bank}</td>
-              <td className='accounts-column'>Institution</td>
-              <td className='accounts-column'>
-                <button className='accounts-removebutton' onClick={() => handleRemoveBank(bank)}>Remove</button>
-              </td>
-            </tr>
-          ))}
-          {brokerages.map(brokerage => (
-            <tr  key={brokerage}>
-              <td className='accounts-column'>{brokerage}</td>
-              <td className='accounts-column'>Brokerage</td>
-              <td className='accounts-column'>
-                <button className='accounts-removebutton' onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        ))}
+        {brokerages.map(brokerage => (
+          <tr key={brokerage} className='w-full table table-fixed'>
+            <td className='text-left py-3 px-4 text-white'>{brokerage}</td>
+            <td className='text-left py-3 px-4'>Brokerage</td>
+            <td className='text-left py-3 px-4 text-white'>
+              <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    </div>
     </div>
   );
 }

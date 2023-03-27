@@ -9,7 +9,8 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import BarGraph from './dashboard_components/BarGraph';
+import TotalAssetsDisplay from './pages/TotalAssets'
+import BarGraph from './dahsboard_components/BarGraph';
 import TransactionDisplay from './pages/TransactionDisplay';
 import PieChart from './dashboard_components/PieChart';
 import BalancesDisplay from './pages/BalancesDisplay';
@@ -33,7 +34,8 @@ import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
 
 function App() {
   return (
-    <div>
+    <div className = "bg-[url('./images/background-image.png')]">
+      <div className= 'mx-20 max-w-full min-h-screen'>
       <Router>
         <AuthProvider>
           <Navbar />
@@ -44,8 +46,8 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/transactions" element={<TransactionDisplay />} />
                 <Route path="/sector_spending" element={<SectorSpending/>} />
-
-                {/* TODO: plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
+                <Route path="/total_assets" element={<TotalAssetsDisplay/>} />
+                {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
                 <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
 
                 <Route path="/balances" element={<BalancesDisplay />} />
@@ -65,6 +67,7 @@ function App() {
 
         </AuthProvider>
       </Router>
+      </div>
     </div>
   );
 }

@@ -32,16 +32,35 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   }
 
   const options = {
-      plugins: {
-          colors: {
-              forceOverride: true
-          },
-          legend: {
-              labels: {
-                  color: "white"
-              }
-          }
+    plugins: {
+      colors: {
+        forceOverride: false
+      },
+      legend: {
+        labels: {
+          color: "white"
         }
+      }
+    },
+    scales : {
+      x : {
+        grid : {
+          color : 'black',
+          display : false
+        },
+        ticks : {
+          color : "white"
+        }
+      },
+      y : {
+        grid : {
+          color : "black"
+        },
+        ticks : {
+          color : "white"
+        }
+      }
+    }
   };
 
   const data = {
@@ -50,7 +69,8 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
       label : 'spending',
       data : bar_data,
       borderColor : 'black',
-      link: bar_labels
+      link: bar_labels,
+      backgroundColor : ['#5fe35f']
     }]
   }
 
@@ -67,7 +87,7 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   };
 
   return (
-    <div>
+    <div className='inline-block w-full max-h-[55vh]'>
       <Bar
       data = {data}
       options = {options}
