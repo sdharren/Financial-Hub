@@ -2,6 +2,8 @@ import ReturnDisplay from "../components/ReturnDisplay";
 import PieChart from "./PieChart";
 
 function InvestmentOverview() {
+    let {authTokens, logoutUser} = useContext(AuthContext);
+
     async function getReturns(endpoint, param) {
         let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + (endpoint==='overall_returns'?'/':'/?param='+param),
             {
