@@ -320,19 +320,22 @@ def set_single_institution_transactions(token,wrapper,user):
     debit_card = make_debit_card(wrapper,user)
 
     try:
-        account_transactions = debit_card.get_single_transaction(token)
+        transaction_list = []
+        account_transactions = debit_card.get_single_transaction(datetime.date(2000,12,16),datetime.date(2050,12,17),token)['transactions']
+        transaction_list.append(account_transactions)
+        debit_card.make_bank_graph_data_dict(token,transaction_list,0)
+        formatted_transactions = debit_card.get_insight_data()
     except Exception:
         raise PlaidQueryException('Something went wrong querying PLAID.')
 
-    institution_name = wrapper.get_institution_name(token)
-
     if(cache.has_key('transactions' + user.email) is False):
-        cache.set('transactions' + user.email, {institution_name:account_transactions})
+        cache.set('transactions' + user.email, formatted_transactions)
     else:
-        balances = cache.get('transactions' + user.email)
+        transactions = cache.get('transactions' + user.email)
         cache.delete('transactions' + user.email)
-        balances[institution_name] = account_transactions
-        cache.set('transactions' + user.email,balances)
+        institution_name = list(formatted_transactions.keys())[0]
+        transactions[institution_name] = formatted_transactions[institution_name]
+        cache.set('transactions' + user.email,transactions)
 
 """
 @params:
