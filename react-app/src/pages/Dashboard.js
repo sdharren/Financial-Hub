@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
-import PieChart from './PieChart';
 import Balances from './Balances';
 import Transactions from './RecentTransactionsDisplay';
 import Currency from './Currency';
-import BarChart from './BarChartDisplay';
+import BarChart from './TransactionDisplay';
 
 import { PieChart as cPie } from './CryptoGraphs/PieChart'
 import { ScatterGraph as cScatter } from './CryptoGraphs/ScatterGraph'
@@ -108,12 +107,7 @@ function Dashboard() {
                 ))}
               </div>
 
-              <div className="right-menu" hidden={stocksActive}>
-                <select value={selectedPieAccount} onChange={handlePieAccountChange}>
-                  <option value="All Accounts">All Accounts</option>
-                  <option value="Account 1">Account 1</option>
-                </select>
-              </div>
+              
 
             </div>
           </div>

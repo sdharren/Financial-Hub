@@ -10,7 +10,7 @@ import Home from './pages/Home';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import BarGraph from './pages/BarGraph';
-import BarChartDisplay from './pages/BarChartDisplay';
+import TransactionDisplay from './pages/TransactionDisplay';
 import PieChart from './pages/PieChart';
 import BalancesDisplay from './pages/Balances';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom"
@@ -23,8 +23,9 @@ import TransactionTable from './pages/RecentTransactionsDisplay';
 import SectorSpending from './pages/SectorSpending';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
-// import { Sector } from 'recharts';
-//import AssetBank from './pages/bankAssets';
+import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
+
+// ask matthew about how margins are lined
 
 function App() {
   return (
@@ -37,10 +38,10 @@ function App() {
               <Route element={<PrivateRoutes/>}>
                 <Route element={<HomePage/>} path = "/homepage" exact />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/bar_graph_display" element={<BarChartDisplay />} />
+                <Route path="/transactions" element={<TransactionDisplay />} />
                 <Route path="/sector_spending" element={<SectorSpending/>} />
 
-                {/* plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
+                {/* TODO: plaid link should throw an error if a user tries to access it (only accessible via link_assets component) */}
                 <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
 
                 <Route path="/balances" element={<BalancesDisplay />} />
@@ -55,6 +56,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
 
+              <Route path="/crypto_addresses" element={<CryptoWalletAddresses />} />
             </Routes>
 
         </AuthProvider>
