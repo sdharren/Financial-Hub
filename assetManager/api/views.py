@@ -256,7 +256,7 @@ def exchange_public_token(request):
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
         set_single_institution_transactions(token,wrapper,request.user)
-        
+
     return Response(status=200)
 
 """
@@ -591,29 +591,30 @@ handle_plaid_errors: decorator that handles Plaid API errors.
 @handle_plaid_errors
 def recent_transactions(request):
     user = request.user
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
 
-        try:
-            bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
-        except TransactionsNotLinkedException:
-            raise TransactionsNotLinkedException('Transactions Not Linked.')
-        except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
+    institutions = AccountType.objects.filter(user = user, account_asset_type = AccountTypeEnum.DEBIT)
 
-        concrete_wrapper = DevelopmentWrapper()
+    insights = []
 
-        debit_card = make_debit_card(concrete_wrapper,user)
+    for institution in institutions:
+        bank_graph_data_insight = getCachedInstitutionData(user,insitution.account_institution_name)
+        insights.append(bank_graph_data_insight)
 
-        try:
-            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
-        except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
+    concrete_wrapper = DevelopmentWrapper()
+
+    debit_card = make_debit_card(concrete_wrapper,user)
+
+    transactions = {}
+    try:
+        for insight in insights:
+            recent_transactions = debit_card.get_recent_transactions(insight,list(insight.keys())[0])
+            transactions[list(insight.keys())[0]] = recent_transactions
+    except Exception:
+        raise PlaidQueryException('Something went wrong querying PLAID.')
 
 
-        return Response(recent_transactions,content_type='application/json',status = 200)
-    else:
-        return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
+    return Response(transactions,content_type='application/json',status = 200)
+
 
 
 """
