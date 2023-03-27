@@ -61,7 +61,10 @@ def total_assets(request):
     user = request.user
     if False == cache.has_key('total_assets'+user.email):
         wrapper = get_plaid_wrapper(user,'balances')
-        bank_assets = sum_instiution_balances(wrapper, request.user)
+        try:
+            bank_assets = sum_instiution_balances(wrapper, request.user)
+        except Exception:
+            bank_assets = 0
         investment_assets = sum_investment_balance(user)
         crypto_assets = 100.0
         # crypto_assets = sum_crypto_balances(user)
