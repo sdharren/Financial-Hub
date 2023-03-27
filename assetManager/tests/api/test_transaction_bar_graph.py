@@ -10,7 +10,8 @@ from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 from rest_framework.test import force_authenticate
 from rest_framework.exceptions import ErrorDetail
-from assetManager.api.views import yearlyGraph, monthlyGraph, weeklyGraph, transaction_data_getter, cacheBankTransactionData
+from assetManager.api.views import yearlyGraph, monthlyGraph, weeklyGraph, transaction_data_getter
+from assetManager.api.views_helpers import *
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
@@ -20,7 +21,14 @@ from assetManager.tests.helpers import LogInTester
 class BarGraphViewTestCase(TestCase, LogInTester):
     """Tests of the views for transactions bar graph."""
 
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
         User = get_user_model()
         users = User.objects.all()
@@ -42,6 +50,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for yearly graph view
 
     def test_yearly_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/yearly-graph/?param=2022')
         force_authenticate(request, user=self.user)
         response = yearlyGraph(request)
@@ -60,6 +69,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for monthly graph view
 
     def test_monthly_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/monthly-graph/?param=2022')
         force_authenticate(request, user=self.user)
         response = monthlyGraph(request)
@@ -84,6 +94,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for weekly graph view
 
     def test_weekly_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/weekly-graph/?param=May+2022')
         force_authenticate(request, user=self.user)
         response = weeklyGraph(request)
@@ -108,11 +119,15 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for cache bank transaction data view
 
     def test_cache_bank_transaction_data(self):
-        bankgraphdata = BankGraphData(cacheBankTransactionData(self.user))
-        cached_data = json.loads(cache.get('transactions' + self.user.email))
+        self.create_public_token()
+        bankgraphdata = BankGraphData(getCachedInstitutionCachedData(self.user))
+        cache.set('transactions' + self.user.email, bankgraphdata.transactionInsight.transaction_history)
+        cached_data = cache.get('transactions' + self.user.email)
         correct_data = bankgraphdata.transactionInsight.transaction_history
         self.assertNotEqual(correct_data,"")
         self.assertNotEqual(cached_data,"")
+        self.assertNotEqual(correct_data,None)
+        self.assertNotEqual(cached_data,None)
         self.assertEqual(correct_data,cached_data)
         self.assertIsInstance(cached_data, list)
         all(self.assertIsInstance(transaction, dict) for transaction in cached_data)
@@ -120,7 +135,8 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # test for transaction data getter view
 
     def test_transaction_data_getter(self):
-        json_data = transaction_data_getter(self.user).transactionInsight.transaction_history
+        self.create_public_token()
+        json_data = transaction_data_getter(self.user)
         self.assertNotEqual(json_data,"")
-        self.assertIsInstance(json_data, list)
-        all(self.assertIsInstance(transaction, dict) for transaction in json_data)
+        self.assertIsInstance(json_data, dict)
+        all(self.assertIsInstance(transaction, str) for transaction in json_data)

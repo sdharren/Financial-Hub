@@ -5,7 +5,7 @@ import bankimg from "../images/asset-bank.png";
 
 import AuthContext from '../context/AuthContext';
 import { useContext } from "react";
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function LinkAssets() {
     let {authTokens, logoutUser} = useContext(AuthContext);
@@ -27,6 +27,14 @@ export default function LinkAssets() {
                 replace: true
             });
         }
+
+        
+    }
+
+    const buttClick = () => {
+        let route = '/crypto_addresses';
+        navigate(route);
+
     }
 
     return <div>
@@ -64,7 +72,7 @@ export default function LinkAssets() {
                     <div class="asset__content">
                         <img class="crypto__image" src={cryptoimg} alt="#"></img>
                         <p class="middle-text">Link your crypto wallet</p>
-                        <button class="link-button">Link</button>
+                        <button class="link-button" onClick={buttClick}>Link</button>
                     </div>
                 </div>
             </div>

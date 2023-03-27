@@ -1,4 +1,4 @@
-import PieChart from "./PieChart";
+import PieChart from "../dahsboard_components/PieChart";
 import { useState } from "react";
 
 function BalancesDisplay() {
@@ -20,7 +20,7 @@ function BalancesDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className="balance-graph">
             {graph}
         </div>
     );

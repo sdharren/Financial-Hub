@@ -24,7 +24,6 @@ urlpatterns = [
     path('sign_up/', views.sign_up, name='sign_up'),
     path('log_in/', views.log_in, name='log_in'),
     path('link_sandbox_investments/', views.link_sandbox_investments),
-    path('api/number/', views.number_view, name='number'),
     path('api/cache_assets_hardcoded/', views.setup_asset_data), #NOTE: this url should be removed later - real one in api/views
     path('api/', include('assetManager.api.urls')),
 ]

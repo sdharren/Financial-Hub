@@ -8,6 +8,7 @@ from assetManager.investments.investment import Investment
 from assetManager.API_wrappers.yfinance_wrapper import TickerNotSupported
 import json
 import os
+from django.conf import settings
 
 class StocksTestCase(TestCase):
     fixtures = [
@@ -15,6 +16,7 @@ class StocksTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.stock_getter = None
         self.user = User.objects.get(email='johndoe@example.org')
 
@@ -50,7 +52,7 @@ class StocksTestCase(TestCase):
         self.stock_getter = _create_stock_getter_with_fake_data()
         total_sum = self.stock_getter.get_total_investment_sum()
         self.assertEqual(total_sum, 10580.3)
-    
+
     def test_get_investment_categories(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         categories = self.stock_getter.get_investment_categories()
@@ -154,7 +156,86 @@ class StocksTestCase(TestCase):
         self.assertTrue(len(data) > 100)
         for key in data:
             self.assertTrue(data[key] > 0)
-        
+
+    def test_set_investment_returns(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        investment = self.stock_getter.investments[1]
+        result = self.stock_getter.set_investment_returns(investment)
+        self.assertTrue('1' in result.returns)
+        self.assertTrue('5' in result.returns)
+        self.assertTrue('30' in result.returns)
+
+    def test_set_investment_returns_does_nothing_for_unsupported_investment(self):
+        self.stock_getter = StocksGetter(None)
+        security = {
+            'name': 'adsf',
+            'ticker_symbol': 'adfhsjkhaiufhkadjfsjlh',
+            'type': 'equity'
+        }
+        holding = {
+            'quantity': 1,
+            'institution_value': 100,
+            'security_id': '1234'
+        }
+        investment = Investment(holding, security)
+        result = self.stock_getter.set_investment_returns(investment)
+        self.assertEqual(result.returns, {})
+
+    def test_get_returns_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        ewz_return = self.stock_getter.get_returns('iShares Inc MSCI Brazil')
+        self.assertTrue(ewz_return['1'] != 0)
+        self.assertTrue(ewz_return['5'] != 0)
+        self.assertTrue(ewz_return['30'] != 0)
+
+    def test_get_returns_returns_nothing_for_not_owned_stock(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        returns = self.stock_getter.get_returns('fadkjdfalskljadfks')
+        self.assertEqual(returns, {})
+
+    def test_get_category_returns_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        etf_returns = self.stock_getter.get_category_returns('etf')
+        self.assertTrue(etf_returns['1'] != 0)
+        self.assertTrue(etf_returns['5'] != 0)
+        self.assertTrue(etf_returns['30'] != 0)
+
+    def test_get_category_returns_works_with_no_investments(self):
+        self.stock_getter = StocksGetter(None)
+        returns = self.stock_getter.get_category_returns('etf')
+        self.assertEqual(returns, {})
+
+    def test_get_category_returns_nothing_with_wrong_category(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        etf_returns = self.stock_getter.get_category_returns('afdafdsfda')
+        self.assertEqual(etf_returns, {})
+
+    def test_get_overall_returns_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        overall_returns = self.stock_getter.get_overall_returns()
+        self.assertTrue(overall_returns['1'] != 0)
+        self.assertTrue(overall_returns['5'] != 0)
+        self.assertTrue(overall_returns['30'] != 0)
+
+    def test_get_overall_returns_works_with_no_investments(self):
+        self.stock_getter = StocksGetter(None)
+        returns = self.stock_getter.get_overall_returns()
+        self.assertEqual(returns, {})
+
+    def test_get_supported_investments_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        supported_investments = self.stock_getter.get_supported_investments()
+        self.assertEqual(supported_investments, {'Nflx Feb 0118 355 Call', 'iShares Inc MSCI Brazil', 'Matthews Pacific Tiger Fund Insti Class', 'Bitcoin', 'Achillion Pharmaceuticals Inc.', 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'Southside Bancshares Inc.'})
+
+    def test_get_categories_works(self):
+        self.stock_getter = _create_stock_getter_with_fake_data()
+        categories = self.stock_getter.get_categories()
+        self.assertEqual(categories, {'mutual fund', 'cash', 'derivative', 'equity', 'etf'})
+
+    def test_is_ticker_supported_works(self):
+        self.stock_getter = StocksGetter(None)
+        self.assertTrue(self.stock_getter.is_ticker_supported('NFLX'))
+
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()
@@ -184,8 +265,9 @@ def _get_fake_investments():
     securities = json.load(securities_file)
     holdings = json.load(holdings_file)
     investments = []
+    stock_getter = StocksGetter(None)
     for i in range (0, len(securities)):
-        investments.append(Investment(holdings[i], securities[i]))
+        investments.append(stock_getter.set_investment_returns(Investment(holdings[i], securities[i])))
     securities_file.close()
     holdings_file.close()
     return investments

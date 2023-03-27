@@ -48,17 +48,20 @@ const Signup = () => {
         if (response.status === 200) {
             loginUser(e)
         }
-        else if (response.status === 400) {
-            for (var key in data) {
-                if (key === "email") {
-                    document.querySelector(".email-error").innerHTML = data[key];
-                    document.querySelector(".email_error").style.display = "block";
-                }
-                if (key === "password") {
-                    document.querySelector(".password-error").innerHTML = data[key];
-                    document.querySelector(".password_error").style.display = "block";
-                }
-            }
+        // else if (response.status === 400) {
+        else {
+            // for (var key in data) {
+            //     if (key === "email") {
+            //         document.querySelector(".email-error").innerHTML = data[key];
+            //         document.querySelector(".email_error").style.display = "block";
+            //     }
+            //     if (key === "password") {
+            //         document.querySelector(".password-error").innerHTML = data[key];
+            //         document.querySelector(".password_error").style.display = "block";
+            //     }
+            // }
+            // alert(data["email"])
+            alert(Object.values(data).join("\n"))
         }
     }
     
@@ -77,9 +80,7 @@ const Signup = () => {
     )
     
     let form2 = (
-        <div class="super-signup-container">
-        <div class="signup-container">
-        <div>
+        <div class="signup-container my-10 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
             <Header 
                 heading = "Register your account"
                 paragraph = "Already have an account? "
@@ -87,7 +88,7 @@ const Signup = () => {
                 linkUrl='/login'
             />
             <form className = "mt-8 space-y-6" onSubmit={signupUser}>
-                <div className=''>
+                <div className='-space-y-px'>
                     {
                         fields.map(field =>
                             <div>
@@ -102,7 +103,7 @@ const Signup = () => {
                                     isRequired = {field.isRequired}
                                     placeholder = {field.placeholder}
                                 />
-                                <p class = {"error " + field.name + "-error"}>hello</p>
+                                <p class = {"error " + field.name + "-error"}></p>
 
                             </div>
                         )
@@ -110,8 +111,6 @@ const Signup = () => {
                     <FormAction handleSubmit={signupUser} text = "Register" />
                 </div>
             </form>
-        </div>
-        </div>
         </div>
     )
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import BarGraph from "./BarGraph";
+import BarGraph from "../dahsboard_components/BarGraph";
+import DropDown from "./DropDown";
 
 function BarChartDisplay() {
     const [graph, setGraph] = useState(<BarGraph endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>);
@@ -25,13 +26,20 @@ function BarChartDisplay() {
         );
     }
 
+    function handleOnChange(event) {
+        setGraph(
+            <BarGraph endpoint={'yearly_graphs'} endpoint_parameter={'yearly_graphs'} loadNext={handleLoadNext}/>
+        );
+    }
+
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className='w-full'>
             <button onClick={handleLoadPrevious}>
                 Go Back
             </button>
             {graph}
+            <DropDown className='' onChange={handleOnChange}/>
         </div>
     );
 }

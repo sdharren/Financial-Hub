@@ -1,0 +1,61 @@
+.nav .nav-logout:hover {
+  cursor: pointer;
+}
+
+.nav li > a::after,
+.nav-logout::after {
+  content: "";
+  display: block;
+  margin: auto;
+  height: 3px;
+  width: 0;
+  top: 5px;
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.nav li > a:hover::after,
+li > a.active-nav::after,
+.nav li > .nav-logout:hover::after {
+  width: 100%;
+  background: white;
+}
+
+.nb_dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+.nb_dropcontent {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left : -50%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: white;
+    border-radius: 5px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    /* z-index: 1; */
+    color: black;
+    text-align: center;
+  }
+
+.nb_dropdown:hover .nb_dropcontent {display: block;}
+
+/* .thingy {
+    padding-bottom: 5px;
+}
+
+.nav-logout {
+    padding-top: 5px
+} */
+
+.nb_dropcontent div {
+    padding-bottom: 5px;
+}
+
+.nb_dropcontent p {
+    padding-top: 5px;
+}

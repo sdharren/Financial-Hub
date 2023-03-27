@@ -152,12 +152,6 @@ class PlaidWrapper():
             except IntegrityError:
                 return
 
-    def _transform_product_to_enum_value(self, product):
-        if product == 'investments' or product == 'assets':
-            return 'STOCK'
-        if product == 'transactions':
-            return 'DEBIT'
-
     '''
     Retrieves the access tokens matching specified paramters. If a user has more than one access for the same product
     - the self.access_token attribute is set to a LIST of tokens

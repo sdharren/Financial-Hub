@@ -9,15 +9,15 @@ body {
     background-attachment: fixed;
 }
 
-.nav {
+/* .nav {
     color: white;
-    /* display: flex; */
-    /* margin-top: 29px;
+    display: flex;
+    margin-top: 29px;
     margin-left: 189px;
-    margin-right: 189px; */
-    /* margin : 1% 10%; */
-    /* justify-content: space-between;
-    align-items: center; */
+    margin-right: 189px;
+    margin : 1% 10%;
+    justify-content: space-between;
+    align-items: center;
     gap: 2rem;
     padding: 0 1rem;
     border-style: solid;
@@ -97,7 +97,7 @@ li > a.active-nav::after,
 .nav li > .nav-logout:hover::after {
   width: 100%;
   background: white;
-}
+} */
 
 /* .logout {
   width: 100%;
@@ -130,6 +130,38 @@ li > a.active-nav::after,
     height: auto;
     
 }
+
+.crypto-wallet-addresses {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.add-button,
+.remove-button,
+.submit-button {
+  margin: 10px;
+  padding: 10px;
+}
+
+.add-button,
+.remove-button {
+  background-color: darkblue;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.submit-button {
+  background-color: purple;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
 
 .home__content {
   position: absolute;
@@ -175,12 +207,12 @@ max-width: 120%;
 
 
 
-  .signup-container {
+  /* .signup-container {
     max-width: 28rem;
     width: 100%;
     margin: auto;
     width: 50%;
-  }
+  } */
 
   .super-signup-container {
     min-height: 100%;
@@ -197,13 +229,28 @@ max-width: 120%;
     font-size: 2.3em;
   }
   /*Container for the dashboard page*/
-  .dashboard-container {
+  /* .dashboard-container {
     width: 100%;
     
+  } */
+
+  .address-form {
+    text-align: center;
+
+  }
+  
+  .address-form-content {
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+
+  .inline-wallet-address-container {
+    margin-right: 50px;
+    text-justify: distribute;
   }
 
   /*Container for the section of the contents of the page*/
-  .piechart-box {
+  /* .piechart-box {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -212,10 +259,10 @@ max-width: 120%;
     float: left;
     height: 80vh;
     
-    }
+    } */
     
     /* Adjust the width of piechart-section to leave space for piechart-graphs and piegraph-content */
-    .piechart-section {
+    /* .piechart-section {
     display: flex;
     flex-wrap: wrap;
     width: calc(100%);
@@ -224,29 +271,29 @@ max-width: 120%;
     margin-top: 50px;
     margin-right: 100px;
     margin-left: 100px;
-    }
+    } */
     
     /*Styling the tabs that allow you to switch categories*/
-    .piechart-tabs {
+    /* .piechart-tabs {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 90%;
     height: 20%;
     
-    }
+    } */
     
     /*Styling individual tab*/
-    .piechart-tab {
+    /* .piechart-tab {
     margin: 0 10px;
     padding: 10px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    }
+    } */
     
     /*When the tab is selected*/
-    .piechart-tab.active {
+    /* .piechart-tab.active {
     background-color: darkblue;
     color: white;
     }
@@ -259,10 +306,10 @@ max-width: 120%;
       justify-content: flex-start;
       align-items: flex-start;
       
-    }
+    } */
     
     /*Graph selection*/
-    .piechart-graphs {
+    /* .piechart-graphs {
       display: flex;
       flex-direction: column;
       width: 100px;
@@ -280,10 +327,10 @@ max-width: 120%;
     
     .piechart-graph.active {
       font-weight: bold;
-    }
+    } */
     
     /*Where the charts are*/
-    .piegraph-content {
+    /* .piegraph-content {
       display: flex;
       height: 90%;
       
@@ -293,7 +340,7 @@ max-width: 120%;
       margin-left: 10px;
       flex: 1;
       
-    }
+    } */
     
     .right-menu {
       
@@ -389,19 +436,17 @@ max-width: 120%;
   margin-right: 20px;
 }
 /* Investment Graphs Display */
-.tab {
+/* .tab {
     float: left;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-    width: 30%;
+    width: 10%;
     height: 500px;
     height: 31.25rem;
-}
+} */
     
-.tab button {
+/* .tab button {
     display: block;
     background-color: inherit;
-    color: black;
+    color: white;
     padding: 22px 16px;
     width: 100%;
     border: none;
@@ -409,30 +454,60 @@ max-width: 120%;
     text-align: left;
     cursor: pointer;
     transition: 0.3s;
-}
+    overflow: hidden;
+} */
 
-.tab button:hover {
+/* .tab button:hover {
     background-color: #ddd;
 }
 
 .tab button.active {
-    background-color: #ccc;
-}
+    font-weight: bold;
+} */
 
-.tabcontent {
+/* .tabcontent {
     float: left;
     padding: 0px 12px;
-    border: 1px solid #ccc;
-    width: 70%;
+    border: 1px solid #ccc !important;
+    width: 90%;
     border-left: none;
     height: 500px;
     height: 31.25rem;
+} */
+
+/* .investment-graphs {
+    position: absolute;
+    left: 5rem;
+    right: 5rem;
+} */
+
+/* .investment-pie {
+    margin: auto;
+} */
+
+.investment-return-positive {
+    display: inline-block;
+    margin-right: 1rem;
+    color: lightgreen;
 }
 
-.investment-graphs {
-    height: 1000px;
+.investment-return-negative {
+    display: inline-block;
+    margin-right: 1rem;
+    color: red;
 }
-    
+ 
+.graph-select {
+    color: #000000 !important;
+    float: left;
+    overflow: hidden;
+    width: 10rem;
+    margin-top: 10px;
+    margin-top: 0.625rem;
+}
+
+.select-option {
+}
  
 .about-page {
   text-align: center;
@@ -440,19 +515,25 @@ max-width: 120%;
 
 .txt-about-us {
   font-family: 'Outfit', sans-serif;
-  font-size: 3rem;
+  opacity: 0.75;
+  font-size: 2.25rem; /* 36px */
+  line-height: 2.5rem; /* 40px */
   margin-top: 2rem;
 }
 
 .txt-monitoring-finances {
   font-family: 'Outfit', sans-serif;
-  font-size: 2rem;
+  font-size: 3rem; /* 48px */
+  line-height: 1;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
 
 .txt-link-assets {
   font-family: 'Outfit', sans-serif;
-  font-size: 2rem;
+  font-size: 1.5rem; /* 24px */
+  line-height: 2rem; /* 32px */
+  font-weight: 300;
   margin-bottom: 1rem;
 }
 
@@ -486,3 +567,11 @@ max-width: 120%;
   position: relative;
   
 }
+
+/* .balance-graph {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+} */

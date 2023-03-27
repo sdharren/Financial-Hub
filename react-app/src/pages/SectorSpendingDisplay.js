@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BarGraph from "./BarGraph";
+import BarGraph from "../dahsboard_components/BarGraph";
 
 function BarChartDisplay() {
     const [graph, setGraph] = useState(<BarGraph endpoint={"sector_spending"} loadNext={handleLoadNext}/>);
@@ -26,7 +26,7 @@ function BarChartDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className='w-full'>
             <button onClick={handleLoadPrevious}>
                 Go Back
             </button>

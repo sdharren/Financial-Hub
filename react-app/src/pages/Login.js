@@ -15,10 +15,10 @@ fields.forEach(field => fieldState[field.id] = '');
 
 const Login = () => {
 
-  let {loginUser} = useContext(AuthContext);
+  let {loginUser, error} = useContext(AuthContext);
 
   let form2 = (
-    <div class="signup-container">
+    <div class="login-container mt-20 mb-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
         <Header
             heading = "Login to your account"
             paragraph= "Don't have an account yet? "
@@ -41,7 +41,7 @@ const Login = () => {
                                 isRequired={field.isRequired}
                                 placeholder={field.placeholder}
                             />
-                            <p class = {"error " + field.name + "-error"}></p>
+                            <p className = {"error " + field.name + "-error"}>{error}</p>
                         </div>
                     )  
                 }
