@@ -14,7 +14,7 @@ const tabGraphData = {
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
   ],
   Stocks: [
-    { name: 'Graph 1', content: <InvestmentGraphs/>}
+    { name: 'All graphs', content: <InvestmentGraphs/>}
   ],
   Banks: [
     { name: 'Balance', content: <Balances /> },
