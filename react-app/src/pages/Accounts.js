@@ -50,7 +50,7 @@ function Accounts() {
     const handleRemoveBank = async (institution) => {
       try {
         
-        const delstockurl = `http://127.0.0.1:8000/api/delete_linked_bank/${institution}/`
+        const delstockurl = `http://127.0.0.1:8000/api/delete_linked_banks/${institution}/`
         const response = await fetch(delstockurl, {
           method: 'DELETE',
           headers: {
