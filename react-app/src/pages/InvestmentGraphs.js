@@ -132,7 +132,7 @@ function InvestmentGraphs() {
                         </div>
                     );
                     changeTabActive(endpoint);
-                }
+
                 break;
         }
     }

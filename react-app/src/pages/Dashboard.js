@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
 import BalancesDisplay from './BalancesDisplay';
-import RecentTransactions from '../dahsboard_components/RecentTransactionsDisplay';
+import RecentTransactions from './RecentTransactionsDisplay';
 import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
-import BarChartDisplay from './SectorSpending';
+import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
 
 
@@ -16,9 +16,9 @@ const tabGraphData = {
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
   ],
   Banks: [
-    { name: 'Balance', content: <Balances /> },
-    { name: 'Recent Transactions', content: <Transactions /> },
-    { name: 'Currency', content: <Currency /> },
+    { name: 'Balance', content: <BalancesDisplay /> },
+    { name: 'Recent Transactions', content: <RecentTransactions /> },
+    { name: 'Currency', content: <CurrencyDisplay /> },
     { name: 'Bar Chart', content: <BarChart /> },
     { name: 'Sector Spending', content: <BarChartDisplay /> }
   ],
@@ -64,10 +64,10 @@ function Dashboard() {
       { name: 'Graph 1', content: <InvestmentGraphs/>}
     ],
     Banks: [
-      { name: 'Balance', content: <Balances /> },
-      { name: 'Transaction', content: <Transactions /> },
-      { name: 'Currency', content: <Currency /> },
-      { name: 'Bar Chart', content: <BarChart /> },
+      { name: 'Balance Breakdown', content: <BalancesDisplay /> },
+      { name: 'Recent Transaction', content: <RecentTransactions /> },
+      { name: 'Currency Breakdown', content: <CurrencyDisplay /> },
+      { name: 'Spending Habits', content: <BarChart /> },
     ],
     Crypto: [
       { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
