@@ -20,22 +20,13 @@ from assetManager.tests.helpers import LogInTester
 
 class OverallGraphViewTestCase(TestCase, LogInTester):
     """Tests of the views for overall assets pie graph."""
+    fixtures = [
+        'assetManager/tests/fixtures/users.json',
+    ]
 
     def setUp(self):
         self.factory = RequestFactory()
-        User = get_user_model()
-        users = User.objects.all()
-        self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'email': 'janedoe@example.org',
-            'password': 'Password123',
-            'password_confirmation':
-            'Password123'
-        }
-        self.url = reverse('sign_up')
-        self.client.post(self.url, self.form_input, follow=True)
-        self.user = User.objects.get(email='janedoe@example.org')
+        self.user = User.objects.get(email='johndoe@example.org')
 
     def tearDown(self):
         cache.clear()

@@ -21,10 +21,6 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='index.html')),
-    path('connect_investments/', views.connect_investments, name='connect_investments'),
-    path('sign_up/', views.sign_up, name='sign_up'),
-    path('log_in/', views.log_in, name='log_in'),
     path('link_sandbox_investments/', views.link_sandbox_investments),
-    path('api/cache_assets_hardcoded/', views.setup_asset_data), #NOTE: this url should be removed later - real one in api/views
     path('api/', include('assetManager.api.urls')),
 ]

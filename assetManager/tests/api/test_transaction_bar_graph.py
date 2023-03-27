@@ -20,6 +20,9 @@ from assetManager.tests.helpers import LogInTester
 
 class BarGraphViewTestCase(TestCase, LogInTester):
     """Tests of the views for transactions bar graph."""
+    fixtures = [
+        'assetManager/tests/fixtures/users.json',
+    ]
 
     def create_public_token(self):
         plaid_wrapper = SandboxWrapper()
@@ -30,19 +33,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
-        User = get_user_model()
-        users = User.objects.all()
-        self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'email': 'janedoe@example.org',
-            'password': 'Password123',
-            'password_confirmation':
-            'Password123'
-        }
-        self.url = reverse('sign_up')
-        self.client.post(self.url, self.form_input, follow=True)
-        self.user = User.objects.get(email='janedoe@example.org')
+        self.user = User.objects.get(email='johndoe@example.org')
 
     def tearDown(self):
         cache.clear()
