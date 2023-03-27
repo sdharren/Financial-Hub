@@ -64,10 +64,10 @@ function Dashboard() {
       { name: 'Graph 1', content: <InvestmentGraphs/>}
     ],
     Banks: [
-      { name: 'Balance', content: <BalancesDisplay /> },
-      { name: 'Transaction', content: <RecentTransactions /> },
-      { name: 'Currency', content: <CurrencyDisplay /> },
-      { name: 'Bar Chart', content: <BarChart /> },
+      { name: 'Balance Breakdown', content: <BalancesDisplay /> },
+      { name: 'Recent Transactions', content: <RecentTransactions /> },
+      { name: 'Currency Breakdown', content: <CurrencyDisplay /> },
+      { name: 'Spending Habits', content: <BarChart /> },
     ],
     Crypto: [
       { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },

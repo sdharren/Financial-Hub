@@ -227,7 +227,7 @@ function InvestmentGraphs() {
                     Category
                     </button>
                 <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center" + (stocksActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('stock_history')}>
-                    Stocks?
+                    Stock Breakdown
                 </button>
             </div>
 
