@@ -157,16 +157,16 @@ export default function RecentTransactions() {
   }
 
   const renderTableData = () => {
-    // return transactions.map(({ amount, date, category, merchant }) => {
-    return transactionss['Royal Bank of Scotland - Current Accounts'].map(({ amount, date, category, merchant}) => {
+    return transactions.map(({ amount, date, category, merchant }) => {
+    // return transactionss['Royal Bank of Scotland - Current Accounts'].map(({ amount, date, category, merchant}) => {
     
       return (
         <tr className='w-full table table-fixed' key={merchant}>
           <td className='text-left py-3 px-4 text-white'>{merchant}</td>
           <td className='text-left py-3 px-4'>{category.join(', ')}</td>
           <td className='text-left py-3 px-4 text-white'>{amount}</td>
-          {/* <td className='text-left py-3 px-4'>{date}</td> */}
-          <td className='text-left py-3 px-4'>{date.toLocaleDateString()}</td>
+          <td className='text-left py-3 px-4'>{date}</td>
+          {/* <td className='text-left py-3 px-4'>{date.toLocaleDateString()}</td> */}
         </tr>
       );
     })
