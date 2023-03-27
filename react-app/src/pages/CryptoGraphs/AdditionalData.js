@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 const CAdditional = () => {
     let {authTokens, logoutUser} = useContext(AuthContext);
-    const [AdditionalData, setAdditionalData] = useState(null);
+    const [AdditionalData, setAdditionalData] = useState({});
     const navigate = useNavigate()
     /*
     const data = {
@@ -28,6 +28,7 @@ const CAdditional = () => {
         let respData = await response.json();
         if (response.status === 200) {
             setAdditionalData(respData);
+            console.log(respData);
         }
         else if (response.status === 303) {
             if (respData['error'] === 'Investments not linked.') {
@@ -37,16 +38,16 @@ const CAdditional = () => {
     }
   
     useEffect(() => {
-      console.log("hello");  
+      
       get_data();
         
-        let data = new Array();
-        for (let key in AdditionalData) {
+      let data = new Array();
+      for (let key in AdditionalData) {
             data.push ({
                 title: AdditionalData[key],
                 value: AdditionalData[key][1]
             })
-
+            console.log(data);
             setAdditionalData(data);
         }
 

@@ -62,21 +62,26 @@ class getUsableCrypto:
         return value
 
 # When run collect data for all addresses listed
-def getAllCryptoData(addresses):
+def getAllCryptoData(user):
     data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
-    btcAddresses = addresses.get("btc", None)
-    ethAddresses = addresses.get("eth", None)
+    btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
+    ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
 
     if(btcAddresses != None):
-        for addr in btcAddresses:
+        for account in btcAddresses:
+            addr = account.access_token
+
             value = getCryptoAddressData.BTC_all(addr)
+            print(value)
             arrVal = [value, "btc"]
 
             data[addr] = arrVal
 
     if(ethAddresses != None):
-        for addr in ethAddresses:
+        for account in ethAddresses:
+            addr = account.access_token
+
             value = getCryptoAddressData.ETH_all(addr)
             arrVal = [value, "eth"]
 
@@ -91,7 +96,7 @@ def getAlternateCryptoData(user, command):
 
     btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
     ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
-    print(command)
+
     if(btcAddresses != None):
         for account in btcAddresses:
             addr = account.access_token
