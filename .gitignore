@@ -168,3 +168,6 @@ bower_components
 psd
 thumb
 sketch
+
+/node_modules
+/coverage
