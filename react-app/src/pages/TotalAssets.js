@@ -10,7 +10,7 @@ function TotalAssetsDisplay({handleClicked}) {
     }
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div>
             {graph}
         </div>
     );

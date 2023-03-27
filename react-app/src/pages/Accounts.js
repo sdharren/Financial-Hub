@@ -83,35 +83,39 @@ function Accounts() {
   };
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Remove</th>
+    <div className='signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600'>
+    <div className='overflow-hidden rounded border-gray-200'>
+    <table className="transaction-table flex flex-col w-full h-[60vh] bg-transparent">
+    <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
+    <tr className='w-full table table-fixed'>
+          <th className='text-left py-3 px-4 uppercase font-semibold text-sm'>Name</th>
+          <th className='text-left py-3 px-4 uppercase font-semibold text-sm'>Type</th>
+          <th className='text-left py-3 px-4 uppercase font-semibold text-sm'>Remove</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody className='text-violet-300 flex-auto block overflow-y-scroll'>
         {banks.map(bank => (
-          <tr key={bank}>
-            <td>{bank}</td>
-            <td>Institution</td>
-            <td>
+          <tr className='w-full table table-fixed' key={bank}>
+            <td className='text-left py-3 px-4 text-white'>{bank}</td>
+            <td className='text-left py-3 px-4'>Institution</td>
+            <td className='text-left py-3 px-4 text-white'>
               <button onClick={() => handleRemoveBank(bank)}>Remove</button>
             </td>
           </tr>
         ))}
         {brokerages.map(brokerage => (
-          <tr key={brokerage}>
-            <td>{brokerage}</td>
-            <td>Brokerage</td>
-            <td>
+          <tr key={brokerage} className='w-full table table-fixed'>
+            <td className='text-left py-3 px-4 text-white'>{brokerage}</td>
+            <td className='text-left py-3 px-4'>Brokerage</td>
+            <td className='text-left py-3 px-4 text-white'>
               <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
+    </div>
+    </div>
   );
 }
 

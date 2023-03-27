@@ -34,7 +34,8 @@ import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
 
 function App() {
   return (
-    <div>
+    <div className = "bg-[url('./images/background-image.png')]">
+      <div className= 'mx-20 max-w-full min-h-screen'>
       <Router>
         <AuthProvider>
           <Navbar />
@@ -66,6 +67,7 @@ function App() {
 
         </AuthProvider>
       </Router>
+      </div>
     </div>
   );
 }

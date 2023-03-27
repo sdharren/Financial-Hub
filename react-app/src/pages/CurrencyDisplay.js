@@ -19,7 +19,7 @@ function CurrencyDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className="">
             {graph}
         </div>
     );

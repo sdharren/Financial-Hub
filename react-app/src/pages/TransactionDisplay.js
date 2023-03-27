@@ -34,12 +34,12 @@ function BarChartDisplay() {
 
 
     return (
-        <div style={{width: '45rem', margin: 'auto', padding: '2rem'}}>
+        <div className='w-full'>
             <button onClick={handleLoadPrevious}>
                 Go Back
             </button>
             {graph}
-            <DropDown onChange={handleOnChange}/>
+            <DropDown className='' onChange={handleOnChange}/>
         </div>
     );
 }

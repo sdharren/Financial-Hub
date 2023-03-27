@@ -11,7 +11,7 @@ function GraphSelect ({ options, handleSelectionUpdate, selectedOption }) {
     );
     
     return (
-        <select className="graph-select" onChange={(event) => handleSelectionUpdate(event.target.value) }>
+        <select className="graph-selec bg-transparent" onChange={(event) => handleSelectionUpdate(event.target.value) }>
             {options.map(o => (
                     o === selectedOption ? 
                     <option className="select-option" key={o} value={o} selected={true} disabled={true}>{o}</option> :

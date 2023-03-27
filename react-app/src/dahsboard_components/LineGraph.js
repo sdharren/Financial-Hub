@@ -104,7 +104,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
 
 
       return (
-        <div>
+        <div className='flex flex-col w-full max-h-[30vh]'>
             {
                 selectOptions === undefined || selectOptions === null
                 ? null
@@ -113,7 +113,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             {
             lineChartData === null ?
             <p>Loading...</p> :
-            <Chart options={options} series={series} type = "area" />
+            <Chart className = 'pt-2' height = "420vh" options={options} series={series} type = "area" />
             }
         </div>
       )
