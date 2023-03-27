@@ -115,3 +115,21 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         institutions = response.json()
         self.assertEqual(len(institutions), 1)
+
+    def test_delete_same_institution_name_different_type(self):
+        self.account_type = AccountType.objects.create(
+            user=self.user,
+            account_asset_type=AccountTypeEnum.DEBIT,
+            access_token='access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349972',
+            account_institution_name=self.brokerage,
+        )
+        before_count = AccountType.objects.count()
+        url = reverse('delete_linked_banks', kwargs={'institution': self.account_type.account_institution_name})
+        response = self.client.delete(url)
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count - 1, after_count)
+
+        deleted_institution = AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.STOCK, account_institution_name=self.brokerage)
+        self.assertEqual(len(deleted_institution),1)
+        not_deleted_institution = AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT, account_institution_name=self.brokerage)
+        self.assertEqual(len(not_deleted_institution),0)
