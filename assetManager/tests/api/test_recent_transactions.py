@@ -25,6 +25,13 @@ class RecentTransactionsViewsTestCase(TestCase):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(self.user, ['transactions'])
 
+    def create_custom_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user(bank_id='ins_1')
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
+
     def tearDown(self):
         cache.clear()
 
@@ -52,7 +59,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response.status_code,405)
 
     def test_get_recent_transactions_with_non_linked_institution_name(self):
-        response = self.client.get('/api/recent_transactions/?param=HSBC UK')
+        response = self.client.get('/api/recent_transactions/')
         self.assertEqual(response.status_code, 303)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
@@ -61,7 +68,7 @@ class RecentTransactionsViewsTestCase(TestCase):
     def test_get_recent_transactions_with_correctly_linked_institution(self):
         self.create_public_token()
         self.assertFalse(cache.has_key('transactions' + self.user.email))
-        response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
+        response = self.client.get('/api/recent_transactions/')
         self.assertEqual(response.status_code, 200)
 
         response_data = response.json()
@@ -85,7 +92,7 @@ class RecentTransactionsViewsTestCase(TestCase):
             account_institution_name = 'HSBC',
         )
 
-        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        response = self.client.get('/api/recent_transactions/')
         self.assertEqual(response.status_code, 303)
 
         response_data = response.json()
@@ -101,18 +108,45 @@ class RecentTransactionsViewsTestCase(TestCase):
             account_institution_name = 'HSBC',
         )
 
-        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        response = self.client.get('/api/recent_transactions/')
         self.assertEqual(response.status_code, 303)
 
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
 
-    def test_recent_transactions_with_no_cache_no_access_token(self):
+    def test_get_recent_transactions_no_institutions_linked(self):
         settings.PLAID_DEVELOPMENT = True
-        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        response = self.client.get('/api/recent_transactions/')
         self.assertEqual(response.status_code, 303)
 
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Transactions Not Linked.')
+
+    def test_get_recent_transactions_multiple_institutions(self):
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.create_public_token()
+        self.create_custom_public_token()
+        response = self.client.get('/api/recent_transactions/')
+        self.assertEqual(response.status_code, 200)
+
+        response_data = response.json()
+        self.assertEqual(len(list(response_data.keys())),2)
+        self.assertEqual(list(response_data.keys())[0], 'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(response_data.keys())[1], 'Bank of America')
+
+        self.assertTrue(datetime.strptime(response_data['Royal Bank of Scotland - Current Accounts'][0]['date'], '%Y-%m-%d').date() <= date.today())
+        self.assertTrue(datetime.strptime(response_data['Bank of America'][0]['date'], '%Y-%m-%d').date() <= date.today())
+
+        if(len(response_data['Royal Bank of Scotland - Current Accounts']) > 0):
+            self.assertTrue('amount' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+            self.assertTrue('date' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+            self.assertTrue('category' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+            self.assertTrue('merchant' in response_data['Royal Bank of Scotland - Current Accounts'][0])
+
+        if(len(response_data['Bank of America']) > 0):
+            self.assertTrue('amount' in response_data['Bank of America'][0])
+            self.assertTrue('date' in response_data['Bank of America'][0])
+            self.assertTrue('category' in response_data['Bank of America'][0])
+            self.assertTrue('merchant' in response_data['Bank of America'][0])
