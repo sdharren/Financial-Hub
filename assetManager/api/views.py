@@ -208,7 +208,6 @@ def exchange_public_token(request):
         return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
 
-    #wrapper = DevelopmentWrapper()
     if settings.PLAID_DEVELOPMENT:
         wrapper = DevelopmentWrapper()
     else:
@@ -223,7 +222,6 @@ def exchange_public_token(request):
     except InvalidPublicToken as e:
         return Response({'error': 'Bad request. Invalid public token.'}, status=400)
 
-    #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
     token = wrapper.get_access_token()
 
@@ -231,10 +229,8 @@ def exchange_public_token(request):
         #update balances cache if it exists
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
-
-    #write a function in helpers it takes an access token, queries plaid for that access token and if
-    #single institution thingy
-    #check duplicate for institution should be done in save access_token
+        set_single_institution_transactions(token,wrapper,request.user)
+        
     return Response(status=200)
 
 """

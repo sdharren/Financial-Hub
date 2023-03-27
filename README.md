@@ -1,6 +1,6 @@
-#🏦 Financial-Hub - 5CCS2SEG Major Group Project - Software Savant's repository for a financial hub to track personal financial assets
+#🏦 Financial-Hub - 5CCS2SEG Major Group Project - Software Savant's repository for a financial hub to track personal financial assets#
 
-##👋 Welcome to [NAME OF PROJECT]
+##👋 Welcome to [NAME OF PROJECT]##
 Thank you for choosing our Financial-Hub Django and React web application to track your personal financial assets.
 
 Our application is designed to provide users with a comprehensive overview of their financial status, including investments, general spending, and cryptocurrency assets such as Bitcoin and Ethereum. We have integrated several APIs, including Plaid, BlockCypher, ForexPython, and YFinance, to enable users to link a range of financial institutions and crypto wallets, view their financial data in various types of charts, and gain valuable insights into their finances.
@@ -11,7 +11,7 @@ To improve the performance of our application, we have implemented a caching sys
 
 We are confident that our Financial-Hub web application will provide you with the tools you need to manage your finances effectively. Thank you for choosing to use [NAME OF PROJECT].
 
-##💻 Instructions For Local Repository And Testing
+##💻 Instructions For Local Repository And Testing##
 
 1. Git pull our repository:
 ```
@@ -42,7 +42,7 @@ python3 manage.py test
 
 7. IMPORTANT NOTE: The tests in the backend make a substantial number of calls to the various APIs. If the tests are called too many times in a row, this could cause a NUMBER_OF_CALLS exceed error from the various APIs. Although these exceptions would be caught by the application when running, due to the extensive number of calls, it is required that testing the application should not be done in short frequencies. The test suite on average takes 10 minutes to run all tests.
 
-##📈 Local Deployment of the Application [Project Testers]
+##📈 Local Deployment of the Application [Project Testers]##
 Assuming you have the team's submitted zip file version of the project, there is one notable difference we ask to verify. Go to **settings.py** in financeHub and please ensure that only on the local version of the application the variable **PLAID_DEVELOPMENT** is set to **False**.
 
 ***The deployed version of the application on Heroku will have this variable set to True, but for the next instructions, please ensure on your local repo that this variable is False.***

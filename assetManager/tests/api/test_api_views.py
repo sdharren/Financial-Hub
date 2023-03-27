@@ -139,8 +139,6 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(before_count,after_count)
 
 
-
-
     def test_put_cache_assets_works_sandbox_environment(self):
         #cache.delete('investments' + self.user.email)
         # setup investments
@@ -293,7 +291,7 @@ class APIViewsTestCase(TestCase):
         cache.set('currency' + self.user.email,{'GBP': 75.0, 'USD':25.0})
         cache.set('balances' + self.user.email,{'HSBC':{'BPq1BWz6ydUQXr1p53L8ugoWqKrjpafzQj8r9':{'name': 'Custom Account Checking', 'available_amount': 1000.0, 'current_amount': 1000.0, 'type': 'depository', 'currency': 'EUR'}}})
         cache.set('product_link' + self.user.email, ['transactions'])
-
+        cache.set('transactions' + self.user.email,{'HSBC': [{'authorized_date': [2023, 3, 26], 'date': [2023, 3, 27], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 3, 26], 'date': [2023, 3, 26], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}]})
         before_count = AccountType.objects.count()
         wrapper = SandboxWrapper()
         public_token = wrapper.create_public_token()
@@ -307,7 +305,31 @@ class APIViewsTestCase(TestCase):
 
         currency = cache.get('currency' + self.user.email)
         balances = cache.get('balances' + self.user.email)
+        transactions = cache.get('transactions' +  self.user.email)
+        transactions_keys = list(transactions.keys())
+        self.assertEqual(len(transactions_keys),2)
+        self.assertTrue(transactions_keys[0] == 'HSBC' or transactions_keys[0] == 'Royal Bank of Scotland - Current Accounts')
+        self.assertTrue(transactions_keys[1] == 'HSBC' or transactions_keys[1] == 'Royal Bank of Scotland - Current Accounts')
+        first_transaction = transactions[transactions_keys[0]][0]
+        first_transaction_keys = list(first_transaction.keys())
+        second_transaction = transactions[transactions_keys[1]][0]
+        second_transaction_keys = list(second_transaction.keys())
 
+        self.assertTrue('authorized_date' in first_transaction_keys)
+        self.assertTrue('date' in first_transaction_keys)
+        self.assertTrue('amount' in first_transaction_keys)
+        self.assertTrue('category' in first_transaction_keys)
+        self.assertTrue('name' in first_transaction_keys)
+        self.assertTrue('iso_currency_code' in first_transaction_keys)
+        self.assertTrue('merchant_name' in first_transaction_keys)
+
+        self.assertTrue('authorized_date' in second_transaction_keys)
+        self.assertTrue('date' in second_transaction_keys)
+        self.assertTrue('amount' in second_transaction_keys)
+        self.assertTrue('category' in second_transaction_keys)
+        self.assertTrue('name' in second_transaction_keys)
+        self.assertTrue('iso_currency_code' in second_transaction_keys)
+        self.assertTrue('merchant_name' in second_transaction_keys)
 
         self.assertEqual(len(list(currency.keys())),2)
         self.assertEqual(list(currency.keys())[0],'EUR')
@@ -348,13 +370,28 @@ class APIViewsTestCase(TestCase):
 
         self.assertTrue(cache.has_key('balances' + self.user.email))
         self.assertTrue(cache.has_key('currency' + self.user.email))
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
 
         currency = cache.get('currency' + self.user.email)
         balances = cache.get('balances' + self.user.email)
+        transactions = cache.get('transactions' + self.user.email)
 
         self.assertEqual(len(list(currency.keys())),1)
         self.assertEqual(list(currency.keys())[0],'GBP')
         self.assertEqual(currency['GBP'],100.0)
+
+        self.assertEqual(len(list(transactions.keys())),1)
+        self.assertTrue(len(transactions[list(transactions.keys())[0]]) >= 1)
+        first_transaction = transactions[list(transactions.keys())[0]][0]
+        first_transaction_keys = list(first_transaction.keys())
+
+        self.assertTrue('authorized_date' in first_transaction_keys)
+        self.assertTrue('date' in first_transaction_keys)
+        self.assertTrue('amount' in first_transaction_keys)
+        self.assertTrue('category' in first_transaction_keys)
+        self.assertTrue('name' in first_transaction_keys)
+        self.assertTrue('iso_currency_code' in first_transaction_keys)
+        self.assertTrue('merchant_name' in first_transaction_keys)
 
         self.assertEqual(len(list(balances.keys())),1)
         self.assertEqual(list(balances.keys())[0],'Royal Bank of Scotland - Current Accounts')
@@ -364,6 +401,7 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('current_amount' in balances['Royal Bank of Scotland - Current Accounts'][account])
             self.assertTrue('type' in balances['Royal Bank of Scotland - Current Accounts'][account])
             self.assertTrue('currency' in balances['Royal Bank of Scotland - Current Accounts'][account])
+
 
     def test_post_exchange_public_token_redirects_with_no_cached_products(self):
         cache.clear()
