@@ -24,6 +24,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
     ]
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.user = User.objects.get(email='johndoe@example.org')
         self.client = APIClient()
         self.client.login(email=self.user.email, password='Password123')
@@ -40,7 +41,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         )
 
     def test_delete_linked_banks_with_valid_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         
         institutions_number_change = self.client.get(reverse("get_linked_banks"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
@@ -64,7 +65,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertFalse(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_delete_linked_banks_with_invalid_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+      
         url = reverse('delete_linked_banks', kwargs={'institution': 'Non-existent bank'})
         response = self.client.delete(url)
 
@@ -72,7 +73,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_delete_linked_banks_with_unauthenticated_user(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         self.client.credentials()
         url = reverse('delete_linked_banks', kwargs={'institution': self.institution})
         response = self.client.delete(url)
@@ -81,7 +82,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_delete_linked_banks_with_wrong_method(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         url = reverse('delete_linked_banks', kwargs={'institution': self.institution})
         response = self.client.get(url)
 
@@ -89,7 +90,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
     
     def test_add_delete_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         # Add institution
         institution_name_add = "Bank of America"
         AccountType.objects.create(
@@ -119,3 +120,21 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         institutions = response.json()
     
         self.assertEqual(len(institutions), 1)
+
+    def test_delete_same_institution_name_different_type(self):
+        self.account_type = AccountType.objects.create(
+            user=self.user,
+            account_asset_type=AccountTypeEnum.STOCK,
+            access_token='access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349972',
+            account_institution_name=self.institution,
+        )
+        before_count = AccountType.objects.count()
+        url = reverse('delete_linked_banks', kwargs={'institution': self.account_type.account_institution_name})
+        response = self.client.delete(url)
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count - 1, after_count)
+
+        deleted_institution = AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT, account_institution_name=self.institution)
+        self.assertEqual(len(deleted_institution),0)
+        not_deleted_institution = AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.STOCK, account_institution_name=self.institution)
+        self.assertEqual(len(not_deleted_institution),1)
