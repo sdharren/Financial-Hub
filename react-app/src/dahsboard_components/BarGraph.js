@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import AuthContext from '../context/AuthContext';
-
-
+import React, { useRef, useContext } from 'react';
+import usePlaid from '../custom_hooks/usePlaid';
+import { Bar, getElementsAtEvent } from 'react-chartjs-2';
 import{ Chart as ChartJS,
   BarElement,
   CategoryScale,
@@ -9,8 +8,9 @@ import{ Chart as ChartJS,
   Tooltip,
   Legend,
   Colors
-} from 'chart.js'
-import { Bar, getElementsAtEvent } from 'react-chartjs-2';
+} from 'chart.js';
+
+
 ChartJS.register(
   BarElement,
   CategoryScale,
@@ -21,27 +21,8 @@ ChartJS.register(
 );
 
 function BarGraph({endpoint, endpoint_parameter, loadNext}) {
-  let {authTokens, logoutUser} = useContext(AuthContext);
-  const [barChartData, setBarChartData] = useState(null);
-
-  let get_data = async() =>  {
-    let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
-    let response = await fetch(url, {
-        method:'GET',
-        headers:{
-            'Content-Type':'application/json',
-            'Authorization':'Bearer ' + String(authTokens.access)
-        }
-    });
-    let data = await response.json();
-    if (response.status === 200) {
-        setBarChartData(data);
-    }
-}
-
-useEffect(() => {
-  get_data();
-}, [endpoint]);
+  
+  const [barChartData, error] = usePlaid({endpoint, endpoint_parameter, loadNext});
 
   let bar_data = [];
   let bar_labels = [];
@@ -49,9 +30,6 @@ useEffect(() => {
       bar_labels.push(barChartData[key].name);
       bar_data.push(barChartData[key].value);
   }
-  // console.log(bar_labels);
-  // console.log(bar_data);
-
 
   const options = {
     plugins: {

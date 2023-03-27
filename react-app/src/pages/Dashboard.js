@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
-import Balances from './Balances';
-import Transactions from './RecentTransactionsDisplay';
-import Currency from './Currency';
+import BalancesDisplay from './BalancesDisplay';
+import RecentTransactions from '../dahsboard_components/RecentTransactionsDisplay';
+import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpending';
+import TotalAssetsDisplay from './TotalAssets';
 
 
 const tabGraphData = {
@@ -32,18 +33,48 @@ const tabGraphData = {
   ],
 };
 
-const lastGraphBorder = (tabName) => {
-    // if (tabName === '')
-}
+
 
 function Dashboard() {
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
 
-  const [activeGraphPie, setActiveGraphPie] = useState('Graph 1');
+  const [activeGraphPie, setActiveGraphPie] = useState('Total Asset Breakdown');
 
   const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
 
+  function handleClicked(event){
+    console.log(event.next)
+    if (event.next==="Bank Assets"){
+      handlePieTabClick('Banks')
+    }
+    else if (event.next==="Crypto Assets"){
+      handlePieTabClick('Crypto')
+    }
+    else{
+      handlePieTabClick('Stocks')
+    }
+  }
+  
+  const tabGraphData = {
+    Overall: [
+      { name: 'Total Asset Breakdown', content:<TotalAssetsDisplay handleClicked={handleClicked}/> },
+    ],
+    Stocks: [
+      { name: 'Graph 1', content: <InvestmentGraphs/>}
+    ],
+    Banks: [
+      { name: 'Balance', content: <Balances /> },
+      { name: 'Transaction', content: <Transactions /> },
+      { name: 'Currency', content: <Currency /> },
+      { name: 'Bar Chart', content: <BarChart /> },
+    ],
+    Crypto: [
+      { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
+      { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
+      { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
+    ],
+  };
 
   const handlePieTabClick = (tabName) => {
     if (tabName === 'Stocks') {

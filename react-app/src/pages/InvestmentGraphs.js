@@ -1,5 +1,5 @@
-import PieChart from "./PieChart";
-import LineGraph from "./LineGraph";
+import PieChart from "../dahsboard_components/PieChart";
+import LineGraph from "../dahsboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
@@ -41,8 +41,8 @@ function InvestmentGraphs() {
     // update the GraphSelect options (called every time a graph is rendered/re-rendered)
     async function updateOptions() {
         let options = {
-            'investments': [],
-            'categories': []
+            'investments': investmentOptions,
+            'categories': categoryOptions
         }
         // on the first render investmentOptions and categoryOptions are not set
         // if we are in first render - fetch them from the API and return a JSON at the same time as the useState variables would only be usable on next render
@@ -81,8 +81,7 @@ function InvestmentGraphs() {
     // render a graph based on the endpoint supplied
     // endpoint_parameter is optional and is a parameter for the API request
     async function changeGraph(endpoint, endpoint_parameter) {
-        const options = await updateOptions(); 
-        changeTabActive(endpoint);
+        const options = await updateOptions();
 
         switch(endpoint) {
             case 'investment_categories':
@@ -98,6 +97,7 @@ function InvestmentGraphs() {
                         />
                     </div>
                 );
+                changeTabActive(endpoint);
                 break;
 
             case 'investment_category_breakdown':
@@ -127,10 +127,12 @@ function InvestmentGraphs() {
                                 endpoint={endpoint} 
                                 updateGraph={handleGraphUpdate} 
                                 endpoint_parameter={endpoint_parameter} 
-                                selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
+                                selectOptions={ options['categories'] } 
                             />
                         </div>
-                );
+                    );
+                    changeTabActive(endpoint);
+                }
                 break;
         }
     }
@@ -234,6 +236,7 @@ function InvestmentGraphs() {
             </div>
         </div>
     );
-}
+
+};
 
 export default InvestmentGraphs;
