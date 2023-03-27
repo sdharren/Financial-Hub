@@ -52,7 +52,7 @@ export default function About() {
                 <div className='about-caption text-white text-center text-5xl font-bold'>Your go-to app for monitoring your finances</div>
                 <div className='link-message text-white text-center text-2xl font-light'>Just link any of your assets to the dashboard and let us do our magic ✨</div>
             </div>
-            <div className='about-us-cards flex flex-row justify-center gap-3 items-stretch'>
+            {/* <div className='about-us-cards flex flex-row justify-center gap-3 items-stretch'>
                 <div className='crypto-card flex flex-col gap-2'>
                     <div className='crypto-label text-white text-center text-3xl font-medium'>Crypto</div>
                     <img className='rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600' src={etherium} alt="Crypto" /> 
@@ -65,9 +65,38 @@ export default function About() {
                     <div className='stocks-label text-white text-center text-3xl font-medium'>Stocks</div>
                     <img className='rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600' src={buy} alt="Stocks" /> 
                 </div>
+            </div> */}
+            <div className="about-container">
+                <div className="about-box">
+                    <h2>Stocks</h2>
+                    <div className="about-background-box">
+                        <img src={group} alt="#" />
+                        <div className="about-image-box">
+                            <img src={buy} alt="Stocks" />
+                        </div>
+                    </div>
+                </div>
+                <div className="about-box">
+                    <h2>Banks</h2>
+                    <div className="about-background-box">
+                        <img src={group} alt="#" />
+                        <div className="about-image-box">
+                            <img src={ecommerce} alt="Banks" />
+                        </div>
+                    </div>
+                </div>
+                <div className="about-box">
+                    <h2>Crypto</h2>
+                    <div className="about-background-box">
+                        <img src={group} alt="#" />
+                        <div className="about-image-box">
+                            <img src={etherium} alt="Crypto" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
 
-    return page2
+    return page1
 }
