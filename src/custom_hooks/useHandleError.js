@@ -11,6 +11,7 @@ const useHandleError = (error) => {
             alert('Something went wrong. Please try again later.');
         }
         else {
+            console.log(error)
             let errorMessage = error['error']
             if (errorMessage === 'Investments not linked.') {
                 redirectToLink('investments');
