@@ -1,6 +1,6 @@
 
 import React from 'react';
-import '../table.css';
+import '../../table.css';
 
 const transactions = {
   'Royal Bank of Scotland - Current Accounts': [

@@ -58,7 +58,6 @@ class getUsableCrypto:
 
 # When run collect data for all addresses listed
 def getAllCryptoData(addresses):
-    # Command format is getUsable.{function}((data[i]), data[i][-1])
     data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
     btcAddresses = addresses.get("btc", None)

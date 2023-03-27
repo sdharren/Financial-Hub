@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import AuthContext from '../context/AuthContext';
+import AuthContext from '../../context/AuthContext';
 import {useNavigate} from 'react-router-dom';
 
 import {
@@ -26,7 +26,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     const navigate = useNavigate()
 
     let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
+        let url = 'http://127.0.0.1:8000/api/crypto_select_data?param=balance/'
         let response = await fetch(url, {
             method:'GET',
             headers:{
@@ -39,9 +39,8 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
             setPieChartData(data);
         }
         else if (response.status === 303) {
-            //TODO: redirect to plaid link investments
             if (data['error'] === 'Investments not linked.') {
-                navigate('/plaid_link')
+                navigate('/crypto_wallets')
             }
         }
     }
@@ -61,8 +60,10 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     let pie_data = new Array();
     let pie_labels = new Array();
     for (let key in pieChartData) {
-        pie_labels.push(key);
-        pie_data.push(pieChartData[key]);
+        let pieLabel = key + ' - ' + pieChartData[key][0]; 
+        pie_labels.push(pieLabel);
+        var currVal = pieChartData[key][1];
+        pie_data.push(currVal);
     }
 
     const data = {
@@ -107,11 +108,11 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     return (
         <div>
             {
-                endpoint==='investment_categories' 
+                endpoint==='crypto_select_data' 
                 ? null 
                 : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
             }
-            <Pie className='investment-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+            <Pie className='crypto-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
         
     ) 
