@@ -7,10 +7,14 @@ const useApiResult = ({request, endpoint}) => {
 
   useEffect(() => {
     fetch(url, headers).then(async (response) => {
-      if (response.ok) {
-        setData(await response.json());
-        setError(null);
-      } else {
+        if (response.ok) {
+            setData(await response.json());
+            setError(null);
+        } 
+      else if (response.status === 303) {
+        setError(await response.json());
+      }
+      else {
         setError(response.statusText);
       }
     })

@@ -200,8 +200,7 @@ class DebitCard():
         if(not bank_graph_data):
             raise bankDataEmpty()
 
-        first_five_transactions = bank_graph_data[:5]
-        recent_transactions = {}
+        first_five_transactions = bank_graph_data[:10]
         all_transactions = []
         for account in first_five_transactions:
             if(account['date'] != 'Not Provided'):
@@ -213,5 +212,4 @@ class DebitCard():
 
             all_transactions.append(case)
 
-        recent_transactions[institution] = all_transactions
-        return recent_transactions
+        return all_transactions

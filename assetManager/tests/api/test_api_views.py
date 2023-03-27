@@ -6,6 +6,7 @@ from django.conf import settings
 from assetManager.models import User
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import InvestmentsNotLinked
+from assetManager.models import AccountType
 from assetManager.tests.investments.test_stocks import _create_stock_getter_with_fake_data
 from assetManager.api.views import *
 from assetManager.api.views import reformat_balances_into_currency
@@ -138,8 +139,6 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(before_count,after_count)
 
 
-
-
     def test_put_cache_assets_works_sandbox_environment(self):
         #cache.delete('investments' + self.user.email)
         # setup investments
@@ -176,6 +175,7 @@ class APIViewsTestCase(TestCase):
 
         self.assertTrue('USD' in currency.keys())
         self.assertEqual(currency['USD'],100)
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
 
     #extend this
     def test_delete_cache_assets_works(self):
@@ -185,11 +185,14 @@ class APIViewsTestCase(TestCase):
         cache.set('currency' + self.user.email,balances)
         reformatted_transactions = BankGraphData(single_transaction_dict)
         cache.set('transactions' + self.user.email,reformatted_transactions.transactionInsight.transaction_history)
+        total_assets_data = {"Bank Assets": 100.0, "Invested Assets": 100.0, "Crypto Assets": 100.0}
+        cache.set('total_assets'+self.user.email,total_assets_data)
 
         self.assertTrue(cache.has_key('investments' + self.user.email))
         self.assertTrue(cache.has_key('balances' + self.user.email))
         self.assertTrue(cache.has_key('currency' + self.user.email))
         self.assertTrue(cache.has_key('transactions' + self.user.email))
+        self.assertTrue(cache.has_key('total_assets' + self.user.email))
 
         response = self.client.delete('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
@@ -197,6 +200,7 @@ class APIViewsTestCase(TestCase):
         self.assertFalse(cache.has_key('balances' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
         self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('total_assets' + self.user.email))
 
     def test_delete_cache_assets_works_for_some_loaded_keys(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
@@ -292,7 +296,7 @@ class APIViewsTestCase(TestCase):
         cache.set('currency' + self.user.email,{'GBP': 75.0, 'USD':25.0})
         cache.set('balances' + self.user.email,{'HSBC':{'BPq1BWz6ydUQXr1p53L8ugoWqKrjpafzQj8r9':{'name': 'Custom Account Checking', 'available_amount': 1000.0, 'current_amount': 1000.0, 'type': 'depository', 'currency': 'EUR'}}})
         cache.set('product_link' + self.user.email, ['transactions'])
-
+        cache.set('transactions' + self.user.email,{'HSBC': [{'authorized_date': [2023, 3, 26], 'date': [2023, 3, 27], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 3, 26], 'date': [2023, 3, 26], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}]})
         before_count = AccountType.objects.count()
         wrapper = SandboxWrapper()
         public_token = wrapper.create_public_token()
@@ -303,10 +307,35 @@ class APIViewsTestCase(TestCase):
         self.assertFalse(cache.has_key('product_link' + self.user.email))
         self.assertTrue(cache.has_key('balances' + self.user.email))
         self.assertTrue(cache.has_key('currency' + self.user.email))
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
 
         currency = cache.get('currency' + self.user.email)
         balances = cache.get('balances' + self.user.email)
+        transactions = cache.get('transactions' +  self.user.email)
+        transactions_keys = list(transactions.keys())
+        self.assertEqual(len(transactions_keys),2)
+        self.assertTrue(transactions_keys[0] == 'HSBC' or transactions_keys[0] == 'Royal Bank of Scotland - Current Accounts')
+        self.assertTrue(transactions_keys[1] == 'HSBC' or transactions_keys[1] == 'Royal Bank of Scotland - Current Accounts')
+        first_transaction = transactions[transactions_keys[0]][0]
+        first_transaction_keys = list(first_transaction.keys())
+        second_transaction = transactions[transactions_keys[1]][0]
+        second_transaction_keys = list(second_transaction.keys())
 
+        self.assertTrue('authorized_date' in first_transaction_keys)
+        self.assertTrue('date' in first_transaction_keys)
+        self.assertTrue('amount' in first_transaction_keys)
+        self.assertTrue('category' in first_transaction_keys)
+        self.assertTrue('name' in first_transaction_keys)
+        self.assertTrue('iso_currency_code' in first_transaction_keys)
+        self.assertTrue('merchant_name' in first_transaction_keys)
+
+        self.assertTrue('authorized_date' in second_transaction_keys)
+        self.assertTrue('date' in second_transaction_keys)
+        self.assertTrue('amount' in second_transaction_keys)
+        self.assertTrue('category' in second_transaction_keys)
+        self.assertTrue('name' in second_transaction_keys)
+        self.assertTrue('iso_currency_code' in second_transaction_keys)
+        self.assertTrue('merchant_name' in second_transaction_keys)
 
         self.assertEqual(len(list(currency.keys())),2)
         self.assertEqual(list(currency.keys())[0],'EUR')
@@ -315,6 +344,7 @@ class APIViewsTestCase(TestCase):
         self.assertEqual(currency['EUR'],1.83)
         self.assertEqual(currency['GBP'],98.17)
 
+        self.assertEqual(transactions, {'HSBC': [{'authorized_date': [2023, 3, 26], 'date': [2023, 3, 27], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 3, 26], 'date': [2023, 3, 26], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}], 'Royal Bank of Scotland - Current Accounts': [{'authorized_date': [2023, 3, 26], 'date': [2023, 3, 27], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 3, 26], 'date': [2023, 3, 26], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 3, 16], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2023, 3, 13], 'date': [2023, 3, 14], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2023, 3, 11], 'amount': 500.0, 'category': ['Transfer', 'Debit'], 'name': 'Tectra Inc', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 3, 10], 'amount': 2078.5, 'category': ['Transfer', 'Credit'], 'name': 'AUTOMATIC PAYMENT - THANK', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 3, 10], 'amount': 500.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': 'KFC', 'iso_currency_code': 'GBP', 'merchant_name': 'KFC'}, {'authorized_date': 'Not Provided', 'date': [2023, 3, 10], 'amount': 500.0, 'category': ['Shops', 'Supermarkets and Groceries'], 'name': 'Madison Bicycle Shop', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 2, 28], 'date': [2023, 3, 1], 'amount': 25.0, 'category': ['Transfer', 'Debit'], 'name': 'CREDIT CARD 3333 PAYMENT *//', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 2, 28], 'date': [2023, 3, 1], 'amount': 5.4, 'category': ['Travel', 'Taxi'], 'name': 'Uber 063015 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 28], 'amount': 5850.0, 'category': ['Food and Drink', 'Restaurants'], 'name': 'ACH Electronic CreditGUSTO PAY 123456', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 28], 'amount': 1000.0, 'category': ['Transfer', 'Debit'], 'name': 'CD DEPOSIT .INITIAL.', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 2, 26], 'date': [2023, 2, 27], 'amount': 78.5, 'category': ['Recreation', 'Gyms and Fitness Centers'], 'name': 'Touchstone Climbing', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 2, 27], 'date': [2023, 2, 27], 'amount': -500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2023, 2, 26], 'date': [2023, 2, 26], 'amount': 12.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': "McDonald's", 'iso_currency_code': 'GBP', 'merchant_name': "McDonald's"}, {'authorized_date': [2023, 2, 26], 'date': [2023, 2, 26], 'amount': 4.33, 'category': ['Food and Drink', 'Restaurants', 'Coffee Shop'], 'name': 'Starbucks', 'iso_currency_code': 'GBP', 'merchant_name': 'Starbucks'}, {'authorized_date': [2023, 2, 24], 'date': [2023, 2, 25], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 2, 24], 'date': [2023, 2, 24], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 14], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2023, 2, 11], 'date': [2023, 2, 12], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 9], 'amount': 500.0, 'category': ['Transfer', 'Debit'], 'name': 'Tectra Inc', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 8], 'amount': 2078.5, 'category': ['Transfer', 'Credit'], 'name': 'AUTOMATIC PAYMENT - THANK', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 8], 'amount': 500.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': 'KFC', 'iso_currency_code': 'GBP', 'merchant_name': 'KFC'}, {'authorized_date': 'Not Provided', 'date': [2023, 2, 8], 'amount': 500.0, 'category': ['Shops', 'Supermarkets and Groceries'], 'name': 'Madison Bicycle Shop', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 1, 29], 'date': [2023, 1, 30], 'amount': 25.0, 'category': ['Transfer', 'Debit'], 'name': 'CREDIT CARD 3333 PAYMENT *//', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 1, 29], 'date': [2023, 1, 30], 'amount': 5.4, 'category': ['Travel', 'Taxi'], 'name': 'Uber 063015 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 29], 'amount': 5850.0, 'category': ['Food and Drink', 'Restaurants'], 'name': 'ACH Electronic CreditGUSTO PAY 123456', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 29], 'amount': 1000.0, 'category': ['Transfer', 'Debit'], 'name': 'CD DEPOSIT .INITIAL.', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 1, 27], 'date': [2023, 1, 28], 'amount': 78.5, 'category': ['Recreation', 'Gyms and Fitness Centers'], 'name': 'Touchstone Climbing', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 1, 28], 'date': [2023, 1, 28], 'amount': -500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2023, 1, 27], 'date': [2023, 1, 27], 'amount': 12.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': "McDonald's", 'iso_currency_code': 'GBP', 'merchant_name': "McDonald's"}, {'authorized_date': [2023, 1, 27], 'date': [2023, 1, 27], 'amount': 4.33, 'category': ['Food and Drink', 'Restaurants', 'Coffee Shop'], 'name': 'Starbucks', 'iso_currency_code': 'GBP', 'merchant_name': 'Starbucks'}, {'authorized_date': [2023, 1, 25], 'date': [2023, 1, 26], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2023, 1, 25], 'date': [2023, 1, 25], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 15], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2023, 1, 12], 'date': [2023, 1, 13], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 10], 'amount': 500.0, 'category': ['Transfer', 'Debit'], 'name': 'Tectra Inc', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 9], 'amount': 2078.5, 'category': ['Transfer', 'Credit'], 'name': 'AUTOMATIC PAYMENT - THANK', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 9], 'amount': 500.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': 'KFC', 'iso_currency_code': 'GBP', 'merchant_name': 'KFC'}, {'authorized_date': 'Not Provided', 'date': [2023, 1, 9], 'amount': 500.0, 'category': ['Shops', 'Supermarkets and Groceries'], 'name': 'Madison Bicycle Shop', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 30], 'date': [2022, 12, 31], 'amount': 25.0, 'category': ['Transfer', 'Debit'], 'name': 'CREDIT CARD 3333 PAYMENT *//', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 30], 'date': [2022, 12, 31], 'amount': 5.4, 'category': ['Travel', 'Taxi'], 'name': 'Uber 063015 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 30], 'amount': 5850.0, 'category': ['Food and Drink', 'Restaurants'], 'name': 'ACH Electronic CreditGUSTO PAY 123456', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 30], 'amount': 1000.0, 'category': ['Transfer', 'Debit'], 'name': 'CD DEPOSIT .INITIAL.', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 28], 'date': [2022, 12, 29], 'amount': 78.5, 'category': ['Recreation', 'Gyms and Fitness Centers'], 'name': 'Touchstone Climbing', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 29], 'date': [2022, 12, 29], 'amount': -500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 12, 28], 'date': [2022, 12, 28], 'amount': 12.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': "McDonald's", 'iso_currency_code': 'GBP', 'merchant_name': "McDonald's"}, {'authorized_date': [2022, 12, 28], 'date': [2022, 12, 28], 'amount': 4.33, 'category': ['Food and Drink', 'Restaurants', 'Coffee Shop'], 'name': 'Starbucks', 'iso_currency_code': 'GBP', 'merchant_name': 'Starbucks'}, {'authorized_date': [2022, 12, 26], 'date': [2022, 12, 27], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 26], 'date': [2022, 12, 26], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 16], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 12, 13], 'date': [2022, 12, 14], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 11], 'amount': 500.0, 'category': ['Transfer', 'Debit'], 'name': 'Tectra Inc', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 10], 'amount': 2078.5, 'category': ['Transfer', 'Credit'], 'name': 'AUTOMATIC PAYMENT - THANK', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 10], 'amount': 500.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': 'KFC', 'iso_currency_code': 'GBP', 'merchant_name': 'KFC'}, {'authorized_date': 'Not Provided', 'date': [2022, 12, 10], 'amount': 500.0, 'category': ['Shops', 'Supermarkets and Groceries'], 'name': 'Madison Bicycle Shop', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 11, 30], 'date': [2022, 12, 1], 'amount': 25.0, 'category': ['Transfer', 'Debit'], 'name': 'CREDIT CARD 3333 PAYMENT *//', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 11, 30], 'date': [2022, 12, 1], 'amount': 5.4, 'category': ['Travel', 'Taxi'], 'name': 'Uber 063015 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 30], 'amount': 5850.0, 'category': ['Food and Drink', 'Restaurants'], 'name': 'ACH Electronic CreditGUSTO PAY 123456', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 30], 'amount': 1000.0, 'category': ['Transfer', 'Debit'], 'name': 'CD DEPOSIT .INITIAL.', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 11, 28], 'date': [2022, 11, 29], 'amount': 78.5, 'category': ['Recreation', 'Gyms and Fitness Centers'], 'name': 'Touchstone Climbing', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 11, 29], 'date': [2022, 11, 29], 'amount': -500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 11, 28], 'date': [2022, 11, 28], 'amount': 12.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': "McDonald's", 'iso_currency_code': 'GBP', 'merchant_name': "McDonald's"}, {'authorized_date': [2022, 11, 28], 'date': [2022, 11, 28], 'amount': 4.33, 'category': ['Food and Drink', 'Restaurants', 'Coffee Shop'], 'name': 'Starbucks', 'iso_currency_code': 'GBP', 'merchant_name': 'Starbucks'}, {'authorized_date': [2022, 11, 26], 'date': [2022, 11, 27], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 11, 26], 'date': [2022, 11, 26], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 16], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 11, 13], 'date': [2022, 11, 14], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 11], 'amount': 500.0, 'category': ['Transfer', 'Debit'], 'name': 'Tectra Inc', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 10], 'amount': 2078.5, 'category': ['Transfer', 'Credit'], 'name': 'AUTOMATIC PAYMENT - THANK', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 10], 'amount': 500.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': 'KFC', 'iso_currency_code': 'GBP', 'merchant_name': 'KFC'}, {'authorized_date': 'Not Provided', 'date': [2022, 11, 10], 'amount': 500.0, 'category': ['Shops', 'Supermarkets and Groceries'], 'name': 'Madison Bicycle Shop', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 31], 'date': [2022, 11, 1], 'amount': 25.0, 'category': ['Transfer', 'Debit'], 'name': 'CREDIT CARD 3333 PAYMENT *//', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 31], 'date': [2022, 11, 1], 'amount': 5.4, 'category': ['Travel', 'Taxi'], 'name': 'Uber 063015 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 31], 'amount': 5850.0, 'category': ['Food and Drink', 'Restaurants'], 'name': 'ACH Electronic CreditGUSTO PAY 123456', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 31], 'amount': 1000.0, 'category': ['Transfer', 'Debit'], 'name': 'CD DEPOSIT .INITIAL.', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 29], 'date': [2022, 10, 30], 'amount': 78.5, 'category': ['Recreation', 'Gyms and Fitness Centers'], 'name': 'Touchstone Climbing', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 30], 'date': [2022, 10, 30], 'amount': -500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 10, 29], 'date': [2022, 10, 29], 'amount': 12.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': "McDonald's", 'iso_currency_code': 'GBP', 'merchant_name': "McDonald's"}, {'authorized_date': [2022, 10, 29], 'date': [2022, 10, 29], 'amount': 4.33, 'category': ['Food and Drink', 'Restaurants', 'Coffee Shop'], 'name': 'Starbucks', 'iso_currency_code': 'GBP', 'merchant_name': 'Starbucks'}, {'authorized_date': [2022, 10, 27], 'date': [2022, 10, 28], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 27], 'date': [2022, 10, 27], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 17], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 10, 14], 'date': [2022, 10, 15], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 12], 'amount': 500.0, 'category': ['Transfer', 'Debit'], 'name': 'Tectra Inc', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 11], 'amount': 2078.5, 'category': ['Transfer', 'Credit'], 'name': 'AUTOMATIC PAYMENT - THANK', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 11], 'amount': 500.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': 'KFC', 'iso_currency_code': 'GBP', 'merchant_name': 'KFC'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 11], 'amount': 500.0, 'category': ['Shops', 'Supermarkets and Groceries'], 'name': 'Madison Bicycle Shop', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 1], 'date': [2022, 10, 2], 'amount': 25.0, 'category': ['Transfer', 'Debit'], 'name': 'CREDIT CARD 3333 PAYMENT *//', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 10, 1], 'date': [2022, 10, 2], 'amount': 5.4, 'category': ['Travel', 'Taxi'], 'name': 'Uber 063015 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 1], 'amount': 5850.0, 'category': ['Food and Drink', 'Restaurants'], 'name': 'ACH Electronic CreditGUSTO PAY 123456', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 10, 1], 'amount': 1000.0, 'category': ['Transfer', 'Debit'], 'name': 'CD DEPOSIT .INITIAL.', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 9, 29], 'date': [2022, 9, 30], 'amount': 78.5, 'category': ['Recreation', 'Gyms and Fitness Centers'], 'name': 'Touchstone Climbing', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 9, 30], 'date': [2022, 9, 30], 'amount': -500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 9, 29], 'date': [2022, 9, 29], 'amount': 12.0, 'category': ['Food and Drink', 'Restaurants', 'Fast Food'], 'name': "McDonald's", 'iso_currency_code': 'GBP', 'merchant_name': "McDonald's"}, {'authorized_date': [2022, 9, 29], 'date': [2022, 9, 29], 'amount': 4.33, 'category': ['Food and Drink', 'Restaurants', 'Coffee Shop'], 'name': 'Starbucks', 'iso_currency_code': 'GBP', 'merchant_name': 'Starbucks'}, {'authorized_date': [2022, 9, 27], 'date': [2022, 9, 28], 'amount': 89.4, 'category': ['Shops', 'Computers and Electronics'], 'name': 'SparkFun', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 9, 27], 'date': [2022, 9, 27], 'amount': -4.22, 'category': ['Transfer', 'Credit'], 'name': 'INTRST PYMNT', 'iso_currency_code': 'GBP', 'merchant_name': 'Not Provided'}, {'authorized_date': 'Not Provided', 'date': [2022, 9, 17], 'amount': 500.0, 'category': ['Travel', 'Airlines and Aviation Services'], 'name': 'United Airlines', 'iso_currency_code': 'GBP', 'merchant_name': 'United Airlines'}, {'authorized_date': [2022, 9, 14], 'date': [2022, 9, 15], 'amount': 6.33, 'category': ['Travel', 'Taxi'], 'name': 'Uber 072515 SF**POOL**', 'iso_currency_code': 'GBP', 'merchant_name': 'Uber'}]})
         self.assertEqual(len(list(balances.keys())),2)
         self.assertEqual(list(balances.keys())[1],'Royal Bank of Scotland - Current Accounts')
         self.assertEqual(list(balances.keys())[0],'HSBC')
@@ -347,13 +377,28 @@ class APIViewsTestCase(TestCase):
 
         self.assertTrue(cache.has_key('balances' + self.user.email))
         self.assertTrue(cache.has_key('currency' + self.user.email))
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
 
         currency = cache.get('currency' + self.user.email)
         balances = cache.get('balances' + self.user.email)
+        transactions = cache.get('transactions' + self.user.email)
 
         self.assertEqual(len(list(currency.keys())),1)
         self.assertEqual(list(currency.keys())[0],'GBP')
         self.assertEqual(currency['GBP'],100.0)
+
+        self.assertEqual(len(list(transactions.keys())),1)
+        self.assertTrue(len(transactions[list(transactions.keys())[0]]) >= 1)
+        first_transaction = transactions[list(transactions.keys())[0]][0]
+        first_transaction_keys = list(first_transaction.keys())
+
+        self.assertTrue('authorized_date' in first_transaction_keys)
+        self.assertTrue('date' in first_transaction_keys)
+        self.assertTrue('amount' in first_transaction_keys)
+        self.assertTrue('category' in first_transaction_keys)
+        self.assertTrue('name' in first_transaction_keys)
+        self.assertTrue('iso_currency_code' in first_transaction_keys)
+        self.assertTrue('merchant_name' in first_transaction_keys)
 
         self.assertEqual(len(list(balances.keys())),1)
         self.assertEqual(list(balances.keys())[0],'Royal Bank of Scotland - Current Accounts')
@@ -363,6 +408,7 @@ class APIViewsTestCase(TestCase):
             self.assertTrue('current_amount' in balances['Royal Bank of Scotland - Current Accounts'][account])
             self.assertTrue('type' in balances['Royal Bank of Scotland - Current Accounts'][account])
             self.assertTrue('currency' in balances['Royal Bank of Scotland - Current Accounts'][account])
+
 
     def test_post_exchange_public_token_redirects_with_no_cached_products(self):
         cache.clear()
@@ -396,6 +442,32 @@ class APIViewsTestCase(TestCase):
         with self.assertRaises(InvestmentsNotLinked):
             retrieve_stock_getter(self.user)
         settings.PLAID_DEVELOPMENT = False
+
+    def test_link_crypto_wallet_works(self):
+        response = self.client.get('/api/link_crypto_wallet/?param=0x312')
+        self.assertEqual(response.status_code, 200)
+        account = AccountType.objects.get(user=self.user)
+        self.assertEqual(account.access_token, '0x312')
+        self.assertEqual(account.account_asset_type, 'CRYPTO')
+        self.assertEqual(account.account_institution_name, 'eth')
+
+    def test_link_crypto_wallet_returns_bad_request_with_no_wallet(self):
+        response = self.client.get('/api/link_crypto_wallet/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_all_crypto_wallets_work_with_user_without_wallets(self):
+        response = self.client.get('/api/all_crypto_wallets/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_all_crypto_wallets_works(self):
+        self.client.get('/api/link_crypto_wallet/?param=0x312')
+        self.client.get('/api/link_crypto_wallet/?param=0adfs21')
+        response = self.client.get('/api/all_crypto_wallets/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertTrue('0x312' in response.data)
+        self.assertTrue('0adfs21' in response.data)
 
     def test_investment_category_names_works(self):
         response = self.client.get('/api/investment_category_names/')
@@ -465,7 +537,3 @@ class APIViewsTestCase(TestCase):
         cache.clear()
         response = self.client.get('/api/overall_returns/')
         self.assertEqual(response.status_code, 303)
-    
-
-
-    

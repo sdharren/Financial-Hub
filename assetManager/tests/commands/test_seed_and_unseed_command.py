@@ -23,18 +23,23 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
 
         self.assertEqual(before_user_count + 1, after_user_count)
-        self.assertEqual(before_account_types_count + 4, after_account_types_count)
+        self.assertEqual(before_account_types_count + 6, after_account_types_count)
 
         user_john = User.objects.get(email = 'johnnydoe@example.org')
 
         bank_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.DEBIT)
         investment_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.STOCK)
+        crypto_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.CRYPTO)
 
         for bank in bank_assets:
             self.assertTrue(bank.account_institution_name == 'Vanguard' or bank.account_institution_name == 'Fidelity')
 
         for investment in investment_assets:
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
+
+        for crypto in crypto_assets:
+            self.assertTrue(crypto.access_token == "bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v" or crypto.access_token == "0x9696f59e4d72e237be84ffd425dcad154bf96976")
+            self.assertTrue(crypto.account_institution_name == "btc" or crypto.account_institution_name == "eth")
 
     def test_seed_command(self):
         accounttypes = AccountType.objects.all()
@@ -55,18 +60,23 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
 
         self.assertEqual(before_user_count + 1, after_user_count)
-        self.assertEqual(before_account_types_count + 4, after_account_types_count)
+        self.assertEqual(before_account_types_count + 6, after_account_types_count)
 
         user_john = User.objects.get(email = 'johnnydoe@example.org')
 
         bank_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.DEBIT)
         investment_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.STOCK)
+        crypto_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.CRYPTO)
 
         for bank in bank_assets:
             self.assertTrue(bank.account_institution_name == 'Vanguard' or bank.account_institution_name == 'Fidelity')
 
         for investment in investment_assets:
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
+
+        for crypto in crypto_assets:
+            self.assertTrue(crypto.access_token == "bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v" or crypto.access_token == "0x9696f59e4d72e237be84ffd425dcad154bf96976")
+            self.assertTrue(crypto.account_institution_name == "btc" or crypto.account_institution_name == "eth")
 
     def test_unseed_command(self):
         call_command('seed')
@@ -76,7 +86,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_account_types_count = AccountType.objects.count()
         after_user_count = User.objects.count()
         self.assertEqual(after_user_count, before_user_count - 1)
-        self.assertEqual(after_account_types_count, before_account_types_count - 4)
+        self.assertEqual(after_account_types_count, before_account_types_count - 6)
 
         accounttypes = AccountType.objects.all()
         users = User.objects.all()

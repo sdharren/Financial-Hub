@@ -37,7 +37,7 @@ function InvestmentGraphs() {
             alert("Linked sandbox investments successfuly.");
         }
     }
-    
+
     // update the GraphSelect options (called every time a graph is rendered/re-rendered)
     async function updateOptions() {
         let options = {
@@ -77,7 +77,7 @@ function InvestmentGraphs() {
             setOverviewActive(false);
         }
     }
-    
+
     // render a graph based on the endpoint supplied
     // endpoint_parameter is optional and is a parameter for the API request
     async function changeGraph(endpoint, endpoint_parameter) {
@@ -89,10 +89,10 @@ function InvestmentGraphs() {
                 setGraph(
                     <div>
                         <ReturnDisplay returns={overall_returns}/>
-                        <PieChart 
-                            endpoint={endpoint} 
-                            endpoint_parameter={endpoint_parameter} 
-                            loadNext={handleLoadNext} 
+                        <PieChart
+                            endpoint={endpoint}
+                            endpoint_parameter={endpoint_parameter}
+                            loadNext={handleLoadNext}
                             updateGraph={handleGraphUpdate}
                         />
                     </div>
@@ -106,42 +106,43 @@ function InvestmentGraphs() {
                         <p>Sorry we cannot get data for {endpoint_parameter}.</p>
                     );
                 }
+
                 else {
                 let category_returns = await getReturns('category_returns', endpoint_parameter);
                 setLastCategory(endpoint_parameter);
                 setGraph(
                     <div>
                         <ReturnDisplay returns={category_returns}/>
-                        <PieChart 
-                            endpoint={endpoint} 
-                            endpoint_parameter={endpoint_parameter} 
-                            loadNext={handleLoadNext} 
-                            updateGraph={handleGraphUpdate} 
+                        <PieChart
+                            endpoint={endpoint}
+                            endpoint_parameter={endpoint_parameter}
+                            loadNext={handleLoadNext}
+                            updateGraph={handleGraphUpdate}
                             selectOptions={options['categories'] }
                         />
                         </div>
                     );
-                    changeTabActive(endpoint);
                 }
                 break;
 
             case 'stock_history':
+
                 if (!options['investments'].includes(endpoint_parameter)) {
                     setGraph(
                         <p>Sorry we cannot get data for {endpoint_parameter}.</p>
                     );
                 }
                 else {
-                let returns = await getReturns('returns', endpoint_parameter);
-                setLastStock(endpoint_parameter);
-                setGraph(
+                    let returns = await getReturns('returns', endpoint_parameter);
+                    setLastStock(endpoint_parameter);
+                    setGraph(
                         <div>
                             <ReturnDisplay returns={returns}/>
-                            <LineGraph 
-                                endpoint={endpoint} 
-                                updateGraph={handleGraphUpdate} 
-                                endpoint_parameter={endpoint_parameter} 
-                                selectOptions={ options['investments'] } 
+                            <LineGraph
+                                endpoint={endpoint}
+                                updateGraph={handleGraphUpdate}
+                                endpoint_parameter={endpoint_parameter}
+                                selectOptions={ options['investments'] }
                             />
                             </div>
                     );
@@ -205,9 +206,9 @@ function InvestmentGraphs() {
             }
             else {
                 // if there is no last stock get our options and choose the first one
-                const options = await updateOptions(); 
+                const options = await updateOptions();
                 changeGraph(
-                    endpoint, 
+                    endpoint,
                     investmentOptions.length === 0 ? options['investments'][0] : investmentOptions[0]
                 );
             }
@@ -218,12 +219,12 @@ function InvestmentGraphs() {
             }
             else {
                 // if there is no last category get our options and choose the first one
-                const options = await updateOptions(); 
+                const options = await updateOptions();
                 changeGraph(
-                    endpoint, 
+                    endpoint,
                     categoryOptions.length === 0 ? options['categories'][0] : categoryOptions[0]
                 );
-            }    
+            }
         }
         else if (endpoint === 'investment_categories') {
             changeGraph(endpoint);

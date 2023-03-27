@@ -51,21 +51,12 @@ class RecentTransactionsViewsTestCase(TestCase):
         response = self.client.post(self.url, follow = True)
         self.assertEqual(response.status_code,405)
 
-    def test_get_recent_transactions_without_institution_name_param(self):
-        response = self.client.get('/api/recent_transactions/?param=')
-        self.assertEqual(response.status_code, 303)
-
-        response_data = response.json()
-        self.assertEqual(list(response_data.keys())[0],'error')
-        self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Name Not Selected')
-
     def test_get_recent_transactions_with_non_linked_institution_name(self):
-        self.create_public_token()
         response = self.client.get('/api/recent_transactions/?param=HSBC UK')
         self.assertEqual(response.status_code, 303)
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
-        self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Transactions Not Linked.')
 
     def test_get_recent_transactions_with_correctly_linked_institution(self):
         self.create_public_token()
@@ -75,7 +66,7 @@ class RecentTransactionsViewsTestCase(TestCase):
 
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'Royal Bank of Scotland - Current Accounts')
-        self.assertTrue(0 < len(response_data['Royal Bank of Scotland - Current Accounts']) <= 5)
+        self.assertTrue(0 < len(response_data['Royal Bank of Scotland - Current Accounts']) <= 10)
         self.assertTrue(datetime.strptime(response_data['Royal Bank of Scotland - Current Accounts'][0]['date'], '%Y-%m-%d').date() <= date.today())
 
         if(len(response_data['Royal Bank of Scotland - Current Accounts']) > 0):
@@ -86,11 +77,6 @@ class RecentTransactionsViewsTestCase(TestCase):
 
 
     def test_recent_transactions_data_with_incorrectly_saved_token_causing_an_error(self):
-        account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}
-        balances = reformatBalancesData(account_balances)
-
-        cache.set('transactions' + self.user.email,balances)
-
         settings.PLAID_DEVELOPMENT = True
         AccountType.objects.create(
             user = self.user,

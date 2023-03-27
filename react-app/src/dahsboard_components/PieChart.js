@@ -20,7 +20,6 @@ ChartJS.register(
 )
 function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
     const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
-
     useHandleError(error);
 
     // if a user selects a different option from select dropdown - tell parent to update this graph
