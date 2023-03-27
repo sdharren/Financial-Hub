@@ -594,28 +594,19 @@ def recent_transactions(request):
 
     institutions = AccountType.objects.filter(user = user, account_asset_type = AccountTypeEnum.DEBIT)
 
-    insights = []
+    if(len(institutions) == 0):
+        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+
+    concrete_wrapper = get_plaid_wrapper(user,'transactions')
+    debit_card = make_debit_card(concrete_wrapper,user)
+    transactions = {}
 
     for institution in institutions:
-        bank_graph_data_insight = getCachedInstitutionData(user,insitution.account_institution_name)
-        insights.append(bank_graph_data_insight)
-
-    concrete_wrapper = DevelopmentWrapper()
-
-    debit_card = make_debit_card(concrete_wrapper,user)
-
-    transactions = {}
-    try:
-        for insight in insights:
-            recent_transactions = debit_card.get_recent_transactions(insight,list(insight.keys())[0])
-            transactions[list(insight.keys())[0]] = recent_transactions
-    except Exception:
-        raise PlaidQueryException('Something went wrong querying PLAID.')
-
+        bank_graph_data_insight = getCachedInstitutionData(user,institution.account_institution_name)
+        recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution.account_institution_name)
+        transactions[institution.account_institution_name] = recent_transactions
 
     return Response(transactions,content_type='application/json',status = 200)
-
-
 
 """
     @params:
