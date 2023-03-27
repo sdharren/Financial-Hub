@@ -53,15 +53,6 @@ function Dashboard() {
     setActiveGraphPie(graphName);
   };
 
-  
-
-
-
-  const handlePieAccountChange = (event) => {
-    setSelectedPieAccount(event.target.value);
-  };
-
-
 
 
   return (
