@@ -1,7 +1,8 @@
 import PieChart from "../dahsboard_components/PieChart";
-import LineGraph from "../dahsboard_components/PieChart";
+import LineGraph from "../dahsboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
+import ReturnDisplay from "../components/ReturnDisplay";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
@@ -84,13 +85,17 @@ function InvestmentGraphs() {
 
         switch(endpoint) {
             case 'investment_categories':
+                let overall_returns = await getReturns('overall_returns');
                 setGraph(
-                    <PieChart 
-                        endpoint={endpoint} 
-                        endpoint_parameter={endpoint_parameter} 
-                        loadNext={handleLoadNext} 
-                        updateGraph={handleGraphUpdate}
-                    />
+                    <div>
+                        <ReturnDisplay returns={overall_returns}/>
+                        <PieChart 
+                            endpoint={endpoint} 
+                            endpoint_parameter={endpoint_parameter} 
+                            loadNext={handleLoadNext} 
+                            updateGraph={handleGraphUpdate}
+                        />
+                    </div>
                 );
                 changeTabActive(endpoint);
                 break;
@@ -102,8 +107,11 @@ function InvestmentGraphs() {
                     );
                 }
                 else {
-                    setLastCategory(endpoint_parameter);
-                    setGraph(
+                let category_returns = await getReturns('category_returns', endpoint_parameter);
+                setLastCategory(endpoint_parameter);
+                setGraph(
+                    <div>
+                        <ReturnDisplay returns={category_returns}/>
                         <PieChart 
                             endpoint={endpoint} 
                             endpoint_parameter={endpoint_parameter} 
@@ -111,6 +119,7 @@ function InvestmentGraphs() {
                             updateGraph={handleGraphUpdate} 
                             selectOptions={options['categories'] }
                         />
+                        </div>
                     );
                     changeTabActive(endpoint);
                 }
@@ -123,14 +132,18 @@ function InvestmentGraphs() {
                     );
                 }
                 else {
-                    setLastStock(endpoint_parameter);
-                    setGraph(
+                let returns = await getReturns('returns', endpoint_parameter);
+                setLastStock(endpoint_parameter);
+                setGraph(
+                        <div>
+                            <ReturnDisplay returns={returns}/>
                             <LineGraph 
                                 endpoint={endpoint} 
                                 updateGraph={handleGraphUpdate} 
                                 endpoint_parameter={endpoint_parameter} 
                                 selectOptions={ options['investments'] } 
                             />
+                            </div>
                     );
                     changeTabActive(endpoint);
                 }
@@ -159,6 +172,20 @@ function InvestmentGraphs() {
 
     async function callApi(endpoint) {
         let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + '/',
+            {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            }
+        );
+        let data = await response.json();
+        return data;
+    }
+
+    async function getReturns(endpoint, param) {
+        let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + (endpoint==='overall_returns'?'/':'/?param='+param),
             {
                 method:'GET',
                 headers:{

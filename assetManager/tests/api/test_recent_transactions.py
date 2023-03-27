@@ -8,7 +8,6 @@ from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
-from django.conf import settings
 from assetManager.models import AccountTypeEnum,AccountType
 from django.core.cache import cache
 from datetime import datetime, date
@@ -19,6 +18,12 @@ class RecentTransactionsViewsTestCase(TestCase):
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]
+
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
 
     def tearDown(self):
         cache.clear()
@@ -55,6 +60,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Institution Name Not Selected')
 
     def test_get_recent_transactions_with_non_linked_institution_name(self):
+        self.create_public_token()
         response = self.client.get('/api/recent_transactions/?param=HSBC UK')
         self.assertEqual(response.status_code, 303)
         response_data = response.json()
@@ -62,6 +68,7 @@ class RecentTransactionsViewsTestCase(TestCase):
         self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
 
     def test_get_recent_transactions_with_correctly_linked_institution(self):
+        self.create_public_token()
         self.assertFalse(cache.has_key('transactions' + self.user.email))
         response = self.client.get('/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts')
         self.assertEqual(response.status_code, 200)
@@ -98,3 +105,28 @@ class RecentTransactionsViewsTestCase(TestCase):
         response_data = response.json()
         self.assertEqual(list(response_data.keys())[0],'error')
         self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
+
+    def test_recent_transactions_with_no_cache_incorrect_access_token(self):
+        settings.PLAID_DEVELOPMENT = True
+        AccountType.objects.create(
+            user = self.user,
+            account_asset_type = AccountTypeEnum.DEBIT,
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            account_institution_name = 'HSBC',
+        )
+
+        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Something went wrong querying PLAID.')
+
+    def test_recent_transactions_with_no_cache_no_access_token(self):
+        settings.PLAID_DEVELOPMENT = True
+        response = self.client.get('/api/recent_transactions/?param=HSBC')
+        self.assertEqual(response.status_code, 303)
+
+        response_data = response.json()
+        self.assertEqual(list(response_data.keys())[0],'error')
+        self.assertEqual(response_data[list(response_data.keys())[0]],'Transactions Not Linked.')

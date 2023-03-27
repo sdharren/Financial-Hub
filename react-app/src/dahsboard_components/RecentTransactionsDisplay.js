@@ -1,61 +1,65 @@
 import React, { useState, useEffect, useContext } from 'react';
-import AuthContext from '../context/AuthContext';
+import useHandleError from '../custom_hooks/useHandleError';
+import usePlaid from '../custom_hooks/usePlaid';
+import { Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel } from '@mui/material';
 
 function RecentTransactions() {
-  let {authTokens, logoutUser} = useContext(AuthContext);
-  const [transactions, setTransactions] = useState([]);
+  const endpoint = 'recent_transactions';
+  const [data, setData] = useState(usePlaid({endpoint}));
+ 
+  useHandleError(data[1]);
 
+  const categories = ['Institution', 'Amount', 'Date', 'Category', 'Merchant'];
 
-
-  let getTransactions = async () => {
-    let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
-    let response = await fetch(transactionURL, {
-      method: 'GET',
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
+  const [sort, setSort] = useState({ category: '', direction: 'asc' });
+  
+  const sortData = (category, direction) => {
+    const sortedData = [...data[0]].sort((a, b) => {
+      if (a[category] < b[category]) return direction === 'asc' ? -1 : 1;
+      if (a[category] > b[category]) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
-    let data = await response.json();
-    if (response.status === 200) {
-        setTransactions(data['Royal Bank of Scotland - Current Accounts']);
-    }
-    else {
-      console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);
-    }
-  
-    } 
-  
-  
-  useEffect(() => {
-    // Call the async function `getTransactions` to fetch the recent transactions
-    getTransactions();
-  }, []);
-
-
+    setData(sortedData);
+    setSort({ category, direction });
+  };
 
   return (
     <div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Merchant</th>
-          <th>Category</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-          {transactions.map(transaction => (
-            <tr key={transaction.merchant}>
-              <td>{transaction.date.toDateString()}</td>
-              <td>{transaction.merchant}</td>
-              <td>{transaction.category.join(', ')}</td>
-              <td>{transaction.amount}</td>
-            </tr>
+    {
+      data[0] === null ?
+      <p>Loading...</p> :
+      <Table>
+      <TableHead>
+        <TableRow>
+          {categories.map((category) => (
+            <TableCell key={category}>
+              <TableSortLabel
+                active={sort.category === category}
+                direction={sort.direction}
+                onClick={() => {
+                  const direction = sort.category === category ? sort.direction === 'asc' ? 'desc' : 'asc' : 'asc';
+                  sortData(category, direction);
+                }}
+              >
+                {category}
+              </TableSortLabel>
+            </TableCell>
           ))}
-      </tbody>
-    </table>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data[0].map((item, index) => (
+          <TableRow key={index}>
+            {categories.map((category) => (
+              <TableCell key={`${index}-${category}`}>
+                {item[category]}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+      }
     </div>
   );
 }

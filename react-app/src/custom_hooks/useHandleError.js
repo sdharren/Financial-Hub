@@ -11,7 +11,7 @@ const useHandleError = (error) => {
                 RedirectToLink('investments');
             }
             else if (errorMessage === 'Transactions Not Linked.') {
-                RedirectToLink('transactions');
+                RedirectToLink('transactions'); 
             }
         }
     }
