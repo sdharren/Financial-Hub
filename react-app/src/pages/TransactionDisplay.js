@@ -34,7 +34,7 @@ function BarChartDisplay() {
 
 
     return (
-        <div className='pl-[2rem]'>
+        <div className='w-full'>
             <button onClick={handleLoadPrevious}>
                 Go Back
             </button>

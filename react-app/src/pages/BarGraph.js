@@ -109,7 +109,7 @@ useEffect(() => {
   };
 
   return (
-    <div className='w-full max-h-[52.5vh] m-auto'>
+    <div className='inline-block w-full max-h-[55vh]'>
       <Bar
       data = {data}
       options = {options}
