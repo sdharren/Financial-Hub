@@ -131,6 +131,38 @@ li > a.active-nav::after,
     
 }
 
+.crypto-wallet-addresses {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.add-button,
+.remove-button,
+.submit-button {
+  margin: 10px;
+  padding: 10px;
+}
+
+.add-button,
+.remove-button {
+  background-color: darkblue;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.submit-button {
+  background-color: purple;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+
 .home__content {
   position: absolute;
   top: 50%;
@@ -200,6 +232,21 @@ max-width: 120%;
   .dashboard-container {
     width: 100%;
     
+  }
+
+  .address-form {
+    text-align: center;
+
+  }
+  
+  .address-form-content {
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+
+  .inline-wallet-address-container {
+    margin-right: 50px;
+    text-justify: distribute;
   }
 
   /*Container for the section of the contents of the page*/
@@ -437,6 +484,18 @@ max-width: 120%;
 .investment-pie {
     margin: auto;
 }
+
+.investment-return-positive {
+    display: inline-block;
+    margin-right: 1rem;
+    color: lightgreen;
+}
+
+.investment-return-negative {
+    display: inline-block;
+    margin-right: 1rem;
+    color: red;
+}
  
 .graph-select {
     color: #000000 !important;
@@ -508,56 +567,5 @@ max-width: 120%;
   height: 100%;
 }
 
-.accounts-name {
-  font-family: 'Outfit', sans-serif;
-  font-size: 4rem;
-  margin-top: 1rem;
-  text-align: center;
-}
 
-.accounts-table {
-  border-collapse: collapse;
-  width: 80%;
-  margin: 0 auto;
-  margin-top: 50px;
-}
-
-.accounts-column, .accounts-head {
-  text-align: center;
-  padding: 8px;
-}
-
-.accounts-head {
-  border-left: 2px solid #00008b ;
-  border-left-width: 4px;
-  border-right: 2px solid #00008b ;
-  border-right-width: 4px;
-}
-
-
-.accounts-row, .accounts-column{
-  border-top: 2px solid #00008b ;
-  border-top-width: 4px;
-  border-left: 2px solid #00008b ;
-  border-left-width: 4px;
-  border-right: 2px solid #00008b ;
-  border-right-width: 4px;
-}
-
-.accounts-removebutton {
-  background-color: #d61616;
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.accounts-removebutton:hover {
-  background-color: #ff0000;
-}
 

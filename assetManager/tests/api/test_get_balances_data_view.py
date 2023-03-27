@@ -18,6 +18,12 @@ class GetBalancesDataViewTestCase(TestCase):
         'assetManager/tests/fixtures/users.json'
     ]
 
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token_custom_user()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
+
     def tearDown(self):
         cache.clear()
 
@@ -50,7 +56,7 @@ class GetBalancesDataViewTestCase(TestCase):
         balances = reformatBalancesData(account_balances)
         self.assertEqual(len(balances),1)
         self.assertEqual(list(balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
-        self.assertEqual(balances[list(balances.keys())[0]], 593.8004402054293)
+        self.assertEqual(balances[list(balances.keys())[0]], 593.8)
 
 
     def test_make_post_request_to_url(self):
@@ -73,12 +79,15 @@ class GetBalancesDataViewTestCase(TestCase):
 
 
     def test_get_balances_succesfully(self):
+        self.create_public_token()
         response = self.client.get(self.url, follow=True)
         response_data = response.json()
-        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8)
         self.assertEqual(response.status_code,200)
 
     def test_get_balances_succesfully_for_multiple_accounts(self):
+        before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
+        self.create_public_token()
         plaid_wrapper = SandboxWrapper()
         public_token = plaid_wrapper.create_public_token(bank_id='ins_1', products_chosen=['transactions'])
         plaid_wrapper.exchange_public_token(public_token)
@@ -86,34 +95,21 @@ class GetBalancesDataViewTestCase(TestCase):
 
         response = self.client.get(self.url, follow = True)
         self.assertEqual(response.status_code, 200)
-        account_balances = json.loads(response.content)
-
-        self.assertEqual(list(account_balances.keys())[0], 'Bank of America')
-        self.assertEqual(list(account_balances.keys())[1], 'Royal Bank of Scotland - Current Accounts')
-
-        self.assertEqual(account_balances[list(account_balances.keys())[0]], 25830.31914893617)
-        self.assertEqual(account_balances[list(account_balances.keys())[1]], 593.8004402054293)
-
-    """
-    add this test in the location to be added for updating the cache when new institutions are added
-    def test_get_balances_data_enforce_cache_delete_due_to_new_institution_linked_in_application(self):
-        settings.PLAID_DEVELOPMENT = False
-        before_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
-        response_first = self.client.get(reverse('get_balances_data'), follow=True)
-        self.assertEqual(response_first.status_code, 200)
         after_count = len(AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT))
-        self.assertEqual(before_count + 1, after_count)
-        account_balances = response_first.json()
-
+        self.assertEqual(before_count + 2, after_count)
+        account_balances = json.loads(response.content)
+        self.assertEqual(len(list(account_balances.keys())),2)
         self.assertEqual(list(account_balances.keys())[0], 'Royal Bank of Scotland - Current Accounts')
+        self.assertEqual(list(account_balances.keys())[1], 'Bank of America')
 
-        self.assertEqual(account_balances[list(account_balances.keys())[0]], 593.8004402054293)
-    """
+        self.assertEqual(account_balances[list(account_balances.keys())[0]], 593.8)
+        self.assertEqual(account_balances[list(account_balances.keys())[1]],25830.32)
 
     def test_get_balances_data_from_the_cache(self):
+        self.create_public_token()
         response = self.client.get(self.url, follow=True)
         response_data = response.json()
-        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8004402054293)
+        self.assertEqual(response_data['Royal Bank of Scotland - Current Accounts'], 593.8)
         self.assertEqual(response.status_code,200)
 
         settings.PLAID_DEVELOPMENT = True

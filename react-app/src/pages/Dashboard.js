@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
-import Balances from './Balances';
-import Transactions from './RecentTransactionsDisplay';
-import Currency from './Currency';
+import BalancesDisplay from './BalancesDisplay';
+import RecentTransactions from '../dahsboard_components/RecentTransactionsDisplay';
+import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 
 
@@ -14,12 +14,12 @@ const tabGraphData = {
     { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
   ],
   Stocks: [
-    { name: 'Graph 1', content: <InvestmentGraphs/>}
+    { name: 'All graphs', content: <InvestmentGraphs/>}
   ],
   Banks: [
-    { name: 'Balance', content: <Balances /> },
-    { name: 'Transaction', content: <Transactions /> },
-    { name: 'Currency', content: <Currency /> },
+    { name: 'Balance', content: <BalancesDisplay /> },
+    { name: 'Transaction', content: <RecentTransactions /> },
+    { name: 'Currency', content: <CurrencyDisplay /> },
     { name: 'Bar Chart', content: <BarChart /> },
   ],
   Crypto: [

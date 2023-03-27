@@ -1,7 +1,8 @@
-import PieChart from "./PieChart";
-import LineGraph from "./LineGraph";
+import PieChart from "../dahsboard_components/PieChart";
+import LineGraph from "../dahsboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
+import ReturnDisplay from "../components/ReturnDisplay";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
@@ -40,8 +41,8 @@ function InvestmentGraphs() {
     // update the GraphSelect options (called every time a graph is rendered/re-rendered)
     async function updateOptions() {
         let options = {
-            'investments': [],
-            'categories': []
+            'investments': investmentOptions,
+            'categories': categoryOptions
         }
         // on the first render investmentOptions and categoryOptions are not set
         // if we are in first render - fetch them from the API and return a JSON at the same time as the useState variables would only be usable on next render
@@ -80,44 +81,74 @@ function InvestmentGraphs() {
     // render a graph based on the endpoint supplied
     // endpoint_parameter is optional and is a parameter for the API request
     async function changeGraph(endpoint, endpoint_parameter) {
-        const options = await updateOptions(); 
-        changeTabActive(endpoint);
+        const options = await updateOptions();
 
         switch(endpoint) {
             case 'investment_categories':
+                let overall_returns = await getReturns('overall_returns');
                 setGraph(
-                    <PieChart 
-                        endpoint={endpoint} 
-                        endpoint_parameter={endpoint_parameter} 
-                        loadNext={handleLoadNext} 
-                        updateGraph={handleGraphUpdate}
-                    />
+                    <div>
+                        <ReturnDisplay returns={overall_returns}/>
+                        <PieChart 
+                            endpoint={endpoint} 
+                            endpoint_parameter={endpoint_parameter} 
+                            loadNext={handleLoadNext} 
+                            updateGraph={handleGraphUpdate}
+                        />
+                    </div>
                 );
+                changeTabActive(endpoint);
                 break;
 
             case 'investment_category_breakdown':
+                let category_returns = await getReturns('category_returns', endpoint_parameter);
                 setLastCategory(endpoint_parameter);
-                setGraph(
-                    <PieChart 
-                        endpoint={endpoint} 
-                        endpoint_parameter={endpoint_parameter} 
-                        loadNext={handleLoadNext} 
-                        updateGraph={handleGraphUpdate} 
-                        selectOptions={ categoryOptions.length === 0 ? options['categories'] : categoryOptions}
-                    />
-                );
+                if (!options['categories'].includes(endpoint_parameter)) {
+                    setGraph(
+                        <p>Sorry we cannot get data for {endpoint_parameter}.</p>
+                    );
+                }
+                
+                else {
+                    setLastCategory(endpoint_parameter);
+                    setGraph(
+                        <div>
+                            <ReturnDisplay returns={category_returns}/>
+                            <PieChart 
+                                endpoint={endpoint} 
+                                endpoint_parameter={endpoint_parameter} 
+                                loadNext={handleLoadNext} 
+                                updateGraph={handleGraphUpdate} 
+                                selectOptions={ options['categories'] }
+                            />
+                        </div>
+                    );
+                }
                 break;
 
             case 'stock_history':
-                setLastStock(endpoint_parameter);
-                setGraph(
-                        <LineGraph 
-                            endpoint={endpoint} 
-                            updateGraph={handleGraphUpdate} 
-                            endpoint_parameter={endpoint_parameter} 
-                            selectOptions={investmentOptions.length === 0 ? options['investments'] : investmentOptions } 
-                        />
-                );
+                
+                if (!options['investments'].includes(endpoint_parameter)) {
+                    setGraph(
+                        <p>Sorry we cannot get data for {endpoint_parameter}.</p>
+                    );
+                }
+                else {
+                    let returns = await getReturns('returns', endpoint_parameter);
+                    setLastStock(endpoint_parameter);
+                    setGraph(
+                        <div>
+                            <ReturnDisplay returns={returns}/>
+                            <LineGraph 
+                                endpoint={endpoint} 
+                                updateGraph={handleGraphUpdate} 
+                                endpoint_parameter={endpoint_parameter} 
+                                selectOptions={ options['categories'] } 
+                            />
+                        </div>
+                    );
+                    changeTabActive(endpoint);
+                }
                 break;
         }
     }
@@ -143,6 +174,20 @@ function InvestmentGraphs() {
 
     async function callApi(endpoint) {
         let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + '/',
+            {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            }
+        );
+        let data = await response.json();
+        return data;
+    }
+
+    async function getReturns(endpoint, param) {
+        let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + (endpoint==='overall_returns'?'/':'/?param='+param),
             {
                 method:'GET',
                 headers:{

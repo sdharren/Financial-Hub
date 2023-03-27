@@ -41,7 +41,7 @@ class GetLinkedBrokerageViewsTestCase(TestCase):
         response = self.client.post(self.url, follow = True)
         self.assertEqual(response.status_code,405)
 
-    
+
 
     def test_get_linked_brokerage_name(self):
         
@@ -56,7 +56,7 @@ class GetLinkedBrokerageViewsTestCase(TestCase):
         brokerage_name = response.json()
         self.assertEqual(brokerage_name,['Vanguard'])
 
-    
+
     def test_get_no_linked_institution(self):
         
         response = self.client.get(self.url,follow = True)
@@ -70,13 +70,13 @@ class GetLinkedBrokerageViewsTestCase(TestCase):
         AccountType.objects.create(
             user = self.user,
             account_asset_type = AccountTypeEnum.STOCK,
-            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349111',
             account_institution_name = 'Vanguard',
         )
         AccountType.objects.create(
             user = self.user,
             account_asset_type = AccountTypeEnum.STOCK,
-            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
+            access_token = 'access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349112',
             account_institution_name = 'Fidelity',
         )
         response = self.client.get(self.url,follow = True)

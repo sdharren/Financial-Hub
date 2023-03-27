@@ -5,7 +5,7 @@ import bankimg from "../images/asset-bank.png";
 
 import AuthContext from '../context/AuthContext';
 import { useContext } from "react";
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function LinkAssets() {
     //Retrieve the authentication tokens from the AuthContext component.
@@ -31,6 +31,14 @@ export default function LinkAssets() {
                 replace: true
             });
         }
+
+        
+    }
+
+    const buttClick = () => {
+        let route = '/crypto_addresses';
+        navigate(route);
+
     }
 
     return <div data-testid= 'linkassetstest'>
@@ -62,13 +70,13 @@ export default function LinkAssets() {
 
         </div>
         <div>
-            <div className="assetLink_holder">
-                <div className="background__box">
-                <img className="background__image" src={bkbox} alt="#"></img>
-                    <div className="asset__content">
-                        <img className="crypto__image" src={cryptoimg} alt="#"></img>
-                        <p className="middle-text">Link your crypto wallet</p>
-                        <button className="link-button">Link</button>
+            <div class="assetLink_holder">
+                <div class="background__box">
+                <img class="background__image" src={bkbox} alt="#"></img>
+                    <div class="asset__content">
+                        <img class="crypto__image" src={cryptoimg} alt="#"></img>
+                        <p class="middle-text">Link your crypto wallet</p>
+                        <button class="link-button" onClick={buttClick}>Link</button>
                     </div>
                 </div>
             </div>

@@ -13,9 +13,10 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
+from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
-
+from assetManager.models import AccountType, AccountTypeEnum
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -116,6 +117,47 @@ def supported_investments(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def returns(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    if request.GET.get('param'):
+        stock_name = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
+    returns = stock_getter.get_returns(stock_name)
+    return Response(returns, status=200, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def category_returns(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    if request.GET.get('param'):
+        category = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
+    returns = stock_getter.get_category_returns(category)
+    return Response(returns, status=200, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def overall_returns(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    returns = stock_getter.get_overall_returns()
+    return Response(returns, status=200, content_type='application/json')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')
@@ -133,6 +175,30 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def link_crypto_wallet(request):
+    user = request.user
+    if request.GET.get('param'):
+        address = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Product not specified.'}, status=400)
+
+    save_wallet_address(user, address)
+
+    return Response(status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_crypto_wallets(request):
+    user = request.user
+    allWallets = get_wallets(user)
+
+    return Response(allWallets, content_type='application/json', status=200)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
@@ -142,7 +208,6 @@ def exchange_public_token(request):
         return Response({'error': 'Link was not initialised correctly.'}, status=303) # redirect to plaid link on front end
     cache.delete('product_link' + request.user.email)
 
-    #wrapper = DevelopmentWrapper()
     if settings.PLAID_DEVELOPMENT:
         wrapper = DevelopmentWrapper()
     else:
@@ -157,7 +222,6 @@ def exchange_public_token(request):
     except InvalidPublicToken as e:
         return Response({'error': 'Bad request. Invalid public token.'}, status=400)
 
-    #if statement that checks whether the new access token is for transactions
     wrapper.save_access_token(request.user, products_selected)
     token = wrapper.get_access_token()
 
@@ -165,12 +229,24 @@ def exchange_public_token(request):
         #update balances cache if it exists
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
-
-    #write a function in helpers it takes an access token, queries plaid for that access token and if
-    #single institution thingy
-    #check duplicate for institution should be done in save access_token
+        set_single_institution_transactions(token,wrapper,request.user)
+        
     return Response(status=200)
 
+"""
+@params:
+request: Django request object
+@api_view(['PUT', 'DELETE']): decorator to indicate that the view only accepts PUT and DELETE HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
+@Description:
+
+This function is a Django view that either caches or deletes investment, bank balance, and currency data for an authenticated user.
+If the request is a PUT, the function first verifies that the user has linked investments, then proceeds to cache the user's investment data, bank balance data, and currency data.
+If the request is a DELETE, the function deletes all cached data related to the user's investments, transactions, currency, and balances.
+
+@return: A Response object with a status code of 200.
+"""
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 @handle_plaid_errors
@@ -347,8 +423,10 @@ def set_bank_access_token(request):
 
 """
 @params:
-request: an HTTP request object containing user authentication information
-user: a user object containing the user's email address and Plaid account information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves and formats currency data associated with a given user.
 The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
@@ -380,8 +458,10 @@ def get_currency_data(request):
 
 """
 @params:
-request: an HTTP request object containing user authentication information
-user: a user object containing the user's email address and Plaid account information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves and formats balance data associated with a given user.
 The function uses a Plaid API wrapper object and a user object to access the data through the Plaid API.
@@ -399,7 +479,6 @@ def get_balances_data(request):
     user = request.user
 
     plaid_wrapper = get_plaid_wrapper(user,'balances')
-
     if cache.has_key('balances' + user.email):
         account_balances = cache.get('balances' + user.email)
         return Response(reformatBalancesData(account_balances), content_type='application/json', status = 200)
@@ -412,7 +491,10 @@ def get_balances_data(request):
 
 """
 @param:
-request: an HTTP request object containing user authentication information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves account balance data for a specific institution associated with a given user.
 The function uses a user object to access the data through a caching system.
@@ -445,7 +527,10 @@ def select_account(request):
 
 """
 @param:
-request: an HTTP request object containing user authentication information
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
 
 @Description: This function retrieves institution names associated with a given user's access tokens.
 The function then gives each institution its own id
@@ -468,6 +553,12 @@ def select_bank_account(request):
     return Response(institutions,status=200)
 
 """
+@params:
+request: Django request object
+@api_view(['GET]): decorator to indicate that the view only accepts GET HTTP requests.
+@permission_classes([IsAuthenticated]): decorator that verifies whether the user is authenticated.
+handle_plaid_errors: decorator that handles Plaid API errors.
+
 @Description:
     This function retrieves recent transactions of a user's bank account from the Plaid API.
     At most five of the most recent transactions as a list of dictionaries containing the name, amount, category and merchant as keys
@@ -487,11 +578,9 @@ def recent_transactions(request):
     if request.GET.get('param'):
         institution_name = request.GET.get('param')
 
-        #if(check_institution_name_selected_exists(user,institution_name) is False):
-        #    return Response({'error': 'Institution Selected Is Not Linked.'}, content_type='application/json', status=303)
         try:
             bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
-        except PublicTokenNotExchanged:
+        except TransactionsNotLinkedException:
             raise TransactionsNotLinkedException('Transactions Not Linked.')
         except Exception:
             raise PlaidQueryException('Something went wrong querying PLAID.')
@@ -503,7 +592,6 @@ def recent_transactions(request):
         try:
             recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
         except Exception:
-            #return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
             raise PlaidQueryException('Something went wrong querying PLAID.')
 
 
