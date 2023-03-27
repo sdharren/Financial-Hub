@@ -54,16 +54,35 @@ useEffect(() => {
 
 
   const options = {
-      plugins: {
-          colors: {
-              forceOverride: true
-          },
-          legend: {
-              labels: {
-                  color: "white"
-              }
-          }
+    plugins: {
+      colors: {
+        forceOverride: false
+      },
+      legend: {
+        labels: {
+          color: "white"
         }
+      }
+    },
+    scales : {
+      x : {
+        grid : {
+          color : 'black',
+          display : false
+        },
+        ticks : {
+          color : "white"
+        }
+      },
+      y : {
+        grid : {
+          color : "black"
+        },
+        ticks : {
+          color : "white"
+        }
+      }
+    }
   };
 
   const data = {
@@ -72,7 +91,8 @@ useEffect(() => {
       label : 'spending',
       data : bar_data,
       borderColor : 'black',
-      link: bar_labels
+      link: bar_labels,
+      backgroundColor : ['rgba(0,0,0,1)']
     }]
   }
 
