@@ -9,6 +9,7 @@ from assetManager.investments.investment import Investment
 from assetManager.investments.transaction import Transaction
 from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNotSupported
 from operator import attrgetter
+from assetManager.transactionInsight.bank_graph_data import create_forex_rates
 
 class TransactionsNotDefined(Exception):
     pass
@@ -28,6 +29,7 @@ class StocksGetter():
 
     # Sends API calls to plaid requesting investment info for each access token associated with user
     def query_investments(self, user):
+        print("HERE")
         unformatted_investments = []
         try:
             access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
@@ -61,11 +63,17 @@ class StocksGetter():
                 self.transactions.append(Transaction(transaction, ticker))
 
     def format_investments(self, unformatted_investments):
+        rates = create_forex_rates(date.today(), base='USD')
         for current_investment in unformatted_investments:
             for holding in current_investment['holdings']:
                 security_id = holding['security_id']
                 for security in current_investment['securities']:
                     if security['security_id'] == security_id:
+                        print(security['iso_currency_code'])
+                        if security['iso_currency_code'] != 'USD':
+                            print("converting to usd old - " + holding['institution_value'])
+                            holding['institution_value'] = holding['institution_value'] * rates[security['iso_currency_code']]
+                            print("new - " + holding['institution_value'])
                         self.investments.append(self.set_investment_returns(Investment(holding, security)))
                         break
 

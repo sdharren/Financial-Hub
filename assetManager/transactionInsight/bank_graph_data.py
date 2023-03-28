@@ -25,10 +25,10 @@ rates (dict): A dictionary containing foreign exchange rates, where the keys are
 and the values are the conversion rate relative to the British pound (GBP).
 If an error occurs during the retrieval process, default rates are returned instead.
 """
-def create_forex_rates(input_date):
+def create_forex_rates(input_date, base='GBP'):
     warnings.filterwarnings('ignore')
     try:
-        url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+        url = "https://theforexapi.com/api/{date}?base={base}&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'), base=base)
         response = requests.get(url,verify=False)
     except Exception:
         error_rates = {'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1}
