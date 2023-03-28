@@ -156,7 +156,6 @@ class StocksTestCase(TestCase):
         self.assertTrue(len(data) > 100)
         for key in data:
             self.assertTrue(data[key] > 0)
-<<<<<<< HEAD
     
     def test_get_portfolio_comparison_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
@@ -167,7 +166,6 @@ class StocksTestCase(TestCase):
         self.stock_getter = _create_stock_getter_with_fake_data()
         data = self.stock_getter.get_index_history(ticker="^FTSE", period="6mo")
         self.assertTrue(len(data) > 100)
-=======
 
     def test_set_investment_returns(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
@@ -247,7 +245,6 @@ class StocksTestCase(TestCase):
     def test_is_ticker_supported_works(self):
         self.stock_getter = StocksGetter(None)
         self.assertTrue(self.stock_getter.is_ticker_supported('NFLX'))
->>>>>>> main
 
 
     def _create_stock_getter_with_sandbox(self):
