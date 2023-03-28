@@ -6,15 +6,7 @@ import { useEffect } from "react";
 const CAdditional = () => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [AdditionalData, setAdditionalData] = useState([]);
-    const navigate = useNavigate()
-    /*
-    const data = {
-        name: 'John Doe',
-        age: 30,
-        email: 'johndoe@example.com',
-      };
-    */
-    
+    const navigate = useNavigate()    
     
     let get_data = async() =>  {
         let url = 'http://127.0.0.1:8000/api/crypto_all_data/'

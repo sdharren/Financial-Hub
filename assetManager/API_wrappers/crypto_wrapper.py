@@ -20,7 +20,7 @@ ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUB
 @params: addr (str) - The cryptocurrency address for which data is to be fetched.
 
 @Description:
-The class getCryptoAddressData provides methods to retrieve data related to cryptocurrency addresses for Bitcoin (BTC) and Ethereum (ETH). The BTC_all() and ETH_all() methods return complete address data including transaction history, while the BTC_overview() and ETH_overview() methods return a summary of the address data including the current balance.
+The class getCryptoAddressData provides methods to retrieve data related to cryptocurrency addresses for Bitcoin (BTC) and Ethereum (ETH). The BTC_all() and ETH_all() methods return complete address data including transaction history.
 
 The data is obtained using API requests to BlockCypher and requires an API key for Bitcoin methods. The addr parameter is the address for which the data is to be retrieved.
 
@@ -33,13 +33,6 @@ class getCryptoAddressData:
 
     def ETH_all(addr):
         command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
-        return re.get(command).json()
-
-    def BTC_overview(addr):
-        return(get_address_overview(address=addr, api_key='9c75ffab7c524ab19cee9d749110a3b2'))
-
-    def ETH_overview(addr):
-        command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr) + "/balance"
         return re.get(command).json()
 
 """
@@ -71,7 +64,6 @@ def find_fiat_rates():
 """
 def toBase(amount, type):
     if(type == "btc"):
-        print(amount)
         amount = amount/(10**(8))
     elif(type == "eth"):
         amount = amount/(10**(18))

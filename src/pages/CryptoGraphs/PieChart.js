@@ -43,7 +43,7 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
             }
         }
         else if (response.status == 429) {
-            console.log("429 - Blockcypher token call limit")
+            console.log("429 - Blockcypher token call limit reached")
         }
     }
 
