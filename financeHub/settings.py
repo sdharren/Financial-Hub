@@ -9,7 +9,11 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+# NOTE: LEAVE BELOW IMPORTS - THEY ARE NEEDED FOR DELOPYMENT!!!
+#import django_heroku
+#import dotenv
+#import dj_database_url
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,14 +25,19 @@ from datetime import timedelta
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l_e^udcu74vj-m^0ns566umxcfdw5)m6zniz6&vjllpca7f+%s'
+SECRET_KEY = '@dg8+*g#1p%854*36rgr!=l4x$-l3&j7$p%!km10#dk37$a=d%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 PLAID_DEVELOPMENT = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    'localhost:8000',
+    'localhost:3000',
+    'financial-hub.herokuapp.com'
+]
 
 
 # Application definition
@@ -44,7 +53,7 @@ INSTALLED_APPS = [
     'assetManager.apps.AssetmanagerConfig',
     'widget_tweaks',
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 REST_FRAMEWORK = {
@@ -101,6 +110,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'financeHub.urls'
@@ -110,7 +120,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -171,6 +181,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+#MEDIA_URL = 'media/'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'build', 'static')
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -179,3 +199,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication
 AUTH_USER_MODEL = 'assetManager.User'
+
+# NOTE: THIS IS NEEDED FOR DEPLOYMENT
+# django_heroku.settings(locals())
+
+
+# dotenv_file = os.path.join(BASE_DIR, ".env")
+# if os.path.isfile(dotenv_file):
+#     dotenv.load_dotenv(dotenv_file)
+
+# DATABASES = {}
+# DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+
+# options = DATABASES['default'].get('OPTIONS', {})
+# options.pop('sslmode', None)
