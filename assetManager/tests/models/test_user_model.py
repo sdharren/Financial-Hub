@@ -2,6 +2,7 @@ from django.test import TestCase
 from assetManager.models import User
 from django.core.exceptions import ValidationError
 
+"""Tests for the User model """
 class UserModelTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     def setUp(self):

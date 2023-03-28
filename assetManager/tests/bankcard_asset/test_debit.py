@@ -20,6 +20,8 @@ from assetManager.tests.bankcard_asset.single_transaction import single_transact
 from datetime import timedelta
 from django.conf import settings
 
+"""Tests for the asset manager class for bank card related access tokens and data."""
+
 class DebitCardSandBoxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
     def setUp(self):
