@@ -64,15 +64,11 @@ function RecentTransactions() {
       <TableHead>
       <TableRow>
           {categories.map((category) => (
-            <TableCell key={category}>
-              <TableSortLabel
-                active={sort.category === category}
-                direction={sort.category === category ? sort.direction : 'asc'}
-                onClick={() => sortData(category)}
-                style={{color: 'white'}}
-              >
-                {category}
-              </TableSortLabel>
+            <TableCell 
+              key={category}
+              style={{color: 'white', fontWeight: 'bold'}}
+            >
+              {category}
             </TableCell>
           ))}
         </TableRow>
