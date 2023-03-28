@@ -195,7 +195,7 @@ class StocksGetter():
                 continue
             else:
                 comparison[date] = {
-                    'portfolio': portfolio_history[date],
+                    'portfolio': round(portfolio_history[date], 1),
                     'index': round(index_history[date] * n_index_units, 1)
                 }
         return comparison
