@@ -6,7 +6,7 @@ import buy from '../images/about-stock.png';
 export default function About() {
 
     let page1 = (
-        <div>
+        <div className='text-white'> 
             <div className="about-page">
             <h1 className='txt-about-us'>About Us</h1>
             <p className='txt-monitoring-finances'>Your go-to app for monitoring finances</p>

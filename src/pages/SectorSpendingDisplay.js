@@ -26,9 +26,9 @@ function BarChartDisplay() {
 
 
     return (
-        <div className='w-full'>
+        <div className='w-full text-white'>
             <button onClick={handleLoadPrevious}>
-                Go Back
+                Go Backk
             </button>
             {graph}
         </div>
