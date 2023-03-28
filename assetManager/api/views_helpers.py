@@ -21,7 +21,6 @@ class TransactionsNotLinkedException(Exception):
 class PlaidQueryException(Exception):
     pass
 
-
 """
 @params:
 account_balances (dict): A dictionary containing account balances for various institutions.
@@ -242,7 +241,7 @@ def sum_instiution_balances(plaid_wrapper,user):
     data = cache.get('balances'+user.email)
     available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
     return sum(available_amounts)
-    
+
 
 """
 @params:

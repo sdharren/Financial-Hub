@@ -39,7 +39,7 @@ function InvestmentGraphs() {
             alert("Linked sandbox investments successfuly.");
         }
     }
-    
+
     // update the GraphSelect options (called every time a graph is rendered/re-rendered)
     async function updateOptions() {
         let options = {
@@ -88,7 +88,7 @@ function InvestmentGraphs() {
             setComparisonActive(true);
         }
     }
-    
+
     // render a graph based on the endpoint supplied
     // endpoint_parameter is optional and is a parameter for the API request
     async function changeGraph(endpoint, endpoint_parameter) {
@@ -100,10 +100,10 @@ function InvestmentGraphs() {
                 setGraph(
                     <div className="inline-block min-h-[60vh] max-h-[60vh] w-full">
                         <ReturnDisplay returns={overall_returns}/>
-                        <PieChart 
-                            endpoint={endpoint} 
-                            endpoint_parameter={endpoint_parameter} 
-                            loadNext={handleLoadNext} 
+                        <PieChart
+                            endpoint={endpoint}
+                            endpoint_parameter={endpoint_parameter}
+                            loadNext={handleLoadNext}
                             updateGraph={handleGraphUpdate}
                         />
                     </div>
@@ -147,7 +147,7 @@ function InvestmentGraphs() {
                                 endpoint_parameter={endpoint_parameter} 
                                 selectOptions={ options['investments'] } 
                             />
-                        </div>
+                            </div>
                     );
                 changeTabActive(endpoint);
                 break;
@@ -226,9 +226,9 @@ function InvestmentGraphs() {
             }
             else {
                 // if there is no last stock get our options and choose the first one
-                const options = await updateOptions(); 
+                const options = await updateOptions();
                 changeGraph(
-                    endpoint, 
+                    endpoint,
                     investmentOptions.length === 0 ? options['investments'][0] : investmentOptions[0]
                 );
             }
@@ -239,12 +239,12 @@ function InvestmentGraphs() {
             }
             else {
                 // if there is no last category get our options and choose the first one
-                const options = await updateOptions(); 
+                const options = await updateOptions();
                 changeGraph(
-                    endpoint, 
+                    endpoint,
                     categoryOptions.length === 0 ? options['categories'][0] : categoryOptions[0]
                 );
-            }    
+            }
         }
         else if (endpoint === 'investment_categories') {
             changeGraph(endpoint);
