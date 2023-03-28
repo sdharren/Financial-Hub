@@ -21,7 +21,7 @@ const useHandleError = (error) => {
             }
         }
     }
-    
+
     async function redirectToLink (assetType) {
         let response = await fetch('api/link_token/?product=' + assetType,
                 {

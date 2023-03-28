@@ -296,7 +296,7 @@ def exchange_public_token(request):
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
         set_single_institution_transactions(token,wrapper,request.user)
-        
+
     return Response(status=200)
 
 """
@@ -679,40 +679,36 @@ handle_plaid_errors: decorator that handles Plaid API errors.
 @handle_plaid_errors
 def recent_transactions(request):
     user = request.user
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
 
+    institutions = AccountType.objects.filter(user = user, account_asset_type = AccountTypeEnum.DEBIT)
+
+    if(len(institutions) == 0):
+        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+
+    concrete_wrapper = get_plaid_wrapper(user,'transactions')
+    debit_card = make_debit_card(concrete_wrapper,user)
+    transactions = {}
+
+    for institution in institutions:
+        bank_graph_data_insight = getCachedInstitutionData(user,institution.account_institution_name)
         try:
-            bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
-        except TransactionsNotLinkedException:
-            raise TransactionsNotLinkedException('Transactions Not Linked.')
+            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution.account_institution_name)
         except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
+            return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
 
-        concrete_wrapper = DevelopmentWrapper()
+        transactions[institution.account_institution_name] = recent_transactions
 
-        debit_card = make_debit_card(concrete_wrapper,user)
-
-        try:
-            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
-        except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
-
-
-        return Response(recent_transactions,content_type='application/json',status = 200)
-    else:
-        return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
-
+    return Response(transactions,content_type='application/json',status = 200)
 
 """
-    @params:
-        request (HttpRequest): the HTTP request object.
+@params:
+    request (HttpRequest): the HTTP request object.
 
-    @Description:
-        Retrieve the linked banks for the authenticated user.
+@Description:
+    Retrieve the linked banks for the authenticated user.
 
-    @return:
-        Response: the HTTP response object containing a list of institution names in JSON format.
+@return:
+    Response: the HTTP response object containing a list of institution names in JSON format.
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -725,14 +721,14 @@ def get_linked_banks(request):
     return Response(institutions, content_type='application/json',status = 200)
 
 """
-    @params:
-        request (HttpRequest): the HTTP request object.
+@params:
+    request (HttpRequest): the HTTP request object.
 
-    @Description:
-        Retrieve the linked brokerages for the authenticated user.
+@Description:
+    Retrieve the linked brokerages for the authenticated user.
 
-    @return:
-        Response: the HTTP response object containing a list of brokerage names in JSON format.
+@return:
+    Response: the HTTP response object containing a list of brokerage names in JSON format.
 
 """
 @api_view(['GET'])
@@ -746,16 +742,16 @@ def linked_brokerage(request):
 
 
 """
-    @params:
-        request: The HTTP request object that contains information about the current request.
-        institution: The name of the linked institution account to be deleted.
+@params:
+    request: The HTTP request object that contains information about the current request.
+    institution: The name of the linked institution account to be deleted.
 
-    @Description:
-        This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
+@Description:
+    This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
 
-    @return:
-        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
-        A HttpResponseBadRequest object with an error message if the account was not found.
+@return:
+    A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+    A HttpResponseBadRequest object with an error message if the account was not found.
 
 """
 @api_view(['DELETE'])
@@ -772,16 +768,16 @@ def delete_linked_banks(request, institution):
 
 
 """
-    @params:
-        request: The HTTP request object that contains information about the current request.
-        brokerage: The name of the linked brokerage account to be deleted.
+@params:
+    request: The HTTP request object that contains information about the current request.
+    brokerage: The name of the linked brokerage account to be deleted.
 
-    @Description:
-        This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
+@Description:
+    This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
 
-    @return:
-        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
-        A HttpResponseBadRequest object with an error message if the account was not found.
+@return:
+    A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+    A HttpResponseBadRequest object with an error message if the account was not found.
 
 """
 @api_view(['DELETE'])
@@ -789,6 +785,27 @@ def delete_linked_banks(request, institution):
 def delete_linked_brokerage(request, brokerage):
 
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def linked_crypto(request):
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO)
+    cryptos = []
+    for crypto in account_types:
+        cryptos.append(crypto.access_token)
+    return Response(cryptos, content_type='application/json',status = 200)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_crypto(request, crypto):
+    
+    account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
      return HttpResponseBadRequest('Linked brokerage account not found')

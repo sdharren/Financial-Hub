@@ -4,11 +4,12 @@ import AuthContext from '../context/AuthContext';
 function Accounts() {
     const [banks, setBanks] = useState([]);
     const [brokerages, setBrokerages] = useState([]);
+    const [cryptos, setCryptos] = useState([]);
     let {authTokens, logoutUser} = useContext(AuthContext);
-    
+
     let getAccounts = async () => {
       try {
-        
+
         const bankurl = 'api/get_linked_banks/';
         const bankresponse = await fetch(bankurl, {
           method: 'GET',
@@ -19,7 +20,7 @@ function Accounts() {
         });
         const bankdata = await bankresponse.json();
         setBanks(bankdata);
-    
+
         const stockurl = 'api/linked_brokerage/';
         const stockresponse = await fetch(stockurl, {
           method: 'GET',
@@ -30,12 +31,23 @@ function Accounts() {
         });
         const stockdata = await stockresponse.json();
         setBrokerages(stockdata);
-    
+
+        const cryptourl = 'api/linked_crypto/';
+        const cryptoresponse = await fetch(cryptourl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + String(authTokens.access)
+          }
+        });
+        const cryptodata = await cryptoresponse.json();
+        setCryptos(cryptodata);
+
       } catch (error) {
         console.error(error);
       }
     }
-    
+
     useEffect(() => {
       // Call the async function `getAccounts` to fetch the linked accounts
       getAccounts();
@@ -44,7 +56,7 @@ function Accounts() {
     const handleRemoveBank = async (institution) => {
       try {
         // Send DELETE request to unlink bank account
-        const response = await fetch(`/api/delete_linked_banks/${institution}/`, {
+        const response = await fetch(`/api/delete_linked_bank/${institution}/`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -64,7 +76,7 @@ function Accounts() {
   const handleRemoveBrokerage = async (brokerage) => {
     // Send DELETE request to unlink brokerage account
     try {
-      
+
       const response = await fetch(`/api/delete_linked_brokerage/${brokerage}/`, {
         method: 'DELETE',
         headers: {
@@ -77,6 +89,26 @@ function Accounts() {
       }
       // Remove bank from list of linked banks
       setBrokerages(brokerages.filter(b => b !== brokerage));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRemoveCrypto = async (crypto) => {
+    try {
+      // Send DELETE request to unlink crypto account
+      const response = await fetch(`/api/delete_linked_crypto/${crypto}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + String(authTokens.access)
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to remove crypto wallet: ${response.status} ${response.statusText}`);
+      }
+      // Remove bank from list of linked banks
+      setCryptos(cryptos.filter(c => c !== crypto));
     } catch (error) {
       console.error(error);
     }
@@ -109,6 +141,15 @@ function Accounts() {
             <td className='text-left py-3 px-4'>Brokerage</td>
             <td className='text-left py-3 px-4 text-white'>
               <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+            </td>
+          </tr>
+        ))}
+        {cryptos.map(crypto => (
+          <tr key={crypto} className='w-full table table-fixed'>
+            <td className='text-left py-3 px-4 text-white'>{crypto}</td>
+            <td className='text-left py-3 px-4'>Crypto</td>
+            <td className='text-left py-3 px-4 text-white'>
+              <button onClick={() => handleRemoveCrypto(crypto)}>Remove</button>
             </td>
           </tr>
         ))}
