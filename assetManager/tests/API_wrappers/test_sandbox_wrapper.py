@@ -3,6 +3,7 @@ from django.test import TestCase
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper, IncorrectInstitutionId,IncorrectProduct
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated,AccessTokenInvalid
 from assetManager.models import User, AccountType, AccountTypeEnum
+from django.db import IntegrityError, transaction
 
 class SandboxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
@@ -182,9 +183,9 @@ class SandboxWrapperTestCase(TestCase):
         self.wrapper.exchange_public_token(public_token)
         self.assertTrue(self.wrapper.get_item_id() != None)
 
-    """
-    #supposed to fail, must merge with shek's branch
+
     def test_force_intergrity_error_in_database(self):
+
         public_token = self.wrapper.create_public_token_custom_user(bank_id = 'ins_115616', products_chosen = ['transactions'])
         self.wrapper.exchange_public_token(public_token)
 
@@ -196,9 +197,9 @@ class SandboxWrapperTestCase(TestCase):
 
         self.assertEqual(before_count + 1,after_count)
 
-        self.wrapper.save_access_token(self.user, ['transactions'])
+        with transaction.atomic():
+            self.wrapper.save_access_token(self.user, ['transactions'])
 
         new_count = AccountType.objects.count()
 
         self.assertEqual(new_count,after_count)
-    """

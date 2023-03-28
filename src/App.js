@@ -1,4 +1,3 @@
-
 import './App.css';
 import React from 'react';
 import './styles.css'
@@ -21,7 +20,7 @@ import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
 import Currency from './pages/Currency';
-import TransactionTable from './pages/RecentTransactionsDisplay';
+import RecentTransactions from './dahsboard_components/RecentTransactionsDisplay';
 import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
 
 // ask matthew about how margins are lined
