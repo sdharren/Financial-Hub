@@ -49,6 +49,7 @@ function CryptoWalletAddresses() {
             Address {index + 1}:
             <input
               type="text"
+              pattern=  "(^0x[a-fA-F0-9]{40}$)|(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)"
               value={address.address}
               onChange={(event) => handleAddressChange(index, 'address', event.target.value)}
             />
