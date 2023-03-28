@@ -361,18 +361,17 @@ def sector_spending(request):
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def crypto_all_data(request):    
+def crypto_all_data(request):    #test
     if(cache.has_key("crypto" + request.user.email)):
-        data = cache.get(cache.has_key("crypto" + request.user.email))
+        data = cache.get("crypto" + request.user.email)
     else:
         data = getAllCryptoData(request.user)
         cache.set("crypto" + request.user.email, data)
-        
     return Response(data, content_type='application/json')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def crypto_select_data(request):
+def crypto_select_data(request):    #test
     print(request.GET.get('param'))
     if request.GET.get('param'):
         if(cache.has_key("crypto" + request.user.email) is False):

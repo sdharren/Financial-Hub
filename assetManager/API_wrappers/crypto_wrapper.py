@@ -92,7 +92,6 @@ def getAllCryptoData(user):
             arrVal = [value, "eth"]
 
             data[addr] = arrVal
-    
     return data
 
 # Collect select data from api instead of requesting all data
