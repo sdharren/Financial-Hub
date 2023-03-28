@@ -73,7 +73,7 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
     const options = {
     chart: {
         stacked: false,
-        height: 350
+        height: 100
     },
     dataLabels: {
         enabled: false
@@ -98,13 +98,13 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
     };
 
     return (
-        <div>
+        <div className='flex flex-col w-full max-h-[30vh]'>
         {
             selectOptions === undefined || selectOptions === null
             ? null
             : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
         }
-        <Chart options={options} series={series} />
+        <Chart height = "420vh" options={options} series={series} />
     </div>
     )
 }
