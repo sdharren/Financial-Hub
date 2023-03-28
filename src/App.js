@@ -40,7 +40,7 @@ import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
 function App() {
   return (
     <div className = "bg-[url('./images/background-image.png')]">
-      <div className= 'mx-20 max-w-full min-h-screen'>
+      <div className= 'mx-20 max-w-full min-h-screen font-["Outfit"]'>
       <Router>
         <AuthProvider>
           <Navbar />
