@@ -11,7 +11,6 @@ import {
 } from 'chart.js'
 
 import { Pie, getElementsAtEvent } from 'react-chartjs-2';
-import GraphSelect from '../../components/GraphSelect';
 
 
 ChartJS.register(
@@ -73,7 +72,7 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
         labels: pie_labels,
         datasets: [
             {
-                label: 'Amount',
+                label: '£',
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels
