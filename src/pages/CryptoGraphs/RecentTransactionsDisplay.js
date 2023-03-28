@@ -45,6 +45,7 @@ const CRecentTransactionsDisplay = () => {
           <th>Confirmed</th>
           <th>Fees</th>
           <th>Total</th>
+          <th>Coin Type</th>
         </tr>
       </thead>
       <tbody>
@@ -62,6 +63,7 @@ const CRecentTransactionsDisplay = () => {
                 <td>{new Date(transactions[wallet][0][subheading].confirmed).toLocaleString()}</td>
                 <td>{transactions[wallet][0][subheading].fees}</td>
                 <td>{transactions[wallet][1] == "btc" ? transactions[wallet][0][subheading].total/1e8 : transactions[wallet][0][subheading].total/1e18}</td>
+                <td>{transactions[wallet][1]}</td>
               </tr>
             ))}
           </React.Fragment>

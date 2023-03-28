@@ -41,7 +41,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         labels: pie_labels,
         datasets: [
             {
-                label: '£',
+                label: '%',
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels

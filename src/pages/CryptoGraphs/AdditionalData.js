@@ -50,10 +50,10 @@ const CAdditional = () => {
           
           <tr key={index}>
             <td>{wallet}</td>
-            <td>{AdditionalData[wallet][1] == "btc" ? AdditionalData[wallet][0].final_balance/1e8 : AdditionalData[wallet][0].final_balance/1e18}</td>
+            <td>{AdditionalData[wallet][1] == "btc" ? "£" + (AdditionalData[wallet][0].final_balance/1e8).toLocaleString() : "£" + (AdditionalData[wallet][0].final_balance/1e18).toLocaleString()}</td>
             <td>{AdditionalData[wallet][0].n_tx}</td>
-            <td>{AdditionalData[wallet][0].total_received}</td>
-            <td>{AdditionalData[wallet][0].total_sent}</td>
+            <td>{AdditionalData[wallet][1] == "btc" ? (AdditionalData[wallet][0].total_received/1e8).toLocaleString() : (AdditionalData[wallet][0].total_received/1e18).toLocaleString()}</td>
+            <td>{AdditionalData[wallet][1] == "btc" ? (AdditionalData[wallet][0].total_sent/1e8).toLocaleString() : (AdditionalData[wallet][0].total_sent/1e18).toLocaleString()}</td>
             <td>{AdditionalData[wallet][1]}</td>
           </tr>
         ))}
