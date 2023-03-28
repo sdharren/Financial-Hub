@@ -259,7 +259,7 @@ def exchange_public_token(request):
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
         set_single_institution_transactions(token,wrapper,request.user)
-        
+
     return Response(status=200)
 
 """
@@ -704,6 +704,27 @@ def delete_linked_banks(request, institution):
 def delete_linked_brokerage(request, brokerage):
 
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def linked_crypto(request):
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO)
+    cryptos = []
+    for crypto in account_types:
+        cryptos.append(crypto.access_token)
+    return Response(cryptos, content_type='application/json',status = 200)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_crypto(request, crypto):
+
+    account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
      return HttpResponseBadRequest('Linked brokerage account not found')
