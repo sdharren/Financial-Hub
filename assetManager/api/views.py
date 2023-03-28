@@ -13,7 +13,7 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
-from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, save_wallet_address, get_wallets
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, getCryptoOverview, save_wallet_address, get_wallets
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse
@@ -372,6 +372,15 @@ def crypto_select_data(request):
         # should return bad request
 
     return Response(data, content_type='application/json')
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_overview(request):
+    data = getCryptoOverview(user=request.user)
+
+    return Response(data, content_type='application/json')
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

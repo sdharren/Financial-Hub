@@ -3,7 +3,7 @@ Get balance given a wallet address
 """
 
 # pip3 install blockcypher
-from blockcypher import get_address_full
+from blockcypher import get_address_full, get_address_overview
 import json
 import requests as re
 
@@ -25,6 +25,13 @@ class getCryptoAddressData:
 
     def ETH_all(addr):
         command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
+        return re.get(command).json()
+
+    def BTC_overview(addr):
+        return(get_address_overview(address=addr, api_key='9c75ffab7c524ab19cee9d749110a3b2'))
+
+    def ETH_overview(addr):
+        command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr) + "/balance"
         return re.get(command).json()
 
 
@@ -142,6 +149,33 @@ def getAlternateCryptoData(user, command):
             data[addr] = arrVal
 
     return data
+
+def getCryptoOverview(user):
+    data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
+
+    btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
+    ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
+    
+    if(btcAddresses != None):
+        for account in btcAddresses:
+            addr = account.access_token
+
+            value = getCryptoAddressData.BTC_overview(addr)
+            arrVal = [value, "btc"]
+
+            data[addr] = arrVal
+
+    if(ethAddresses != None):
+        for account in ethAddresses:
+            addr = account.access_token
+
+            value = getCryptoAddressData.ETH_overview(addr)
+            arrVal = [value, "eth"]
+
+            data[addr] = arrVal
+        
+    return data
+
 
 def save_wallet_address(user, address):
     try:
