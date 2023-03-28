@@ -1,178 +1,47 @@
-// import React from 'react';
-// import { render, screen } from '@testing-library/react';
-// import LinkAssets from '../../pages/LinkAssets';
-// import { BrowserRouter, MemoryRouter } from 'react-router-dom';
-// import { AuthProvider } from '../../context/AuthContext';
-// import App from '../../App';
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { customRenderUser, customRenderNoUser} from '../test-utils'
+import LinkAssets from "../../pages/LinkAssets";
 
-// describe('LinkAssets component', () => {
-//     const user = { name: 'Test User', email: 'test@example.com' };
-//     const PrivateRouteWrapper = ({ children }) => (
-//       <AuthProvider value={{ user }}>
-//         {children}
-//       </AuthProvider>
-//     );
+describe("LinkAssets component", () => {
+  it("should render correctly for a logged-in user", () => {
+    customRenderUser(<LinkAssets />);
+    expect(screen.getByTestId("linkassetstest")).toBeInTheDocument();
+    expect(screen.getAllByRole("button")).toHaveLength(3);
+  });
 
-//   it('renders without crashing', () => {
-//     render(
-//         <MemoryRouter initialEntries={[LinkAssets]}>
-//           <PrivateRouteWrapper>
-//             <App />
-//           </PrivateRouteWrapper>
-//         </MemoryRouter>
-//     );
-//     const linkassets = screen.queryByTestId('linkassetstest');
-//     expect(linkassets).toBeDefined();
-//   });
+  it("should render texts for the page", () => {
+    customRenderUser(<LinkAssets />);
+    const debitText = screen.getByText("Link your credit or debit card");
+    const assetText = screen.getByText("Link your brokerage account");
+    const cryptoText = screen.getByText("Link your crypto wallet");
+    expect(debitText).toBeInTheDocument();
+    expect(assetText).toBeInTheDocument();
+    expect(cryptoText).toBeInTheDocument();
 
-//   it('contains the "home_page" class', () => {
-//     const { container } = render(
-//         <MemoryRouter initialEntries={['/link_assets']}>
-//           <PrivateRouteWrapper>
-//             <App />
-//           </PrivateRouteWrapper>
-//         </MemoryRouter>
-//       );
-//       expect(container.querySelector('.asset__content')).toBeInTheDocument();
-//   });
+  })
 
-//   it('contains the "home_boxes" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider value={{ user }}>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.background__image')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home_text_holder" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.middle-text')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home__content__holder" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.link-button')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home__box" class', () => {render(
-//     <BrowserRouter>
-//     <AuthProvider>
-//     <LinkAssets />
-//     </AuthProvider>
-//     </BrowserRouter>);
-//     expect(container.querySelector('.assetLink_holder')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home__background_image" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.debit__card__image')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home__content" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.background__box')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home-text" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.bank__image')).toBeInTheDocument();
-//   });
-
-//   it('contains the "home__first__image" class', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.crypto__image')).toBeInTheDocument();
-//   });
-
-//   it('has the correct source for the "home__background__image" element', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.debit__card__image').src).toEqual('http://localhost/asset-debit.png');
-//   });
-
-//   it('has the correct source for the "home__background__image" element', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.bank__image').src).toEqual('http://localhost/asset-bank.png');
-//   });
-
-//   it('has the correct source for the "home__background__image" element', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.crypto__image').src).toEqual('http://localhost/asset-crypto.png');
-//   });
-
-//   it('has the correct alt text for the "home__background__image" element', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.debit__card__image').alt).toEqual('#');
-//   });
-
-//   it('has the correct alt text for the "home__first__image" elements', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelectorAll('.bank__image').alt).toEqual('#');
+  it("should render the images for the page", () => {
+    customRenderUser(<LinkAssets />);
+    const bankImg = screen.getByRole('img', {name : "debit__card__image"});
+    const assetImg = screen.getByRole('img', {name : "bank__image"});
+    const cryptoImg = screen.getByRole('img', {name : "crypto__image"});
+    expect(bankImg['src']).toEqual("http://localhost/asset-debit.png");
+    expect(assetImg['src']).toEqual("http://localhost/asset-bank.png");
+    expect(cryptoImg['src']).toEqual("http://localhost/asset-crypto.png");
     
-//   });
+  })
 
-//   it('has the correct alt text for the "home__background__image" element', () => {
-//     const { container } = render(
-//         <BrowserRouter>
-//         <AuthProvider>
-//         <LinkAssets />
-//         </AuthProvider>
-//         </BrowserRouter>);
-//     expect(container.querySelector('.crypto__image').alt).toEqual('#');
-//   });
-// });
+//   it("should render the background images for the page", () => {
+//     customRenderUser(<LinkAssets />);
+//     const backgroundImg = screen.getByRole('img', {name : "background__image"});
+//     expect(backgroundImg['src']).toEqual("http://localhost/asset-background");
+//   }
+//   )
+
+  it("should navigate to the crypto addresses page when clicking on the crypto wallet button", async () => {
+    customRenderUser(<LinkAssets />);
+    const linkButton = screen.getAllByText("Link")[2];
+    fireEvent.click(linkButton);
+    expect(screen.getByText("Link your crypto wallet"));
+  });
+});

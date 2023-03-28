@@ -46,10 +46,10 @@ export default function LinkAssets() {
         <div>
             <div className="assetLink_holder">
                 <div className="background__box">
-                <img className="background__image" src={bkbox} alt="#"></img>
+                <img className="background__image" src={bkbox} alt="background__image"></img>
                     <div className="asset__content">
-                        <img className="debit__card__image" src={debitCard} alt="#"></img>
-                        <p className="middle-text">Link your credit or debit card</p>
+                        <img className="debit__card__image" src={debitCard} alt="debit__card__image"></img>
+                        <p className="debit-middle-text">Link your credit or debit card</p>
                         <button className="link-button" onClick={async () => {await get_link_token("transactions");} }>Link</button>
                     </div>
                 </div>
@@ -59,10 +59,10 @@ export default function LinkAssets() {
         <div>
             <div className="assetLink_holder">
                 <div className="background__box">
-                <img className="background__image" src={bkbox} alt="#"></img>
+                <img className="background__image" src={bkbox} alt="background__image"></img>
                     <div className="asset__content">
-                        <img className="bank__image" src={bankimg} alt="#"></img>
-                        <p className="middle-text">Link your brokerage account</p>
+                        <img className="bank__image" src={bankimg} alt="bank__image"></img>
+                        <p className="asset-middle-text">Link your brokerage account</p>
                         <button className="link-button" onClick={async () => {await get_link_token("investments");} }>Link</button>
                     </div>
                 </div>
@@ -72,10 +72,10 @@ export default function LinkAssets() {
         <div>
             <div class="assetLink_holder">
                 <div class="background__box">
-                <img class="background__image" src={bkbox} alt="#"></img>
+                <img class="background__image" src={bkbox} alt="background__image"></img>
                     <div class="asset__content">
-                        <img class="crypto__image" src={cryptoimg} alt="#"></img>
-                        <p class="middle-text">Link your crypto wallet</p>
+                        <img class="crypto__image" src={cryptoimg} alt="crypto__image"></img>
+                        <p class="crypto-middle-text">Link your crypto wallet</p>
                         <button class="link-button" onClick={buttClick}>Link</button>
                     </div>
                 </div>
