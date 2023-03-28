@@ -4,8 +4,8 @@ Get balance given a wallet address
 
 # pip3 install blockcypher
 from blockcypher import get_address_full, get_address_overview
-import json
 import requests as re
+import warnings
 
 from assetManager.models import AccountType, AccountTypeEnum
 from assetManager.helpers import make_aware_date
@@ -15,6 +15,20 @@ from django.db import IntegrityError
 # KEY is BTC/ETH and Value is List of addresses
 ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
              "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
+
+# Get fiat conversion rates
+def find_fiat_rates():
+    response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
+    btc_gbp = response_btc.json()['bitcoin']['gbp']
+
+    # Make a GET request to the CoinGecko API to get the ETH-to-GBP exchange rate
+    response_eth = re.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp')
+    eth_gbp = response_eth.json()['ethereum']['gbp']
+
+    rates = [btc_gbp, eth_gbp]
+
+    return(rates)
+
 
 # All return values in JSON form
 # BTC Docs available @ https://www.blockcypher.com/dev/bitcoin/?python#address-endpoint
@@ -75,11 +89,15 @@ def getAllCryptoData(user):
     btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
     ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
 
+    rate = find_fiat_rates()
+
     if(btcAddresses != None):
         for account in btcAddresses:
             addr = account.access_token
 
             value = getCryptoAddressData.BTC_all(addr)
+            amount = value["final_balance"] 
+            value["final_balance"] = amount * rate[0]
             arrVal = [value, "btc"]
 
             data[addr] = arrVal
@@ -89,6 +107,10 @@ def getAllCryptoData(user):
             addr = account.access_token
 
             value = getCryptoAddressData.ETH_all(addr)
+            
+            amount = value["final_balance"] 
+            value["final_balance"] = amount * rate[1]
+            
             arrVal = [value, "eth"]
 
             data[addr] = arrVal
@@ -103,6 +125,8 @@ def getAlternateCryptoData(user, command, data):
     btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
     ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
 
+    rate = find_fiat_rates()
+
     if(btcAddresses != None):
         for account in btcAddresses:
             addr = account.access_token
@@ -113,7 +137,7 @@ def getAlternateCryptoData(user, command, data):
                 if command == "address":
                     value = getUsableCrypto.getAddress(value, "btc")
                 elif command == "balance":
-                    value = getUsableCrypto.getBalance(value, "btc")
+                    value = getUsableCrypto.getBalance(value, "btc") * rate[0]
                 elif command == "notx":
                     value = getUsableCrypto.getNoTx(value, "btc")
                 elif command == "received":
@@ -137,7 +161,7 @@ def getAlternateCryptoData(user, command, data):
             if command == "address":
                 value = getUsableCrypto.getAddress(value, "eth")
             elif command == "balance":
-                value = getUsableCrypto.getBalance(value, "eth")
+                value = getUsableCrypto.getBalance(value, "eth") * rate[1]
             elif command == "notx":
                 value = getUsableCrypto.getNoTx(value, "eth")
             elif command == "received":
