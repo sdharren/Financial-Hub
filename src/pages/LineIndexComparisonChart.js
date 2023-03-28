@@ -2,20 +2,23 @@ import { useState, useEffect, useContext } from "react";
 import Chart from "react-apexcharts";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/AuthContext';
+import GraphSelect from "../components/GraphSelect";
 
-function LineIndexComparisonChart () {
+function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions, updateGraph }) {
     const [comparisonData, setComparisonData] = useState(null);
-
     const navigate = useNavigate();
-
     let {authTokens, logoutUser} = useContext(AuthContext);
 
-    
-        // 
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
+    }
 
     useEffect (() => {
         const get_data = async() =>  {
-            let url = 'api/portfolio_comparison/?param=^GDAXI';
+            let url = 'api/portfolio_comparison/?param='+endpoint_parameter;
             let response = await fetch(url, {
                 method:'GET',
                 headers:{
@@ -36,7 +39,7 @@ function LineIndexComparisonChart () {
             }
         }
         get_data();
-    }, []);
+    }, [endpoint, endpoint_parameter]);
 
     let dates = [];
     let portfolio = [];
@@ -55,8 +58,6 @@ function LineIndexComparisonChart () {
         });
     }
 
-    console.log(portfolio)
-    console.log(index)
     const series = [  
         {    
             name: 'Portfolio',   
@@ -98,8 +99,13 @@ function LineIndexComparisonChart () {
 
     return (
         <div>
-            <Chart options={options} series={series} />
-        </div>
+        {
+            selectOptions === undefined || selectOptions === null
+            ? null
+            : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
+        }
+        <Chart options={options} series={series} />
+    </div>
     )
 }
 
