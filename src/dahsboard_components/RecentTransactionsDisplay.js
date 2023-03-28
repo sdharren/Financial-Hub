@@ -56,7 +56,7 @@ function RecentTransactions() {
       data === null ? (
       <p>Loading...</p> 
       ) : (
-      <TableContainer styles={styles.container}>
+      <TableContainer styles={styles.container} style = {{ maxHeight: '57vh'}}>
       <Typography variant="h6" style={styles.title}>
         Recent Transactions
       </Typography>
@@ -69,6 +69,7 @@ function RecentTransactions() {
                 active={sort.category === category}
                 direction={sort.category === category ? sort.direction : 'asc'}
                 onClick={() => sortData(category)}
+                style={{color: 'white'}}
               >
                 {category}
               </TableSortLabel>
@@ -80,11 +81,11 @@ function RecentTransactions() {
         {Object.entries(data).map(([institution, transactions]) => (
           transactions.map((transaction, index) => (
             <TableRow key={`${institution}-${index}`}>
-              <TableCell>{institution}</TableCell>
-              <TableCell>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
-              <TableCell>{transaction.date}</TableCell>
-              <TableCell>{transaction.merchant}</TableCell>
-              <TableCell>{transaction.category}</TableCell>
+              <TableCell style={{color: 'white'}}>{institution}</TableCell>
+              <TableCell style={{color: 'white'}}>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
+              <TableCell style={{color: 'white'}}>{transaction.date}</TableCell>
+              <TableCell style={{color: 'white'}}>{transaction.merchant}</TableCell>
+              <TableCell style={{color: 'white'}}>{transaction.category}</TableCell>
             </TableRow>
           ))
         ))}
