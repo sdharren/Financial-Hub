@@ -8,7 +8,7 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
-from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets
+from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets, getAllCryptoData
 from functools import wraps
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from rest_framework.response import Response
@@ -489,12 +489,24 @@ def transaction_data_getter(user):
     except Exception:
         raise PlaidQueryException('Something went wrong querying PLAID.')
 
+"""
+@params:
+- user: models.User
+  The user making the query
 
+@description:
+This function retrieves all wallets of a user then iteratively sums all the wallet balances
+
+@return:
+An integer that is the overall balance across all wallets
+"""
 def sum_crypto_balances(user):
     wallets = get_wallets(user)
     total = 0
-    storedData = cache.get("crypto" + user.email)
-    data = getAlternateCryptoData(wallets, "balance", storedData)
+    if not cache.has_key("crypto" + user.email):
+        cache.set("crypto" + user.email,getAllCryptoData(user))
+    data = cache.get("crypto" + user.email)
+    data = getAlternateCryptoData(user, "balance", data)
     for key in data.keys():
-        total += data[key][1]
+        total = total + data[key][0]
     return total
