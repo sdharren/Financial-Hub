@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import useHandleError from '../custom_hooks/useHandleError';
 import usePlaid from '../custom_hooks/usePlaid';
-import { Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel } from '@mui/material';
+import { Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel, TableContainer } from '@mui/material';
 
 function RecentTransactions() {
   const endpoint = 'recent_transactions';
@@ -41,7 +41,8 @@ function RecentTransactions() {
       data === null ? (
       <p>Loading...</p> 
       ) : (
-      <Table>
+      <TableContainer style={{maxHeight: '57vh'}}>
+      <Table stickyHeader>
       <TableHead>
       <TableRow>
           {categories.map((category) => (
@@ -71,6 +72,7 @@ function RecentTransactions() {
         ))}
       </TableBody>
       </Table>
+      </TableContainer>
       )}
     </div>
   );
