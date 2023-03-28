@@ -1,57 +1,112 @@
+import { useState, useEffect, useContext } from "react";
+import Chart from "react-apexcharts";
+import { useNavigate } from "react-router-dom";
+import AuthContext from '../context/AuthContext';
+import GraphSelect from "../components/GraphSelect";
 
-const data = [  
-    {    
-        name: 'Portfolio',   
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 130]
+function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions, updateGraph }) {
+    const [comparisonData, setComparisonData] = useState(null);
+    const navigate = useNavigate();
+    let {authTokens, logoutUser} = useContext(AuthContext);
+
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
+    }
+
+    useEffect (() => {
+        const get_data = async() =>  {
+            let url = 'api/portfolio_comparison/?param='+endpoint_parameter;
+            let response = await fetch(url, {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
+            });
+
+            let data = await response.json();
+            
+            if (response.status === 200) {
+                setComparisonData(data);
+            }
+            else if (response.status === 303) {
+                if (data['error'] === 'Investments not linked.') {
+                    navigate('/plaid_link');
+                }
+            }
+        }
+        get_data();
+    }, [endpoint, endpoint_parameter]);
+
+    let dates = [];
+    let portfolio = [];
+    let index = [];
+    
+    for (let key in comparisonData) {
+        dates.push(key);
+        portfolio.push({
+            x: key,
+            y: comparisonData[key]['portfolio']
+        });
+        
+        index.push({
+            x: key,
+            y:comparisonData[key]['index']
+        });
+    }
+
+    const series = [  
+        {    
+            name: 'Portfolio',   
+            data: portfolio
+        },
+
+        {
+            name: 'Index',
+            data: index
+        }
+    ];
+
+    const options = {
+    chart: {
+        stacked: false,
+        height: 350
     },
-
-    {
-        name: 'Index',
-        data: [20, 22, 30, 45, 60, 90, 105, 120, 135, 150]
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        width: [2, 2],
+        curve: 'straight'
+    },
+    xaxis: {
+        type: 'datetime',
+    },
+    yaxis: {
+        title: {
+        text: 'Value'
+        }
+    },
+    legend: {
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetX: 40
     }
-];
+    };
 
-const options = {
-  chart: {
-    type: 'line',
-    stacked: true,
-    height: 350
-  },
-  dataLabels: {
-    enabled: false
-  },
-  stroke: {
-    width: [2, 2],
-    curve: 'smooth'
-  },
-  series: data,
-  xaxis: {
-    type: 'datetime'
-  },
-  yaxis: {
-    title: {
-      text: 'Value'
-    }
-  },
-  fill: {
-    opacity: [0.8, 0.8],
-    gradient: {
-      inverseColors: false,
-      shade: 'light',
-      type: 'vertical',
-      opacityFrom: 0.85,
-      opacityTo: 0.55,
-      stops: [0, 100]
-    }
-  },
-  legend: {
-    position: 'top',
-    horizontalAlign: 'left',
-    offsetX: 40
-  }
-};
+    return (
+        <div>
+        {
+            selectOptions === undefined || selectOptions === null
+            ? null
+            : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
+        }
+        <Chart options={options} series={series} />
+    </div>
+    )
+}
 
-const chart = new ApexCharts(document.querySelector('#chart'), options);
-
-
-chart.render();
+export default LineIndexComparisonChart;

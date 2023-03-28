@@ -1,7 +1,7 @@
 import React from 'react';
 import ApexCharts from 'apexcharts-react';
 
-const BubbleChart = () => {
+function BubbleChart () {
   const options = {
     chart: {
       type: 'bubble',

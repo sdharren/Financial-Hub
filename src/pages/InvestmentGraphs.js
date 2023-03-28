@@ -3,6 +3,7 @@ import LineGraph from "../dahsboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
+import LineIndexComparisonChart from "./LineIndexComparisonChart";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
@@ -17,6 +18,7 @@ function InvestmentGraphs() {
     const [overviewActive, setOverviewActive] = useState(true);
     const [categoryActive, setCategoryActive] = useState(false);
     const [stocksActive, setStocksActive] = useState(false);
+    const [comparisonActive, setComparisonActive] = useState(false);
 
     // keep track of last displayed graphs so we know what to display if user switches tabs manually
     const [lastCategory, setLastCategory] = useState(null);
@@ -65,16 +67,25 @@ function InvestmentGraphs() {
             setCategoryActive(false);
             setStocksActive(false);
             setOverviewActive(true);
+            setComparisonActive(false);
         }
         else if (graph === 'investment_category_breakdown') {
             setCategoryActive(true);
             setStocksActive(false);
             setOverviewActive(false);
+            setComparisonActive(false);
         }
         else if (graph === 'stock_history') {
             setCategoryActive(false);
             setStocksActive(true);
             setOverviewActive(false);
+            setComparisonActive(false);
+        }
+        else if (graph === 'portfolio_comparison') {
+            setCategoryActive(false);
+            setStocksActive(false);
+            setOverviewActive(false);
+            setComparisonActive(true);
         }
     }
     
@@ -138,6 +149,24 @@ function InvestmentGraphs() {
                             />
                         </div>
                     );
+                changeTabActive(endpoint);
+                break;
+            
+            case 'portfolio_comparison':
+                const comparisonOptions = ["^GSPC","^FTSE", "^DJI", "^STOXX50E", "^GDAXI"];
+                if (endpoint_parameter === null || endpoint_parameter === undefined) {
+                    var endpoint_parameter = comparisonOptions[0];
+                }
+                setGraph(
+                    <div className="inline-block min-h-[60vh] max-h-[60vh] w-full">
+                        <LineIndexComparisonChart
+                            endpoint={endpoint}
+                            updateGraph={handleGraphUpdate}
+                            endpoint_parameter={endpoint_parameter}
+                            selectOptions={comparisonOptions}
+                        />        
+                    </div>
+                );
                 changeTabActive(endpoint);
                 break;
         }
@@ -220,6 +249,9 @@ function InvestmentGraphs() {
         else if (endpoint === 'investment_categories') {
             changeGraph(endpoint);
         }
+        else if (endpoint === 'portfolio_comparison') {
+            changeGraph(endpoint);
+        }
     }
 
 
@@ -232,8 +264,11 @@ function InvestmentGraphs() {
                 <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (categoryActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
                     Category
                     </button>
-                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center" + (stocksActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('stock_history')}>
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (stocksActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('stock_history')}>
                     Stock Breakdown
+                </button>
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center" + (comparisonActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('portfolio_comparison')}>
+                    Portfolio Comparison
                 </button>
             </div>
 
