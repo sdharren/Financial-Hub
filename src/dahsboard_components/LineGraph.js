@@ -80,6 +80,11 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             },
             xaxis: {
                 categories: chartCategories,
+                labels: {
+                    style: {
+                      colors: '#fff'
+                    }
+                  }
             },
             dataLabels: {
                 enabled: false
