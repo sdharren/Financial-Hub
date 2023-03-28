@@ -102,7 +102,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -171,3 +170,4 @@ sketch
 
 /node_modules
 /coverage
+.env
