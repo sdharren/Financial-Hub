@@ -23,19 +23,12 @@ import Link from './pages/Link';
 import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
 import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
-
-// ask matthew about how margins are lined
 import CurrencyDisplay from './pages/CurrencyDisplay';
-// import TransactionTable
 import LineGraph from './dahsboard_components/LineGraph';
-
-// ask matthew about how margins are lined
 import SectorSpending from './pages/SectorSpendingDisplay';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
-
-// ask matthew about how margins are lined
 
 function App() {
   return (
