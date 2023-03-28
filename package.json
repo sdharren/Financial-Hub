@@ -5,6 +5,10 @@
   "proxy": "http://127.0.0.1:8000",
   "homepage": ".",
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/material": "^5.11.15",
+    "@mui/styled-engine": "^5.11.11",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
