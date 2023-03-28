@@ -28,6 +28,11 @@ class Command(BaseCommand):
             second_public_token = wrapper.create_public_token(bank_id='ins_12', products_chosen=['investments','transactions'])
             wrapper.exchange_public_token(second_public_token)
             wrapper.save_access_token(user, ['transactions','investments'])
+
+            public_custom_token = wrapper.create_public_token_custom_user()
+            wrapper.exchange_public_token(public_custom_token)
+            wrapper.save_access_token(user, ['transactions'])
+            
             #bitcoin
             save_wallet_address(user,"bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v")
             #euthereum
