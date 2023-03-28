@@ -39,33 +39,40 @@ const CRecentTransactionsDisplay = () => {
     getTransactions();
   }, []);
 
-  const renderTableHeader = () => {
-    return (
-      <tr>
-        <th>Address</th>
-        <th>Confirmations</th>
-        <th>Amount</th>
-      </tr>
-    );
-  }
-
-  const renderTableData = () => {
-    return transactions[transactions].map(({ address, confirmations, amount }) => {
-      return (
-        <tr key={address}>
-          <td>{address}</td>
-          <td>{confirmations}</td>
-          <td>{amount}</td>
-        </tr>
-      );
-    });
-  }
-
   return (
-    <table className="transaction-table">
-      <thead>{renderTableHeader()}</thead>
-      <tbody>{renderTableData()}</tbody>
-    </table>
+    <div>
+      {transactions.map((wallet, walletIndex) => (
+        <div key={walletIndex}>
+          <h2>Wallet: {wallet.address}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Block Hash</th>
+                <th>Block Height</th>
+                <th>Confidence</th>
+                <th>Confirmations</th>
+                <th>Confirmed</th>
+                <th>Double Spend</th>
+                <th>Fees</th>
+              </tr>
+            </thead>
+            <tbody>
+              {wallet.txs.map((transaction, transactionIndex) => (
+                <tr key={transactionIndex}>
+                  <td>{transaction.block_hash}</td>
+                  <td>{transaction.block_height}</td>
+                  <td>{transaction.confidence}</td>
+                  <td>{transaction.confirmations}</td>
+                  <td>{transaction.confirmed}</td>
+                  <td>{transaction.double_spend ? "Yes" : "No"}</td>
+                  <td>{transaction.fees}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
   );
 };
 

@@ -66,7 +66,6 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
         let pieLabel = key + ' - ' + pieChartData[key][1]; 
         pie_labels.push(pieLabel);
         var currVal = pieChartData[key][0];
-        console.log(currVal);
         pie_data.push(currVal);
     }
 
@@ -74,7 +73,7 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
         labels: pie_labels,
         datasets: [
             {
-                label: '$$$',
+                label: 'Amount',
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels

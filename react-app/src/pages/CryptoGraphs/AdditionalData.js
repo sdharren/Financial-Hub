@@ -39,38 +39,35 @@ const CAdditional = () => {
     useEffect(() => {
       get_data();
       }, []);
-    
+
 
     return (
       <table>
       <thead>
         <tr>
           <th>Wallet</th>
-          <th>Address</th>
           <th>Balance</th>
           <th>Number of Transactions</th>
           <th>Total Received</th>
           <th>Total Sent</th>
+          <th>Coin Type</th>
         </tr>
       </thead>
       <tbody>
         {Object.keys(AdditionalData).map((wallet, index) => (
+          
           <tr key={index}>
             <td>{wallet}</td>
-            {Object.keys(AdditionalData[wallet]).map((subheading, index) => (
-              <React.Fragment key={index}>
-                <td>{subheading}</td>
-                <td>{data[wallet][subheading].value1}</td>
-                <td>{data[wallet][subheading].value2}</td>
-                <td>{data[wallet][subheading].value3}</td>
-                <td>{data[wallet][subheading].value2}</td>
-                <td>{data[wallet][subheading].value3}</td>
-              </React.Fragment>
-            ))}
+            <td>{AdditionalData[wallet][1] == "btc" ? AdditionalData[wallet][0].final_balance/1e8 : AdditionalData[wallet][0].final_balance/1e18}</td>
+            <td>{AdditionalData[wallet][0].n_tx}</td>
+            <td>{AdditionalData[wallet][0].total_received}</td>
+            <td>{AdditionalData[wallet][0].total_sent}</td>
+            <td>{AdditionalData[wallet][1]}</td>
           </tr>
         ))}
       </tbody>
     </table>
+
     );
   };
   
