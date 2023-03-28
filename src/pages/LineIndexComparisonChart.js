@@ -1,13 +1,14 @@
 import { useState, useEffect, useContext } from "react";
 import Chart from "react-apexcharts";
-import { useNavigate } from "react-router-dom";
-import AuthContext from '../context/AuthContext';
 import GraphSelect from "../components/GraphSelect";
+import usePlaid from "../custom_hooks/usePlaid";
+import useHandleError from "../custom_hooks/useHandleError";
 
 function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions, updateGraph }) {
-    const [comparisonData, setComparisonData] = useState(null);
-    const navigate = useNavigate();
-    let {authTokens, logoutUser} = useContext(AuthContext);
+
+    const [comparisonData, error] = usePlaid({endpoint, endpoint_parameter})
+
+    useHandleError(error);
 
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
@@ -15,31 +16,6 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
             'param': nextParam
         });
     }
-
-    useEffect (() => {
-        const get_data = async() =>  {
-            let url = 'api/portfolio_comparison/?param='+endpoint_parameter;
-            let response = await fetch(url, {
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/json',
-                    'Authorization':'Bearer ' + String(authTokens.access)
-                }
-            });
-
-            let data = await response.json();
-            
-            if (response.status === 200) {
-                setComparisonData(data);
-            }
-            else if (response.status === 303) {
-                if (data['error'] === 'Investments not linked.') {
-                    navigate('/plaid_link');
-                }
-            }
-        }
-        get_data();
-    }, [endpoint, endpoint_parameter]);
 
     let dates = [];
     let portfolio = [];
