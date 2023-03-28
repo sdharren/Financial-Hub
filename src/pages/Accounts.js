@@ -4,7 +4,7 @@ import AuthContext from '../context/AuthContext';
 function Accounts() {
     const [banks, setBanks] = useState([]);
     const [brokerages, setBrokerages] = useState([]);
-    const [cryptos, setCrypto] = useState([]);
+    const [cryptos, setCryptos] = useState([]);
     let {authTokens, logoutUser} = useContext(AuthContext);
 
     let getAccounts = async () => {
@@ -41,7 +41,7 @@ function Accounts() {
           }
         });
         const cryptodata = await cryptoresponse.json();
-        setCrypto(cryptodata);
+        setCryptos(cryptodata);
 
       } catch (error) {
         console.error(error);
@@ -94,10 +94,10 @@ function Accounts() {
     }
   };
 
-  const handleRemoveCrypto = async (wallet_address) => {
+  const handleRemoveCrypto = async (crypto) => {
     try {
       // Send DELETE request to unlink crypto account
-      const response = await fetch(`/api/delete_linked_crypto/${wallet_address}/`, {
+      const response = await fetch(`/api/delete_linked_crypto/${crypto}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ function Accounts() {
         throw new Error(`Failed to remove crypto wallet: ${response.status} ${response.statusText}`);
       }
       // Remove bank from list of linked banks
-      setCrypto(cryptos.filter(crypto => crypto !== wallet_address));
+      setCryptos(cryptos.filter(c => c !== crypto));
     } catch (error) {
       console.error(error);
     }

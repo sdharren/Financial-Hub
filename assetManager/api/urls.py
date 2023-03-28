@@ -42,5 +42,5 @@ urlpatterns = [
     path('link_crypto_wallet/', views.link_crypto_wallet, name='link_crypto_wallet'),
     path('all_crypto_wallets/', views.all_crypto_wallets, name='all_crypto_wallets'),
     path('linked_crypto/', views.linked_crypto, name='linked_crypto'),
-    path('delete_linked_crypto/<str:crypto>', views.delete_linked_crypto, name='delete_linked_crypto'),
+    path('delete_linked_crypto/<str:crypto>/', views.delete_linked_crypto, name='delete_linked_crypto'),
 ]

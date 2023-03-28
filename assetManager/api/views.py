@@ -723,7 +723,7 @@ def linked_crypto(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_linked_crypto(request, crypto):
-    print('here')
+    
     account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
