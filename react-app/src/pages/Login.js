@@ -13,7 +13,7 @@ const fields = loginFields;
 let fieldState = {};
 fields.forEach(field => fieldState[field.id] = '');
 
-const Login = () => {
+const Login = ({submit}) => {
 
   let {loginUser, error} = useContext(AuthContext);
 
@@ -25,7 +25,7 @@ const Login = () => {
             linkName = "Signup"
             linkUrl = "/signup"
         />
-        <form className = "mt-8 space-y-6" onSubmit = {loginUser}>
+        <form className = "mt-8 space-y-6" onSubmit = {submit === undefined ? loginUser : submit}>
             <div className = "-space-y-px">
                 {
                     fields.map(field=>
