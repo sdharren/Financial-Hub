@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import useHandleError from '../custom_hooks/useHandleError';
 import usePlaid from '../custom_hooks/usePlaid';
-import { Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel } from '@mui/material';
+import { Typography, Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel, TableContainer, Paper } from '@mui/material';
 
 function RecentTransactions() {
   const endpoint = 'recent_transactions';
@@ -14,45 +14,62 @@ function RecentTransactions() {
  
   useHandleError(error);
 
+  const styles = {
+    container: {
+      backgroundColor: 'transparent', // Set the container background to transparent
+    },
+    title: {
+      textAlign: 'center',
+      marginBottom: '1rem', // Add some margin below the title
+    },
+    table: {
+      backgroundColor: 'transparent',
+    },
+  };
+
   const categories = ['Institution', 'Amount', 'Date', 'Category', 'Merchant'];
 
-  // const [sort, setSort] = useState({ category: 'institution', direction: 'asc' });
+  const [sort, setSort] = useState({ category: 'institution', direction: 'asc' });
 
-  // const sortData = (category) => {
-  //   const isAscending = sort.category === category && sort.direction === 'asc';
-  //   const sortedData = Object.entries(data).sort((a, b) => {
-  //     const aValue = a[1][0][category];
-  //     const bValue = b[1][0][category];
-  //     if (aValue < bValue) {
-  //       return isAscending ? -1 : 1;
-  //     }
-  //     if (aValue > bValue) {
-  //       return isAscending ? 1 : -1;
-  //     }
-  //     return 0;
-  //   });
-  //   setSort({ category, direction: isAscending ? 'desc' : 'asc' });
-  //   setData(Object.fromEntries(sortedData));
-  // };
+  const sortData = (category) => {
+    const isAscending = sort.category === category && sort.direction === 'asc';
+    const sortedData = Object.entries(data).sort((a, b) => {
+      const aValue = a[1][0][category];
+      const bValue = b[1][0][category];
+      if (aValue < bValue) {
+        return isAscending ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return isAscending ? 1 : -1;
+      }
+      return 0;
+    });
+    setSort({ category, direction: isAscending ? 'desc' : 'asc' });
+    setData(Object.fromEntries(sortedData));
+  };
 
   return (
-    <div>
+    <div styles={styles.container}>
     {
       data === null ? (
       <p>Loading...</p> 
       ) : (
-      <Table>
+      <TableContainer component={Paper}>
+      <Typography variant="h6" style={styles.title}>
+        Recent Transactions
+      </Typography>
+      <Table style={styles.table}>
       <TableHead>
       <TableRow>
           {categories.map((category) => (
             <TableCell key={category}>
-              {/* <TableSortLabel
+              <TableSortLabel
                 active={sort.category === category}
                 direction={sort.category === category ? sort.direction : 'asc'}
                 onClick={() => sortData(category)}
               >
                 {category}
-              </TableSortLabel> */}
+              </TableSortLabel>
             </TableCell>
           ))}
         </TableRow>
@@ -71,6 +88,7 @@ function RecentTransactions() {
         ))}
       </TableBody>
       </Table>
+      </TableContainer>
       )}
     </div>
   );
