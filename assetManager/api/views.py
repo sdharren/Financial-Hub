@@ -725,6 +725,9 @@ def delete_linked_brokerage(request, brokerage):
      return HttpResponseBadRequest('Linked brokerage account not found')
 
     account_type.delete()
+
+    delete_cached('investments', request.user)
+
     return HttpResponse(status=204)
 
 @api_view(['GET'])
