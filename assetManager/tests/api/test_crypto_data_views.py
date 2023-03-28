@@ -54,6 +54,16 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         crypto_data = crypto_all_data(request).data
         cache.set('crypto'+self.user.email,crypto_data)
 
+    def test_crypto_all_data_with_cached_data(self):
+        self.create_public_token()
+        self.generate_then_cache_crypto()
+        request = self.factory.get('/dashboard')
+        force_authenticate(request, user=self.user)
+        response = crypto_all_data(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEqual(cache.get('crypto'+self.user.email),response.data)
+
     def test_crypto_all_data_without_cached_data(self):
         self.create_public_token()
         self.generate_then_cache_crypto()
