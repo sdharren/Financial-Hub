@@ -66,7 +66,7 @@ function RecentTransactions() {
           {categories.map((category) => (
             <TableCell 
               key={category}
-              style={{color: 'white', fontWeight: 'bold', fontSize: '1.5rem'}}
+              style={{color: 'white', fontWeight: 'bold', fontSize: '0.9rem'}}
             >
               {category}
             </TableCell>
