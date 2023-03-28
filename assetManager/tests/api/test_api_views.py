@@ -185,11 +185,14 @@ class APIViewsTestCase(TestCase):
         cache.set('currency' + self.user.email,balances)
         reformatted_transactions = BankGraphData(single_transaction_dict)
         cache.set('transactions' + self.user.email,reformatted_transactions.transactionInsight.transaction_history)
+        total_assets_data = {"Bank Assets": 100.0, "Invested Assets": 100.0, "Crypto Assets": 100.0}
+        cache.set('total_assets'+self.user.email,total_assets_data)
 
         self.assertTrue(cache.has_key('investments' + self.user.email))
         self.assertTrue(cache.has_key('balances' + self.user.email))
         self.assertTrue(cache.has_key('currency' + self.user.email))
         self.assertTrue(cache.has_key('transactions' + self.user.email))
+        self.assertTrue(cache.has_key('total_assets' + self.user.email))
 
         response = self.client.delete('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
@@ -197,6 +200,7 @@ class APIViewsTestCase(TestCase):
         self.assertFalse(cache.has_key('balances' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
         self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('total_assets' + self.user.email))
 
     def test_delete_cache_assets_works_for_some_loaded_keys(self):
         account_balances = {'Royal Bank of Scotland - Current Accounts': {'JP4gb79D1RUbW96a98qVc5w1JDxPNjIo7xRkx': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, 'k1xZm8kWJjCnRqmjqGgrt96VaexNzGczPaZoA': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}}

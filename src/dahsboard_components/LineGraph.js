@@ -7,7 +7,7 @@ import useHandleError from '../custom_hooks/useHandleError';
 
 function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
     const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
-
+    
     useHandleError(error);
 
     var chartCategories = [], chartSeries = [];
