@@ -221,7 +221,17 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
+"""
+@params: request: HTTP request object containing information about the user and the GET parameters.
 
+@Description: This function is responsible for linking a user's cryptocurrency wallet address to their account. 
+It retrieves the user object from the request, checks if the 'param' parameter is present in the GET request, 
+and saves the wallet address to the user's account using the save_wallet_address() function. 
+It then retrieves all of the user's cryptocurrency data using getAllCryptoData(), caches it using the cache.set() function, and returns a HTTP 200 response.
+
+@return: Response object: A HTTP response object with a status code of 200 if the wallet address is successfully linked, 
+or a status code of 400 with an error message if the 'param' parameter is not present in the GET request.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def link_crypto_wallet(request):
@@ -238,7 +248,14 @@ def link_crypto_wallet(request):
         
     return Response(status=200)
 
+"""
+@params: request: an HTTP request object
 
+@Description: This function takes an HTTP request object and returns a JSON response containing all the crypto wallets associated with the user making the request. 
+It calls the "get_wallets" function with the user object extracted from the request to retrieve all the wallets. The JSON response is returned with a status code of 200.
+
+@return: Response: a JSON response containing all the crypto wallets associated with the user making the request.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def all_crypto_wallets(request):
@@ -381,11 +398,12 @@ def sector_spending(request):
     return Response(graphData, content_type='application/json')
 
 """
-@params: an HTTP request object containing user authentication information
+@params: request: HTTP request object
 
-@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+@Description: This function retrieves cryptocurrency data for a user. It first checks if the data is already cached for the user, and if so, retrieves it from the cache. 
+Otherwise, it calls the getAllCryptoData function to fetch the data and stores it in the cache for future use. The function returns the cryptocurrency data as a JSON response.
 
-@return: Response: returns a response containing a json that contains the data to display on the bar graph
+@return: Response object containing the cryptocurrency data in JSON format
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -397,6 +415,17 @@ def crypto_all_data(request):    #test
         cache.set("crypto" + request.user.email, data)
     return Response(data, content_type='application/json')
 
+
+"""
+@params: request - Django HttpRequest object containing the request parameters.
+
+@Description: This function is used to fetch cryptocurrency data based on the user's input. The function takes a GET request from the user and checks for a 'param' parameter. 
+If it exists, the function first checks if the requested data is already stored in the cache. If not, it fetches the data by calling the getAllCryptoData() function and stores 
+it in the cache. It then calls the getAlternateCryptoData() function to fetch the requested data. If the data is already present in the cache, 
+it directly fetches the data using cache.get(). If the 'param' parameter is not present, it raises an exception.
+
+@return: The function returns a Django Response object containing the requested cryptocurrency data in JSON format.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def crypto_select_data(request):
@@ -413,6 +442,14 @@ def crypto_select_data(request):
         # should return bad request
     return Response(data, content_type='application/json')
 
+
+"""
+@params: an HTTP request object containing user authentication information
+
+@Description: Gets the users transaction data from cache then returns the relevant transactions to be displayed by the graph
+
+@return: Response: returns a response containing a json that contains the data to display on the bar graph
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def yearlyGraph(request):
