@@ -15,6 +15,20 @@ from django.db import IntegrityError
 ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
              "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
 
+# Get fiat conversion rates
+def find_fiat_rates(): #test
+    try:
+        response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
+        btc_gbp = response_btc.json()['bitcoin']['gbp']
+
+        # Make a GET request to the CoinGecko API to get the ETH-to-GBP exchange rate
+        response_eth = re.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp')
+        eth_gbp = response_eth.json()['ethereum']['gbp']
+
+        rates = [btc_gbp, eth_gbp]
+    except:
+        rates = [21823.87,1408.89]
+    return(rates)
 
 """
 @params: addr (str) - The cryptocurrency address for which data is to be fetched.

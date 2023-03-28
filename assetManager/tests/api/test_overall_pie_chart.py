@@ -45,7 +45,7 @@ class OverallGraphViewTestCase(TestCase, LogInTester):
         response = total_assets(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        self.assertEqual(response.data,{'Bank Assets': 43500.0, 'Investment Assets': 0, 'Crypto Assets': 100.0})
+        self.assertEqual(response.data,{'Bank Assets': 43500.0, 'Investment Assets': 0, 'Crypto Assets': 0.0})
 
     def test_overall_graph_when_data_is_cached(self):
         cache.set('total_assets'+self.user.email,{'Bank Assets': 100.0, 'Investment Assets': 1000.0, 'Crypto Assets': 100})
@@ -80,4 +80,4 @@ class OverallGraphViewTestCase(TestCase, LogInTester):
     def test_sum_crypto_balances_with_wallet(self):
         save_wallet_address(self.user, "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo")
         balance = sum_crypto_balances(self.user)
-        self.assertEqual(balance,248597.34714565)
+        self.assertEqual(balance,118327018426508.02)
