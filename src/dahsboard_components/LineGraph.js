@@ -117,7 +117,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             }
             {
             lineChartData === null ?
-            <p>Loading...</p> :
+            <p className='text-white'>Loading...</p> :
             <Chart className = 'pt-2' height = "420vh" options={options} series={series} type = "area" />
             }
         </div>
