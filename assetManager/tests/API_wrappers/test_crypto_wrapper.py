@@ -1,5 +1,5 @@
 from django.test import TestCase
-from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets, getAllCryptoData
+from assetManager.API_wrappers.crypto_wrapper import *
 from assetManager.models import User, AccountType
 from django.db import IntegrityError, transaction
 import re
@@ -135,5 +135,8 @@ class CryptoWraperTestCase(TestCase):
     def test_addr_regex_false(self, data=crypto_example_data):
         self.assertFalse(re.match("/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/g", list(data.keys())[0]) or re.match("/^0x[a-fA-F0-9]{40}$/g", list(data.keys())[0]))
     
-
-    
+    def test_find_fiat_rates(self):
+        conversion_rates = find_fiat_rates()
+        self.assertEqual(2,len(conversion_rates))
+        self.assertNotEqual(conversion_rates[0],None)
+        self.assertNotEqual(conversion_rates[1],None)

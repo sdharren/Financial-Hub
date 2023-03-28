@@ -67,8 +67,8 @@ def total_assets(request):
         except Exception:
             bank_assets = 0
         investment_assets = sum_investment_balance(user)
-        crypto_assets = 100.0
-        # crypto_assets = sum_crypto_balances(user)
+        # crypto_assets = 100.0
+        crypto_assets = sum_crypto_balances(user)
         data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
         cache.set('total_assets'+user.email, data)
     else:
