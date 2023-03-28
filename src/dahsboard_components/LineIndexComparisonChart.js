@@ -15,7 +15,7 @@ function LineIndexComparisonChart () {
 
     useEffect (() => {
         const get_data = async() =>  {
-            let url = 'http://127.0.0.1:8000/api/portfolio_comparison/?param=^FTSE';
+            let url = 'api/portfolio_comparison/?param=^FTSE';
             let response = await fetch(url, {
                 method:'GET',
                 headers:{

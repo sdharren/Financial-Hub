@@ -9,7 +9,7 @@ function Accounts() {
     let getAccounts = async () => {
       try {
         
-        const bankurl = 'http://127.0.0.1:8000/api/get_linked_banks/';
+        const bankurl = 'api/get_linked_banks/';
         const bankresponse = await fetch(bankurl, {
           method: 'GET',
           headers: {
@@ -20,7 +20,7 @@ function Accounts() {
         const bankdata = await bankresponse.json();
         setBanks(bankdata);
     
-        const stockurl = 'http://127.0.0.1:8000/api/linked_brokerage/';
+        const stockurl = 'api/linked_brokerage/';
         const stockresponse = await fetch(stockurl, {
           method: 'GET',
           headers: {

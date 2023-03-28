@@ -9,7 +9,7 @@ function DebitAccounts({endpoint, endpoint_parameter, loadNext}) {
     const navigate = useNavigate()
 
     let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
+        let url = 'api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
         let response = await fetch(url, {
             method:'GET',
             headers:{

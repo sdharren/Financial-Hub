@@ -18,7 +18,7 @@ const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) =
     }
 
     let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
+        let url = 'api/' + String(endpoint) + (endpoint_parameter != null ? '?param='+endpoint_parameter : '/')
         let response = await fetch(url, {
             method:'GET',
             headers:{
@@ -42,7 +42,7 @@ const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) =
     }
 
     let redirectToLink = async(assetType) => {
-        let response = await fetch('http://127.0.0.1:8000/api/link_token/?product=' + assetType,
+        let response = await fetch('api/link_token/?product=' + assetType,
             {
                 method:'GET',
                 headers:{

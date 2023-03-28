@@ -12,7 +12,7 @@ export default function LinkAssets() {
     const navigate = useNavigate()
 
     async function get_link_token(product) {
-        let url = 'http://127.0.0.1:8000/api/link_token?product=' + product
+        let url = 'api/link_token?product=' + product
         let response = await fetch(url, {
             method:'GET',
             headers:{

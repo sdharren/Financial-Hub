@@ -173,7 +173,7 @@ export default function RecentTransactions() {
   }
 
   let getTransactions = async () => {
-    let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Fidelity';
+    let transactionURL = 'api/recent_transactions/?param=Fidelity';
     let response = await fetch(transactionURL, {
       method: 'GET',
       headers: {

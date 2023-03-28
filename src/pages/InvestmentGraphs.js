@@ -24,7 +24,7 @@ function InvestmentGraphs() {
 
     // FOR DEVELOPMENT PURPOSES (use this if investments aren't linked - put onLoad={link_sandbox()} in the top div at the very bottom)
     let link_sandbox = async() => {
-        let response = await fetch('http://127.0.0.1:8000/api/sandbox_investments/',
+        let response = await fetch('api/sandbox_investments/',
             {
                 method:'GET',
                 headers:{
@@ -163,7 +163,7 @@ function InvestmentGraphs() {
     }
 
     async function callApi(endpoint) {
-        let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + '/',
+        let response = await fetch('api/' + endpoint + '/',
             {
                 method:'GET',
                 headers:{
@@ -177,7 +177,7 @@ function InvestmentGraphs() {
     }
 
     async function getReturns(endpoint, param) {
-        let response = await fetch('http://127.0.0.1:8000/api/' + endpoint + (endpoint==='overall_returns'?'/':'/?param='+param),
+        let response = await fetch('api/' + endpoint + (endpoint==='overall_returns'?'/':'/?param='+param),
             {
                 method:'GET',
                 headers:{

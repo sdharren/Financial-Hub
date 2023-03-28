@@ -8,7 +8,7 @@ function RecentTransactions() {
 
 
   let getTransactions = async () => {
-    let transactionURL = 'http://127.0.0.1:8000/api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
+    let transactionURL = 'api/recent_transactions/?param=Royal Bank of Scotland - Current Accounts';
     let response = await fetch(transactionURL, {
       method: 'GET',
       headers: {
