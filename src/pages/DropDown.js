@@ -15,7 +15,6 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
       }
     });
     let data = await response.json();
-    console.log(data)
     setData(data);
   }
 
@@ -24,25 +23,30 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
   }, [endpoint]);
 
 
-  function handleMenuClick(event){
+  async function handleMenuClick(event){
     let selectedOption = event.target.value;
-    console.log("Clicked item:", selectedOption);
   
     let url = 'api/set_bank_access_token/'
     let payload = {
       selectedOption: selectedOption,
     }
-    fetch(url, {
+    await fetch(url, {
       method: 'POST',
       headers:{
         'Content-Type':'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       },
       body: JSON.stringify(payload)
-    })
+    }
+    )
     .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.log(error))
+    .catch(error => console.log(error));
+
+    let parameter = {
+        'endpoint': endpoint,
+        'param': endpoint_parameter
+    };
+    loadNext(parameter)
   }
 
   const options = data.map((item, index) => (
