@@ -103,6 +103,9 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
         position: 'top',
         horizontalAlign: 'left',
         offsetX: 40,
+        labels: {
+            colors: '#fff'
+        }
     }
     };
 
