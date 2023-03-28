@@ -97,7 +97,7 @@ def getAllCryptoData(user):
 
             value = getCryptoAddressData.BTC_all(addr)
             amount = value["final_balance"] 
-            value["final_balance"] = amount * rate[0]
+            value["final_balance"] = (amount) * rate[0]
             arrVal = [value, "btc"]
 
             data[addr] = arrVal
@@ -109,7 +109,7 @@ def getAllCryptoData(user):
             value = getCryptoAddressData.ETH_all(addr)
             
             amount = value["final_balance"] 
-            value["final_balance"] = amount * rate[1]
+            value["final_balance"] = (amount) * rate[1]
             
             arrVal = [value, "eth"]
 
