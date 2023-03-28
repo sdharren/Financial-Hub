@@ -56,7 +56,7 @@ function Accounts() {
     const handleRemoveBank = async (institution) => {
       try {
         // Send DELETE request to unlink bank account
-        const response = await fetch(`/api/delete_linked_banks/${institution}/`, {
+        const response = await fetch(`/api/delete_linked_bank/${institution}/`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -141,6 +141,15 @@ function Accounts() {
             <td className='text-left py-3 px-4'>Brokerage</td>
             <td className='text-left py-3 px-4 text-white'>
               <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+            </td>
+          </tr>
+        ))}
+        {cryptos.map(crypto => (
+          <tr key={crypto} className='w-full table table-fixed'>
+            <td className='text-left py-3 px-4 text-white'>{crypto}</td>
+            <td className='text-left py-3 px-4'>Crypto</td>
+            <td className='text-left py-3 px-4 text-white'>
+              <button onClick={() => handleRemoveCrypto(crypto)}>Remove</button>
             </td>
           </tr>
         ))}
