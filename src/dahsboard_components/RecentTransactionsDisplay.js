@@ -23,15 +23,6 @@ function RecentTransactions() {
       textAlign: 'center',
       marginBottom: '1rem', // Add some margin below the title
     },
-    tableRow: {
-      color: '#fff', // Set the color of the table rows to white
-    },
-    tableCell: {
-      color: '#fff', // Set the color of the table rows to white
-    },
-    tableBody: {
-      color: '#fff', // Set the color of the table rows to white
-    },
     table: {
       backgroundColor: 'transparent',
       boxShadow: 'none',
@@ -69,11 +60,11 @@ function RecentTransactions() {
       <Typography variant="h6" style={styles.title}>
         Recent Transactions
       </Typography>
-      <Table stickyHeader style={styles.table}>
+      <Table>
       <TableHead>
-      <TableRow styles={styles.tableRow}>
+      <TableRow>
           {categories.map((category) => (
-            <TableCell key={category} styles={styles.tableCell}>
+            <TableCell key={category}>
               <TableSortLabel
                 active={sort.category === category}
                 direction={sort.category === category ? sort.direction : 'asc'}
@@ -85,15 +76,15 @@ function RecentTransactions() {
           ))}
         </TableRow>
       </TableHead>
-      <TableBody styles={styles.tableBody}>
+      <TableBody>
         {Object.entries(data).map(([institution, transactions]) => (
           transactions.map((transaction, index) => (
-            <TableRow key={`${institution}-${index}`} styles={styles.tableRow}>
-              <TableCell styles={styles.tableCell}>{institution}</TableCell>
-              <TableCell styles={styles.tableCell}>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
-              <TableCell styles={styles.tableCell}>{transaction.date}</TableCell>
-              <TableCell styles={styles.tableCell}>{transaction.merchant}</TableCell>
-              <TableCell styles={styles.tableCell}>{transaction.category}</TableCell>
+            <TableRow key={`${institution}-${index}`}>
+              <TableCell>{institution}</TableCell>
+              <TableCell>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
+              <TableCell>{transaction.date}</TableCell>
+              <TableCell>{transaction.merchant}</TableCell>
+              <TableCell>{transaction.category}</TableCell>
             </TableRow>
           ))
         ))}
