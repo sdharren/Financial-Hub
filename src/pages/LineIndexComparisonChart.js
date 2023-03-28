@@ -60,6 +60,11 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
     },
     xaxis: {
         type: 'datetime',
+        labels: {
+            style: {
+                colors: '#fff'
+            }   
+        }
     },
     yaxis: {
         title: {
