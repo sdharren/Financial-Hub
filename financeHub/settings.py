@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import django_heroku
-import dotenv
-import dj_database_url
+# NOTE: LEAVE BELOW IMPORTS - THEY ARE NEEDED FOR DELOPYMENT!!!
+#import django_heroku
+#import dotenv
+#import dj_database_url
 import os
 from pathlib import Path
 
@@ -29,7 +30,7 @@ SECRET_KEY = '@dg8+*g#1p%854*36rgr!=l4x$-l3&j7$p%!km10#dk37$a=d%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-PLAID_DEVELOPMENT = True
+PLAID_DEVELOPMENT = False
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -199,16 +200,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication
 AUTH_USER_MODEL = 'assetManager.User'
 
-# Deployment stuff
-django_heroku.settings(locals())
+# NOTE: THIS IS NEEDED FOR DEPLOYMENT
+# django_heroku.settings(locals())
 
 
-dotenv_file = os.path.join(BASE_DIR, ".env")
-if os.path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
+# dotenv_file = os.path.join(BASE_DIR, ".env")
+# if os.path.isfile(dotenv_file):
+#     dotenv.load_dotenv(dotenv_file)
 
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+# DATABASES = {}
+# DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-options = DATABASES['default'].get('OPTIONS', {})
-options.pop('sslmode', None)
+# options = DATABASES['default'].get('OPTIONS', {})
+# options.pop('sslmode', None)
