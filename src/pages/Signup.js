@@ -48,17 +48,20 @@ const Signup = () => {
         if (response.status === 200) {
             loginUser(e)
         }
-        else if (response.status === 400) {
-            for (var key in data) {
-                if (key === "email") {
-                    document.querySelector(".email-error").innerHTML = data[key];
-                    document.querySelector(".email_error").style.display = "block";
-                }
-                if (key === "password") {
-                    document.querySelector(".password-error").innerHTML = data[key];
-                    document.querySelector(".password_error").style.display = "block";
-                }
-            }
+        // else if (response.status === 400) {
+        else {
+            // for (var key in data) {
+            //     if (key === "email") {
+            //         document.querySelector(".email-error").innerHTML = data[key];
+            //         document.querySelector(".email_error").style.display = "block";
+            //     }
+            //     if (key === "password") {
+            //         document.querySelector(".password-error").innerHTML = data[key];
+            //         document.querySelector(".password_error").style.display = "block";
+            //     }
+            // }
+            // alert(data["email"])
+            alert(Object.values(data).join("\n"))
         }
     }
     
@@ -77,7 +80,7 @@ const Signup = () => {
     )
     
     let form2 = (
-        <div class="signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
+        <div class="signup-container my-10 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
             <Header 
                 heading = "Register your account"
                 paragraph = "Already have an account? "
