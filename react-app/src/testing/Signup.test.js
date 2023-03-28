@@ -1,18 +1,18 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import Signup from "../pages/Signup";
-import customRender from "./test-utils";
+import { customRenderNoUser } from "./test-utils";
 import userEvent from "@testing-library/user-event";
 
 describe("Signup component", () => {
     it("renders without crashing", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
     })
 
     it("has first and last name, email, password and password confirmation fields", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
 
@@ -30,7 +30,7 @@ describe("Signup component", () => {
     })
 
     it("email field is of type 'email'", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
 
@@ -39,7 +39,7 @@ describe("Signup component", () => {
     })
 
     it("password field is of type 'password'", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
 
@@ -48,7 +48,7 @@ describe("Signup component", () => {
     })
 
     it("password confirmation field is of type 'password'", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
 
@@ -57,7 +57,7 @@ describe("Signup component", () => {
     })
 
     it("has a register button", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
 
@@ -66,7 +66,7 @@ describe("Signup component", () => {
     })
 
     it("register is of type 'submit'", () => {
-        customRender(
+        customRenderNoUser(
             <Signup />
         )
 
@@ -76,7 +76,7 @@ describe("Signup component", () => {
 
     it("register button calls function on click", () => {
         const testfn = jest.fn()
-        customRender(
+        customRenderNoUser(
             <Signup submit={testfn}/>
         )
 

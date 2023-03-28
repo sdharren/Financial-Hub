@@ -2,18 +2,18 @@ import React, { useContext } from "react";
 import { render, screen} from "@testing-library/react";
 import userEvent from '@testing-library/user-event'
 import Login from "../pages/Login";
-import customRender from "./test-utils";
+import {customRenderNoUser} from "./test-utils";
 
 describe("Login component", () => {
 
     it("renders without crashing", () => {
-        customRender(
+        customRenderNoUser(
             <Login />
         )
     })
 
     it("form has email, password and button field", () => {
-        customRender(
+        customRenderNoUser(
             <Login />
         )
 
@@ -27,7 +27,7 @@ describe("Login component", () => {
     })
 
     it("email field is of type 'email'", () => {
-        customRender(
+        customRenderNoUser(
             <Login />
         )
 
@@ -36,7 +36,7 @@ describe("Login component", () => {
     })
 
     it("password field is of type 'password'", () => {
-        customRender(
+        customRenderNoUser(
             <Login />
         )
 
@@ -46,7 +46,7 @@ describe("Login component", () => {
 
     it("calls click event", () => {
         const testfn = jest.fn()
-        customRender(<Login submit = {testfn}/>)
+        customRenderNoUser(<Login submit = {testfn}/>)
 
         const submit_button = screen.getByText('Login')
         userEvent.click(submit_button)

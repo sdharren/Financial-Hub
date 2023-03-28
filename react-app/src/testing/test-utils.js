@@ -13,12 +13,20 @@ const user = {
   }
 
 const authTokens = {}
-
-// const signup = jest.fn();
 const loginUser = jest.fn();
 const logoutUser = jest.fn();
 
-const AllTheProviders = ({ children }) => {
+const AllTheProvidersNoUser = ({ children }) => {
+  return (
+    <Router>
+      <AuthContext.Provider value={{ user: null, authTokens, loginUser, logoutUser }}>
+        {children}
+      </AuthContext.Provider>
+    </Router>
+  );
+};
+
+const AllTheProvidersUser = ({ children }) => {
   return (
     <Router>
       <AuthContext.Provider value={{ user: {}, authTokens, loginUser, logoutUser }}>
@@ -28,10 +36,12 @@ const AllTheProviders = ({ children }) => {
   );
 };
 
-const customRender = (ui, options) => {
-  render(ui, { wrapper: AllTheProviders, ...options });
+export const customRenderUser = (ui, options) => {
+  render(ui, { wrapper: AllTheProvidersUser, ...options });
+};
+
+export const customRenderNoUser = (ui, options) => {
+  render(ui, { wrapper: AllTheProvidersNoUser, ...options });
 };
 
 export * from "@testing-library/react";
-
-export default customRender;
