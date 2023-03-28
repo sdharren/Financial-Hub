@@ -692,7 +692,7 @@ def delete_linked_banks(request, institution):
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
 
     if not account_type:
-     return HttpResponseBadRequest('Linked bank account not found')
+        return HttpResponseBadRequest('Linked bank account not found')
 
     account_type.delete()
 
@@ -764,4 +764,11 @@ def delete_linked_crypto(request, crypto):
      return HttpResponseBadRequest('Linked brokerage account not found')
 
     account_type.delete()
+    
+    if(cache.has_key("crypto" + request.user.email)):
+        delete_cached('crypto', request.user)
+        cryptoData = getAllCryptoData(user)
+        cache.set("crypto" + user.email, cryptoData)
+
+
     return HttpResponse(status=204)

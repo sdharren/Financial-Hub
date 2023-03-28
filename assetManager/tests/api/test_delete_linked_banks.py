@@ -52,10 +52,9 @@ class DeleteLinkedBanksViewTestCase(TestCase):
 
         self.assertEqual(len(institutions_2), 1)
 
-
         url = reverse('delete_linked_banks', kwargs={'institution': self.institution})
         response = self.client.delete(url)
-
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(cache.has_key('transactions' + self.user.email))
         self.assertFalse(cache.has_key('currency' + self.user.email))
         self.assertFalse(cache.has_key('balances' + self.user.email))
