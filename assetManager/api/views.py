@@ -13,7 +13,7 @@ from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
-from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, getCryptoOverview, save_wallet_address, get_wallets
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, save_wallet_address, get_wallets
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from .views_helpers import *
 from django.http import HttpResponseBadRequest, HttpResponse
@@ -188,6 +188,9 @@ def link_crypto_wallet(request):
 
     save_wallet_address(user, address)
 
+    data = getAllCryptoData(user)
+    cache.set("crypto" + user.email, data)
+        
     return Response(status=200)
 
 
@@ -268,6 +271,8 @@ def cache_assets(request):
 
         #caching of bank related investements
         #Balances ##SERGY THESE ARE THE ONES TO MOVE
+        cryptoData = getAllCryptoData(user)
+        cache.set("crypto" + user.email, cryptoData)
         account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances)
         cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
@@ -275,6 +280,7 @@ def cache_assets(request):
 
     elif request.method == 'DELETE':
         user = request.user
+        delete_cached("crypto", user)
         delete_cached('investments', user)
         delete_cached('transactions', user)
         delete_cached('currency', user)
@@ -355,8 +361,12 @@ def sector_spending(request):
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def crypto_all_data(request):
-    data = getAllCryptoData(user=request.user)
+def crypto_all_data(request):    
+    if(cache.has_key("crypto" + request.user.email)):
+        data = cache.get(cache.has_key("crypto" + request.user.email))
+    else:
+        data = getAllCryptoData(request.user)
+        cache.set("crypto" + request.user.email, data=data)
 
     return Response(data, content_type='application/json')
 
@@ -365,22 +375,17 @@ def crypto_all_data(request):
 def crypto_select_data(request):
     print(request.GET.get('param'))
     if request.GET.get('param'):
-        
-        data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')))
+        if(cache.has_key("crypto" + request.user.email)):
+            data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data= cache.get("crypto" + request.user.email))
+        else:
+            storedData = getAllCryptoData(user=request.user)
+            cache.set("crypto" + request.user.email, storedData)
+            data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data=storedData)
     else:
         raise Exception
         # should return bad request
 
     return Response(data, content_type='application/json')
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def crypto_overview(request):
-    data = getCryptoOverview(user=request.user)
-
-    return Response(data, content_type='application/json')
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

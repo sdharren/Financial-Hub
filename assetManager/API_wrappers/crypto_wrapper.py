@@ -97,9 +97,9 @@ def getAllCryptoData(user):
     return data
 
 # Collect select data from api instead of requesting all data
-def getAlternateCryptoData(user, command):
+def getAlternateCryptoData(user, command, data):
     # Command format is getUsable.{function}((data[i]), data[i][-1])
-    data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
+    #data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
     btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
     ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
@@ -107,8 +107,8 @@ def getAlternateCryptoData(user, command):
     if(btcAddresses != None):
         for account in btcAddresses:
             addr = account.access_token
-            value = getCryptoAddressData.BTC_all(addr)
-
+            #value = getCryptoAddressData.BTC_all(addr)
+            value = data
             if command == "address":
                 value = getUsableCrypto.getAddress(value, "btc")
             elif command == "balance":
@@ -149,33 +149,6 @@ def getAlternateCryptoData(user, command):
             data[addr] = arrVal
 
     return data
-
-def getCryptoOverview(user):
-    data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
-
-    btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
-    ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
-    
-    if(btcAddresses != None):
-        for account in btcAddresses:
-            addr = account.access_token
-
-            value = getCryptoAddressData.BTC_overview(addr)
-            arrVal = [value, "btc"]
-
-            data[addr] = arrVal
-
-    if(ethAddresses != None):
-        for account in ethAddresses:
-            addr = account.access_token
-
-            value = getCryptoAddressData.ETH_overview(addr)
-            arrVal = [value, "eth"]
-
-            data[addr] = arrVal
-        
-    return data
-
 
 def save_wallet_address(user, address):
     try:
