@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import useHandleError from '../custom_hooks/useHandleError';
 import usePlaid from '../custom_hooks/usePlaid';
-import { Typography, Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel, TableContainer, Paper } from '@mui/material';
+import { Typography, Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel, TableContainer } from '@mui/material';
 
 function RecentTransactions() {
   const endpoint = 'recent_transactions';
@@ -16,14 +16,25 @@ function RecentTransactions() {
 
   const styles = {
     container: {
-      backgroundColor: 'transparent', // Set the container background to transparent
+      backgroundColor: 'transparent',
+      boxShadow: 'none',
     },
     title: {
       textAlign: 'center',
       marginBottom: '1rem', // Add some margin below the title
     },
+    tableRow: {
+      color: '#fff', // Set the color of the table rows to white
+    },
+    tableCell: {
+      color: '#fff', // Set the color of the table rows to white
+    },
+    tableBody: {
+      color: '#fff', // Set the color of the table rows to white
+    },
     table: {
       backgroundColor: 'transparent',
+      boxShadow: 'none',
     },
   };
 
@@ -54,15 +65,15 @@ function RecentTransactions() {
       data === null ? (
       <p>Loading...</p> 
       ) : (
-      <TableContainer component={Paper}>
+      <TableContainer styles={styles.container}>
       <Typography variant="h6" style={styles.title}>
         Recent Transactions
       </Typography>
       <Table style={styles.table}>
       <TableHead>
-      <TableRow>
+      <TableRow styles={styles.tableRow}>
           {categories.map((category) => (
-            <TableCell key={category}>
+            <TableCell key={category} styles={styles.tableCell}>
               <TableSortLabel
                 active={sort.category === category}
                 direction={sort.category === category ? sort.direction : 'asc'}
@@ -74,15 +85,15 @@ function RecentTransactions() {
           ))}
         </TableRow>
       </TableHead>
-      <TableBody>
+      <TableBody styles={styles.tableBody}>
         {Object.entries(data).map(([institution, transactions]) => (
           transactions.map((transaction, index) => (
-            <TableRow key={`${institution}-${index}`}>
-              <TableCell>{institution}</TableCell>
-              <TableCell>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
-              <TableCell>{transaction.date}</TableCell>
-              <TableCell>{transaction.merchant}</TableCell>
-              <TableCell>{transaction.category}</TableCell>
+            <TableRow key={`${institution}-${index}`} styles={styles.tableRow}>
+              <TableCell styles={styles.tableCell}>{institution}</TableCell>
+              <TableCell styles={styles.tableCell}>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
+              <TableCell styles={styles.tableCell}>{transaction.date}</TableCell>
+              <TableCell styles={styles.tableCell}>{transaction.merchant}</TableCell>
+              <TableCell styles={styles.tableCell}>{transaction.category}</TableCell>
             </TableRow>
           ))
         ))}
