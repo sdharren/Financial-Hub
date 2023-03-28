@@ -62,9 +62,9 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
         type: 'datetime',
         labels: {
             style: {
-              colors: '#fff'
-            }
-          },
+                colors: '#fff'
+            }   
+        }
     },
     yaxis: {
         show: true,
