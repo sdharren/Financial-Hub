@@ -1,56 +1,70 @@
-// import React from 'react';
-// import { render, screen } from '@testing-library/react';
-// import { MemoryRouter } from 'react-router-dom'; 
-// import Navbar from '../components/Navbar';
+import React from 'react';
+import { getAllByTitle, getByLabelText, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom'; 
+import Navbar from '../components/Navbar';
+import { customRenderUser, customRenderNoUser } from './test-utils'
 
-// describe('Navbar', () => {
-//   test('renders the site title', () => {
-//     render(
-//       <MemoryRouter> 
-//         <Navbar />
-//       </MemoryRouter>
-//     );
-//     const siteTitle = screen.getByRole('link', { name: /financial hub/i });
-//     expect(siteTitle).toBeInTheDocument();
-//   });
+describe('Navbar with user', () => {
+    it("renders without crashing", () => {
+        customRenderUser(<Navbar />)
+    })
 
-//   test('renders the correct number of nav links', () => {
-//     render(
-//       <MemoryRouter> 
-//         <Navbar />
-//       </MemoryRouter>
-//     );
-//     const navLinks = screen.getAllByRole('link');
-//     expect(navLinks).toHaveLength(4);
-//   });
+    it("renders site title", () => {
+        customRenderUser(<Navbar />)
 
-//   test('renders the about nav link', () => {
-//     render(
-//       <MemoryRouter> 
-//         <Navbar />
-//       </MemoryRouter>
-//     );
-//     const aboutLink = screen.getByRole('link', { name: /about/i });
-//     expect(aboutLink).toBeInTheDocument();
-//   });
+        const siteTitle = screen.getByRole('link', {name : 'DASH.'})
+        expect(siteTitle).toBeInTheDocument()
+    })
 
-//   test('renders the sign up nav link', () => {
-//     render(
-//       <MemoryRouter> 
-//         <Navbar />
-//       </MemoryRouter>
-//     );
-//     const signUpLink = screen.getByRole('link', { name: /sign up/i });
-//     expect(signUpLink).toBeInTheDocument();
-//   });
+    it("renders correct amount of 'list items' items", () => {
+        customRenderUser(<Navbar />)
 
-//   test('renders the log in nav link', () => {
-//     render(
-//       <MemoryRouter> 
-//         <Navbar />
-//       </MemoryRouter>
-//     );
-//     const logInLink = screen.getByRole('link', { name: /log in/i });
-//     expect(logInLink).toBeInTheDocument();
-//   });
-// });
+        const li_items = screen.getAllByRole('listitem')
+        expect(li_items.length).toBe(4)
+    })
+
+    it('renders "link assets", "manage linked assets" and "My account"', () => {
+        customRenderUser(<Navbar />)
+
+        const linkAssets = screen.getByText('Link assets')
+        const manageAssets = screen.getByText('Manage linked assets')
+        const myAccount = screen.getByText('My account')
+
+        expect(linkAssets).toBeInTheDocument()
+        expect(manageAssets).toBeInTheDocument()
+        expect(myAccount).toBeInTheDocument()
+    })
+})
+
+describe('Navbar with no user', () => {
+    it("renders without crashing", () => {
+        customRenderNoUser(<Navbar />)
+    })
+
+    it("renders site title", () => {
+        customRenderNoUser(<Navbar />)
+
+        const siteTitle = screen.getByRole('link', {name : 'DASH.'})
+        expect(siteTitle).toBeInTheDocument()
+    })
+
+    it("renders correct amount of 'list items' items", () => {
+        customRenderNoUser(<Navbar />)
+
+        const li_items = screen.getAllByRole('listitem')
+        expect(li_items.length).toBe(3)
+    })
+
+    it('renders "about", "sign up" and "log in"', () => {
+        customRenderNoUser(<Navbar />)
+
+        const login = screen.getByText('Log in')
+        const signup = screen.getByText('Sign up')
+        const about = screen.getByText('About')
+
+        expect(login).toBeInTheDocument()
+        expect(signup).toBeInTheDocument()
+        expect(about).toBeInTheDocument()
+    })
+
+})

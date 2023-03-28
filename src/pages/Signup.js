@@ -8,7 +8,7 @@ import '../static/errors.css';
 
 // need to add confirmation that passwords match
 
-const Signup = () => {
+const Signup = ({submit}) => {
 
     const fields = signupFields;
     let fieldState = {};
@@ -80,14 +80,14 @@ const Signup = () => {
     )
     
     let form2 = (
-        <div class="signup-container my-10 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
+        <div className="signup-container my-10 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
             <Header 
                 heading = "Register your account"
                 paragraph = "Already have an account? "
                 linkName= "Login here"
                 linkUrl='/login'
             />
-            <form className = "mt-8 space-y-6" onSubmit={signupUser}>
+            <form className = "mt-8 space-y-6" onSubmit={submit === undefined ? signupUser : submit}>
                 <div className='-space-y-px'>
                     {
                         fields.map(field =>

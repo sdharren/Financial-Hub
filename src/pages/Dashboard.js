@@ -164,7 +164,7 @@ function Dashboard() {
 
     let page2 = (
         <div className='dashboard-container my-10px py-10 px-5'>
-            <div className='dashboard-catagories flex flex-row justify-between mb-10'>
+            <div data-testid='graph-tabs' className='dashboard-catagories flex flex-row justify-between mb-10'>
                 {Object.keys(tabGraphData).map((tabName) => (
                     <div
                       key={tabName}
@@ -177,7 +177,7 @@ function Dashboard() {
             </div>
             {activeTabPie === 'Stocks' ? <InvestmentGraphs /> : 
             (<div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
-                <div className='graph-names flex flex-col mr-2 w-40'>
+                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
                         hidden={stocksActive}

@@ -36,10 +36,10 @@ export default function Navbar() {
                 <Link to="/about">About</Link>
             </li>
             <li>
-                <Link to="/signup">Sign Up</Link>
+                <Link to="/signup">Sign up</Link>
             </li>
             <li>
-                <Link to ="/login">Login</Link>
+                <Link to ="/login">Log in</Link>
             </li>
         </ul>
     );
@@ -76,7 +76,7 @@ export default function Navbar() {
                 <Link to = "/link_assets">Link assets</Link>
             </li>
             <li>
-                <Link to = "/accounts">Managed linked assets</Link>
+                <Link to = "/accounts">Manage linked assets</Link>
             </li>
             <li>
                 <div className='nb_dropdown'>
