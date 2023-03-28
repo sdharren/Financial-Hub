@@ -19,11 +19,11 @@ ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUB
 # Get fiat conversion rates
 def find_fiat_rates():
     response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
-    btc_gbp = response_btc.json()['bitcoin']['gbp']
+    btc_gbp = response_btc.json()["bitcoin"]["gbp"]
 
     # Make a GET request to the CoinGecko API to get the ETH-to-GBP exchange rate
     response_eth = re.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp')
-    eth_gbp = response_eth.json()['ethereum']['gbp']
+    eth_gbp = response_eth.json()["ethereum"]["gbp"]
 
     rates = [btc_gbp, eth_gbp]
 
@@ -51,9 +51,11 @@ class getCryptoAddressData:
 
 def toBase(amount, type):
     if(type == "btc"):
+        print(amount)
         amount = amount/(10**(8))
     elif(type == "eth"):
         amount = amount/(10**(18))
+        
 
     return amount
 
@@ -125,8 +127,6 @@ def getAlternateCryptoData(user, command, data):
     btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
     ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
 
-    rate = find_fiat_rates()
-
     if(btcAddresses != None):
         for account in btcAddresses:
             addr = account.access_token
@@ -137,7 +137,7 @@ def getAlternateCryptoData(user, command, data):
                 if command == "address":
                     value = getUsableCrypto.getAddress(value, "btc")
                 elif command == "balance":
-                    value = getUsableCrypto.getBalance(value, "btc") * rate[0]
+                    value = getUsableCrypto.getBalance(value, "btc")
                 elif command == "notx":
                     value = getUsableCrypto.getNoTx(value, "btc")
                 elif command == "received":
@@ -161,7 +161,7 @@ def getAlternateCryptoData(user, command, data):
             if command == "address":
                 value = getUsableCrypto.getAddress(value, "eth")
             elif command == "balance":
-                value = getUsableCrypto.getBalance(value, "eth") * rate[1]
+                value = getUsableCrypto.getBalance(value, "eth")
             elif command == "notx":
                 value = getUsableCrypto.getNoTx(value, "eth")
             elif command == "received":
