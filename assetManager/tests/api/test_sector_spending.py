@@ -7,34 +7,32 @@ from django.test import TestCase
 from django.urls import reverse
 from assetManager.models import User
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
 from rest_framework.test import force_authenticate
 from rest_framework.exceptions import ErrorDetail
 from assetManager.api.views import sector_spending, company_spending
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
-
+from django.conf import settings
 from assetManager.tests.helpers import LogInTester
+from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 
 class BarGraphViewTestCase(TestCase, LogInTester):
     """Tests of the views for transactions bar graph."""
+    fixtures = [
+        'assetManager/tests/fixtures/users.json',
+    ]
+
+    def create_public_token(self):
+        plaid_wrapper = SandboxWrapper()
+        public_token = plaid_wrapper.create_public_token()
+        plaid_wrapper.exchange_public_token(public_token)
+        plaid_wrapper.save_access_token(self.user, ['transactions'])
 
     def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
-        User = get_user_model()
-        users = User.objects.all()
-        self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'email': 'janedoe@example.org',
-            'password': 'Password123',
-            'password_confirmation':
-            'Password123'
-        }
-        self.url = reverse('sign_up')
-        self.client.post(self.url, self.form_input, follow=True)
-        self.user = User.objects.get(email='janedoe@example.org')
+        self.user = User.objects.get(email='johndoe@example.org')
 
     def tearDown(self):
         cache.clear()
@@ -42,6 +40,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for sector_spending graph view
 
     def test_sector_spending_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/sector_spending/')
         force_authenticate(request, user=self.user)
         response = sector_spending(request)
@@ -60,6 +59,7 @@ class BarGraphViewTestCase(TestCase, LogInTester):
     # tests for company_spending graph view
 
     def test_company_spending_graph_with_param(self):
+        self.create_public_token()
         request = self.factory.get('/company_spending/?param=Transport')
         force_authenticate(request, user=self.user)
         response = company_spending(request)

@@ -66,7 +66,7 @@ class StocksGetter():
                 security_id = holding['security_id']
                 for security in current_investment['securities']:
                     if security['security_id'] == security_id:
-                        self.investments.append(Investment(holding, security))
+                        self.investments.append(self.set_investment_returns(Investment(holding, security)))
                         break
 
     #Returns total investment sum within the account
@@ -140,20 +140,20 @@ class StocksGetter():
                 # maybe get quantity and multiply by current price? need to know if plaid updates data freqeuntly or at all
                 category_dict[investment.get_name()] += investment.get_total_price()
         return category_dict
-    
+
     # Returns the stock ticker for associated with a name if one exists
     def get_stock_ticker(self, stock_name):
         for investment in self.investments:
             if investment.get_name() == stock_name:
                 return investment.get_ticker()
         return 'Cannot get stock ticker for ' + stock_name
-    
+
     # Returns the day-by-day portfolio history for a specified period in months (only 1, 3, 6 months accepted)
     # The return is a dict of the form {date: portfolio vaue}
     def get_portfolio_history(self, months=6):
         end_date = date.today()
         start_date = end_date - relativedelta(months=months)
-        
+
         portfolio_history = defaultdict(float)
         stock_histories = []
 
@@ -215,3 +215,59 @@ class StocksGetter():
 
     def is_ticker_supported(self, ticker):
         return self.yfinance_wrapper.is_ticker_supported(ticker)
+
+    def set_investment_returns(self, investment):
+        ticker = investment.get_ticker()
+        returns = {}
+        if ticker is not None:
+            try:
+                history = list(self.yfinance_wrapper.get_stock_history_for_period(ticker, 1).values())
+            except TickerNotSupported:
+                return investment
+            else:
+                history.reverse()
+                current_price = history[0]
+                returns['1'] = _calculate_percentage_diff(history[1], current_price)
+                returns['5'] = _calculate_percentage_diff(history[5], current_price)
+                returns['30'] = _calculate_percentage_diff(history[len(history)-1], current_price)
+        investment.returns = returns
+        return investment
+
+    # Gets percentage returns of a given stock for 1, 5 and 30 days
+    def get_returns(self, stock_name):
+        for investment in self.investments:
+            if investment.get_name() == stock_name:
+                return investment.get_returns()
+        return {}
+
+    # Gets percentage returns of a given stock category for 1, 5 and 30 days
+    def get_category_returns(self, category):
+        returns = defaultdict(float)
+        for investment in self.investments:
+            if investment.get_category() == category and investment.get_returns() != {}:
+                returns['1'] += investment.get_returns()['1']
+                returns['5'] += investment.get_returns()['5']
+                returns['30'] += investment.get_returns()['30']
+        if len(returns) > 0:
+            returns['1'] = round(returns['1'], 1)
+            returns['5'] = round(returns['5'], 1)
+            returns['30'] = round(returns['30'], 1)
+        return returns
+
+    # Gets percentage returns of the whole portfolio for 1, 5 and 30 days
+    def get_overall_returns(self):
+        returns = defaultdict(float)
+        for investment in self.investments:
+            if investment.get_returns() != {}:
+                returns['1'] += investment.get_returns()['1']
+                returns['5'] += investment.get_returns()['5']
+                returns['30'] += investment.get_returns()['30']
+        if len(returns) > 0:
+            returns['1'] = round(returns['1'], 1)
+            returns['5'] = round(returns['5'], 1)
+            returns['30'] = round(returns['30'], 1)
+        return returns
+
+def _calculate_percentage_diff(old, current):
+    percentage = ((current - old) / current) * 100
+    return round(percentage, 1)

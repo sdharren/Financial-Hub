@@ -16,15 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from assetManager import views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.home,name='home_page'),
-    path('connect_investments/', views.connect_investments, name='connect_investments'),
-    path('sign_up/', views.sign_up, name='sign_up'),
-    path('log_in/', views.log_in, name='log_in'),
+    path('', TemplateView.as_view(template_name='index.html')),
     path('link_sandbox_investments/', views.link_sandbox_investments),
-    path('api/number/', views.number_view, name='number'),
-    path('api/cache_assets_hardcoded/', views.setup_asset_data), #NOTE: this url should be removed later - real one in api/views
     path('api/', include('assetManager.api.urls')),
 ]
