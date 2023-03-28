@@ -16,13 +16,10 @@ urlpatterns = [
     path('investment_category_names/', views.investment_category_names),
     path('investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown'),
     path('stock_history/', views.stock_history, name='stock_history'),
-<<<<<<< HEAD
     path('portfolio_comparison/', views.portfolio_comparison),
-=======
     path('returns/', views.returns, name='returns'),
     path('category_returns/', views.category_returns, name='category_returns'),
     path('overall_returns/', views.overall_returns, name='overall_returns'),
->>>>>>> main
     path('supported_investments/', views.supported_investments),
     path('exchange_public_token/', views.exchange_public_token, name='exchange_public_token'),
     path('link_token/', views.link_token, name='link_token'),

@@ -20,21 +20,17 @@ import InvestmentGraphs from './pages/InvestmentGraphs';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
-<<<<<<< HEAD:react-app/src/App.js
 import Currency from './pages/Currency';
 import TransactionTable from './pages/RecentTransactionsDisplay';
 import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
 
 // ask matthew about how margins are lined
-import SectorSpending from './pages/SectorSpending';
-=======
 import CurrencyDisplay from './pages/CurrencyDisplay';
 // import TransactionTable
 import LineGraph from './dahsboard_components/LineGraph';
 
 // ask matthew about how margins are lined
 import SectorSpending from './pages/SectorSpendingDisplay';
->>>>>>> main:src/App.js
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
@@ -71,11 +67,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<Signup />} />
-<<<<<<< HEAD:react-app/src/App.js
-=======
 
               <Route path="/crypto_addresses" element={<CryptoWalletAddresses />} />
->>>>>>> main:src/App.js
             </Routes>
 
         </AuthProvider>
