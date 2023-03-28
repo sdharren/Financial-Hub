@@ -425,7 +425,8 @@ def transaction_data_getter(user):
 def sum_crypto_balances(user):
     wallets = get_wallets(user)
     total = 0
-    data = getAlternateCryptoData(wallets, "balance")
+    storedData = cache.get("crypto" + user.email)
+    data = getAlternateCryptoData(wallets, "balance", storedData)
     for key in data.keys():
         total += data[key][1]
     
