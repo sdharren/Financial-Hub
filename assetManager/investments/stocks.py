@@ -187,7 +187,7 @@ class StocksGetter():
         comparison = defaultdict(dict)
 
         n_index_units = list(portfolio_history.values())[0]/list(index_history.values())[0] # Calculate how many units of the index could have been bought at start (To normalise graph)
-        print(n_index_units)
+        
         for date in portfolio_history:
             try:
                 current_index = index_history[date]
@@ -196,7 +196,7 @@ class StocksGetter():
             else:
                 comparison[date] = {
                     'portfolio': portfolio_history[date],
-                    'index': (index_history[date] * n_index_units)
+                    'index': round(index_history[date] * n_index_units, 1)
                 }
         return comparison
     
