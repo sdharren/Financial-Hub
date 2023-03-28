@@ -66,10 +66,31 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
 
     def test_crypto_all_data_without_cached_data(self):
         self.create_public_token()
-        self.generate_then_cache_crypto()
         request = self.factory.get('/dashboard')
         force_authenticate(request, user=self.user)
         response = crypto_all_data(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         self.assertEqual(cache.get('crypto'+self.user.email),response.data)
+
+    def test_crypto_select_data_with_cached_data(self):
+        self.create_public_token()
+        self.generate_then_cache_crypto()
+        request = self.factory.get('/dashboard?param="address"')
+        force_authenticate(request, user=self.user)
+        response = crypto_select_data(request)
+        self.assertEqual(response.data,cache.get('crypto'+self.user.email))
+
+    def test_crypto_select_data_without_cached_data(self):
+        self.create_public_token()
+        request = self.factory.get('/dashboard?param="address"')
+        force_authenticate(request, user=self.user)
+        response = crypto_select_data(request)
+        self.assertEqual(response.data,cache.get('crypto'+self.user.email))
+
+    def test_crypto_select_data_with_incorrect_param(self):
+        self.create_public_token()
+        request = self.factory.get('/dashboard/')
+        force_authenticate(request, user=self.user)
+        with self.assertRaises(Exception) as e:
+            crypto_select_data(request)
