@@ -44,8 +44,10 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
 
     let parameter = {
         'endpoint': endpoint,
-        'param': endpoint_parameter
+        'param': endpoint_parameter,
+        'name': selectedOption
     };
+    console.log(parameter)
     loadNext(parameter)
   }
 

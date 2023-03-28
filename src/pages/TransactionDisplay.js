@@ -5,8 +5,8 @@ import DropDown from "./DropDown";
 function BarChartDisplay() {
     const [graph, setGraph] = useState(
         <div>
-            <BarGraph endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>
-            <DropDown className='' endpoint={"yearly_graphs"} loadNext={handleOnChange}/>
+            <BarGraph endpoint={"yearly_graphs"} endpoint_parameter={'fda'} loadNext={handleLoadNext}/>
+            <DropDown className='' endpoint={"yearly_graphs"} endpoint_parameter={'fda'} loadNext={handleOnChange}/>
         </div>
     );
 
@@ -22,7 +22,6 @@ function BarChartDisplay() {
         setGraph(
                 <div>
                     <BarGraph endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
-                    <DropDown className='' endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleOnChange}/>
                 </div>
                 
         );
@@ -31,7 +30,7 @@ function BarChartDisplay() {
     function handleLoadPrevious(event){
         setGraph(
             <div>
-                <BarGraph endpoint='yearly_graphs' endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                <BarGraph endpoint='yearly_graphs' endpoint_parameter={'fda'} loadNext={handleLoadNext}/>
                 <DropDown className='' endpoint={'yearly_graphs'} endpoint_parameter={event.next} loadNext={handleOnChange}/>
             </div>
         );
@@ -40,7 +39,7 @@ function BarChartDisplay() {
     function handleOnChange(event) {
         setGraph(
             <div>
-                <BarGraph endpoint={event['endpoint']} endpoint_parameter={event['param']} loadNext={handleLoadNext}/>
+                <BarGraph endpoint={'yearly_graphs'} endpoint_parameter={event['name']} loadNext={handleLoadNext}/>
                 <DropDown className='' endpoint={event['endpoint']} endpoint_parameter={event['param']} loadNext={handleOnChange}/>
             </div>
         );
