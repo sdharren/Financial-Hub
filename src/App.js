@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import TotalAssetsDisplay from './pages/TotalAssets'
 import BarGraph from './dahsboard_components/BarGraph';
 import TransactionDisplay from './pages/TransactionDisplay';
+import RecentTransactions from './dahsboard_components/RecentTransactionsDisplay';
 import PieChart from './dahsboard_components/PieChart';
 import BalancesDisplay from './pages/BalancesDisplay';
 import BarChartDisplay from './pages/TransactionDisplay';
