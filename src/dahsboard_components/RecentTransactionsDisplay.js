@@ -69,7 +69,7 @@ function RecentTransactions() {
       <Typography variant="h6" style={styles.title}>
         Recent Transactions
       </Typography>
-      <Table style={styles.table}>
+      <Table stickyHeader style={styles.table}>
       <TableHead>
       <TableRow styles={styles.tableRow}>
           {categories.map((category) => (
