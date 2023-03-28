@@ -3,7 +3,12 @@ import BarGraph from "../dahsboard_components/BarGraph";
 import DropDown from "./DropDown";
 
 function BarChartDisplay() {
-    const [graph, setGraph] = useState(<BarGraph endpoint={"yearly_graphs"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(
+        <div>
+            <BarGraph endpoint={"yearly_graphs"} endpoint_parameter={'fda'} loadNext={handleLoadNext}/>
+            <DropDown className='' endpoint={"yearly_graphs"} endpoint_parameter={'fda'} loadNext={handleOnChange}/>
+        </div>
+    );
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
@@ -14,21 +19,29 @@ function BarChartDisplay() {
 
     // passed as a parameter to the bar chart to update this page once a section of the bar chart is clicked
     function handleLoadNext(event) {
-        console.log(nextRoute[event.current]);
         setGraph(
-                <BarGraph endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                <div>
+                    <BarGraph endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                </div>
+                
         );
     }
 
     function handleLoadPrevious(event){
         setGraph(
-            <BarGraph endpoint='yearly_graphs' endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+            <div>
+                <BarGraph endpoint='yearly_graphs' endpoint_parameter={'fda'} loadNext={handleLoadNext}/>
+                <DropDown className='' endpoint={'yearly_graphs'} endpoint_parameter={event.next} loadNext={handleOnChange}/>
+            </div>
         );
     }
 
     function handleOnChange(event) {
         setGraph(
-            <BarGraph endpoint={'yearly_graphs'} endpoint_parameter={'yearly_graphs'} loadNext={handleLoadNext}/>
+            <div>
+                <BarGraph endpoint={'yearly_graphs'} endpoint_parameter={event['name']} loadNext={handleLoadNext}/>
+                <DropDown className='' endpoint={event['endpoint']} endpoint_parameter={event['param']} loadNext={handleOnChange}/>
+            </div>
         );
     }
 
@@ -39,7 +52,6 @@ function BarChartDisplay() {
                 Go Back
             </button>
             {graph}
-            <DropDown className='' onChange={handleOnChange}/>
         </div>
     );
 }
