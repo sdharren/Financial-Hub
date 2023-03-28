@@ -5,61 +5,73 @@ import { Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel } from
 
 function RecentTransactions() {
   const endpoint = 'recent_transactions';
-  const [data, setData] = useState(usePlaid({endpoint}));
+  const [transactionData, error] = usePlaid({endpoint});
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    setData(transactionData);
+  }, [transactionData]);
  
-  useHandleError(data[1]);
+  useHandleError(error);
 
   const categories = ['Institution', 'Amount', 'Date', 'Category', 'Merchant'];
 
-  const [sort, setSort] = useState({ category: '', direction: 'asc' });
-  
-  const sortData = (category, direction) => {
-    const sortedData = [...data[0]].sort((a, b) => {
-      if (a[category] < b[category]) return direction === 'asc' ? -1 : 1;
-      if (a[category] > b[category]) return direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-    setData(sortedData);
-    setSort({ category, direction });
-  };
+  // const [sort, setSort] = useState({ category: 'institution', direction: 'asc' });
+
+  // const sortData = (category) => {
+  //   const isAscending = sort.category === category && sort.direction === 'asc';
+  //   const sortedData = Object.entries(data).sort((a, b) => {
+  //     const aValue = a[1][0][category];
+  //     const bValue = b[1][0][category];
+  //     if (aValue < bValue) {
+  //       return isAscending ? -1 : 1;
+  //     }
+  //     if (aValue > bValue) {
+  //       return isAscending ? 1 : -1;
+  //     }
+  //     return 0;
+  //   });
+  //   setSort({ category, direction: isAscending ? 'desc' : 'asc' });
+  //   setData(Object.fromEntries(sortedData));
+  // };
 
   return (
     <div>
     {
-      data[0] === null ?
-      <p>Loading...</p> :
+      data === null ? (
+      <p>Loading...</p> 
+      ) : (
       <Table>
       <TableHead>
-        <TableRow>
+      <TableRow>
           {categories.map((category) => (
             <TableCell key={category}>
-              <TableSortLabel
+              {/* <TableSortLabel
                 active={sort.category === category}
-                direction={sort.direction}
-                onClick={() => {
-                  const direction = sort.category === category ? sort.direction === 'asc' ? 'desc' : 'asc' : 'asc';
-                  sortData(category, direction);
-                }}
+                direction={sort.category === category ? sort.direction : 'asc'}
+                onClick={() => sortData(category)}
               >
                 {category}
-              </TableSortLabel>
+              </TableSortLabel> */}
             </TableCell>
           ))}
         </TableRow>
       </TableHead>
       <TableBody>
-        {data[0].map((item, index) => (
-          <TableRow key={index}>
-            {categories.map((category) => (
-              <TableCell key={`${index}-${category}`}>
-                {item[category]}
-              </TableCell>
-            ))}
-          </TableRow>
+        {Object.entries(data).map(([institution, transactions]) => (
+          transactions.map((transaction, index) => (
+            <TableRow key={`${institution}-${index}`}>
+              <TableCell>{institution}</TableCell>
+              <TableCell>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
+              <TableCell>{transaction.date}</TableCell>
+              <TableCell>{transaction.merchant}</TableCell>
+              <TableCell>{transaction.category}</TableCell>
+            </TableRow>
+          ))
         ))}
       </TableBody>
-    </Table>
-      }
+      </Table>
+      )}
     </div>
   );
 }

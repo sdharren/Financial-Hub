@@ -189,6 +189,17 @@ class DebitCard():
         else:
             return self.bank_graph_data
 
+
+    def format_category(self,category):
+        if(category[0] == 'Not Provided'):
+            return 'Not Provided'
+
+        result = ', '.join(category)
+        last_comma_index = result.rfind(',')
+        if last_comma_index != -1:
+            result = f"{result[:last_comma_index]},{result[last_comma_index+1:]}"
+        return result
+
     """
     @params: bank_graph_data, dictionary , institution_name: string of the corresponding institution name of the dictionary
 
@@ -208,7 +219,7 @@ class DebitCard():
             else:
                 date = account['date']
 
-            case = {'amount': '£' + str(account['amount']), 'date':date, 'category':account['category'], 'merchant':account['merchant_name']}
+            case = {'amount': '£' + str(account['amount']), 'date':date, 'category':self.format_category(account['category']), 'merchant':account['merchant_name']}
 
             all_transactions.append(case)
 

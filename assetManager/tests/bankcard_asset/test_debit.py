@@ -120,13 +120,13 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_hsbc[0]['merchant'],'Not Provided')
         self.assertEqual(recent_transactions_hsbc[1]['merchant'],'Not Provided')
 
-        self.assertEqual(recent_transactions[0]['category'],['Transfer', 'Debit'])
-        self.assertEqual(recent_transactions[1]['category'],['Transfer', 'Debit'])
-        self.assertEqual(recent_transactions[2]['category'],['Food and Drink', 'Restaurants'])
-        self.assertEqual(recent_transactions[3]['category'],['Transfer', 'Debit'])
+        self.assertEqual(recent_transactions[0]['category'],'Transfer, Debit')
+        self.assertEqual(recent_transactions[1]['category'],'Transfer, Debit')
+        self.assertEqual(recent_transactions[2]['category'],'Food and Drink, Restaurants')
+        self.assertEqual(recent_transactions[3]['category'],'Transfer, Debit')
 
-        self.assertEqual(recent_transactions_hsbc[0]['category'],['Payment', 'Credit Card'])
-        self.assertEqual(recent_transactions_hsbc[1]['category'],['Payment', 'Credit Card'])
+        self.assertEqual(recent_transactions_hsbc[0]['category'],'Payment, Credit Card')
+        self.assertEqual(recent_transactions_hsbc[1]['category'],'Payment, Credit Card')
 
 
     def test_get_recent_transactions_with_one_institution_linked_and_today_dates(self):
@@ -153,11 +153,11 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_made[3]['merchant'],'Not Provided')
         self.assertEqual(recent_transactions_made[4]['merchant'],'Not Provided')
 
-        self.assertEqual(recent_transactions_made[0]['category'],['Transfer', 'Debit'])
-        self.assertEqual(recent_transactions_made[1]['category'],['Food and Drink', 'Restaurants', 'Fast Food'])
-        self.assertEqual(recent_transactions_made[2]['category'],['Food and Drink', 'Restaurants'])
-        self.assertEqual(recent_transactions_made[3]['category'],['Transfer', 'Debit'])
-        self.assertEqual(recent_transactions_made[3]['category'],['Transfer', 'Debit'])
+        self.assertEqual(recent_transactions_made[0]['category'],'Transfer, Debit')
+        self.assertEqual(recent_transactions_made[1]['category'],'Food and Drink, Restaurants, Fast Food')
+        self.assertEqual(recent_transactions_made[2]['category'],'Food and Drink, Restaurants')
+        self.assertEqual(recent_transactions_made[3]['category'],'Transfer, Debit')
+        self.assertEqual(recent_transactions_made[3]['category'],'Transfer, Debit')
 
     def test_get_correct_indexing_of_transactions_data_with_single_institution(self):
         self.single_transaction_history = single_transaction_dict

@@ -36,9 +36,9 @@ function Dashboard() {
       { name: 'Graph 1', content: <InvestmentGraphs/>}
     ],
     Banks: [
-      { name: 'Balance', content: <Balances /> },
-      { name: 'Transaction', content: <Transactions /> },
-      { name: 'Currency', content: <Currency /> },
+      { name: 'Balance', content: <BalancesDisplay /> },
+      { name: 'Transaction', content: <RecentTransactions /> },
+      { name: 'Currency', content: <CurrencyDisplay /> },
       { name: 'Bar Chart', content: <BarChart /> },
     ],
     Crypto: [
