@@ -69,7 +69,7 @@ def total_assets(request):
         crypto_assets = 100.0
         # crypto_assets = sum_crypto_balances(user)
         data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
-        cache.set('total_assets'+user.email, data)
+        cache.set('total_assets'+user.email, data, 86400)
     else:
         data = cache.get('total_assets'+user.email)
     return Response(data, content_type='application/json', status=200)
@@ -207,7 +207,7 @@ def overall_returns(request):
 def link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')
-        cache.set('product_link' + request.user.email, [product])
+        cache.set('product_link' + request.user.email, [product], 86400)
     else:
         return Response({'error': 'Bad request. Product not specified.'}, status=400)
     wrapper = DevelopmentWrapper()
@@ -310,9 +310,9 @@ def cache_assets(request):
         #caching of bank related investements
         #Balances ##SERGY THESE ARE THE ONES TO MOVE
         account_balances = get_institutions_balances(wrapper,request.user)
-        cache.set('balances' + user.email, account_balances)
-        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
-        cache.set('transactions'+user.email,transaction_data_getter(request.user)) #test this
+        cache.set('balances' + user.email, account_balances, 86400)
+        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)), 86400)
+        cache.set('transactions'+user.email,transaction_data_getter(request.user), 86400) #test this
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
@@ -337,7 +337,7 @@ def sandbox_investments(request):
     wrapper.save_access_token(user, products_chosen=['investments'])
     stock_getter = StocksGetter(wrapper)
     stock_getter.query_investments(user)
-    cache.set('investments' + user.email, stock_getter.investments)
+    cache.set('investments' + user.email, stock_getter.investments, 86400)
     return Response(status=200)
 
 """
@@ -452,7 +452,7 @@ def set_bank_access_token(request):
         debitCards = DebitCard(plaid_wrapper,request.user)
         access_token = debitCards.access_tokens[access_token_id]
         cache.delete('access_token'+request.user.email)
-        cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
+        cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token), 86400)
         return Response(status=200)
     except Exception:
         return Response(status=400)
@@ -488,7 +488,7 @@ def get_currency_data(request):
 
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
-    cache.set('currency' + user.email, proportion_currencies)
+    cache.set('currency' + user.email, proportion_currencies, 86400)
 
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
@@ -522,7 +522,7 @@ def get_balances_data(request):
     account_balances = get_institutions_balances(plaid_wrapper,user)
 
     balances = reformatBalancesData(account_balances)
-    cache.set('balances' + user.email, account_balances)
+    cache.set('balances' + user.email, account_balances, 86400)
     return Response(balances, content_type='application/json', status = 200)
 
 """
@@ -722,6 +722,9 @@ def delete_linked_brokerage(request, brokerage):
      return HttpResponseBadRequest('Linked brokerage account not found')
 
     account_type.delete()
+
+    delete_cached('investments', request.user)
+
     return HttpResponse(status=204)
 
 @api_view(['GET'])
