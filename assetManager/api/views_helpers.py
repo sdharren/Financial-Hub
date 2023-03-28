@@ -8,7 +8,7 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
-from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets
+from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets, getAllCryptoData
 from functools import wraps
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from rest_framework.response import Response
@@ -137,6 +137,21 @@ def reformatBalancesData(account_balances):
 
     return balances
 
+def retrieve_stock_getter(user):
+    if cache.has_key('investments' + user.email):
+        stock_getter = StocksGetter(None)
+        data = cache.get('investments' + user.email)
+        stock_getter.investments = data
+    else:
+        if settings.PLAID_DEVELOPMENT:
+            wrapper = DevelopmentWrapper()
+        else:
+            wrapper = SandboxWrapper()
+        stock_getter = StocksGetter(wrapper)
+        stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
+        cache.set('investments' + user.email, stock_getter.investments)
+    return stock_getter
+
 """
 @params:
 user (User): An instance of the User model.
@@ -147,7 +162,6 @@ type (str): A string that specifies the type of Plaid wrapper to be used. Possib
 This function returns an instance of the Plaid wrapper that is used to make requests to the Plaid API.
 First the settings.PLAID_DEVELOPMENT is checked to determine whether to return a wrapper of type Sandbox or Development
 Second if SandboxWrapper is needed, the type variable 'transactions' or 'balances' creates a public token or custom public token respectively
-
 @return: plaid_wrapper (PlaidWrapper): An instance of the Plaid wrapper.
 """
 def get_plaid_wrapper(user,type):
@@ -198,14 +212,58 @@ If the account balances are successfully retrieved, the function returns them. I
 A dictionary containing the account balances of all the linked institutions for the given `user`.
 """
 def get_institutions_balances(plaid_wrapper,user):
-    debit_card = make_debit_card(plaid_wrapper,user)
+    debit_card = make_debit_card(plaid_wrapper,user) # always use this first
 
     try:
-        account_balances = debit_card.get_account_balances()
+        account_balances = debit_card.get_account_balances() # always use this exception
     except Exception:
         raise PlaidQueryException('Something went wrong querying PLAID.')
 
     return account_balances
+
+"""
+@params:
+- user: models.User
+  The user making the query
+- plaid_wrapper: Union[DevelopmentWrapper, SandboxWrapper]
+  The concrete types of PlaidWrapper used for the query
+
+@description:
+This function retrieves the account balances for all the linked institutions of the given `user` using the provided `plaid_wrapper`.
+It first calls the `get_institutions_balances` function to get all institution balances then access each institutions accounts and then their available_amount
+Then it sums all available_amounts and returns it
+
+@return:
+An integer that is the overall balance across all accounts
+"""
+def sum_instiution_balances(plaid_wrapper,user):
+    if False == cache.has_key('balances'+user.email):    # test this
+        data = get_institutions_balances(plaid_wrapper,user)
+        cache.set('balances'+user.email,data)
+    data = cache.get('balances'+user.email)
+    available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
+    return sum(available_amounts)
+    
+
+"""
+@params:
+- user: models.User
+  The user making the query
+
+@description:
+This function retrieves the account balances for all the linked investments of the given `user` using the provided `plaid_wrapper`.
+It first calls the `retrieve_stock_getter` function to get an object that has access to all stocks related to the user
+Then it calls get_total_investment_sum and returns it
+
+@return:
+An integer that is the overall balance across all investments
+"""
+def sum_investment_balance(user):
+    try:
+        stock_getter = retrieve_stock_getter(user)
+        return stock_getter.get_total_investment_sum()
+    except Exception:
+        return 0
 
 """
 @params:
@@ -263,19 +321,22 @@ def set_single_institution_transactions(token,wrapper,user):
     debit_card = make_debit_card(wrapper,user)
 
     try:
-        account_transactions = debit_card.get_single_transaction(token)
+        transaction_list = []
+        account_transactions = debit_card.get_single_transaction(datetime.date(2000,12,16),datetime.date(2050,12,17),token)['transactions']
+        transaction_list.append(account_transactions)
+        debit_card.make_bank_graph_data_dict(token,transaction_list,0)
+        formatted_transactions = debit_card.get_insight_data()
     except Exception:
         raise PlaidQueryException('Something went wrong querying PLAID.')
 
-    institution_name = wrapper.get_institution_name(token)
-
     if(cache.has_key('transactions' + user.email) is False):
-        cache.set('transactions' + user.email, {institution_name:account_transactions})
+        cache.set('transactions' + user.email, formatted_transactions)
     else:
-        balances = cache.get('transactions' + user.email)
+        transactions = cache.get('transactions' + user.email)
         cache.delete('transactions' + user.email)
-        balances[institution_name] = account_transactions
-        cache.set('transactions' + user.email,balances)
+        institution_name = list(formatted_transactions.keys())[0]
+        transactions[institution_name] = formatted_transactions[institution_name]
+        cache.set('transactions' + user.email,transactions)
 
 """
 @params:
@@ -397,10 +458,13 @@ Then returns the transactions correlating to the institution name.
 """
 def getCachedInstitutionCachedData(user):
     if False == cache.has_key('access_token'+user.email):
-        plaid_wrapper = get_plaid_wrapper(user,'transactions')
-        debitCards = make_debit_card(plaid_wrapper,user)
-        token = debitCards.access_tokens[0]
-        cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
+        try:
+            plaid_wrapper = get_plaid_wrapper(user,'transactions')
+            debitCards = make_debit_card(plaid_wrapper,user)
+            token = debitCards.access_tokens[0]
+            cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
+        except Exception:
+            raise PlaidQueryException('Something went wrong querying PLAID.')
     institution_name = cache.get('access_token'+user.email)
     if cache.has_key('transactions' + user.email):
         cachedInstitutions = cache.get('transactions' + user.email)
@@ -419,14 +483,30 @@ def getCachedInstitutionCachedData(user):
 def transaction_data_getter(user):
     plaid_wrapper = get_plaid_wrapper(user,'transactions')
     debitCards = make_debit_card(plaid_wrapper,user)
-    debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
-    return debitCards.get_insight_data()
+    try:
+        debitCards.make_graph_transaction_data_insight(datetime.date(2000,12,16),datetime.date(2050,12,17))
+        return debitCards.get_insight_data()
+    except Exception:
+        raise PlaidQueryException('Something went wrong querying PLAID.')
 
+"""
+@params:
+- user: models.User
+  The user making the query
+
+@description:
+This function retrieves all wallets of a user then iteratively sums all the wallet balances
+
+@return:
+An integer that is the overall balance across all wallets
+"""
 def sum_crypto_balances(user):
     total = 0
-    storedData = cache.get("crypto" + user.email)
-    data = getAlternateCryptoData(user, "balance", storedData)
+    if not cache.has_key("crypto" + user.email):
+        cache.set("crypto" + user.email,getAllCryptoData(user))
+    data = cache.get("crypto" + user.email)
+    data = getAlternateCryptoData(user, "balance", data)
+
     for key in data.keys():
-        total += data[key][1]
-    
+        total = total + data[key][0]
     return total
