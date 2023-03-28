@@ -92,7 +92,9 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
                     color: "white"
                 }
             }
-        }
+        },
+        responsive : true,
+        maintainAspectRatio : false,
     };
     const chartRef = useRef();
     const onClick = (event) => {
@@ -108,8 +110,8 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
     };
 
     return (
-        <div>
-            <Pie className='crypto-pie' data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+        <div className='inline-block min-h-[60vh] w-full max-h-[60vh]'>
+            <Pie className='crypto-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
         
     ) 
