@@ -43,6 +43,9 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
                 navigate('/crypto_wallets')
             }
         }
+        else if (response.status == 429) {
+            console.log("429 - Blockcypher token call limit")
+        }
     }
 
     // if a user selects a different option from select dropdown - tell parent to update this graph
@@ -63,6 +66,7 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
         let pieLabel = key + ' - ' + pieChartData[key][1]; 
         pie_labels.push(pieLabel);
         var currVal = pieChartData[key][0];
+        console.log(currVal);
         pie_data.push(currVal);
     }
 

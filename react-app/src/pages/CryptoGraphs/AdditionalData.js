@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 const CAdditional = () => {
     let {authTokens, logoutUser} = useContext(AuthContext);
-    const [AdditionalData, setAdditionalData] = useState({});
+    const [AdditionalData, setAdditionalData] = useState([]);
     const navigate = useNavigate()
     /*
     const data = {
@@ -28,7 +28,6 @@ const CAdditional = () => {
         let respData = await response.json();
         if (response.status === 200) {
             setAdditionalData(respData);
-            console.log(respData);
         }
         else if (response.status === 303) {
             if (respData['error'] === 'Investments not linked.') {
@@ -43,17 +42,16 @@ const CAdditional = () => {
         
       let data = new Array();
       for (let key in AdditionalData) {
-            data.push ({
-                title: AdditionalData[key],
-                value: AdditionalData[key][1]
-            })
-            console.log(data);
-            setAdditionalData(data);
-        }
+        console.log(key)
+        data.push ({
+            title: AdditionalData[key],
+            value: AdditionalData[key][1]
+        })
+        setAdditionalData(data);
+      }
 
-        }, [AdditionalData]);
+      }, [AdditionalData]);
     
-
 
     return (
       <table>
@@ -64,7 +62,7 @@ const CAdditional = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(AdditionalData).map(([key, value]) => (
+          {AdditionalData.map(([key, value]) => (
             <tr key={key}>
               <td>{key}</td>
               <td>{value}</td>

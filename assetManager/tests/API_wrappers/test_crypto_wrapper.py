@@ -1,5 +1,5 @@
 from django.test import TestCase
-from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
+from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets, getAllCryptoData
 from assetManager.models import User, AccountType
 from django.db import IntegrityError, transaction
 
@@ -56,6 +56,9 @@ class CryptoWraperTestCase(TestCase):
         save_wallet_address(self.user, self.btc_address)
         wallets = get_wallets(self.user)
         self.assertEqual(len(wallets), 2)
+
+    def test_data_recieved_in_dictionary(self):
+        
 
     
 

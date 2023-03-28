@@ -366,8 +366,8 @@ def crypto_all_data(request):
         data = cache.get(cache.has_key("crypto" + request.user.email))
     else:
         data = getAllCryptoData(request.user)
-        cache.set("crypto" + request.user.email, data=data)
-
+        cache.set("crypto" + request.user.email, data)
+        
     return Response(data, content_type='application/json')
 
 @api_view(['GET'])
@@ -375,16 +375,17 @@ def crypto_all_data(request):
 def crypto_select_data(request):
     print(request.GET.get('param'))
     if request.GET.get('param'):
-        if(cache.has_key("crypto" + request.user.email)):
-            data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data= cache.get("crypto" + request.user.email))
-        else:
+        if(cache.has_key("crypto" + request.user.email) is False):
             storedData = getAllCryptoData(user=request.user)
             cache.set("crypto" + request.user.email, storedData)
+            data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data = storedData)
+        else:
+            storedData = cache.get("crypto" + request.user.email)
+            print(request.GET.get('param'))
             data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data=storedData)
     else:
         raise Exception
         # should return bad request
-
     return Response(data, content_type='application/json')
 
 @api_view(['GET'])
