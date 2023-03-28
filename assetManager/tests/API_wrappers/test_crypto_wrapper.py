@@ -46,8 +46,7 @@ class CryptoWraperTestCase(TestCase):
                         "script": "483045022100d06cdad1a54081e8499a4117f9f52d7fbc83c679dda7e3c22c08e964915b7354022010a2d6af1601d28d33a456dab2bccf3fbde35b2f3a9db82f72d675c90d015571014104672a00c8ee6fa23d68094dd98188ea1491848498554a10e13194851b614168b225b28b7f5a1c6ba98b5463438ef030c48b60533031ff2de84104e549d8d06ea9",
                         "script_type": "pay-to-pubkey-hash",
                         "sequence": 4294967295
-                    },
-                    ...,
+                    }
 
                 ],
                 "lock_time": 0,
@@ -59,8 +58,7 @@ class CryptoWraperTestCase(TestCase):
                         "script": "76a9148629647bd642a2372d846a7660e210c8414f047c88ac",
                         "script_type": "pay-to-pubkey-hash",
                         "value": 3500000
-                    },
-                    ...,
+                    }
                 ],
                 "preference": "medium",
                 "received": "datetime.datetime(2014, 3, 26, 17, 8, 4, 0, tzinfo=tzutc())",
@@ -133,6 +131,9 @@ class CryptoWraperTestCase(TestCase):
 
     def test_addr_regex_correct(self, data=crypto_example_data):
         self.assertTrue(re.match("/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/g", list(data.keys())[0]) or re.match("/^0x[a-fA-F0-9]{40}$/g", list(data.keys())[0]))
+
+    def test_addr_regex_false(self, data=crypto_example_data):
+        self.assertFalse(re.match("/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/g", list(data.keys())[0]) or re.match("/^0x[a-fA-F0-9]{40}$/g", list(data.keys())[0]))
     
 
     

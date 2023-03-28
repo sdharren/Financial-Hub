@@ -371,8 +371,7 @@ def crypto_all_data(request):    #test
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def crypto_select_data(request):    #test
-    print(request.GET.get('param'))
+def crypto_select_data(request):
     if request.GET.get('param'):
         if(cache.has_key("crypto" + request.user.email) is False):
             storedData = getAllCryptoData(user=request.user)
@@ -380,7 +379,6 @@ def crypto_select_data(request):    #test
             data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data = storedData)
         else:
             storedData = cache.get("crypto" + request.user.email)
-            print(request.GET.get('param'))
             data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data=storedData)
     else:
         raise Exception
