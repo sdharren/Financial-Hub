@@ -25,12 +25,12 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
         dates.push(key);
         portfolio.push({
             x: key,
-            y: comparisonData[key]['portfolio']
+            y: comparisonData[key]['portfolio'].toFixed(2)
         });
         
         index.push({
             x: key,
-            y:comparisonData[key]['index']
+            y:comparisonData[key]['index'].toFixed(2)
         });
     }
 
@@ -60,16 +60,49 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
     },
     xaxis: {
         type: 'datetime',
+        labels: {
+            style: {
+              colors: '#fff'
+            }
+          },
     },
     yaxis: {
+        show: true,
+            showAlways: true,
+            tickAmount: 6,
+            labels: {
+                show: true,
+                align: 'right',
+                minWidth: 0,
+                maxWidth: 160,
+                style: {
+                    colors: ['#fff'],
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 400,
+                    cssClass: 'apexcharts-yaxis-label',
+                },
+                offsetX: 0,
+                offsetY: 0,
+                rotate: 0,
+            },
+            axisBorder: {
+                show: true,
+                color: '#fff',
+                offsetX: 0,
+                offsetY: 0
+            },
         title: {
-        text: 'Value'
+        text: 'Value',
+        style: {
+            color: '#fff',
+        },
         }
     },
     legend: {
         position: 'top',
         horizontalAlign: 'left',
-        offsetX: 40
+        offsetX: 40,
     }
     };
 
