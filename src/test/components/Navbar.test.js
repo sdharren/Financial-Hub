@@ -1,87 +1,70 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
-import AuthContext from '../../context/AuthContext';
+import { getAllByTitle, getByLabelText, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom'; 
 import Navbar from '../../components/Navbar';
+import { customRenderUser, customRenderNoUser } from '../test-utils'
 
-describe('Navbar', () => {
-  const authTokens = { access: 'fakeToken' };
-  const logoutUser = jest.fn();
-  const user = {
-    name: 'testuser',
-    email: 'testuser@test.com',
-    id: 1,
-  };
+describe('Navbar with user', () => {
+    it("renders without crashing", () => {
+        customRenderUser(<Navbar />)
+    })
 
-  beforeEach(() => {
-    jest.spyOn(window, 'fetch');
-    window.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ first_name: 'test' }),
-    });
-  });
+    it("renders site title", () => {
+        customRenderUser(<Navbar />)
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
+        const siteTitle = screen.getByRole('link', {name : 'DASH.'})
+        expect(siteTitle).toBeInTheDocument()
+    })
 
-  test('renders navbar contents', async () => {
-    render(
-      <MemoryRouter>
-        <AuthContext.Provider value={{ user, authTokens, logoutUser }}>
-          <Navbar />
-        </AuthContext.Provider>
-      </MemoryRouter>
-    );
+    it("renders correct amount of 'list items' items", () => {
+        customRenderUser(<Navbar />)
 
-    expect(screen.getByTestId('navbar')).toBeInTheDocument();
-    expect(screen.getByText('Financial Hub')).toBeInTheDocument();
-    expect(screen.getByText('Bank accounts')).toBeInTheDocument();
-    expect(screen.getByText('Currencies')).toBeInTheDocument();
-    expect(screen.getByText('Transactions')).toBeInTheDocument();
-    expect(screen.getByText('Bar graph')).toBeInTheDocument();
-    expect(screen.getByText('Logout')).toBeInTheDocument();
-  });
+        const li_items = screen.getAllByRole('listitem')
+        expect(li_items.length).toBe(4)
+    })
 
-  test('renders default form when user is not logged in', async () => {
-    render(
-      <MemoryRouter>
-        <AuthContext.Provider value={{ user: null }}>
-          <Navbar />
-        </AuthContext.Provider>
-      </MemoryRouter>
-    );
+    it('renders "link assets", "manage linked assets" and "My account"', () => {
+        customRenderUser(<Navbar />)
 
-    expect(screen.getByTestId('navbar')).toBeInTheDocument();
-    expect(screen.getByText('Financial Hub')).toBeInTheDocument();
-    expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getByText('Sign Up')).toBeInTheDocument();
-    expect(screen.getByText('Login')).toBeInTheDocument();
-  });
+        const linkAssets = screen.getByText('Link assets')
+        const manageAssets = screen.getByText('Manage linked assets')
+        const myAccount = screen.getByText('My account')
 
-//   test('displays user first name when logged in', async () => {
-//     render(
-//       <MemoryRouter>
-//         <AuthContext.Provider value={{ user, authTokens, logoutUser }}>
-//           <Navbar />
-//         </AuthContext.Provider>
-//       </MemoryRouter>
-//     );
+        expect(linkAssets).toBeInTheDocument()
+        expect(manageAssets).toBeInTheDocument()
+        expect(myAccount).toBeInTheDocument()
+    })
+})
 
-//     expect(screen.getByText('test')).toBeInTheDocument();
-//   });
+describe('Navbar with no user', () => {
+    it("renders without crashing", () => {
+        customRenderNoUser(<Navbar />)
+    })
 
-  test('calls logoutUser function when "Logout" is clicked', async () => {
-    render(
-      <MemoryRouter>
-        <AuthContext.Provider value={{ user, authTokens, logoutUser }}>
-          <Navbar />
-        </AuthContext.Provider>
-      </MemoryRouter>
-    );
+    it("renders site title", () => {
+        customRenderNoUser(<Navbar />)
 
-    userEvent.click(screen.getByText('Logout'));
-    expect(logoutUser).toHaveBeenCalled();
-  });
-});
+        const siteTitle = screen.getByRole('link', {name : 'DASH.'})
+        expect(siteTitle).toBeInTheDocument()
+    })
+
+    it("renders correct amount of 'list items' items", () => {
+        customRenderNoUser(<Navbar />)
+
+        const li_items = screen.getAllByRole('listitem')
+        expect(li_items.length).toBe(3)
+    })
+
+    it('renders "about", "sign up" and "log in"', () => {
+        customRenderNoUser(<Navbar />)
+
+        const login = screen.getByText('Log in')
+        const signup = screen.getByText('Sign up')
+        const about = screen.getByText('About')
+
+        expect(login).toBeInTheDocument()
+        expect(signup).toBeInTheDocument()
+        expect(about).toBeInTheDocument()
+    })
+
+})

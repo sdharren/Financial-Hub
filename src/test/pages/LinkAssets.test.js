@@ -1,3 +1,4 @@
+import React from 'react';
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { customRenderUser, customRenderNoUser} from '../test-utils'
 import LinkAssets from "../../pages/LinkAssets";
@@ -31,12 +32,15 @@ describe("LinkAssets component", () => {
     
   })
 
-//   it("should render the background images for the page", () => {
-//     customRenderUser(<LinkAssets />);
-//     const backgroundImg = screen.getByRole('img', {name : "background__image"});
-//     expect(backgroundImg['src']).toEqual("http://localhost/asset-background");
-//   }
-//   )
+  it("should render the background images for the page", () => {
+    customRenderUser(<LinkAssets />);
+    const backgroundImg1 = screen.getByRole('img', { name: "background__image1"});
+    const backgroundImg2 = screen.getByRole('img', { name: "background__image2"});
+    const backgroundImg3 = screen.getByRole('img', { name: "background__image3"});
+    expect(backgroundImg1['src']).toEqual("http://localhost/asset-background.png");
+    expect(backgroundImg2['src']).toEqual("http://localhost/asset-background.png");
+    expect(backgroundImg3['src']).toEqual("http://localhost/asset-background.png");
+  });
 
   it("should navigate to the crypto addresses page when clicking on the crypto wallet button", async () => {
     customRenderUser(<LinkAssets />);

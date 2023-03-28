@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { render, screen} from "@testing-library/react";
 import userEvent from '@testing-library/user-event'
-import Login from "../pages/Login";
-import {customRenderNoUser} from "./test-utils";
+import Login from "../../pages/Login";
+import {customRenderNoUser} from "../test-utils";
 
 describe("Login component", () => {
 

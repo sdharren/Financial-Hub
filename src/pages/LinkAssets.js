@@ -46,7 +46,7 @@ export default function LinkAssets() {
         <div>
             <div className="assetLink_holder">
                 <div className="background__box">
-                <img className="background__image" src={bkbox} alt="background__image"></img>
+                <img className="background__image1" src={bkbox} alt="background__image1"></img>
                     <div className="asset__content">
                         <img className="debit__card__image" src={debitCard} alt="debit__card__image"></img>
                         <p className="debit-middle-text">Link your credit or debit card</p>
@@ -59,7 +59,7 @@ export default function LinkAssets() {
         <div>
             <div className="assetLink_holder">
                 <div className="background__box">
-                <img className="background__image" src={bkbox} alt="background__image"></img>
+                <img className="background__image2" src={bkbox} alt="background__image2"></img>
                     <div className="asset__content">
                         <img className="bank__image" src={bankimg} alt="bank__image"></img>
                         <p className="asset-middle-text">Link your brokerage account</p>
@@ -72,7 +72,7 @@ export default function LinkAssets() {
         <div>
             <div class="assetLink_holder">
                 <div class="background__box">
-                <img class="background__image" src={bkbox} alt="background__image"></img>
+                <img class="background__image3" src={bkbox} alt="background__image3"></img>
                     <div class="asset__content">
                         <img class="crypto__image" src={cryptoimg} alt="crypto__image"></img>
                         <p class="crypto-middle-text">Link your crypto wallet</p>
