@@ -1,7 +1,7 @@
-import debitCard from "../images/asset-debit.png";
+import debitCard from "../images/asset-debit2.png";
 import bkbox from "../images/asset-background.png";
-import cryptoimg from "../images/asset-crypto.png";
-import bankimg from "../images/asset-bank.png";
+import cryptoimg from "../images/asset-crypto2.png";
+import bankimg from "../images/asset-bank2.png";
 
 import AuthContext from '../context/AuthContext';
 import { useContext } from "react";
@@ -37,9 +37,9 @@ export default function LinkAssets() {
 
     }
 
-    return <div>
+    let page1 = (<div>
         
-        <div>
+        <div className="">
             <div class="assetLink_holder">
                 <div class="background__box">
                 <img class="background__image" src={bkbox} alt="#"></img>
@@ -81,5 +81,27 @@ export default function LinkAssets() {
 
      
     </div>
+    )
+    let page2 = (
+        <div className='home-container flex flex-col my-10px mx-20 p-10 gap-8'>
+            <div className='link-debit flex flex-row justify-between gap-8 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600 py-5 px-10'>
+                <img className="debit_image ml-[-2rem]" src={debitCard} alt="#"></img>
+                <p class="middle-text text-center my-auto text-3xl">Link your bank account</p>
+                <button class="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={async () => {await get_link_token("transactions");} }>Link</button>
+            </div>
+            <div className='link-stocks flex flex-row justify-between gap-8 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600 py-5 px-10'>
+                <img class="stock_image" src={bankimg} alt="#"></img>
+                <p class="middle-text text-center my-auto text-3xl">Link your brokerage account</p>
+                <button class="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={async () => {await get_link_token("investments");} }>Link</button>
+            </div>
+            <div className='link-crypto flex flex-row justify-between gap-8 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600 py-5 px-10'>
+                <img class="crypto_image" src={cryptoimg} alt="#"></img>
+                <p class="middle-text text-center my-auto text-3xl">Link your crypto wallet</p>
+                <button class="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={async () => {await get_link_token("transactions");} }>Link</button>
 
+            </div>
+        </div>
+    )
+    
+    return page2
 }
