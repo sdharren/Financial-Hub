@@ -54,11 +54,11 @@ function RecentTransactions() {
       data === null ? (
       <p>Loading...</p> 
       ) : (
-      <TableContainer component={Paper}>
+      <TableContainer style={{maxHeight:'58vh'}} component={Paper}>
       <Typography variant="h6" style={styles.title}>
         Recent Transactions
       </Typography>
-      <Table style={styles.table}>
+      <Table stickyHeader style={styles.table}>
       <TableHead>
       <TableRow>
           {categories.map((category) => (
