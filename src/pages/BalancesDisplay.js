@@ -1,5 +1,7 @@
 import PieChart from "../dahsboard_components/PieChart";
+import BarGraph from "../dahsboard_components/BarGraph";
 import { useState } from "react";
+import DropDown from "./DropDown";
 
 function BalancesDisplay() {
     const [graph, setGraph] = useState(<PieChart endpoint={"get_balances_data"} loadNext={handleLoadNext}/>);
@@ -18,10 +20,16 @@ function BalancesDisplay() {
         );
     }
 
+    function handleOnChange(event) {
+        setGraph(
+            <BarGraph endpoint={'yearly_graphs'} endpoint_parameter={'yearly_graphs'} loadNext={handleLoadNext}/>
+        );
+    }
 
     return (
         <div className="balance-graph">
             {graph}
+            <DropDown className='' onChange={handleOnChange}/>
         </div>
     );
 }

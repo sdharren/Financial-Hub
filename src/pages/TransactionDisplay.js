@@ -9,7 +9,6 @@ function BarChartDisplay() {
     const nextRoute = {
         'yearly_graphs': 'monthly_graphs',
         'monthly_graphs': 'weekly_graphs',
-        'weekly_graphs': 'weekly_graphs'
     }
 
     // passed as a parameter to the bar chart to update this page once a section of the bar chart is clicked
@@ -39,7 +38,6 @@ function BarChartDisplay() {
                 Go Back
             </button>
             {graph}
-            <DropDown className='' onChange={handleOnChange}/>
         </div>
     );
 }
