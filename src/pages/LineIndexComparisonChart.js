@@ -15,7 +15,7 @@ function LineIndexComparisonChart () {
 
     useEffect (() => {
         const get_data = async() =>  {
-            let url = 'http://127.0.0.1:8000/api/portfolio_comparison/?param=^GDAXI';
+            let url = 'api/portfolio_comparison/?param=^GDAXI';
             let response = await fetch(url, {
                 method:'GET',
                 headers:{
@@ -44,10 +44,19 @@ function LineIndexComparisonChart () {
     
     for (let key in comparisonData) {
         dates.push(key);
-        portfolio.push(comparisonData[key]['portfolio']);
-        index.push(comparisonData[key]['index']);
+        portfolio.push({
+            x: key,
+            y: comparisonData[key]['portfolio']
+        });
+        
+        index.push({
+            x: key,
+            y:comparisonData[key]['index']
+        });
     }
 
+    console.log(portfolio)
+    console.log(index)
     const series = [  
         {    
             name: 'Portfolio',   
@@ -62,8 +71,7 @@ function LineIndexComparisonChart () {
 
     const options = {
     chart: {
-        // type: 'line',
-        stacked: true,
+        stacked: false,
         height: 350
     },
     dataLabels: {
@@ -71,26 +79,14 @@ function LineIndexComparisonChart () {
     },
     stroke: {
         width: [2, 2],
-        curve: 'smooth'
+        curve: 'straight'
     },
     xaxis: {
-        //type: 'datetime', COMMENTED THIS OUT FOR TESTING
-        categories:  dates, // THIS IS WHERE THE DATES GO
+        type: 'datetime',
     },
     yaxis: {
         title: {
         text: 'Value'
-        }
-    },
-    fill: {
-        opacity: [0.8, 0.8],
-        gradient: {
-        inverseColors: false,
-        shade: 'light',
-        type: 'vertical',
-        opacityFrom: 0.85,
-        opacityTo: 0.55,
-        stops: [0, 100]
         }
     },
     legend: {
@@ -100,10 +96,6 @@ function LineIndexComparisonChart () {
     }
     };
 
-    // const chart = new ApexCharts(document.querySelector('#chart'), options);
-
-
-    // chart.render();
     return (
         <div>
             <Chart options={options} series={series} />
