@@ -6,9 +6,6 @@ import { useContext } from 'react';
 import AuthContext from '../../context/AuthContext';
 
 
-
-
-
 const CRecentTransactionsDisplay = () => {
   const [transactions, setTransactions] = useState([]);
   let {authTokens, logoutUser} = useContext(AuthContext);
@@ -35,44 +32,43 @@ const CRecentTransactionsDisplay = () => {
 
 
   useEffect(() => {
-    // Call the async function `getTransactions` to fetch the recent transactions
     getTransactions();
   }, []);
 
   return (
-    <div>
-      {transactions.map((wallet, walletIndex) => (
-        <div key={walletIndex}>
-          <h2>Wallet: {wallet.address}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Block Hash</th>
-                <th>Block Height</th>
-                <th>Confidence</th>
-                <th>Confirmations</th>
-                <th>Confirmed</th>
-                <th>Double Spend</th>
-                <th>Fees</th>
+    <table>
+      <thead>
+        <tr>
+          <th>From Address</th>
+          <th>To Addresses</th>
+          <th>Confirmations</th>
+          <th>Confirmed</th>
+          <th>Fees</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.keys(transactions).map((wallet, index) => (
+          <React.Fragment key={index}>
+            {Object.keys(transactions[wallet][0]).map((subheading, subindex) => (
+              <tr key={subindex}>
+                <td>{subindex === 0 ? wallet : ''}</td>
+                <td>
+                  <a href={'https://www.blockchain.com/explorer/transactions/btc/' + (transactions[wallet][0][subheading].hash)}>
+                    {(transactions[wallet][0][subheading].addresses).length}
+                  </a>
+                </td>
+                <td>{transactions[wallet][0][subheading].confirmations.toLocaleString()}</td>
+                <td>{new Date(transactions[wallet][0][subheading].confirmed).toLocaleString()}</td>
+                <td>{transactions[wallet][0][subheading].fees}</td>
+                <td>{transactions[wallet][1] == "btc" ? transactions[wallet][0][subheading].total/1e8 : transactions[wallet][0][subheading].total/1e18}</td>
               </tr>
-            </thead>
-            <tbody>
-              {wallet.txs.map((transaction, transactionIndex) => (
-                <tr key={transactionIndex}>
-                  <td>{transaction.block_hash}</td>
-                  <td>{transaction.block_height}</td>
-                  <td>{transaction.confidence}</td>
-                  <td>{transaction.confirmations}</td>
-                  <td>{transaction.confirmed}</td>
-                  <td>{transaction.double_spend ? "Yes" : "No"}</td>
-                  <td>{transaction.fees}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
-    </div>
+            ))}
+          </React.Fragment>
+        ))}
+      </tbody>
+    </table>
+
   );
 };
 
