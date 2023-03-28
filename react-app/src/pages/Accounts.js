@@ -63,6 +63,7 @@ function Accounts() {
         }
         // Remove bank from list of linked banks
         setBanks(banks.filter(bank => bank !== institution));
+        window.location.reload(false);
       } catch (error) {
         console.error(error);
       }
@@ -86,6 +87,7 @@ function Accounts() {
       }
       // Remove bank from list of linked banks
       setBrokerages(brokerages.filter(b => b !== brokerage));
+      window.location.reload(false);
     } catch (error) {
       console.error(error);
     }
