@@ -106,11 +106,10 @@ def getAlternateCryptoData(user, command, data):
 
     if(btcAddresses != None):
         for account in btcAddresses:
-            if(account in data):
-                addr = account.access_token
-                #value = getCryptoAddressData.BTC_all(addr)
+            addr = account.access_token
+            if(addr in list(data.keys())):
 
-                value = data.get(account)[0]
+                value = data.get(addr)[0]
                 
                 if command == "address":
                     value = getUsableCrypto.getAddress(value, "btc")
@@ -131,11 +130,10 @@ def getAlternateCryptoData(user, command, data):
 
     if(ethAddresses != None):
         for account in ethAddresses:
-            if(account in data):
-                addr = account.access_token
-                #value = getCryptoAddressData.BTC_all(addr)
+            addr = account.access_token
+            if(addr in list(data.keys())):
 
-                value = data.get(account)[0]
+                value = data.get(addr)[0]
 
             if command == "address":
                 value = getUsableCrypto.getAddress(value, "eth")

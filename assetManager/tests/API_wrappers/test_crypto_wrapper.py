@@ -2,6 +2,7 @@ from django.test import TestCase
 from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets, getAllCryptoData
 from assetManager.models import User, AccountType
 from django.db import IntegrityError, transaction
+import re
 
 
 class CryptoWraperTestCase(TestCase):
@@ -9,6 +10,71 @@ class CryptoWraperTestCase(TestCase):
         'assetManager/tests/fixtures/users.json',
         'assetManager/tests/fixtures/account_types.json'
     ]
+
+    crypto_example_data = {"1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD": [{
+        "address": "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD",
+        "balance": 4433416,
+        "final_balance": 4433416,
+        "final_n_tx": 7,
+        "n_tx": 7,
+        "total_received": 4433416,
+        "total_sent": 0,
+        "txs": [
+            {
+                "addresses": [
+                    "18KXZzuC3xvz6upUMQpsZzXrBwNPWZjdSa",
+                    "1AAuRETEcHDqL4VM3R97aZHP8DSUHxpkFV",
+                    "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD",
+                    "1VxsEDjo6ZLMT99dpcLu4RQonMDVEQQTG"
+                ],
+                "block_hash": "0000000000000000af64802c79f9b22e9091eb5548b4b662d5e444e61885923b",
+                "block_height": 292586,
+                "confidence": 1,
+                "confirmations": 87238,
+                "confirmed": "datetime.datetime(2014, 3, 26, 17, 8, 4, 0, tzinfo=tzutc())",
+                "double_spend": False,
+                "fees": 20000,
+                "hash": "b4735a0690dab16b8789fceaf81c511f3be484e319f684cc214380eaa2851030",
+                "inputs": [
+                    {
+                        "addresses": [
+                            "1VxsEDjo6ZLMT99dpcLu4RQonMDVEQQTG"
+                        ],
+                        "output_index": 0,
+                        "output_value": 3500000,
+                        "prev_hash": "729f6469b59fea5da77457f3291e2623c2516e3e8e7afc782687c6d59f4c5e41",
+                        "script": "483045022100d06cdad1a54081e8499a4117f9f52d7fbc83c679dda7e3c22c08e964915b7354022010a2d6af1601d28d33a456dab2bccf3fbde35b2f3a9db82f72d675c90d015571014104672a00c8ee6fa23d68094dd98188ea1491848498554a10e13194851b614168b225b28b7f5a1c6ba98b5463438ef030c48b60533031ff2de84104e549d8d06ea9",
+                        "script_type": "pay-to-pubkey-hash",
+                        "sequence": 4294967295
+                    },
+                    ...,
+
+                ],
+                "lock_time": 0,
+                "outputs": [
+                    {
+                        "addresses": [
+                            "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"
+                        ],
+                        "script": "76a9148629647bd642a2372d846a7660e210c8414f047c88ac",
+                        "script_type": "pay-to-pubkey-hash",
+                        "value": 3500000
+                    },
+                    ...,
+                ],
+                "preference": "medium",
+                "received": "datetime.datetime(2014, 3, 26, 17, 8, 4, 0, tzinfo=tzutc())",
+                "relayed_by": "",
+                "size": 438,
+                "total": 3537488,
+                "ver": 1,
+                "vin_sz": 2,
+                "vout_sz": 2
+            }
+        ],
+        "unconfirmed_balance": 0,
+        "unconfirmed_n_tx": 0}, "btc"]}
+
 
     def setUp(self):
         self.user = User.objects.get(email='johndoe@example.org')
@@ -57,9 +123,16 @@ class CryptoWraperTestCase(TestCase):
         wallets = get_wallets(self.user)
         self.assertEqual(len(wallets), 2)
 
-    def test_data_recieved_in_dictionary(self):
-        
+    def test_data_received_is_not_none(self):
+        data = getAllCryptoData(self.user)
+        self.assertIsNotNone(data)
 
+    def test_data_received_is_dictionary(self):
+        data = getAllCryptoData(self.user)
+        self.assertIsInstance(dict)
+
+    def test_addr_regex_correct(self, data=crypto_example_data):
+        self.assertTrue(re.match("/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/g", list(data.keys())[0]) or re.match("/^0x[a-fA-F0-9]{40}$/g", list(data.keys())[0]))
     
 
     

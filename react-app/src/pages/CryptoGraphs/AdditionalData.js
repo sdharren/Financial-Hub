@@ -37,39 +37,40 @@ const CAdditional = () => {
     }
   
     useEffect(() => {
-      
       get_data();
-        
-      let data = new Array();
-      for (let key in AdditionalData) {
-        console.log(key)
-        data.push ({
-            title: AdditionalData[key],
-            value: AdditionalData[key][1]
-        })
-        setAdditionalData(data);
-      }
-
-      }, [AdditionalData]);
+      }, []);
     
 
     return (
       <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Value</th>
+      <thead>
+        <tr>
+          <th>Wallet</th>
+          <th>Address</th>
+          <th>Balance</th>
+          <th>Number of Transactions</th>
+          <th>Total Received</th>
+          <th>Total Sent</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.keys(AdditionalData).map((wallet, index) => (
+          <tr key={index}>
+            <td>{wallet}</td>
+            {Object.keys(AdditionalData[wallet]).map((subheading, index) => (
+              <React.Fragment key={index}>
+                <td>{subheading}</td>
+                <td>{data[wallet][subheading].value1}</td>
+                <td>{data[wallet][subheading].value2}</td>
+                <td>{data[wallet][subheading].value3}</td>
+                <td>{data[wallet][subheading].value2}</td>
+                <td>{data[wallet][subheading].value3}</td>
+              </React.Fragment>
+            ))}
           </tr>
-        </thead>
-        <tbody>
-          {AdditionalData.map(([key, value]) => (
-            <tr key={key}>
-              <td>{key}</td>
-              <td>{value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        ))}
+      </tbody>
+    </table>
     );
   };
   
