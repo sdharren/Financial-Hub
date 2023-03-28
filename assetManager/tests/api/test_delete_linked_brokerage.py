@@ -37,8 +37,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         )
 
     def test_delete_linked_brokerage_with_valid_institution(self):
-        settings.PLAID_DEVELOPMENT = False
-
+    
         institutions_number_change = self.client.get(reverse("linked_brokerage"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
         institutions_2 = institutions_number_change.json()
@@ -60,7 +59,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertFalse(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_delete_linked_brokerage_with_invalid_brokerage(self):
-        settings.PLAID_DEVELOPMENT = False
+       
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': 'Non-existent bank'})
         response = self.client.delete(url)
 
@@ -68,7 +67,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_delete_linked_brokerage_with_unauthenticated_user(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         self.client.credentials()
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': self.brokerage})
         response = self.client.delete(url)
@@ -77,7 +76,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_delete_linked_brokerage_with_wrong_method(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': self.brokerage})
         response = self.client.get(url)
 
@@ -85,7 +84,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_add_delete_brokerage(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         # Add institution
         brokerage_name_add = "Fidelity"
         AccountType.objects.create(

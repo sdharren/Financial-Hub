@@ -38,8 +38,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         )
 
     def test_delete_linked_banks_with_valid_institution(self):
-        settings.PLAID_DEVELOPMENT = False
-
+        
         institutions_number_change = self.client.get(reverse("get_linked_banks"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
         institutions_2 = institutions_number_change.json()
@@ -62,7 +61,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertFalse(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_delete_linked_banks_with_invalid_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         url = reverse('delete_linked_banks', kwargs={'institution': 'Non-existent bank'})
         response = self.client.delete(url)
 
@@ -70,7 +69,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_delete_linked_banks_with_unauthenticated_user(self):
-        settings.PLAID_DEVELOPMENT = False
+    
         self.client.credentials()
         url = reverse('delete_linked_banks', kwargs={'institution': self.institution})
         response = self.client.delete(url)
@@ -79,7 +78,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_delete_linked_banks_with_wrong_method(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         url = reverse('delete_linked_banks', kwargs={'institution': self.institution})
         response = self.client.get(url)
 
@@ -87,7 +86,7 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=self.institution).exists())
 
     def test_add_delete_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+       
         # Add institution
         institution_name_add = "Bank of America"
         AccountType.objects.create(
