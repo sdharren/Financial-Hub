@@ -61,7 +61,10 @@ def total_assets(request):
     user = request.user
     if False == cache.has_key('total_assets'+user.email):
         wrapper = get_plaid_wrapper(user,'balances')
-        bank_assets = sum_instiution_balances(wrapper, request.user)
+        try:
+            bank_assets = sum_instiution_balances(wrapper, request.user)
+        except Exception:
+            bank_assets = 0
         investment_assets = sum_investment_balance(user)
         crypto_assets = 100.0
         # crypto_assets = sum_crypto_balances(user)
@@ -128,6 +131,22 @@ def stock_history(request):
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
     data = stock_getter.get_stock_history(stock_ticker)
     return Response(data, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def portfolio_comparison(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    if request.GET.get('param'):
+        ticker = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
+    
+    comparison = stock_getter.get_portfolio_comparison(ticker, period=6)
+    return Response(comparison, content_type='application/json', status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -697,6 +716,27 @@ def delete_linked_banks(request, institution):
 def delete_linked_brokerage(request, brokerage):
 
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+    return HttpResponse(status=204)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def linked_crypto(request):
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO)
+    cryptos = []
+    for crypto in account_types:
+        cryptos.append(crypto.access_token)
+    return Response(cryptos, content_type='application/json',status = 200)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_crypto(request, crypto):
+    
+    account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
      return HttpResponseBadRequest('Linked brokerage account not found')

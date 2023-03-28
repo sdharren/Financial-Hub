@@ -1,0 +1,45 @@
+/* 
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 10;
+  background-color: #f5f5f5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-width: 650px;
+  margin-left: -20%;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.transaction-table th {
+  background-color: #673ab7;
+  color: #fff;
+}
+
+.transaction-table tbody {
+  background-color: #333;
+  border-top: 2px solid #673ab7;
+  
+  border-radius: 40px;
+}
+
+.transaction-table tbody tr:nth-child(even) {
+  background-color: #444;
+}
+
+.transaction-table tbody tr:hover {
+  background-color: #555;
+}
+
+.transaction-table tbody tr {
+  border-radius: 20px;
+  overflow: hidden;
+} */
