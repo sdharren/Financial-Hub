@@ -16,6 +16,7 @@ urlpatterns = [
     path('investment_category_names/', views.investment_category_names),
     path('investment_category_breakdown/', views.investment_category_breakdown, name='investment_category_breakdown'),
     path('stock_history/', views.stock_history, name='stock_history'),
+    path('portfolio_comparison/', views.portfolio_comparison),
     path('returns/', views.returns, name='returns'),
     path('category_returns/', views.category_returns, name='category_returns'),
     path('overall_returns/', views.overall_returns, name='overall_returns'),

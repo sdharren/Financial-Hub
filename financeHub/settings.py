@@ -36,7 +36,8 @@ ALLOWED_HOSTS = [
     'localhost',
     'localhost:8000',
     'localhost:3000',
-    'financial-hub.herokuapp.com'
+    'financial-hub.herokuapp.com',
+    '127.0.0.1'
 ]
 
 

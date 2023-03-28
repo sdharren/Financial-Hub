@@ -20,6 +20,11 @@ import InvestmentGraphs from './pages/InvestmentGraphs';
 import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
+import Currency from './pages/Currency';
+import TransactionTable from './pages/RecentTransactionsDisplay';
+import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
+
+// ask matthew about how margins are lined
 import CurrencyDisplay from './pages/CurrencyDisplay';
 // import TransactionTable
 import LineGraph from './dahsboard_components/LineGraph';
@@ -35,7 +40,7 @@ import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
 function App() {
   return (
     <div className = "bg-[url('./images/background-image.png')]">
-      <div className= 'mx-20 max-w-full min-h-screen'>
+      <div className= 'mx-20 max-w-full min-h-screen font-["Outfit"]'>
       <Router>
         <AuthProvider>
           <Navbar />
@@ -55,6 +60,7 @@ function App() {
                 <Route path="/list" element={<TransactionDisplay />} />
                 <Route path="/link_assets" element={<LinkAssets />} />
                 <Route path="/accounts" element={<Accounts />} />
+                <Route path="/portfolio_comparison" element={<LineIndexComparisonChart />} />
                 {/* <Route path="/bankassets" element={<AssetBank />} /> */}
               </Route>
               <Route path="/login" element={<Login/>} />

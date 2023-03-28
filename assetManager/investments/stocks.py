@@ -178,6 +178,28 @@ class StocksGetter():
                 portfolio_history[current_date.strftime('%Y-%m-%d')] = current_sum
         return portfolio_history
 
+    def get_index_history(self, ticker, period="6mo"):
+        return self.yfinance_wrapper.getIndexValues(ticker, period)
+
+    def get_portfolio_comparison(self, ticker, period=6):
+        index_history = self.get_index_history(ticker, str(period) + 'mo')
+        portfolio_history = self.get_portfolio_history(period)
+        comparison = defaultdict(dict)
+
+        n_index_units = list(portfolio_history.values())[0]/list(index_history.values())[0] # Calculate how many units of the index could have been bought at start (To normalise graph)
+        print(n_index_units)
+        for date in portfolio_history:
+            try:
+                current_index = index_history[date]
+            except KeyError:
+                continue
+            else:
+                comparison[date] = {
+                    'portfolio': portfolio_history[date],
+                    'index': (index_history[date] * n_index_units)
+                }
+        return comparison
+    
     def get_supported_investments(self):
         stocks = set()
         for investment in self.investments:
