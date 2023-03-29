@@ -89,8 +89,8 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   return (
     <div className='inline-block w-full max-h-[55vh]'>
       <Bar
-      data = {data}
-      options = {options}
+      data = {data ? data : {}}
+      options = {options ? options : {}}
       onClick = {onClick}
       ref = {chartRef}></Bar>
     </div>
