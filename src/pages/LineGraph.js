@@ -5,7 +5,7 @@ import AuthContext from '../context/AuthContext';
 import GraphSelect from '../components/GraphSelect';
 import { useNavigate } from 'react-router-dom';
 
-const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) => {
+const LineGraph = ({ endpoint, endpoint_parameter, updateGraph, selectOptions, currency }) => {
     let {authTokens, logoutUser} = useContext(AuthContext);
     const [lineGraphData, setLineGraphData] = useState(null);
     const navigate = useNavigate();
@@ -71,6 +71,16 @@ const LineGraph = ({endpoint, endpoint_parameter, updateGraph, selectOptions}) =
         line_data.push(lineGraphData[key]);
     }
 
+    const options = {
+        yaxis: {
+            labels: {
+                formatter: function (value) {
+                    return currency ? currency : '£' + value;
+                }
+            }
+        }
+    }
+    
     const data = {
         labels: line_labels,
         datasets: [{

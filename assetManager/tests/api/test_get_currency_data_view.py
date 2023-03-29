@@ -13,7 +13,7 @@ from assetManager.assets.debit_card import DebitCard
 from assetManager.models import User,AccountType,AccountTypeEnum
 
 class GetCurrencyDataViewTestCase(TestCase):
-    """Tests of the log in view."""
+    """Tests for the get_currency_data view."""
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]

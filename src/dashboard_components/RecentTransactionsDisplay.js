@@ -54,7 +54,7 @@ function RecentTransactions() {
     <div styles={styles.container}>
     {
       data === null ? (
-      <p>Loading...</p> 
+      <p className='text-white'>Loading...</p> 
       ) : (
       <TableContainer styles={styles.container} style = {{ maxHeight: '57vh'}}>
       <Typography variant="h6" style={styles.title}>

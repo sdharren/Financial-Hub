@@ -5,7 +5,7 @@ import 'chart.js/auto';
 import GraphSelect from '../components/GraphSelect';
 import useHandleError from '../custom_hooks/useHandleError';
 
-function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
+function LineGraph({ endpoint, endpoint_parameter, updateGraph, selectOptions, currency}) {
     const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
     
     useHandleError(error);
@@ -18,7 +18,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
         chartSeries.push(lineChartData[key].toFixed(2));
         chartCategories.push(key.slice(0, 10));
     }
-
+    console.log(chartSeries)
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
             'endpoint': endpoint,
@@ -52,6 +52,9 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             showAlways: true,
             tickAmount: 6,
             labels: {
+                formatter: function (value) {
+                    return (currency ? currency : '£') + value.toFixed(2);
+                },
                 show: true,
                 align: 'right',
                 minWidth: 0,
@@ -80,6 +83,11 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             },
             xaxis: {
                 categories: chartCategories,
+                labels: {
+                    style: {
+                      colors: '#fff'
+                    }
+                  }
             },
             dataLabels: {
                 enabled: false
@@ -112,7 +120,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             }
             {
             lineChartData === null ?
-            <p>Loading...</p> :
+            <p className='text-white'>Loading...</p> :
             <Chart className = 'pt-2' height = "420vh" options={options} series={series} type = "area" />
             }
         </div>

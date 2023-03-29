@@ -25,19 +25,22 @@ rates (dict): A dictionary containing foreign exchange rates, where the keys are
 and the values are the conversion rate relative to the British pound (GBP).
 If an error occurs during the retrieval process, default rates are returned instead.
 """
-def create_forex_rates(input_date):
+def create_forex_rates(input_date, base='GBP'):
     warnings.filterwarnings('ignore')
     try:
-        url = "https://theforexapi.com/api/{date}?base=GBP&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'))
+        url = "https://theforexapi.com/api/{date}?base={base}&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'), base=base)
         response = requests.get(url,verify=False)
     except Exception:
-        error_rates = {'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1}
+        if base == 'GBP':
+            error_rates = {'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1}
+        elif base == 'USD':
+            error_rates = {'GBP': 0.81, 'EUR': 0.92, 'JPY': 131.94, 'CHF': 0.92, 'NOK': 10.4, 'AUD': 1.5, 'CAD': 1.36, 'INR': 82.29, 'USD': 1}
         return error_rates
 
     rates = json.loads(response.content.decode('utf-8'))['rates']
-
-    if 'GBP' not in rates.keys():
-        rates['GBP'] = 1
+    
+    if base not in rates.keys():
+        rates[base] = 1
 
     return rates
 

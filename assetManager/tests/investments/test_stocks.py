@@ -246,6 +246,66 @@ class StocksTestCase(TestCase):
         self.stock_getter = StocksGetter(None)
         self.assertTrue(self.stock_getter.is_ticker_supported('NFLX'))
 
+    def test_format_investments_converts_to_usd(self):
+        input_data = [
+            {
+                'holdings': [
+                    {
+                        'security_id': '123',
+                        'institution_value': 1000,
+                        'quantity': 1
+                    }
+                ],
+                'securities': [
+                    {
+                        'name': 'Netflix',
+                        'ticker_symbol': 'NFLX',
+                        'security_id': '123',
+                        'iso_currency_code': 'GBP',
+                        'type': 'equity'
+                    }
+                ]
+            },
+            {
+                'holdings': [
+                    {
+                        'security_id': '22',
+                        'institution_value': 5000,
+                        'quantity': 1
+                    },
+                    {
+                        'security_id': '1',
+                        'institution_value': 3333,
+                        'quantity': 1
+                    }
+                ],
+                'securities': [
+                    {
+                        'name': 'Google',
+                        'ticker_symbol': 'GOOG',
+                        'security_id': '22',
+                        'iso_currency_code': 'GBP',
+                        'type': 'equity'
+                    },
+                    {
+                        'name': 'Stock',
+                        'ticker_symbol': 'STCK',
+                        'security_id': '1',
+                        'iso_currency_code': 'GBP',
+                        'type': 'equity'
+                    }
+                ]
+            }
+        ]
+        self.stock_getter = StocksGetter(None)
+        self.stock_getter.format_investments(input_data)
+        old_data = {
+            'GOOG': 5000,
+            'STCK': 3333,
+            'NFLX': 1000
+        }
+        for investment in self.stock_getter.investments:
+            self.assertTrue(investment.get_total_price() > old_data[investment.get_ticker()])
 
     def _create_stock_getter_with_sandbox(self):
         self.wrapper = SandboxWrapper()

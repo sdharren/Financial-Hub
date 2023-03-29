@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
 import BalancesDisplay from './BalancesDisplay';
-import RecentTransactions from '../dahsboard_components/RecentTransactionsDisplay';
+import RecentTransactions from '../dashboard_components/RecentTransactionsDisplay';
 import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
@@ -68,6 +68,7 @@ function Dashboard() {
       { name: 'Recent Transactions', content: <RecentTransactions /> },
       { name: 'Currency Breakdown', content: <CurrencyDisplay /> },
       { name: 'Spending Habits', content: <BarChart /> },
+      { name: 'Sector Spending', content: <BarChartDisplay /> }
     ],
     Crypto: [
       { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
@@ -100,7 +101,7 @@ function Dashboard() {
   };
 
     let page1 = (
-        <div>
+        <div data-testid = 'dashboardtest'>
           
           <div className="dashboard-container">
             <div className="piechart-box">

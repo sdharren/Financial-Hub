@@ -191,8 +191,8 @@ class DebitCard():
 
 
     def format_category(self,category):
-        if(category[0] == 'Not Provided'):
-            return 'Not Provided'
+        if(category == 'Not Provided'):
+            return category
 
         result = ', '.join(category)
         last_comma_index = result.rfind(',')
