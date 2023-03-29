@@ -43,12 +43,20 @@ const CScatter = () => {
       type: "datetime",
       title: {
         text: "Date"
-      }
+      },
     },
     yaxis: {
       title: {
         text: "Transaction Amount",
+        style: {
+          color: '#fff'
+        }
       },
+      labels: {
+        style: {
+          colors: '#fff'
+        }
+      }
     },
     legend: {
       position: "top",
