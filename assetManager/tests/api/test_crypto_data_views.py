@@ -19,7 +19,7 @@ from assetManager.API_wrappers.crypto_wrapper import save_wallet_address
 from assetManager.tests.helpers import LogInTester
 
 
-class CacheTransactionsViewTestCase(TestCase, LogInTester):
+class CryptoDataViewsTestCase(TestCase, LogInTester):
     fixtures = [
         'assetManager/tests/fixtures/users.json',
     ]
@@ -40,6 +40,8 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         self.factory = RequestFactory()
         self.user = User.objects.get(email='johndoe@example.org')
 
+    def tearDown(self):
+        cache.clear()
 
     def generate_then_cache_crypto(self):
         save_wallet_address(self.user, "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo")
@@ -66,6 +68,10 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         self.assertEqual(cache.get('crypto'+self.user.email),response.data)
+
+    def test_crypto_all_data_redirects_with_no_crypto_linked(self):
+        response = self.factory.get('/crypto_all_data')
+        self.assertEqual(response, 303)
 
     def test_crypto_select_data_with_cached_data(self):
         self.create_public_token()

@@ -85,7 +85,7 @@ class DeleteLinkedCrytpoViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.CRYPTO, access_token='bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v').exists())
 
-    """
+
     def test_multiple_delete_crypto(self):
         cache.set('crypto' + self.user.email,'random-data-that-will-be-deleted')
         AccountType.objects.create(
@@ -106,10 +106,8 @@ class DeleteLinkedCrytpoViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertTrue(cache.has_key("crypto" + self.user.email))
-        print(cache.get("crypto" + self.user.email))
         # Check number of linked institutions after deleting
         response = self.client.get(reverse("linked_crypto"), format="json")
         self.assertEqual(response.status_code, 200)
         institutions = response.json()
         self.assertEqual(len(institutions), 1)
-    """

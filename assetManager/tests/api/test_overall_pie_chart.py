@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from assetManager.API_wrappers.crypto_wrapper import save_wallet_address
+from django.core.cache import cache
 
 
 from assetManager.tests.helpers import LogInTester
@@ -76,7 +77,7 @@ class OverallGraphViewTestCase(TestCase, LogInTester):
     def test_sum_crypto_balances_with_no_wallet(self):
         balance = sum_crypto_balances(self.user)
         self.assertEqual(balance,0)
-    
+
     def test_sum_crypto_balances_with_wallet(self):
         save_wallet_address(self.user, "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo")
         balance = sum_crypto_balances(self.user)
