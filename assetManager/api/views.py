@@ -338,7 +338,7 @@ def company_spending(request):
     if request.GET.get('param'):
         sector = request.GET.get('param')
     else:
-        raise Exception
+        return Response(status=400)
         # should return bad request
     graphData = transactions.companySpendingPerSector(sector)
     return Response(graphData, content_type='application/json')
@@ -386,7 +386,7 @@ def monthlyGraph(request):
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
-        raise Exception
+        return Response(status=400)
         # should return bad request
     graphData = transactions.monthlySpendingInYear(int(yearName))
     return Response(graphData, content_type='application/json')
@@ -406,7 +406,7 @@ def weeklyGraph(request):
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
-        raise Exception
+        return Response(status=400)
         # should return bad request
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
