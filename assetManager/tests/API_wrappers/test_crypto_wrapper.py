@@ -127,13 +127,10 @@ class CryptoWraperTestCase(TestCase):
 
     def test_data_received_is_dictionary(self):
         data = getAllCryptoData(self.user)
-        self.assertIsInstance(dict)
+        self.assertIsInstance(data, dict)
 
     def test_addr_regex_correct(self, data=crypto_example_data):
-        self.assertTrue(re.match("/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/g", list(data.keys())[0]) or re.match("/^0x[a-fA-F0-9]{40}$/g", list(data.keys())[0]))
-
-    def test_addr_regex_false(self, data=crypto_example_data):
-        self.assertFalse(re.match("/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/g", list(data.keys())[0]) or re.match("/^0x[a-fA-F0-9]{40}$/g", list(data.keys())[0]))
+        self.assertTrue(re.match(r"^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$", list(data.keys())[0]) or re.match(r"(\b0x[a-f0-9]{40}\b)", list(data.keys())[0]))
     
     def test_find_fiat_rates(self):
         conversion_rates = find_fiat_rates()
