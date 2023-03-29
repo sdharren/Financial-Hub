@@ -31,25 +31,6 @@ function RecentTransactions() {
 
   const categories = ['Institution', 'Amount (£)', 'Date', 'Category', 'Merchant'];
 
-  const [sort, setSort] = useState({ category: 'institution', direction: 'asc' });
-
-  const sortData = (category) => {
-    const isAscending = sort.category === category && sort.direction === 'asc';
-    const sortedData = Object.entries(data).sort((a, b) => {
-      const aValue = a[1][0][category];
-      const bValue = b[1][0][category];
-      if (aValue < bValue) {
-        return isAscending ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return isAscending ? 1 : -1;
-      }
-      return 0;
-    });
-    setSort({ category, direction: isAscending ? 'desc' : 'asc' });
-    setData(Object.fromEntries(sortedData));
-  };
-
   return (
     <div styles={styles.container}>
     {
