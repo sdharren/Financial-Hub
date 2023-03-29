@@ -32,7 +32,7 @@ const CScatter = () => {
 
   const options = {
     chart: {
-      height: 350,
+      // height: 100,
       type: "scatter",
       zoom: {
         enabled: true,
@@ -72,8 +72,8 @@ const CScatter = () => {
   });
 
   return (
-    <div id="chart">
-      <ApexCharts options={options} series={series} type="scatter" height={350} />
+    <div id="chart" className='flex flex-col w-full max-h-[30vh]'>
+      <ApexCharts options={options} series={series} type="scatter" height= '450vh' />
     </div>
   );
 };
