@@ -28,7 +28,7 @@ const HomePage = () => {
     }
 
     return (
-        <div>
+        <div data-testid= 'homepagetest'>
             <p>You are logged in {firstName}!</p>
         </div>
     )

@@ -1,5 +1,5 @@
-import PieChart from "../dahsboard_components/PieChart";
-import LineGraph from "../dahsboard_components/LineGraph";
+import PieChart from "../dashboard_components/PieChart";
+import LineGraph from "../dashboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";

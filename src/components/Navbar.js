@@ -94,7 +94,7 @@ export default function Navbar() {
     );
 
     return (
-        <nav className="nav border-white border-b-2">
+        <nav className="nav border-white border-b-2" data-testid="navbar">
             <div className='navbarContents text-white flex pt-5 pb-3 px-2'>
                 <Link to = {user ? "/dashboard" : "/"} className="site-title text-4xl font-bold">DASH.</Link>
                 {user ? loggedInForm : defaultForm}

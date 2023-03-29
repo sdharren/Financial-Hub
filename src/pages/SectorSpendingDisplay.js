@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BarGraph from "../dahsboard_components/BarGraph";
+import BarGraph from "../dashboard_components/BarGraph";
 import DropDown from "./DropDown";
 
 function BarChartDisplay() {
