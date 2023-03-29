@@ -1,6 +1,8 @@
 from django.test import TestCase
 from assetManager.models import UserManager
 
+"""Tests for the UserManager BaseUserManager """
+
 class UserManagerModelTestCase(TestCase):
     def setUp(self):
         self.email = 'johndoe@example.org'

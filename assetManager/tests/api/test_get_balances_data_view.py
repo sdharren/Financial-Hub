@@ -13,7 +13,8 @@ from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import AccountTypeEnum,AccountType
 
 class GetBalancesDataViewTestCase(TestCase):
-    """Tests of the log in view."""
+    """Tests of the get_balances_data view."""
+
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]

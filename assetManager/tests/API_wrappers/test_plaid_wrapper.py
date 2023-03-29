@@ -2,6 +2,8 @@ from django.test import TestCase
 from assetManager.models import User
 from assetManager.API_wrappers.plaid_wrapper import PlaidWrapper, PublicTokenNotExchanged, PlaidWrapperIsAnAbstractClass
 
+"""Tests of the PLAID general wrapper class."""
+
 class PlaidWrapperTestCase(TestCase):
     fixtures = [
         'assetManager/tests/fixtures/users.json',

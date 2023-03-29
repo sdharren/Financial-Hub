@@ -5,6 +5,7 @@ from datetime import datetime
 import re
 from django.db import IntegrityError
 
+"""Tests for the AccountType model """
 class AccountTypeCase(TestCase):
 
     fixtures = ['assetManager/tests/fixtures/users.json'],['assetManager/tests/fixtures/account_types.json']

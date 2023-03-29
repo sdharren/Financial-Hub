@@ -5,6 +5,8 @@ from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, Lin
 from assetManager.models import User, AccountType, AccountTypeEnum
 from django.db import IntegrityError, transaction
 
+"""Tests of the PLAID sandbox wrapper class."""
+
 class SandboxWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']
 

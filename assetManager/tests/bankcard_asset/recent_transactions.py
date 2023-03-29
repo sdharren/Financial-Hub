@@ -42,7 +42,7 @@ multiple_recent_transactions_dict = [[{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d
 'amount': 398.34,
 'authorized_date': date.today(),
 'authorized_datetime': None,
-'category': ['Transfer', 'Debit'],
+'category': None,
 'category_id': '21006000',
 'check_number': None,
 'date': date.today(),

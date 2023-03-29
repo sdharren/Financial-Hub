@@ -144,7 +144,7 @@ def portfolio_comparison(request):
         ticker = request.GET.get('param')
     else:
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
-    
+
     comparison = stock_getter.get_portfolio_comparison(ticker, period=6)
     
     return Response(comparison, content_type='application/json', status=200)
@@ -693,9 +693,32 @@ def delete_linked_banks(request, institution):
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
 
     if not account_type:
-     return HttpResponseBadRequest('Linked bank account not found')
+        return HttpResponseBadRequest('Linked bank account not found')
 
     account_type.delete()
+
+    if(cache.has_key('transactions' + request.user.email)):
+        transactions = cache.get('transactions' + request.user.email)
+        delete_cached('transactions', request.user)
+
+        if institution in transactions.keys():
+            del transactions[institution]
+
+        if len(transactions) != 0:
+            cache.set('transactions' + request.user.email, transactions)
+
+    if(cache.has_key('balances' + request.user.email)):
+        balances = cache.get('balances' + request.user.email)
+        delete_cached('currency', request.user)
+        delete_cached('balances', request.user)
+
+        if institution in balances.keys():
+            del balances[institution]
+
+        if(len(balances) != 0):
+            cache.set('balances' + request.user.email,balances)
+            cache.set('currency' + request.user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(balances)))
+
     return HttpResponse(status=204)
 
 
@@ -739,11 +762,18 @@ def linked_crypto(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_linked_crypto(request, crypto):
-    
+
     account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
      return HttpResponseBadRequest('Linked brokerage account not found')
 
     account_type.delete()
+
+    if(cache.has_key("crypto" + request.user.email)):
+        delete_cached('crypto', request.user)
+        cryptoData = getAllCryptoData(user)
+        cache.set("crypto" + user.email, cryptoData)
+
+
     return HttpResponse(status=204)

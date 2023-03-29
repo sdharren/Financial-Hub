@@ -14,7 +14,8 @@ from datetime import datetime, date
 from assetManager.api.views import reformatBalancesData
 
 class RecentTransactionsViewsTestCase(TestCase):
-    """Tests of the log in view."""
+    """Tests for the recent_transactions view."""
+    
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]

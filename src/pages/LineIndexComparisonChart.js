@@ -71,6 +71,9 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
             showAlways: true,
             tickAmount: 6,
             labels: {
+                formatter: function (value) {
+                    return '$' + value;
+                },
                 show: true,
                 align: 'right',
                 minWidth: 0,
