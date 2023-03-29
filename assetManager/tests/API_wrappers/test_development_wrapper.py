@@ -4,6 +4,7 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged, LinkTokenNotCreated, AccessTokenInvalid, InvalidProductSelection, InvalidPublicToken
 from assetManager.models import User, AccountType
 
+"""Tests of the PLAID DevelopmentWrapper."""
 
 class DevelopmentWrapperTestCase(TestCase):
     fixtures = ['assetManager/tests/fixtures/users.json']

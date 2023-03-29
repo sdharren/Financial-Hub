@@ -12,7 +12,7 @@ from assetManager.models import AccountTypeEnum,AccountType
 from django.core.cache import cache
 
 class SelectAccountViewsTestCase(TestCase):
-    """Tests of the log in view."""
+    """Tests for the select_account view."""
     fixtures = [
         'assetManager/tests/fixtures/users.json'
     ]

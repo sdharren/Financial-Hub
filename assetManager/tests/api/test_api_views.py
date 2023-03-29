@@ -14,11 +14,13 @@ from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 from assetManager.tests.bankcard_asset.single_transaction import single_transaction_dict
 
+
 class APIViewsTestCase(TestCase):
     fixtures = [
         'assetManager/tests/fixtures/users.json',
     ]
 
+    """Tests of general views in api/views"""
 
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False

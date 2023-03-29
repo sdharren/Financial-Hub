@@ -87,7 +87,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
             }
             {
                 pieChartData === null ? 
-                <p>Loading...</p> :  
+                <p className='text-white'>Loading...</p> :  
                 <Pie className='investment-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
             }
         </div>
