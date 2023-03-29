@@ -8,6 +8,9 @@ import BarChartDisplay from '../../pages/SectorSpendingDisplay';
 import InvestmentGraphs from '../../pages/InvestmentGraphs';
 import { customRenderUser } from '../test-utils'
 
+import BarGraph from '../../dashboard_components/BarGraph';
+import LineGraph from '../../dashboard_components/LineGraph';
+
 describe("Balances Display", () => {
     it("renders without crashing", () => {
         customRenderUser(<BalancesDisplay />)
@@ -41,5 +44,17 @@ describe("Sector spending bar chart", () => {
 describe("Investment graphs display", () => {
     it("renders without crashing", () => {
         customRenderUser(<InvestmentGraphs />)
+    })
+})
+
+describe("Bar graph", () => {
+    it("renders without creashing", () => {
+        customRenderUser(<BarGraph />)
+    })
+})
+
+describe("Line graph", () => {
+    it("renders without creashing", () => {
+        customRenderUser(<LineGraph />)
     })
 })
