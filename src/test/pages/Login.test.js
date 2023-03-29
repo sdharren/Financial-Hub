@@ -45,7 +45,7 @@ describe("Login component", () => {
     })
 
     it("calls click event", () => {
-        const testfn = jest.fn()
+        const testfn = jest.fn(e => e.preventDefault())
         customRenderNoUser(<Login submit = {testfn}/>)
 
         const submit_button = screen.getByText('Login')

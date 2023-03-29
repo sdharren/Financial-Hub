@@ -75,7 +75,7 @@ describe("Signup component", () => {
     })
 
     it("register button calls function on click", () => {
-        const testfn = jest.fn()
+        const testfn = jest.fn(e => e.preventDefault())
         customRenderNoUser(
             <Signup submit={testfn}/>
         )
