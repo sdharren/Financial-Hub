@@ -8,7 +8,7 @@ from plaid.exceptions import ApiException
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from django.core.exceptions import ObjectDoesNotExist
-
+from assetManager.transactionInsight.bank_graph_data import create_forex_rates,get_currency_converter
 
 """
 Custom Exception Thrown In the case that the passed list of transactions is empty
@@ -105,11 +105,20 @@ class DebitCard():
 
 
     def get_single_account_balances(self,token):
+        input_date = get_currency_converter()
+        rates = create_forex_rates(input_date)
         request_accounts = self.plaid_wrapper.get_accounts(token)
         accounts = format_accounts_data(request_accounts)
+        for account in accounts:
+            if accounts[account]['currency'] not in rates.keys():
+                del accounts[account]
+
         return accounts
 
     def get_single_transaction(self,start_date_input,end_date_input,token):
+        input_date = get_currency_converter()
+        rates = create_forex_rates(input_date)
+
         self.refresh_api(token)
         transaction_request = TransactionsGetRequest(
             access_token=token,
@@ -118,7 +127,7 @@ class DebitCard():
         )
 
         transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
-        return transaction_response
+        return transaction_response['transactions']
 
     """
     @params:
@@ -143,10 +152,19 @@ class DebitCard():
     @return: transactions, list containing TransactionsGetRequest return objects composed of list of transactions linked to corresponding account_id
     """
     def get_transactions_by_date(self,start_date_input,end_date_input):
+        input_date = get_currency_converter()
+        rates = create_forex_rates(input_date)
+
         transactions = []
         for token in self.access_tokens:
             transaction_response = self.get_single_transaction(start_date_input,end_date_input,token)
-            transactions.append(transaction_response['transactions'])
+
+            new_transactions = []
+            for transaction in transaction_response:
+                if(transaction['iso_currency_code'] in rates.keys()):
+                    new_transactions.append(transaction)
+
+            transactions.append(new_transactions)
 
         return transactions
 

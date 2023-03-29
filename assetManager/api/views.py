@@ -146,7 +146,7 @@ def portfolio_comparison(request):
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
 
     comparison = stock_getter.get_portfolio_comparison(ticker, period=6)
-    
+
     return Response(comparison, content_type='application/json', status=200)
 
 @api_view(['GET'])
@@ -298,6 +298,7 @@ If the request is a DELETE, the function deletes all cached data related to the 
 @handle_plaid_errors
 def cache_assets(request):
     if request.method == 'PUT':
+        print('here')
         user = request.user
         if settings.PLAID_DEVELOPMENT: # TODO: remove wrapper from here later they should be created within each methods
             wrapper = DevelopmentWrapper()
@@ -309,6 +310,7 @@ def cache_assets(request):
 
         #caching of bank related investements
         #Balances ##SERGY THESE ARE THE ONES TO MOVE
+        print('here')
         account_balances = get_institutions_balances(wrapper,request.user)
         cache.set('balances' + user.email, account_balances, 86400)
         cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)), 86400)
@@ -321,6 +323,7 @@ def cache_assets(request):
         delete_cached('transactions', user)
         delete_cached('currency', user)
         delete_cached('balances', user)
+        print('delete balances')
         delete_cached('total_assets',user) #test this
 
     return Response(status=200)
