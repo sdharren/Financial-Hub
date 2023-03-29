@@ -11,7 +11,7 @@ class CryptoWraperTestCase(TestCase):
         'assetManager/tests/fixtures/account_types.json'
     ]
 
-    crypto_example_data = {"1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD": [{
+    crypto_btc_example_data = {"1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD": [{
         "address": "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD",
         "balance": 4433416,
         "final_balance": 4433416,
@@ -72,6 +72,65 @@ class CryptoWraperTestCase(TestCase):
         ],
         "unconfirmed_balance": 0,
         "unconfirmed_n_tx": 0}, "btc"]}
+
+    crypto_eth_example_data = { "0x7CEcBd7a618146Cb251735b524e98f62d548177b": [{
+        "address": "0x7CEcBd7a618146Cb251735b524e98f62d548177b",
+        "total_received": 613136037139846027,
+        "total_sent": 609820639361600898,
+        "balance": 3315397778245129,
+        "unconfirmed_balance": 0,
+        "final_balance": 3315397778245129,
+        "n_tx": 58,
+        "unconfirmed_n_tx": 0,
+        "final_n_tx": 58,
+        "nonce": 36,
+        "pool_nonce": 36,
+        "hasMore": true,
+        "txs": [
+            {
+            "block_hash": "eec1dd4d7271a53ada4cf3145577d0610e8648aefa42a9420a7ab1d3ae9a787b",
+            "block_height": 13113955,
+            "block_index": 550,
+            "hash": "5b199d5a3b3a3f9b2ffe37878bb3b428affbec117e7888202ba22503b3967a79",
+            "addresses": [
+                "7cecbd7a618146cb251735b524e98f62d548177b",
+                "f9209e6809e0a08ae18b1366c437cb3cad2b6182"
+            ],
+            "total": 1550897349206251,
+            "fees": 735000000000000,
+            "size": 109,
+            "gas_limit": 21000,
+            "gas_used": 21000,
+            "gas_price": 35000000000,
+            "gas_tip_cap": 35000000000,
+            "gas_fee_cap": 35000000000,
+            "confirmed": "2021-08-28T12:41:39Z",
+            "received": "2021-08-28T12:01:08.52Z",
+            "ver": 0,
+            "double_spend": false,
+            "vin_sz": 1,
+            "vout_sz": 1,
+            "confirmations": 111695,
+            "confidence": 1,
+            "inputs": [
+                {
+                "sequence": 35,
+                "addresses": [
+                    "7cecbd7a618146cb251735b524e98f62d548177b"
+                ]
+                }
+            ],
+            "outputs": [
+                {
+                "value": 1550897349206251,
+                "addresses": [
+                    "f9209e6809e0a08ae18b1366c437cb3cad2b6182"
+                ]
+                }
+            ]
+            },
+        ]
+        }, "eth"]}
 
 
     def setUp(self):
@@ -171,32 +230,32 @@ class CryptoWraperTestCase(TestCase):
         self.assertEqual(toBase(100,"btc"),1e-06)
         self.assertEqual(toBase(100,"eth"),1e-16)
 
-    def test_alternate_crypto_command_address(self, data=crypto_example_data):
+    def test_alternate_crypto_command_address(self, data=crypto_btc_example_data):
         value = data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("address")
         returned = getAlternateCryptoData(self.user, "address", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("address")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_balance(self, data=crypto_example_data):
+    def test_alternate_crypto_command_balance(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("balance")
         returned = getAlternateCryptoData(self.user, "balance", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("balance")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_n_tx(self, data=crypto_example_data):
+    def test_alternate_crypto_command_n_tx(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("n_tx")
         returned = getAlternateCryptoData(self.user, "notx", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("n_tx")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_total_received(self, data=crypto_example_data):
+    def test_alternate_crypto_command_total_received(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("total_received")
         returned = getAlternateCryptoData(self.user, "received", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("total_received")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_total_sent(self, data=crypto_example_data):
+    def test_alternate_crypto_command_total_sent(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("total_sent")
         returned = getAlternateCryptoData(self.user, "sent", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("total_sent")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_txs(self, data=crypto_example_data):
+    def test_alternate_crypto_command_txs(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("txs")
         returned = getAlternateCryptoData(self.user, "txs", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("txs")
         self.assertEqual(returned, value)
