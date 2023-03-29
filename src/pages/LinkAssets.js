@@ -97,7 +97,7 @@ export default function LinkAssets() {
             <div className='link-crypto flex flex-row justify-between gap-8 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600 py-5 px-10'>
                 <img class="crypto_image" src={cryptoimg} alt="#"></img>
                 <p class="middle-text text-center my-auto text-4xl">Link your crypto wallet</p>
-                <button class="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={async () => {await get_link_token("transactions");} }>Link</button>
+                <button class="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={buttClick}>Link</button>
 
             </div>
         </div>

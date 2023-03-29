@@ -262,6 +262,9 @@ def all_crypto_wallets(request):
     user = request.user
     allWallets = get_wallets(user)
 
+    if (not allWallets):
+        return Response({'error': 'Crypto not linked.'}, status=303, content_type='application/json')
+
     return Response(allWallets, content_type='application/json', status=200)
 
 
@@ -412,6 +415,8 @@ def crypto_all_data(request):    #test
         data = cache.get("crypto" + request.user.email)
     else:
         data = getAllCryptoData(request.user)
+        if not data:
+            return Response({'error': 'Crypto not linked.'}, status=303, content_type='application/json')
         cache.set("crypto" + request.user.email, data)
     return Response(data, content_type='application/json')
 
@@ -432,14 +437,15 @@ def crypto_select_data(request):
     if request.GET.get('param'):
         if(cache.has_key("crypto" + request.user.email) is False):
             storedData = getAllCryptoData(user=request.user)
+            if not storedData:
+                return Response({'error': 'Crypto not linked.'}, status=303, content_type='application/json')
             cache.set("crypto" + request.user.email, storedData)
             data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data = storedData)
         else:
             storedData = cache.get("crypto" + request.user.email)
             data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data=storedData)
     else:
-        raise Exception
-        # should return bad request
+        raise Response({'Bad request. Param not specified.'}, status=400, content_type='application/json')
     return Response(data, content_type='application/json')
 
 
