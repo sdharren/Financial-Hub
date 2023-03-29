@@ -18,7 +18,7 @@ function LineGraph({ endpoint, endpoint_parameter, updateGraph, selectOptions, c
         chartSeries.push(lineChartData[key].toFixed(2));
         chartCategories.push(key.slice(0, 10));
     }
-
+    console.log(chartSeries)
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
             'endpoint': endpoint,
@@ -53,7 +53,7 @@ function LineGraph({ endpoint, endpoint_parameter, updateGraph, selectOptions, c
             tickAmount: 6,
             labels: {
                 formatter: function (value) {
-                    return (currency ? currency : '£') + value;
+                    return (currency ? currency : '£') + value.toFixed(2);
                 },
                 show: true,
                 align: 'right',
