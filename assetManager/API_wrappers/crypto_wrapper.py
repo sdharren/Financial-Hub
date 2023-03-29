@@ -12,7 +12,7 @@ from datetime import datetime
 from django.db import IntegrityError
 
 # KEY is BTC/ETH and Value is List of addresses
-ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
+ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"],
              "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
 
 """
@@ -22,7 +22,7 @@ ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUB
 
 @return: A list of two floats representing the current exchange rates for Bitcoin and Ethereum in GBP.
 """
-def find_fiat_rates(): 
+def find_fiat_rates():
     try:
         response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
         btc_gbp = response_btc.json()['bitcoin']['gbp']
@@ -72,17 +72,17 @@ def toBase(amount, type):
         amount = amount/(10**(8))
     elif(type == "eth"):
         amount = amount/(10**(18))
-        
+
 
     return amount
 
 """
 @params: data (dict), type (str)
 
-@Description: 
-This class contains several methods to extract different pieces of information related to cryptocurrencies, such as the address, balance, number of transactions, total amount received, total amount sent, and transaction details. These methods take in a dictionary 'data' that contains relevant information about a cryptocurrency and a string 'type' that specifies the type of cryptocurrency. 
+@Description:
+This class contains several methods to extract different pieces of information related to cryptocurrencies, such as the address, balance, number of transactions, total amount received, total amount sent, and transaction details. These methods take in a dictionary 'data' that contains relevant information about a cryptocurrency and a string 'type' that specifies the type of cryptocurrency.
 
-@return: 
+@return:
 Each method returns a specific piece of information extracted from the 'data' dictionary in the specified format. The 'getAddress' method returns the address, the 'getBalance' method returns the final balance converted to the specified base, the 'getNoTx' method returns the number of transactions, the 'getTotalReceived' method returns the total amount received converted to the specified base, the 'getTotalSent' method returns the total amount sent converted to the specified base, and the 'getTxs' method returns transaction details.
 
 """
@@ -108,7 +108,7 @@ def getTxs(data, type):
         value = data.get("txrefs")
     else:
         value = 0
-        
+
     return value
 
 """
@@ -131,7 +131,7 @@ def getAllCryptoData(user):
             addr = account.access_token
 
             value = BTC_all(addr)
-            amount = value["final_balance"] 
+            amount = value["final_balance"]
             value["final_balance"] = (amount) * rate[0]
             arrVal = [value, "btc"]
 
@@ -142,10 +142,10 @@ def getAllCryptoData(user):
             addr = account.access_token
 
             value = ETH_all(addr)
-            
-            amount = value["final_balance"] 
+
+            amount = value["final_balance"]
             value["final_balance"] = (amount) * rate[1]
-            
+
             arrVal = [value, "eth"]
 
             data[addr] = arrVal
@@ -169,13 +169,13 @@ def getAlternateCryptoData(user, command, data):
     btcAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="btc")
     ethAddresses = AccountType.objects.all().filter(user=user, account_asset_type="CRYPTO", account_institution_name="eth")
 
-    if(btcAddresses != None):
+    if(len(btcAddresses) != 0):
         for account in btcAddresses:
             addr = account.access_token
             if(addr in list(data.keys())):
 
                 value = data.get(addr)[0]
-                
+
                 if command == "address":
                     value = getAddress(value, "btc")
                 elif command == "balance":
@@ -188,12 +188,12 @@ def getAlternateCryptoData(user, command, data):
                     value = getTotalSent(value, "btc")
                 elif command == "txs":
                     value = getTxs(value, "btc")
-                    
+
                 arrVal = [value, "btc"]
 
                 data[addr] = arrVal
 
-    if(ethAddresses != None):
+    if(len(ethAddresses) != 0):
         for account in ethAddresses:
             addr = account.access_token
             if(addr in list(data.keys())):
@@ -212,7 +212,7 @@ def getAlternateCryptoData(user, command, data):
                 value = getTotalSent(value, "eth")
             elif command == "txs":
                 value = getTxs(value, "eth")
-            
+
             arrVal = [value, "eth"]
 
             data[addr] = arrVal
@@ -242,7 +242,7 @@ def save_wallet_address(user, address):
 
 """
 @params: user (User object) - The user for whom the wallets need to be retrieved.
-    
+
 @Description: This function retrieves the wallets for a given user, by fetching all account types which have an account_asset_type of "CRYPTO" and belong to the specified user. It then extracts the access token for each of these accounts and returns them as a list of wallets.
 
 @return: wallets (list) - A list of access tokens for all wallets owned by the specified user.
@@ -253,4 +253,3 @@ def get_wallets(user):
     for wallet in accounts:
         wallets.append(wallet.access_token)
     return wallets
-
