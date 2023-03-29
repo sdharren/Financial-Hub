@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import { Link } from "react-router-dom"
 import AuthContext from '../context/AuthContext';
 import '../static/navbar.css';
+import logo from '../images/logo3.png';
 
 export default function Navbar() {
     let {user, logoutUser, authTokens} = useContext(AuthContext);
@@ -96,7 +97,9 @@ export default function Navbar() {
     return (
         <nav className="nav border-white border-b-2" data-testid="navbar">
             <div className='navbarContents text-white flex pt-5 pb-3 px-2'>
-                <Link to = {user ? "/dashboard" : "/"} className="site-title text-4xl font-bold">DASH.</Link>
+                <Link to = {user ? "/dashboard" : "/"} className="site-title text-4xl font-bold">
+                    <img className='aspect-auto max-h-[8vh]' src={logo}/>
+                </Link>
                 {user ? loggedInForm : defaultForm}
             </div>
         </nav>
