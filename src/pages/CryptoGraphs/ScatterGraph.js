@@ -69,6 +69,9 @@ const CScatter = () => {
     legend: {
       position: "top",
       horizontalAlign: "left",
+      labels: {
+        colors: '#fff'
+      }
     },
   };
 
