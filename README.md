@@ -1,4 +1,4 @@
-![finscope](https://user-images.githubusercontent.com/95051689/228572955-b3128ba7-b9f8-4b4b-a07e-9d2d10e3b3d5.jpg)
+![FINSC (1200 × 630 px)](https://user-images.githubusercontent.com/123044814/228573703-d980d2af-e1b6-4050-a5ef-d86d30937d63.png)
 # 🏦Financial-Hub - FinScope 
 
 ## 5CCS2SEG Major Group Project - Software Savant's repository for a financial hub to track personal financial assets
