@@ -15,8 +15,14 @@ from django.db import IntegrityError
 ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
              "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
 
+"""
+@params: None
 
-def find_fiat_rates(): #test
+@Description: This function retrieves the current exchange rates for Bitcoin and Ethereum in GBP (Great British Pound) from the CoinGecko API by making two GET requests. The rates are returned as a list of floats.
+
+@return: A list of two floats representing the current exchange rates for Bitcoin and Ethereum in GBP.
+"""
+def find_fiat_rates(): 
     try:
         response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
         btc_gbp = response_btc.json()['bitcoin']['gbp']
@@ -41,33 +47,18 @@ The data is obtained using API requests to BlockCypher and requires an API key f
 @return:
 The methods return the requested data in JSON format.
 """
-class getCryptoAddressData:
-    def BTC_all(addr):
+def BTC_all(addr):
+    try:
         return get_address_full(address=addr, confirmations=3, api_key='9c75ffab7c524ab19cee9d749110a3b2')
+    except Exception:
+        return {}
 
-    def ETH_all(addr):
+def ETH_all(addr):
+    try:
         command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
         return re.get(command).json()
-
-"""
-@params: None
-
-@Description: This function retrieves the current exchange rates for Bitcoin and Ethereum in GBP (Great British Pound) from the CoinGecko API by making two GET requests. The rates are returned as a list of floats.
-
-@return: A list of two floats representing the current exchange rates for Bitcoin and Ethereum in GBP.
-"""
-def find_fiat_rates():
-    response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
-    btc_gbp = response_btc.json()["bitcoin"]["gbp"]
-
-    # Make a GET request to the CoinGecko API to get the ETH-to-GBP exchange rate
-    response_eth = re.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp')
-    eth_gbp = response_eth.json()["ethereum"]["gbp"]
-
-    rates = [btc_gbp, eth_gbp]
-
-    return(rates)
-
+    except Exception:
+            return {}
 
 """
 @params: amount (float) - the amount to be converted to a different base, type (string) - the type of cryptocurrency to which the conversion needs to be done ('btc' or 'eth').
@@ -139,7 +130,7 @@ def getAllCryptoData(user):
         for account in btcAddresses:
             addr = account.access_token
 
-            value = getCryptoAddressData.BTC_all(addr)
+            value = BTC_all(addr)
             amount = value["final_balance"] 
             value["final_balance"] = (amount) * rate[0]
             arrVal = [value, "btc"]
@@ -150,7 +141,7 @@ def getAllCryptoData(user):
         for account in ethAddresses:
             addr = account.access_token
 
-            value = getCryptoAddressData.ETH_all(addr)
+            value = ETH_all(addr)
             
             amount = value["final_balance"] 
             value["final_balance"] = (amount) * rate[1]

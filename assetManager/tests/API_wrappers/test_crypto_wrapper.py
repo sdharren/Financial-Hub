@@ -167,3 +167,13 @@ class CryptoWraperTestCase(TestCase):
         crypto_data = getAlternateCryptoData(self.user,"address",data)
         self.assertEqual(crypto_data,{})
         self.assertIsInstance(crypto_data,dict)
+    
+    def test_BTC_all(self):
+        self.assertNotEqual(BTC_all("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"),{})
+
+    def test_ETH_all(self):
+        self.assertNotEqual(ETH_all("0xbd3Afb0bB76683eCb4225F9DBc91f998713C3b01"),{})
+
+    def test_to_base(self):
+        self.assertEqual(toBase(100,"btc"),1e-06)
+        self.assertEqual(toBase(100,"eth"),1e-16)
