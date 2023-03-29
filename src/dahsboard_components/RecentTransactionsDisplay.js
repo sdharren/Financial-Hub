@@ -29,7 +29,7 @@ function RecentTransactions() {
     },
   };
 
-  const categories = ['Institution', 'Amount', 'Date', 'Category', 'Merchant'];
+  const categories = ['Institution', 'Amount (£)', 'Date', 'Category', 'Merchant'];
 
   const [sort, setSort] = useState({ category: 'institution', direction: 'asc' });
 
@@ -78,7 +78,7 @@ function RecentTransactions() {
           transactions.map((transaction, index) => (
             <TableRow key={`${institution}-${index}`}>
               <TableCell style={{color: 'white'}}>{institution}</TableCell>
-              <TableCell style={{color: 'white'}}>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
+              <TableCell style={{color: 'white'}}>{(transaction.amount.replace('£', '') * (-1))}</TableCell>
               <TableCell style={{color: 'white'}}>{transaction.date}</TableCell>
               <TableCell style={{color: 'white'}}>{transaction.merchant}</TableCell>
               <TableCell style={{color: 'white'}}>{transaction.category}</TableCell>
