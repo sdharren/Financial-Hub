@@ -63,7 +63,6 @@ function Accounts() {
         }
         // Remove bank from list of linked banks
         setBanks(banks.filter(bank => bank !== institution));
-        window.location.reload(false);
       } catch (error) {
         console.error(error);
       }
@@ -87,14 +86,14 @@ function Accounts() {
       }
       // Remove bank from list of linked banks
       setBrokerages(brokerages.filter(b => b !== brokerage));
-      window.location.reload(false);
+  
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <div className='signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600'>
+    <div className='signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600' data-testid ="accountstest">
     <div className='overflow-hidden rounded border-gray-200'>
     <table className="transaction-table flex flex-col w-full h-[60vh] bg-transparent">
     <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
@@ -110,7 +109,7 @@ function Accounts() {
             <td className='text-left py-3 px-4 text-white'>{bank}</td>
             <td className='text-left py-3 px-4'>Institution</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button onClick={() => handleRemoveBank(bank)}>Remove</button>
+              <button data-testid = "remove-bank" onClick={() => handleRemoveBank(bank)}>Delete</button>
             </td>
           </tr>
         ))}
@@ -119,7 +118,7 @@ function Accounts() {
             <td className='text-left py-3 px-4 text-white'>{brokerage}</td>
             <td className='text-left py-3 px-4'>Brokerage</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+              <button data-testid = "remove-brokerage"  onClick={() => handleRemoveBrokerage(brokerage)}>Delete</button>
             </td>
           </tr>
         ))}
