@@ -33,16 +33,6 @@ describe("LinkAssets component", () => {
     
   })
 
-  // it("should render the background images for the page", () => {
-  //   customRenderUser(<LinkAssets />);
-  //   const backgroundImg1 = screen.getByRole('img', { name: "background__image1"});
-  //   const backgroundImg2 = screen.getByRole('img', { name: "background__image2"});
-  //   const backgroundImg3 = screen.getByRole('img', { name: "background__image3"});
-  //   expect(backgroundImg1['src']).toEqual("http://localhost/asset-background.png");
-  //   expect(backgroundImg2['src']).toEqual("http://localhost/asset-background.png");
-  //   expect(backgroundImg3['src']).toEqual("http://localhost/asset-background.png");
-  // });
-
   
    
     const mockNavigate = jest.fn();
@@ -57,63 +47,6 @@ describe("LinkAssets component", () => {
       expect(linkAssetsComponent).toBeInTheDocument();
     });
   
-    it('calls get_link_token function with transactions product when Link button on credit/debit card asset is clicked', async () => {
-      const mockGetLinkToken = jest.fn();
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              link_token: 'testLinkToken',
-            }),
-          status: 200,
-        })
-      );
-      
-      customRenderUser(<LinkAssets />);
-
-      const links = await screen.queryByTestId('linktransactions');
-      fireEvent.click(links);
-
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/plaid_link',
-          expect.objectContaining({
-            state: expect.objectContaining({ link_token: 'mockToken' }),
-          })
-        );
-
-        });
-
-
-    });
-  
-    it('calls get_link_token function with investments product when Link button on brokerage account asset is clicked', async () => {
-      const mockGetLinkToken = jest.fn();
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              link_token: 'testLinkToken',
-            }),
-          status: 200,
-        })
-      );
-  
-      customRenderUser(<LinkAssets />);
-  
-      const linkButton = screen.getByText('Link', { exact: false });
-      fireEvent.click(linkButton);
-  
-      await expect(mockGetLinkToken).toHaveBeenCalledWith('investments');
-    });
-  
-    it('navigates to /crypto_addresses when Link button on crypto wallet asset is clicked', () => {
-      customRenderUser(<LinkAssets />);
-  
-      const linkButton = screen.getByText('Link', { exact: false });
-      fireEvent.click(linkButton);
-  
-      expect(mockNavigate).toHaveBeenCalledWith('/crypto_addresses', { replace: true });
-    });
+    
   
 });

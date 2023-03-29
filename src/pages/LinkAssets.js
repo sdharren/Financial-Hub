@@ -40,52 +40,7 @@ export default function LinkAssets() {
         navigate(route);
 
     }
-
-    let page1 = (<div>
-        
-        <div>
-            <div className="assetLink_holder">
-                <div className="background__box">
-                <img className="background__image1" src={bkbox} alt="background__image1"></img>
-                    <div className="asset__content">
-                        <img className="debit__card__image" src={debitCard} alt="debit__card__image"></img>
-                        <p className="debit-middle-text">Link your credit or debit card</p>
-                        <button data-testid = 'linktransactions' className="link-button" onClick={async () => {await get_link_token("transactions");} }>Link</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div>
-            <div className="assetLink_holder">
-                <div className="background__box">
-                <img className="background__image2" src={bkbox} alt="background__image2"></img>
-                    <div className="asset__content">
-                        <img className="bank__image" src={bankimg} alt="bank__image"></img>
-                        <p className="asset-middle-text">Link your brokerage account</p>
-                        <button className="link-button" onClick={async () => {await get_link_token("investments");} }>Link</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div>
-            <div class="assetLink_holder">
-                <div class="background__box">
-                <img class="background__image3" src={bkbox} alt="background__image3"></img>
-                    <div class="asset__content">
-                        <img class="crypto__image" src={cryptoimg} alt="crypto__image"></img>
-                        <p class="crypto-middle-text">Link your crypto wallet</p>
-                        <button class="link-button" onClick={buttClick}>Link</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-     
-    </div>
-    )
+    
     let page2 = (
         <div className='home-container flex flex-col my-10px mx-20 p-10 gap-8' data-testid="linkassetstest">
             <div className='link-debit flex flex-row justify-between gap-8 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600 py-5 px-10'>
@@ -101,7 +56,7 @@ export default function LinkAssets() {
             <div className='link-crypto flex flex-row justify-between gap-8 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600 py-5 px-10'>
                 <img className="crypto_image" src={cryptoimg} alt="crypto_image"></img>
                 <p className="middle-text text-center my-auto text-4xl text-white">Link your crypto wallet</p>
-                <button className="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={async () => {await get_link_token("transactions");} }>Link</button>
+                <button className="link-button rounded-[50px] text-lg py-2.5 px-10 border-2 my-auto text-center align-center text-lg" onClick={async () => {buttClick()} }>Link</button>
 
             </div>
         </div>
