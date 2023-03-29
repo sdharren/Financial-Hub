@@ -15,7 +15,7 @@ from django.db import IntegrityError
 ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"], 
              "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
 
-# Get fiat conversion rates
+
 def find_fiat_rates(): #test
     try:
         response_btc = re.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp')
@@ -95,31 +95,30 @@ This class contains several methods to extract different pieces of information r
 Each method returns a specific piece of information extracted from the 'data' dictionary in the specified format. The 'getAddress' method returns the address, the 'getBalance' method returns the final balance converted to the specified base, the 'getNoTx' method returns the number of transactions, the 'getTotalReceived' method returns the total amount received converted to the specified base, the 'getTotalSent' method returns the total amount sent converted to the specified base, and the 'getTxs' method returns transaction details.
 
 """
-class getUsableCrypto:
-    def getAddress(self,data, type):
-        return (data.get("address"))
+def getAddress(data, type):
+    return (data.get("address"))
 
-    def getBalance(self,data, type):
-        return toBase((data.get("final_balance")), type)
-    
-    def getNoTx(self,data, type):
-        return (data.get("n_tx"))
+def getBalance(data, type):
+    return toBase((data.get("final_balance")), type)
 
-    def getTotalReceived(self,data, type):
-        return toBase((data.get("total_received")), type)
+def getNoTx(data, type):
+    return (data.get("n_tx"))
 
-    def getTotalSent(self,data, type):
-        return toBase((data.get("total_sent")), type)
+def getTotalReceived(data, type):
+    return toBase((data.get("total_received")), type)
 
-    def getTxs(self,data, type):
-        if(type == "btc"):
-            value = data.get("txs")
-        elif(type == "eth"):
-            value = data.get("txrefs")
-        else:
-            value = 0
+def getTotalSent(data, type):
+    return toBase((data.get("total_sent")), type)
+
+def getTxs(data, type):
+    if(type == "btc"):
+        value = data.get("txs")
+    elif(type == "eth"):
+        value = data.get("txrefs")
+    else:
+        value = 0
         
-        return value
+    return value
 
 """
 @params: user (object)
@@ -187,17 +186,17 @@ def getAlternateCryptoData(user, command, data):
                 value = data.get(addr)[0]
                 
                 if command == "address":
-                    value = getUsableCrypto.getAddress(value, "btc")
+                    value = getAddress(value, "btc")
                 elif command == "balance":
-                    value = getUsableCrypto.getBalance(value, "btc")
+                    value = getBalance(value, "btc")
                 elif command == "notx":
-                    value = getUsableCrypto.getNoTx(value, "btc")
+                    value = getNoTx(value, "btc")
                 elif command == "received":
-                    value = getUsableCrypto.getTotalReceived(value, "btc")
+                    value = getTotalReceived(value, "btc")
                 elif command == "sent":
-                    value = getUsableCrypto.getTotalSent(value, "btc")
+                    value = getTotalSent(value, "btc")
                 elif command == "txs":
-                    value = getUsableCrypto.getTxs(value, "btc")
+                    value = getTxs(value, "btc")
                     
                 arrVal = [value, "btc"]
 
@@ -211,17 +210,17 @@ def getAlternateCryptoData(user, command, data):
                 value = data.get(addr)[0]
 
             if command == "address":
-                value = getUsableCrypto.getAddress(value, "eth")
+                value = getAddress(value, "eth")
             elif command == "balance":
-                value = getUsableCrypto.getBalance(value, "eth")
+                value = getBalance(value, "eth")
             elif command == "notx":
-                value = getUsableCrypto.getNoTx(value, "eth")
+                value = getNoTx(value, "eth")
             elif command == "received":
-                value = getUsableCrypto.getTotalReceived(value, "eth")
+                value = getTotalReceived(value, "eth")
             elif command == "sent":
-                value = getUsableCrypto.getTotalSent(value, "eth")
+                value = getTotalSent(value, "eth")
             elif command == "txs":
-                value = getUsableCrypto.getTxs(value, "eth")
+                value = getTxs(value, "eth")
             
             arrVal = [value, "eth"]
 

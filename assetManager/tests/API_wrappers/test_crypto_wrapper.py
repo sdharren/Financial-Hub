@@ -139,13 +139,12 @@ class CryptoWraperTestCase(TestCase):
         self.assertNotEqual(conversion_rates[1],None)
 
     def test_get_usable_crypto(self,data=crypto_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
-        crypto_wrapper = getUsableCrypto()
-        self.assertNotEqual(crypto_wrapper.getAddress(data,"etc"),None)
-        self.assertNotEqual(crypto_wrapper.getBalance(data,"etc"),None)
-        self.assertNotEqual(crypto_wrapper.getNoTx(data,"etc"),None)
-        self.assertNotEqual(crypto_wrapper.getTotalReceived(data,"etc"),None)
-        self.assertNotEqual(crypto_wrapper.getTotalSent(data,"etc"),None)
-        self.assertNotEqual(crypto_wrapper.getTxs(data,"etc"),None)
+        self.assertNotEqual(getAddress(data,"etc"),None)
+        self.assertNotEqual(getBalance(data,"etc"),None)
+        self.assertNotEqual(getNoTx(data,"etc"),None)
+        self.assertNotEqual(getTotalReceived(data,"etc"),None)
+        self.assertNotEqual(getTotalSent(data,"etc"),None)
+        self.assertNotEqual(getTxs(data,"etc"),None)
 
     def test_get_all_crypto_data_with_wallet_linked(self):
         crypto_data = getAllCryptoData(self.user)
