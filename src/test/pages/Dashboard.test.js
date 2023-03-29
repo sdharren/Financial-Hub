@@ -32,7 +32,7 @@ describe("Dashboard", () => {
         expect(chartTabs.length).toBe(1)
     })
 
-    it("Banks has 4 tabs", () => {
+    it("Banks has 5 tabs", () => {
         customRenderUser(
             <Dashboard />
         )
@@ -40,10 +40,10 @@ describe("Dashboard", () => {
         const banksTab = screen.getByText('Banks')
         userEvent.click(banksTab)
         const chartTabs = screen.getByTestId('graph-names').querySelectorAll(".piechart-graph")
-        expect(chartTabs.length).toBe(4)
+        expect(chartTabs.length).toBe(5)
     })
 
-    it("Stocks has 3 tabs", () => {
+    it("Stocks has 4 tabs", () => {
         customRenderUser(
             <Dashboard />
         )
@@ -51,6 +51,6 @@ describe("Dashboard", () => {
         const stocksTab = screen.getByText('Stocks')
         userEvent.click(stocksTab)
         const chartTabs = screen.getByTestId('graph-names').querySelectorAll(".tablinks")
-        expect(chartTabs.length).toBe(3)
+        expect(chartTabs.length).toBe(4)
     })
 })

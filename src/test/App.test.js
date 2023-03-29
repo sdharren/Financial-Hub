@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter, Link, Route } from 'react-router-dom';
+import { BrowserRouter, Link, Route, MemoryRouter } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import App from '../App';
 import About from '../pages/About';
@@ -10,6 +10,7 @@ import HomePage from '../pages/HomePage';
 import Dashboard from '../pages/Dashboard';
 import LinkAssets from '../pages/LinkAssets';
 import Accounts from '../pages/Accounts';
+import { AuthProvider } from '../context/AuthContext';
 import {customRenderUser, customRenderNoUser} from "./test-utils";
 
 
