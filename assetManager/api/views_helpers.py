@@ -21,7 +21,6 @@ class TransactionsNotLinkedException(Exception):
 class PlaidQueryException(Exception):
     pass
 
-
 """
 @params:
 account_balances (dict): A dictionary containing account balances for various institutions.
@@ -149,7 +148,7 @@ def retrieve_stock_getter(user):
             wrapper = SandboxWrapper()
         stock_getter = StocksGetter(wrapper)
         stock_getter.query_investments(user) #NOTE: can raise InvestmentsNotLinked
-        cache.set('investments' + user.email, stock_getter.investments)
+        cache.set('investments' + user.email, stock_getter.investments, 86400)
     return stock_getter
 
 """
@@ -238,11 +237,11 @@ An integer that is the overall balance across all accounts
 def sum_instiution_balances(plaid_wrapper,user):
     if False == cache.has_key('balances'+user.email):    # test this
         data = get_institutions_balances(plaid_wrapper,user)
-        cache.set('balances'+user.email,data)
+        cache.set('balances'+user.email, data, 86400)
     data = cache.get('balances'+user.email)
     available_amounts = [account['available_amount'] for account in data.values() for account in account.values()]
     return sum(available_amounts)
-    
+
 
 """
 @params:
@@ -290,14 +289,14 @@ def set_single_institution_balances_and_currency(token,wrapper,user):
     institution_name = wrapper.get_institution_name(token)
 
     if(cache.has_key('balances' + user.email) is False):
-        cache.set('balances' + user.email, {institution_name:account_balances})
+        cache.set('balances' + user.email, {institution_name:account_balances}, 86400)
     else:
         balances = cache.get('balances' + user.email)
         cache.delete('balances' + user.email)
         balances[institution_name] = account_balances
-        cache.set('balances' + user.email,balances)
+        cache.set('balances' + user.email,balances, 86400)
 
-    cache.set('currency' + user.email, calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(cache.get('balances' + user.email))))
+    cache.set('currency' + user.email, calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(cache.get('balances' + user.email))), 86400)
 
 """
  @params:
@@ -329,13 +328,13 @@ def set_single_institution_transactions(token,wrapper,user):
         raise PlaidQueryException('Something went wrong querying PLAID.')
 
     if(cache.has_key('transactions' + user.email) is False):
-        cache.set('transactions' + user.email, formatted_transactions)
+        cache.set('transactions' + user.email, formatted_transactions, 86400)
     else:
         transactions = cache.get('transactions' + user.email)
         cache.delete('transactions' + user.email)
         institution_name = list(formatted_transactions.keys())[0]
         transactions[institution_name] = formatted_transactions[institution_name]
-        cache.set('transactions' + user.email,transactions)
+        cache.set('transactions' + user.email,transactions, 86400)
 
 """
 @params:
@@ -385,7 +384,7 @@ def cache_investments(user):
         stock_getter.query_investments(user)
     except InvestmentsNotLinked:
         return False
-    cache.set('investments' + user.email, stock_getter.investments)
+    cache.set('investments' + user.email, stock_getter.investments, 86400)
     return True
 
 """
@@ -410,7 +409,7 @@ The format that the cache is stored is 'transactions' + user.email as the key an
 """
 def cacheBankTransactionData(user):
     if False==cache.has_key('transactions' + user.email):
-        cache.set('transactions' + user.email, transaction_data_getter(user))
+        cache.set('transactions' + user.email, transaction_data_getter(user), 86400)
 
 
 """
@@ -461,7 +460,7 @@ def getCachedInstitutionCachedData(user):
             plaid_wrapper = get_plaid_wrapper(user,'transactions')
             debitCards = make_debit_card(plaid_wrapper,user)
             token = debitCards.access_tokens[0]
-            cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token))
+            cache.set('access_token'+user.email,debitCards.get_institution_name_from_db(token), 86400)
         except Exception:
             raise PlaidQueryException('Something went wrong querying PLAID.')
     institution_name = cache.get('access_token'+user.email)

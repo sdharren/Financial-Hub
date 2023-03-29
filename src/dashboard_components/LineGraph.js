@@ -7,7 +7,7 @@ import useHandleError from '../custom_hooks/useHandleError';
 
 function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
     const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
-
+    
     useHandleError(error);
 
     var chartCategories = [], chartSeries = [];
@@ -80,6 +80,11 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             },
             xaxis: {
                 categories: chartCategories,
+                labels: {
+                    style: {
+                      colors: '#fff'
+                    }
+                  }
             },
             dataLabels: {
                 enabled: false
@@ -112,7 +117,7 @@ function LineGraph({endpoint, endpoint_parameter, updateGraph, selectOptions}) {
             }
             {
             lineChartData === null ?
-            <p>Loading...</p> :
+            <p className='text-white'>Loading...</p> :
             <Chart className = 'pt-2' height = "420vh" options={options} series={series} type = "area" />
             }
         </div>
