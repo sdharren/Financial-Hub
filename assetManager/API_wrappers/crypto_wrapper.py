@@ -96,26 +96,28 @@ Each method returns a specific piece of information extracted from the 'data' di
 
 """
 class getUsableCrypto:
-    def getAddress(data, type):
+    def getAddress(self,data, type):
         return (data.get("address"))
 
-    def getBalance(data, type):
+    def getBalance(self,data, type):
         return toBase((data.get("final_balance")), type)
     
-    def getNoTx(data, type):
+    def getNoTx(self,data, type):
         return (data.get("n_tx"))
 
-    def getTotalReceived(data, type):
+    def getTotalReceived(self,data, type):
         return toBase((data.get("total_received")), type)
 
-    def getTotalSent(data, type):
+    def getTotalSent(self,data, type):
         return toBase((data.get("total_sent")), type)
 
-    def getTxs(data, type):
+    def getTxs(self,data, type):
         if(type == "btc"):
             value = data.get("txs")
         elif(type == "eth"):
             value = data.get("txrefs")
+        else:
+            value = 0
         
         return value
 
