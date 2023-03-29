@@ -162,7 +162,7 @@ def getAllCryptoData(user):
 @return: data (dict) - the updated dictionary containing the retrieved cryptocurrency data.
 """
 def getAlternateCryptoData(user, command, data):
-
+    print(data)
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     #data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
@@ -172,12 +172,12 @@ def getAlternateCryptoData(user, command, data):
     if(len(btcAddresses) != 0):
         for account in btcAddresses:
             addr = account.access_token
-            if addr == data['address']:
-                value = data
+            if(addr in list(data.keys())):
+
+                value = data.get(addr)[0]
 
                 if command == "address":
                     value = getAddress(value, "btc")
-
                 elif command == "balance":
                     value = getBalance(value, "btc")
                 elif command == "notx":
@@ -218,7 +218,6 @@ def getAlternateCryptoData(user, command, data):
             data[addr] = arrVal
 
     return data
-
 """
 @params: user (User object), address (str)
           - user: The user object to which the wallet address belongs
