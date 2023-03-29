@@ -51,7 +51,11 @@ class YFinanceWrapper():
                 raise TickerNotSupported()
         else:
             raise TickerNotSupported()
-        return close
+
+        dict_with_datetimes = {}
+        for key in close.keys():
+            dict_with_datetimes[key.to_pydatetime().strftime('%Y-%m-%d')] = close[key]
+        return dict_with_datetimes
 
     def getDayDelta(self, initial_amount, data):
         keys = list(data.keys())

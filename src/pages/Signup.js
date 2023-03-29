@@ -103,7 +103,7 @@ const Signup = ({submit}) => {
                                     isRequired = {field.isRequired}
                                     placeholder = {field.placeholder}
                                 />
-                                <p class = {"error " + field.name + "-error"}></p>
+                                <p className = {"error " + field.name + "-error"}></p>
 
                             </div>
                         )

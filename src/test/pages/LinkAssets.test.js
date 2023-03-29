@@ -13,7 +13,7 @@ describe("LinkAssets component", () => {
 
   it("should render texts for the page", () => {
     customRenderUser(<LinkAssets />);
-    const debitText = screen.getByText("Link your credit or debit card");
+    const debitText = screen.getByText("Link your bank account");
     const assetText = screen.getByText("Link your brokerage account");
     const cryptoText = screen.getByText("Link your crypto wallet");
     expect(debitText).toBeInTheDocument();
@@ -24,24 +24,24 @@ describe("LinkAssets component", () => {
 
   it("should render the images for the page", () => {
     customRenderUser(<LinkAssets />);
-    const bankImg = screen.getByRole('img', {name : "debit__card__image"});
-    const assetImg = screen.getByRole('img', {name : "bank__image"});
-    const cryptoImg = screen.getByRole('img', {name : "crypto__image"});
-    expect(bankImg['src']).toEqual("http://localhost/asset-debit.png");
-    expect(assetImg['src']).toEqual("http://localhost/asset-bank.png");
-    expect(cryptoImg['src']).toEqual("http://localhost/asset-crypto.png");
+    const bankImg = screen.getByRole('img', {name : "debit_image"});
+    const assetImg = screen.getByRole('img', {name : "stock_image"});
+    const cryptoImg = screen.getByRole('img', {name : "crypto_image"});
+    expect(bankImg['src']).toEqual("http://localhost/asset-debit2.png");
+    expect(assetImg['src']).toEqual("http://localhost/asset-bank2.png");
+    expect(cryptoImg['src']).toEqual("http://localhost/asset-crypto2.png");
     
   })
 
-  it("should render the background images for the page", () => {
-    customRenderUser(<LinkAssets />);
-    const backgroundImg1 = screen.getByRole('img', { name: "background__image1"});
-    const backgroundImg2 = screen.getByRole('img', { name: "background__image2"});
-    const backgroundImg3 = screen.getByRole('img', { name: "background__image3"});
-    expect(backgroundImg1['src']).toEqual("http://localhost/asset-background.png");
-    expect(backgroundImg2['src']).toEqual("http://localhost/asset-background.png");
-    expect(backgroundImg3['src']).toEqual("http://localhost/asset-background.png");
-  });
+  // it("should render the background images for the page", () => {
+  //   customRenderUser(<LinkAssets />);
+  //   const backgroundImg1 = screen.getByRole('img', { name: "background__image1"});
+  //   const backgroundImg2 = screen.getByRole('img', { name: "background__image2"});
+  //   const backgroundImg3 = screen.getByRole('img', { name: "background__image3"});
+  //   expect(backgroundImg1['src']).toEqual("http://localhost/asset-background.png");
+  //   expect(backgroundImg2['src']).toEqual("http://localhost/asset-background.png");
+  //   expect(backgroundImg3['src']).toEqual("http://localhost/asset-background.png");
+  // });
 
   
    

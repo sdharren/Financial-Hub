@@ -69,7 +69,7 @@ def total_assets(request):
         crypto_assets = 100.0
         # crypto_assets = sum_crypto_balances(user)
         data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
-        cache.set('total_assets'+user.email, data)
+        cache.set('total_assets'+user.email, data, 86400)
     else:
         data = cache.get('total_assets'+user.email)
     return Response(data, content_type='application/json', status=200)
@@ -134,6 +134,23 @@ def stock_history(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def portfolio_comparison(request):
+    try:
+        stock_getter = retrieve_stock_getter(request.user)
+    except InvestmentsNotLinked:
+        return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+
+    if request.GET.get('param'):
+        ticker = request.GET.get('param')
+    else:
+        return Response({'error': 'Bad request. Param not specified.'}, status=400)
+    
+    comparison = stock_getter.get_portfolio_comparison(ticker, period=6)
+    
+    return Response(comparison, content_type='application/json', status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def supported_investments(request):
     try:
         stock_getter = retrieve_stock_getter(request.user)
@@ -190,7 +207,7 @@ def overall_returns(request):
 def link_token(request):
     if request.GET.get('product'):
         product = request.GET.get('product')
-        cache.set('product_link' + request.user.email, [product])
+        cache.set('product_link' + request.user.email, [product], 86400)
     else:
         return Response({'error': 'Bad request. Product not specified.'}, status=400)
     wrapper = DevelopmentWrapper()
@@ -259,7 +276,7 @@ def exchange_public_token(request):
         token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
         set_single_institution_transactions(token,wrapper,request.user)
-        
+
     return Response(status=200)
 
 """
@@ -293,9 +310,9 @@ def cache_assets(request):
         #caching of bank related investements
         #Balances ##SERGY THESE ARE THE ONES TO MOVE
         account_balances = get_institutions_balances(wrapper,request.user)
-        cache.set('balances' + user.email, account_balances)
-        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)))
-        cache.set('transactions'+user.email,transaction_data_getter(request.user)) #test this
+        cache.set('balances' + user.email, account_balances, 86400)
+        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)), 86400)
+        cache.set('transactions'+user.email,transaction_data_getter(request.user), 86400) #test this
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
@@ -320,7 +337,7 @@ def sandbox_investments(request):
     wrapper.save_access_token(user, products_chosen=['investments'])
     stock_getter = StocksGetter(wrapper)
     stock_getter.query_investments(user)
-    cache.set('investments' + user.email, stock_getter.investments)
+    cache.set('investments' + user.email, stock_getter.investments, 86400)
     return Response(status=200)
 
 """
@@ -338,7 +355,7 @@ def company_spending(request):
     if request.GET.get('param'):
         sector = request.GET.get('param')
     else:
-        raise Exception
+        return Response(status=400)
         # should return bad request
     graphData = transactions.companySpendingPerSector(sector)
     return Response(graphData, content_type='application/json')
@@ -386,7 +403,7 @@ def monthlyGraph(request):
     if request.GET.get('param'):
         yearName = request.GET.get('param')
     else:
-        raise Exception
+        return Response(status=400)
         # should return bad request
     graphData = transactions.monthlySpendingInYear(int(yearName))
     return Response(graphData, content_type='application/json')
@@ -406,7 +423,7 @@ def weeklyGraph(request):
     if request.GET.get('param'):
         date = request.GET.get('param')
     else:
-        raise Exception
+        return Response(status=400)
         # should return bad request
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
@@ -431,13 +448,13 @@ def set_bank_access_token(request):
         decoded_data = data.decode('utf-8')
         parsed_data = json.loads(decoded_data)
         access_token_id = int(parsed_data['selectedOption'])
-        plaid_wrapper = get_plaid_wrapper(request.user,'balances')
+        plaid_wrapper = get_plaid_wrapper(request.user,'transactions')
         debitCards = DebitCard(plaid_wrapper,request.user)
         access_token = debitCards.access_tokens[access_token_id]
         cache.delete('access_token'+request.user.email)
-        cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token))
+        cache.set('access_token'+request.user.email,debitCards.get_institution_name_from_db(access_token), 86400)
         return Response(status=200)
-    except:
+    except Exception:
         return Response(status=400)
 
 """
@@ -471,7 +488,7 @@ def get_currency_data(request):
 
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
-    cache.set('currency' + user.email, proportion_currencies)
+    cache.set('currency' + user.email, proportion_currencies, 86400)
 
     return Response(proportion_currencies, content_type='application/json', status = 200)
 
@@ -505,7 +522,7 @@ def get_balances_data(request):
     account_balances = get_institutions_balances(plaid_wrapper,user)
 
     balances = reformatBalancesData(account_balances)
-    cache.set('balances' + user.email, account_balances)
+    cache.set('balances' + user.email, account_balances, 86400)
     return Response(balances, content_type='application/json', status = 200)
 
 """
@@ -594,40 +611,36 @@ handle_plaid_errors: decorator that handles Plaid API errors.
 @handle_plaid_errors
 def recent_transactions(request):
     user = request.user
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
 
+    institutions = AccountType.objects.filter(user = user, account_asset_type = AccountTypeEnum.DEBIT)
+
+    if(len(institutions) == 0):
+        return Response({'error': 'Transactions Not Linked.'}, content_type='application/json', status=303)
+
+    concrete_wrapper = get_plaid_wrapper(user,'transactions')
+    debit_card = make_debit_card(concrete_wrapper,user)
+    transactions = {}
+
+    for institution in institutions:
+        bank_graph_data_insight = getCachedInstitutionData(user,institution.account_institution_name)
         try:
-            bank_graph_data_insight = getCachedInstitutionData(user,institution_name)
-        except TransactionsNotLinkedException:
-            raise TransactionsNotLinkedException('Transactions Not Linked.')
+            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution.account_institution_name)
         except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
+            return Response({'error': 'Something went wrong querying PLAID.'}, content_type='application/json', status=303)
 
-        concrete_wrapper = DevelopmentWrapper()
+        transactions[institution.account_institution_name] = recent_transactions
 
-        debit_card = make_debit_card(concrete_wrapper,user)
-
-        try:
-            recent_transactions = debit_card.get_recent_transactions(bank_graph_data_insight,institution_name)
-        except Exception:
-            raise PlaidQueryException('Something went wrong querying PLAID.')
-
-
-        return Response(recent_transactions,content_type='application/json',status = 200)
-    else:
-        return Response({'error': 'Institution Name Not Selected'}, content_type='application/json', status=303)
-
+    return Response(transactions,content_type='application/json',status = 200)
 
 """
-    @params:
-        request (HttpRequest): the HTTP request object.
+@params:
+    request (HttpRequest): the HTTP request object.
 
-    @Description:
-        Retrieve the linked banks for the authenticated user.
+@Description:
+    Retrieve the linked banks for the authenticated user.
 
-    @return:
-        Response: the HTTP response object containing a list of institution names in JSON format.
+@return:
+    Response: the HTTP response object containing a list of institution names in JSON format.
 """
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -640,14 +653,14 @@ def get_linked_banks(request):
     return Response(institutions, content_type='application/json',status = 200)
 
 """
-    @params:
-        request (HttpRequest): the HTTP request object.
+@params:
+    request (HttpRequest): the HTTP request object.
 
-    @Description:
-        Retrieve the linked brokerages for the authenticated user.
+@Description:
+    Retrieve the linked brokerages for the authenticated user.
 
-    @return:
-        Response: the HTTP response object containing a list of brokerage names in JSON format.
+@return:
+    Response: the HTTP response object containing a list of brokerage names in JSON format.
 
 """
 @api_view(['GET'])
@@ -661,16 +674,16 @@ def linked_brokerage(request):
 
 
 """
-    @params:
-        request: The HTTP request object that contains information about the current request.
-        institution: The name of the linked institution account to be deleted.
+@params:
+    request: The HTTP request object that contains information about the current request.
+    institution: The name of the linked institution account to be deleted.
 
-    @Description:
-        This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
+@Description:
+    This function deletes a linked institution account associated with the authenticated user and the given institution name, and returns a 204 (No Content) response.
 
-    @return:
-        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
-        A HttpResponseBadRequest object with an error message if the account was not found.
+@return:
+    A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+    A HttpResponseBadRequest object with an error message if the account was not found.
 
 """
 @api_view(['DELETE'])
@@ -687,16 +700,16 @@ def delete_linked_banks(request, institution):
 
 
 """
-    @params:
-        request: The HTTP request object that contains information about the current request.
-        brokerage: The name of the linked brokerage account to be deleted.
+@params:
+    request: The HTTP request object that contains information about the current request.
+    brokerage: The name of the linked brokerage account to be deleted.
 
-    @Description:
-        This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
+@Description:
+    This function deletes a linked brokerage account associated with the authenticated user and the given brokerage name, and returns a 204 (No Content) response.
 
-    @return:
-        A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
-        A HttpResponseBadRequest object with an error message if the account was not found.
+@return:
+    A HttpResponse object with status code 204 (No Content) if the account was successfully deleted.
+    A HttpResponseBadRequest object with an error message if the account was not found.
 
 """
 @api_view(['DELETE'])
@@ -704,6 +717,30 @@ def delete_linked_banks(request, institution):
 def delete_linked_brokerage(request, brokerage):
 
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
+
+    if not account_type:
+     return HttpResponseBadRequest('Linked brokerage account not found')
+
+    account_type.delete()
+
+    delete_cached('investments', request.user)
+
+    return HttpResponse(status=204)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def linked_crypto(request):
+    account_types = AccountType.objects.filter(user = request.user, account_asset_type = AccountTypeEnum.CRYPTO)
+    cryptos = []
+    for crypto in account_types:
+        cryptos.append(crypto.access_token)
+    return Response(cryptos, content_type='application/json',status = 200)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_linked_crypto(request, crypto):
+    
+    account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
      return HttpResponseBadRequest('Linked brokerage account not found')

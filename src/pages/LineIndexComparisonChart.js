@@ -1,57 +1,124 @@
+import { useState, useEffect, useContext } from "react";
+import Chart from "react-apexcharts";
+import GraphSelect from "../components/GraphSelect";
+import usePlaid from "../custom_hooks/usePlaid";
+import useHandleError from "../custom_hooks/useHandleError";
 
-const data = [  
-    {    
-        name: 'Portfolio',   
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 130]
+function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions, updateGraph }) {
+
+    const [comparisonData, error] = usePlaid({endpoint, endpoint_parameter})
+
+    useHandleError(error);
+
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
+    }
+
+    let dates = [];
+    let portfolio = [];
+    let index = [];
+    
+    for (let key in comparisonData) {
+        dates.push(key);
+        portfolio.push({
+            x: key,
+            y: comparisonData[key]['portfolio'].toFixed(2)
+        });
+        
+        index.push({
+            x: key,
+            y:comparisonData[key]['index'].toFixed(2)
+        });
+    }
+
+    const series = [  
+        {    
+            name: 'Portfolio',   
+            data: portfolio
+        },
+
+        {
+            name: 'Index',
+            data: index
+        }
+    ];
+
+    const options = {
+    chart: {
+        stacked: false,
+        height: 100
     },
-
-    {
-        name: 'Index',
-        data: [20, 22, 30, 45, 60, 90, 105, 120, 135, 150]
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        width: [2, 2],
+        curve: 'straight'
+    },
+    xaxis: {
+        type: 'datetime',
+        labels: {
+            style: {
+                colors: '#fff'
+            }   
+        }
+    },
+    yaxis: {
+        show: true,
+            showAlways: true,
+            tickAmount: 6,
+            labels: {
+                show: true,
+                align: 'right',
+                minWidth: 0,
+                maxWidth: 160,
+                style: {
+                    colors: ['#fff'],
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 400,
+                    cssClass: 'apexcharts-yaxis-label',
+                },
+                offsetX: 0,
+                offsetY: 0,
+                rotate: 0,
+            },
+            axisBorder: {
+                show: true,
+                color: '#fff',
+                offsetX: 0,
+                offsetY: 0
+            },
+        title: {
+        text: 'Value',
+        style: {
+            color: '#fff',
+        },
+        }
+    },
+    legend: {
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetX: 40,
+        labels: {
+            colors: '#fff'
+        }
     }
-];
+    };
 
-const options = {
-  chart: {
-    type: 'line',
-    stacked: true,
-    height: 350
-  },
-  dataLabels: {
-    enabled: false
-  },
-  stroke: {
-    width: [2, 2],
-    curve: 'smooth'
-  },
-  series: data,
-  xaxis: {
-    type: 'datetime'
-  },
-  yaxis: {
-    title: {
-      text: 'Value'
-    }
-  },
-  fill: {
-    opacity: [0.8, 0.8],
-    gradient: {
-      inverseColors: false,
-      shade: 'light',
-      type: 'vertical',
-      opacityFrom: 0.85,
-      opacityTo: 0.55,
-      stops: [0, 100]
-    }
-  },
-  legend: {
-    position: 'top',
-    horizontalAlign: 'left',
-    offsetX: 40
-  }
-};
+    return (
+        <div className='flex flex-col w-full max-h-[30vh]'>
+        {
+            selectOptions === undefined || selectOptions === null
+            ? null
+            : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
+        }
+        <Chart height = "420vh" options={options} series={series} />
+    </div>
+    )
+}
 
-const chart = new ApexCharts(document.querySelector('#chart'), options);
-
-
-chart.render();
+export default LineIndexComparisonChart;
