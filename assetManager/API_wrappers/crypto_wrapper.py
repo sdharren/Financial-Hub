@@ -172,12 +172,12 @@ def getAlternateCryptoData(user, command, data):
     if(len(btcAddresses) != 0):
         for account in btcAddresses:
             addr = account.access_token
-            if(addr in list(data.keys())):
-
-                value = data.get(addr)[0]
+            if addr == data['address']:
+                value = data
 
                 if command == "address":
                     value = getAddress(value, "btc")
+
                 elif command == "balance":
                     value = getBalance(value, "btc")
                 elif command == "notx":

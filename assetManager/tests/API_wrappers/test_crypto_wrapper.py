@@ -121,9 +121,8 @@ class CryptoWraperTestCase(TestCase):
         wallets = get_wallets(self.user)
         self.assertEqual(len(wallets), 2)
 
-    def test_get_all_crypto_data(self):
+    def test_get_all_crypto_data_linked_wallets(self):
         save_wallet_address(self.user,"1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")
-        #euthereum
         save_wallet_address(self.user,"0x7CEcBd7a618146Cb251735b524e98f62d548177b")
         data = getAllCryptoData(self.user)
         self.assertIsNotNone(data)
@@ -146,19 +145,13 @@ class CryptoWraperTestCase(TestCase):
         self.assertNotEqual(getTotalSent(data,"etc"),None)
         self.assertNotEqual(getTxs(data,"etc"),None)
 
-    def test_get_all_crypto_data_with_wallet_linked(self):
-        crypto_data = getAllCryptoData(self.user)
-        save_wallet_address(self.user, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa ")
-        self.assertNotEqual(crypto_data,None)
-        self.assertIsInstance(crypto_data,dict)
-
     def test_get_all_crypto_data_with_no_wallet_linked(self):
         crypto_data = getAllCryptoData(self.user)
         self.assertEqual(crypto_data,{})
         self.assertIsInstance(crypto_data,dict)
 
     def test_get_alternate_crypto_data_with_wallet_linked(self,data=crypto_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
-        save_wallet_address(self.user, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa ")
+        save_wallet_address(self.user, "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")
         crypto_data = getAlternateCryptoData(self.user,"address",data)
         self.assertNotEqual(crypto_data,None)
         self.assertIsInstance(crypto_data,dict)
