@@ -703,7 +703,8 @@ def delete_linked_banks(request, institution):
         if institution in transactions.keys():
             del transactions[institution]
 
-        cache.set('transactions' + request.user.email, transactions)
+        if len(transactions) != 0:
+            cache.set('transactions' + request.user.email, transactions)
 
     if(cache.has_key('balances' + request.user.email)):
         balances = cache.get('balances' + request.user.email)
@@ -713,9 +714,9 @@ def delete_linked_banks(request, institution):
         if institution in balances.keys():
             del balances[institution]
 
-        cache.set('currency' + request.user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(balances)))
-        cache.set('balances' + request.user.email,balances)
-
+        if(len(balances) != 0):
+            cache.set('balances' + request.user.email,balances)
+            cache.set('currency' + request.user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(balances)))
 
     return HttpResponse(status=204)
 
@@ -764,7 +765,7 @@ def delete_linked_crypto(request, crypto):
      return HttpResponseBadRequest('Linked brokerage account not found')
 
     account_type.delete()
-    
+
     if(cache.has_key("crypto" + request.user.email)):
         delete_cached('crypto', request.user)
         cryptoData = getAllCryptoData(user)

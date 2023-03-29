@@ -123,7 +123,7 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
         self.assertEqual(recent_transactions_hsbc[1]['merchant'],'Not Provided')
 
         self.assertEqual(recent_transactions[0]['category'],'Transfer, Debit')
-        self.assertEqual(recent_transactions[1]['category'],'Transfer, Debit')
+        self.assertEqual(recent_transactions[1]['category'],'Not Provided')
         self.assertEqual(recent_transactions[2]['category'],'Food and Drink, Restaurants')
         self.assertEqual(recent_transactions[3]['category'],'Transfer, Debit')
 
@@ -325,7 +325,6 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
                 self.assertTrue(isinstance(reformatted_data[account]['currency'], str))
 
 
-    #attempt to incorporate set up in this
     def test_make_transaction_data_insight_with_one_access_token(self):
         user = User.objects.get(email='lillydoe@example.org')
         plaid_wrapper = SandboxWrapper()

@@ -130,3 +130,34 @@ class DeleteLinkedBanksViewTestCase(TestCase):
         institutions = response.json()
 
         self.assertEqual(len(institutions), 1)
+
+    def test_delete_linked_bank_with_only_one_bank_saved_in_cache(self):
+        cache.set('balances' + self.user.email, {'Fidelity': {'v448a7e8nRcA68Z4mBklURyBqXozmWFnp1XXa': {'name': 'Savings', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}, '9xx9bgy9EwCRXBpakQw8HJBM7DZV6kcVrgEEe': {'name': 'Checking', 'available_amount': 500.0, 'current_amount': 500.0, 'type': 'depository', 'currency': 'USD'}}})
+
+        cache.set('transactions' + self.user.email, {'Fidelity': [{'authorized_date': [2022, 12, 16], 'date': [2022, 12, 17], 'amount': 532.43, 'category': ['Payment', 'Credit Card'], 'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C', 'iso_currency_code': 'USD', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 16], 'date': [2022, 12, 17], 'amount': 236.53, 'category': ['Payment', 'Credit Card'], 'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A', 'iso_currency_code': 'USD', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 16], 'date': [2022, 12, 16], 'amount': 1014.28, 'category': ['Payment', 'Credit Card'], 'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 CRGKFKKSPABG UXZYOTAYLDA D', 'iso_currency_code': 'USD', 'merchant_name': 'Not Provided'}, {'authorized_date': [2022, 12, 16], 'date': [2022, 12, 16], 'amount': 658.53, 'category': ['Payment', 'Credit Card'], 'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 KABCRGKSPKFG YOTALDUXZYA B', 'iso_currency_code': 'USD', 'merchant_name': 'Not Provided'}]})
+
+        self.assertTrue(cache.has_key('balances' + self.user.email))
+        self.assertTrue(cache.has_key('transactions' + self.user.email))
+        self.assertTrue(len(list(cache.get('balances' + self.user.email).keys())), 1)
+        self.assertTrue(len(list(cache.get('transactions' + self.user.email).keys())), 1)
+
+        institution_name_add = "Fidelity"
+        AccountType.objects.create(
+            user=self.user,
+            account_asset_type=AccountTypeEnum.DEBIT,
+            access_token="access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349111",
+            account_institution_name=institution_name_add,
+        )
+
+        response = self.client.get(reverse("get_linked_banks"), format="json")
+        self.assertEqual(response.status_code, 200)
+        institutions = response.json()
+
+        self.assertEqual(len(institutions), 2)
+
+        # Delete institution
+        url = reverse('delete_linked_banks', kwargs={'institution': institution_name_add})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(cache.has_key('transactions' + self.user.email))
+        self.assertFalse(cache.has_key('balances' + self.user.email))
