@@ -1,42 +1,21 @@
 import { useState, useEffect, useContext } from "react";
 import Chart from "react-apexcharts";
-import { useNavigate } from "react-router-dom";
-import AuthContext from '../context/AuthContext';
+import GraphSelect from "../components/GraphSelect";
+import usePlaid from "../custom_hooks/usePlaid";
+import useHandleError from "../custom_hooks/useHandleError";
 
-function LineIndexComparisonChart () {
-    const [comparisonData, setComparisonData] = useState(null);
+function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions, updateGraph }) {
 
-    const navigate = useNavigate();
+    const [comparisonData, error] = usePlaid({endpoint, endpoint_parameter})
 
-    let {authTokens, logoutUser} = useContext(AuthContext);
+    useHandleError(error);
 
-    
-        // 
-
-    useEffect (() => {
-        const get_data = async() =>  {
-            let url = 'api/portfolio_comparison/?param=^FTSE';
-            let response = await fetch(url, {
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/json',
-                    'Authorization':'Bearer ' + String(authTokens.access)
-                }
-            });
-
-            let data = await response.json();
-            
-            if (response.status === 200) {
-                setComparisonData(data);
-            }
-            else if (response.status === 303) {
-                if (data['error'] === 'Investments not linked.') {
-                    navigate('/plaid_link');
-                }
-            }
-        }
-        get_data();
-    }, []);
+    let handleSelectionUpdate = async(nextParam) => {
+        updateGraph({
+            'endpoint': endpoint,
+            'param': nextParam
+        });
+    }
 
     let dates = [];
     let portfolio = [];
@@ -44,8 +23,15 @@ function LineIndexComparisonChart () {
     
     for (let key in comparisonData) {
         dates.push(key);
-        portfolio.push(comparisonData[key]['portfolio']);
-        index.push(comparisonData[key]['index']);
+        portfolio.push({
+            x: key,
+            y: comparisonData[key]['portfolio'].toFixed(2)
+        });
+        
+        index.push({
+            x: key,
+            y:comparisonData[key]['index'].toFixed(2)
+        });
     }
 
     const series = [  
@@ -62,52 +48,79 @@ function LineIndexComparisonChart () {
 
     const options = {
     chart: {
-        // type: 'line',
-        stacked: true,
-        height: 350
+        stacked: false,
+        height: 100
     },
     dataLabels: {
         enabled: false
     },
     stroke: {
         width: [2, 2],
-        curve: 'smooth'
+        curve: 'straight'
     },
     xaxis: {
-        //type: 'datetime', COMMENTED THIS OUT FOR TESTING
-        categories:  dates, // THIS IS WHERE THE DATES GO
-    },
-    yaxis: {
-        title: {
-        text: 'Value'
+        type: 'datetime',
+        labels: {
+            style: {
+                colors: '#fff'
+            }   
         }
     },
-    fill: {
-        opacity: [0.8, 0.8],
-        gradient: {
-        inverseColors: false,
-        shade: 'light',
-        type: 'vertical',
-        opacityFrom: 0.85,
-        opacityTo: 0.55,
-        stops: [0, 100]
+    yaxis: {
+        show: true,
+            showAlways: true,
+            tickAmount: 6,
+            labels: {
+                formatter: function (value) {
+                    return '$' + value;
+                },
+                show: true,
+                align: 'right',
+                minWidth: 0,
+                maxWidth: 160,
+                style: {
+                    colors: ['#fff'],
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 400,
+                    cssClass: 'apexcharts-yaxis-label',
+                },
+                offsetX: 0,
+                offsetY: 0,
+                rotate: 0,
+            },
+            axisBorder: {
+                show: true,
+                color: '#fff',
+                offsetX: 0,
+                offsetY: 0
+            },
+        title: {
+        text: 'Value',
+        style: {
+            color: '#fff',
+        },
         }
     },
     legend: {
         position: 'top',
         horizontalAlign: 'left',
-        offsetX: 40
+        offsetX: 40,
+        labels: {
+            colors: '#fff'
+        }
     }
     };
 
-    // const chart = new ApexCharts(document.querySelector('#chart'), options);
-
-
-    // chart.render();
     return (
-        <div>
-            <Chart options={options} series={series} />
-        </div>
+        <div className='flex flex-col w-full max-h-[30vh]'>
+        {
+            selectOptions === undefined || selectOptions === null
+            ? null
+            : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
+        }
+        <Chart height = "420vh" options={options} series={series} />
+    </div>
     )
 }
 
