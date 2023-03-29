@@ -22,6 +22,7 @@ function RecentTransactions() {
     title: {
       textAlign: 'center',
       marginBottom: '1rem', // Add some margin below the title
+      color: '#fff'
     },
     table: {
       backgroundColor: 'transparent',
