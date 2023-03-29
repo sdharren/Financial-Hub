@@ -40,6 +40,8 @@ class CryptoDataViewsTestCase(TestCase, LogInTester):
         self.factory = RequestFactory()
         self.user = User.objects.get(email='johndoe@example.org')
 
+    def tearDown(self):
+        cache.clear()
 
     def generate_then_cache_crypto(self):
         save_wallet_address(self.user, "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo")
