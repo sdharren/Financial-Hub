@@ -28,23 +28,26 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(self.user, ['transactions'])
 
+    fixtures = [
+        'assetManager/tests/fixtures/users.json'
+    ]
 
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
         User = get_user_model()
         users = User.objects.all()
-        self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'email': 'janedoe@example.org',
-            'password': 'Password123',
-            'password_confirmation':
-            'Password123'
-        }
-        self.url = reverse('sign_up')
-        self.client.post(self.url, self.form_input, follow=True)
-        self.user = User.objects.get(email='janedoe@example.org')
+        # self.form_input = {
+        #     'first_name': 'Jane',
+        #     'last_name': 'Doe',
+        #     'email': 'janedoe@example.org',
+        #     'password': 'Password123',
+        #     'password_confirmation':
+        #     'Password123'
+        # }
+        # self.url = reverse('sign_up')
+        # self.client.post(self.url, self.form_input, follow=True)
+        self.user = User.objects.get(email='johndoe@example.org')
 
 
     def generate_then_cache_crypto(self):
