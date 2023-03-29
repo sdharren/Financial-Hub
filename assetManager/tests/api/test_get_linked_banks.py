@@ -43,7 +43,7 @@ class GetLinkedBankViewsTestCase(TestCase):
 
 
     def test_get_linked_institution_name(self):
-        settings.PLAID_DEVELOPMENT = False
+      
         AccountType.objects.create(
             user = self.user,
             account_asset_type = AccountTypeEnum.DEBIT,
@@ -64,7 +64,7 @@ class GetLinkedBankViewsTestCase(TestCase):
 
 
     def test_get_multiple_linked_institution_names(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         AccountType.objects.create(
             user = self.user,
             account_asset_type = AccountTypeEnum.DEBIT,
@@ -84,7 +84,7 @@ class GetLinkedBankViewsTestCase(TestCase):
 
 
     def test_get_linked_banks_with_unauthenticated_user(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         self.client.logout()
         url = reverse('get_linked_banks')
         response = self.client.get(url, format='json')

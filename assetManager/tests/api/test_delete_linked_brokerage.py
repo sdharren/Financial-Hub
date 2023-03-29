@@ -37,7 +37,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         )
 
     def test_delete_linked_brokerage_with_valid_institution(self):
-        settings.PLAID_DEVELOPMENT = False
+        
 
         institutions_number_change = self.client.get(reverse("linked_brokerage"), format="json")
         self.assertEqual(institutions_number_change.status_code, 200)
@@ -60,7 +60,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertFalse(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_delete_linked_brokerage_with_invalid_brokerage(self):
-        settings.PLAID_DEVELOPMENT = False
+       
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': 'Non-existent bank'})
         response = self.client.delete(url)
 
@@ -68,7 +68,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_delete_linked_brokerage_with_unauthenticated_user(self):
-        settings.PLAID_DEVELOPMENT = False
+       
         self.client.credentials()
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': self.brokerage})
         response = self.client.delete(url)
@@ -77,7 +77,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_delete_linked_brokerage_with_wrong_method(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         url = reverse('delete_linked_brokerage', kwargs={'brokerage': self.brokerage})
         response = self.client.get(url)
 
@@ -85,7 +85,7 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertTrue(AccountType.objects.filter(user=self.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=self.brokerage).exists())
 
     def test_add_delete_brokerage(self):
-        settings.PLAID_DEVELOPMENT = False
+        
         # Add institution
         brokerage_name_add = "Fidelity"
         AccountType.objects.create(
@@ -115,3 +115,21 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         institutions = response.json()
         self.assertEqual(len(institutions), 1)
+
+    def test_delete_same_institution_name_different_type(self):
+        self.account_type = AccountType.objects.create(
+            user=self.user,
+            account_asset_type=AccountTypeEnum.DEBIT,
+            access_token='access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349972',
+            account_institution_name=self.brokerage,
+        )
+        before_count = AccountType.objects.count()
+        url = reverse('delete_linked_banks', kwargs={'institution': self.account_type.account_institution_name})
+        response = self.client.delete(url)
+        after_count = AccountType.objects.count()
+        self.assertEqual(before_count - 1, after_count)
+
+        deleted_institution = AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.STOCK, account_institution_name=self.brokerage)
+        self.assertEqual(len(deleted_institution),1)
+        not_deleted_institution = AccountType.objects.filter(user = self.user, account_asset_type = AccountTypeEnum.DEBIT, account_institution_name=self.brokerage)
+        self.assertEqual(len(not_deleted_institution),0)

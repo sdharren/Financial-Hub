@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import Signup from "../pages/Signup";
-import { customRenderNoUser } from "./test-utils";
+import Signup from "../../pages/Signup";
+import { customRenderNoUser } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 
 describe("Signup component", () => {

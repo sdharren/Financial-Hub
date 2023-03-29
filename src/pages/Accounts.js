@@ -4,8 +4,12 @@ import AuthContext from '../context/AuthContext';
 function Accounts() {
     const [banks, setBanks] = useState([]);
     const [brokerages, setBrokerages] = useState([]);
+    let {authTokens, logoutUser} = useContext(AuthContext) || {};
+    
+    //Function sends two GET request to the server. One to get the bank accounts the user has linked, and the one to get the linked brokerage accounts.
+    //The response is then parsed as JSON. 
+    //If the response is successful (HTTP status code 200), the component sets the banks and brokerages constants to the response  
     const [cryptos, setCryptos] = useState([]);
-    let {authTokens, logoutUser} = useContext(AuthContext);
 
     let getAccounts = async () => {
       try {
@@ -51,12 +55,16 @@ function Accounts() {
     useEffect(() => {
       // Call the async function `getAccounts` to fetch the linked accounts
       getAccounts();
-    }, []);
 
+    }, []);
+    
+    //This defines a function handleRemoveBank that sends a DELETE request to an API endpoint to unlink a bank account
+    //Updates the banks state variable by removing the specified institution.
     const handleRemoveBank = async (institution) => {
       try {
-        // Send DELETE request to unlink bank account
-        const response = await fetch(`/api/delete_linked_bank/${institution}/`, {
+        
+        const delstockurl = `http://127.0.0.1:8000/api/delete_linked_banks/${institution}/`
+        const response = await fetch(delstockurl, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -73,11 +81,13 @@ function Accounts() {
       }
     };
 
+  //This defines a function handleRemoveBank that sends a DELETE request to an API endpoint to unlink a bank account
+  //Updates the brokerage state variable by removing the specified institution.
   const handleRemoveBrokerage = async (brokerage) => {
-    // Send DELETE request to unlink brokerage account
+    
     try {
-
-      const response = await fetch(`/api/delete_linked_brokerage/${brokerage}/`, {
+      const delbrokerageurl = `http://127.0.0.1:8000/api/delete_linked_brokerage/${brokerage}/`
+      const response = await fetch(delbrokerageurl, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -89,6 +99,7 @@ function Accounts() {
       }
       // Remove bank from list of linked banks
       setBrokerages(brokerages.filter(b => b !== brokerage));
+  
     } catch (error) {
       console.error(error);
     }
@@ -115,7 +126,7 @@ function Accounts() {
   };
 
   return (
-    <div className='signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600'>
+    <div className='signup-container mt-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600' data-testid ="accountstest">
     <div className='overflow-hidden rounded border-gray-200'>
     <table className="transaction-table flex flex-col w-full h-[60vh] bg-transparent">
     <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
@@ -131,7 +142,7 @@ function Accounts() {
             <td className='text-left py-3 px-4 text-white'>{bank}</td>
             <td className='text-left py-3 px-4'>Institution</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button onClick={() => handleRemoveBank(bank)}>Remove</button>
+              <button data-testid = "remove-bank" onClick={() => handleRemoveBank(bank)}>Delete</button>
             </td>
           </tr>
         ))}
@@ -140,7 +151,7 @@ function Accounts() {
             <td className='text-left py-3 px-4 text-white'>{brokerage}</td>
             <td className='text-left py-3 px-4'>Brokerage</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button onClick={() => handleRemoveBrokerage(brokerage)}>Remove</button>
+              <button data-testid = "remove-brokerage"  onClick={() => handleRemoveBrokerage(brokerage)}>Delete</button>
             </td>
           </tr>
         ))}
