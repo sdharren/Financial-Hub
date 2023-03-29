@@ -82,6 +82,7 @@ function LineGraph({ endpoint, endpoint_parameter, updateGraph, selectOptions, c
             curve: 'straight',
             },
             xaxis: {
+                type: 'datetime',
                 categories: chartCategories,
                 labels: {
                     style: {

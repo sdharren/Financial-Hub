@@ -22,6 +22,7 @@ function RecentTransactions() {
     title: {
       textAlign: 'center',
       marginBottom: '1rem', // Add some margin below the title
+      color: '#fff'
     },
     table: {
       backgroundColor: 'transparent',
@@ -29,26 +30,7 @@ function RecentTransactions() {
     },
   };
 
-  const categories = ['Institution', 'Amount', 'Date', 'Category', 'Merchant'];
-
-  const [sort, setSort] = useState({ category: 'institution', direction: 'asc' });
-
-  const sortData = (category) => {
-    const isAscending = sort.category === category && sort.direction === 'asc';
-    const sortedData = Object.entries(data).sort((a, b) => {
-      const aValue = a[1][0][category];
-      const bValue = b[1][0][category];
-      if (aValue < bValue) {
-        return isAscending ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return isAscending ? 1 : -1;
-      }
-      return 0;
-    });
-    setSort({ category, direction: isAscending ? 'desc' : 'asc' });
-    setData(Object.fromEntries(sortedData));
-  };
+  const categories = ['Institution', 'Amount (£)', 'Date', 'Category', 'Merchant'];
 
   return (
     <div styles={styles.container}>
@@ -78,7 +60,7 @@ function RecentTransactions() {
           transactions.map((transaction, index) => (
             <TableRow key={`${institution}-${index}`}>
               <TableCell style={{color: 'white'}}>{institution}</TableCell>
-              <TableCell style={{color: 'white'}}>{'£' + (transaction.amount.replace('£', '') * (-1))}</TableCell>
+              <TableCell style={{color: 'white'}}>{(transaction.amount.replace('£', '') * (-1))}</TableCell>
               <TableCell style={{color: 'white'}}>{transaction.date}</TableCell>
               <TableCell style={{color: 'white'}}>{transaction.merchant}</TableCell>
               <TableCell style={{color: 'white'}}>{transaction.category}</TableCell>
