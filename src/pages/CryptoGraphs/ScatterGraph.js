@@ -42,8 +42,16 @@ const CScatter = () => {
     xaxis: {
       type: "datetime",
       title: {
-        text: "Date"
+        text: "Date",
+        style: {
+          color: '#fff'
+        }
       },
+      labels: {
+        style: {
+          colors: '#fff'
+        }
+      }
     },
     yaxis: {
       title: {
