@@ -36,40 +36,42 @@ const CRecentTransactionsDisplay = () => {
   }, []);
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>From Address</th>
-          <th>To Addresses</th>
-          <th>Confirmations</th>
-          <th>Confirmed</th>
-          <th>Fees</th>
-          <th>Total</th>
-          <th>Coin Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.keys(transactions).map((wallet, index) => (
-          <React.Fragment key={index}>
-            {Object.keys(transactions[wallet][0]).map((subheading, subindex) => (
-              <tr key={subindex}>
-                <td>{subindex === 0 ? wallet : ''}</td>
-                <td>
-                  <a href={'https://www.blockchain.com/explorer/transactions/btc/' + (transactions[wallet][0][subheading].hash)}>
-                    {(transactions[wallet][0][subheading].addresses).length}
-                  </a>
-                </td>
-                <td>{transactions[wallet][0][subheading].confirmations.toLocaleString()}</td>
-                <td>{new Date(transactions[wallet][0][subheading].confirmed).toLocaleString()}</td>
-                <td>{transactions[wallet][0][subheading].fees}</td>
-                <td>{transactions[wallet][1] == "btc" ? transactions[wallet][0][subheading].total/1e8 : transactions[wallet][0][subheading].total/1e18}</td>
-                <td>{transactions[wallet][1]}</td>
-              </tr>
-            ))}
-          </React.Fragment>
-        ))}
-      </tbody>
-    </table>
+    <div className='overflow-hidden rounded border-gray-200'>
+      <table className="transaction-table w-full h-[60vh] bg-transparent">
+        <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
+          <tr>
+            <th>From Address</th>
+            <th>To Addresses</th>
+            <th>Confirmations</th>
+            <th>Confirmed</th>
+            <th>Fees</th>
+            <th>Total</th>
+            <th>Coin Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.keys(transactions).map((wallet, index) => (
+            <React.Fragment key={index}>
+              {Object.keys(transactions[wallet][0]).map((subheading, subindex) => (
+                <tr key={subindex}>
+                  <td>{subindex === 0 ? wallet : ''}</td>
+                  <td>
+                    <a href={'https://www.blockchain.com/explorer/transactions/btc/' + (transactions[wallet][0][subheading].hash)}>
+                      {(transactions[wallet][0][subheading].addresses).length}
+                    </a>
+                  </td>
+                  <td>{transactions[wallet][0][subheading].confirmations.toLocaleString()}</td>
+                  <td>{new Date(transactions[wallet][0][subheading].confirmed).toLocaleString()}</td>
+                  <td>{transactions[wallet][0][subheading].fees}</td>
+                  <td>{transactions[wallet][1] == "btc" ? transactions[wallet][0][subheading].total/1e8 : transactions[wallet][0][subheading].total/1e18}</td>
+                  <td>{transactions[wallet][1]}</td>
+                </tr>
+              ))}
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
   );
 };
