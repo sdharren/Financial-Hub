@@ -6,6 +6,7 @@ Get balance given a wallet address
 from blockcypher import get_address_full, get_address_overview
 import requests as re
 
+
 from assetManager.models import AccountType, AccountTypeEnum
 from assetManager.helpers import make_aware_date
 from datetime import datetime
@@ -55,8 +56,11 @@ def BTC_all(addr):
 
 def ETH_all(addr):
     try:
-        command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr)
-        return re.get(command).json()
+        command = "https://api.blockcypher.com/v1/eth/main/addrs/" + str(addr) + "/full"
+        response = re.get(command)
+        out = response.json()
+        return out
+
     except Exception:
             return {}
 
@@ -102,12 +106,7 @@ def getTotalSent(data, type):
     return toBase((data.get("total_sent")), type)
 
 def getTxs(data, type):
-    if(type == "btc"):
-        value = data.get("txs")
-    elif(type == "eth"):
-        value = data.get("txrefs")
-    else:
-        value = 0
+    value = data.get("txs")
 
     return value
 
@@ -142,13 +141,17 @@ def getAllCryptoData(user):
             addr = account.access_token
 
             value = ETH_all(addr)
-
-            amount = value["final_balance"]
-            value["final_balance"] = (amount) * rate[1]
+            
+            amount = value["balance"]
+            try:
+                value["balance"] = (amount) * rate[1]
+            except:
+                value["balance"] = 0
 
             arrVal = [value, "eth"]
 
             data[addr] = arrVal
+
     return data
 
 """
@@ -162,7 +165,6 @@ def getAllCryptoData(user):
 @return: data (dict) - the updated dictionary containing the retrieved cryptocurrency data.
 """
 def getAlternateCryptoData(user, command, data):
-    print(data)
     # Command format is getUsable.{function}((data[i]), data[i][-1])
     #data = {} # Dict where key is address and value is 2d array where index 0 is coin type and index 1 is value returned
 
@@ -173,7 +175,6 @@ def getAlternateCryptoData(user, command, data):
         for account in btcAddresses:
             addr = account.access_token
             if(addr in list(data.keys())):
-
                 value = data.get(addr)[0]
 
                 if command == "address":
@@ -196,11 +197,13 @@ def getAlternateCryptoData(user, command, data):
     if(len(ethAddresses) != 0):
         for account in ethAddresses:
             addr = account.access_token
+
             if(addr in list(data.keys())):
 
                 value = data.get(addr)[0]
 
             if command == "address":
+                
                 value = getAddress(value, "eth")
             elif command == "balance":
                 value = getBalance(value, "eth")
@@ -215,6 +218,7 @@ def getAlternateCryptoData(user, command, data):
 
             arrVal = [value, "eth"]
 
+            
             data[addr] = arrVal
 
     return data

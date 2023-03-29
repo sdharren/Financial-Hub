@@ -20,6 +20,7 @@ const CScatter = () => {
         let data = await response.json();
         if (response.status === 200) {
             setWalletData(data);
+            console.log(data);
         }
         else {
         console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);

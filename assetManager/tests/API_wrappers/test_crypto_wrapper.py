@@ -259,3 +259,5 @@ class CryptoWraperTestCase(TestCase):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("txs")
         returned = getAlternateCryptoData(self.user, "txs", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("txs")
         self.assertEqual(returned, value)
+
+    

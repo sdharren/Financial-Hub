@@ -61,8 +61,8 @@ const CRecentTransactionsDisplay = () => {
                     </a>
                   </td>
                   <td>{transactions[wallet][0][subheading].confirmations.toLocaleString()}</td>
-                  <td>{new Date(transactions[wallet][0][subheading].confirmed).toLocaleString()}</td>
-                  <td>{transactions[wallet][0][subheading].fees}</td>
+                  <td>{transactions[wallet][1] == "btc" ? new Date(transactions[wallet][0][subheading].confirmed).toLocaleString() : new Date(transactions[wallet][0][subheading].confirmed).toLocaleString()}</td>
+                  <td>{transactions[wallet][1] == "btc" ? transactions[wallet][0][subheading].fees : transactions[wallet][0][subheading].fees/1e18}</td>
                   <td>{transactions[wallet][1] == "btc" ? transactions[wallet][0][subheading].total/1e8 : transactions[wallet][0][subheading].total/1e18}</td>
                   <td>{transactions[wallet][1]}</td>
                 </tr>

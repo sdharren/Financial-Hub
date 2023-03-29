@@ -37,7 +37,7 @@ class Command(BaseCommand):
             save_wallet_address(user,"1ECHiGyhvCifeuhdNQJZGD3QeiizGAJCcb")
             save_wallet_address(user, "1FSTG2YrasjVdiaNqYK4p3TCHyT4G7fXYU")
             #ethereum
-            save_wallet_address(user,"0x088368A0C31DaEbcE569CBfB9Fe60d883bE1fc1c")
+            save_wallet_address(user,"0x00000000219ab540356cBB839Cbe05303d7705Fa")
 
 
         else:
