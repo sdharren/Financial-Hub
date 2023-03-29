@@ -31,6 +31,9 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
         plaid_wrapper.exchange_public_token(public_token)
         plaid_wrapper.save_access_token(self.user, ['transactions'])
 
+    fixtures = [
+        'assetManager/tests/fixtures/users.json'
+    ]
 
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False
