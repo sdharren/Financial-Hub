@@ -20,7 +20,6 @@ import PrivateRoutes from './utils/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
 import Currency from './pages/Currency';
-import RecentTransactions from './dahsboard_components/RecentTransactionsDisplay';
 import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
 
 // ask matthew about how margins are lined
