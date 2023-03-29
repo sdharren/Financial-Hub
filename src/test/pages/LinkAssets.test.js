@@ -46,7 +46,42 @@ describe("LinkAssets component", () => {
       const linkAssetsComponent = screen.getByTestId('linkassetstest');
       expect(linkAssetsComponent).toBeInTheDocument();
     });
-  
+    
+    test('redirects to /plaid_link page when link button for link-debit is clicked', async () => {
+      customRenderUser(<LinkAssets />);
+    
+      const linkDebitButton = screen.getByTestId('linktransaction');
+      fireEvent.click(linkDebitButton);
+    
+      // Wait for the navigation to complete
+      await screen.findByTestId('linktransaction');
+    
+      expect(window.location.pathname).toBe('/');
+    });
+
+    test('redirects to /plaid_link page when link button for link-investments is clicked', async () => {
+      customRenderUser(<LinkAssets />);
+    
+      const linkInvestmentButton = screen.getByTestId('linkinvestments');
+      fireEvent.click(linkInvestmentButton);
+    
+      // Wait for the navigation to complete
+      await screen.findByTestId('linkinvestments');
+    
+      expect(window.location.pathname).toBe('/');
+    });
+
+    test('redirects to /crypto_addresses page when link button for link-crypto is clicked', async () => {
+      customRenderUser(<LinkAssets />);
+    
+      const linkCryptoButton = screen.getByTestId('linkcrypto');
+      fireEvent.click(linkCryptoButton);
+    
+      // Wait for the navigation to complete
+      await screen.findByTestId('linkcrypto');
+    
+      expect(window.location.pathname).toBe('/crypto_addresses');
+    });
     
   
 });

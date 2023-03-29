@@ -39,7 +39,7 @@ function Link() {
 
     
     return (
-        <div style={{margin: 'auto'}} onLoad={open()}>
+        <div data-testid='linkplaid' style={{margin: 'auto'}} onLoad={open()}>
             <h2 className='text-white'>Taking you to Plaid. Hold on!</h2>
         </div>
     );
