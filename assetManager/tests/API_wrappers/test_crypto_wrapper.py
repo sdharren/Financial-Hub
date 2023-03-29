@@ -85,7 +85,7 @@ class CryptoWraperTestCase(TestCase):
         "final_n_tx": 58,
         "nonce": 36,
         "pool_nonce": 36,
-        "hasMore": true,
+        "hasMore": True,
         "txs": [
             {
             "block_hash": "eec1dd4d7271a53ada4cf3145577d0610e8648aefa42a9420a7ab1d3ae9a787b",
@@ -107,7 +107,7 @@ class CryptoWraperTestCase(TestCase):
             "confirmed": "2021-08-28T12:41:39Z",
             "received": "2021-08-28T12:01:08.52Z",
             "ver": 0,
-            "double_spend": false,
+            "double_spend": False,
             "vin_sz": 1,
             "vout_sz": 1,
             "confirmations": 111695,
@@ -187,7 +187,7 @@ class CryptoWraperTestCase(TestCase):
         self.assertIsNotNone(data)
         self.assertIsInstance(data, dict)
 
-    def test_addr_regex_correct(self, data=crypto_example_data):
+    def test_addr_regex_correct(self, data=crypto_btc_example_data):
         self.assertTrue(re.match(r"^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$", list(data.keys())[0]) or re.match(r"(\b0x[a-f0-9]{40}\b)", list(data.keys())[0]))
 
     def test_find_fiat_rates(self):
@@ -196,7 +196,7 @@ class CryptoWraperTestCase(TestCase):
         self.assertNotEqual(conversion_rates[0],None)
         self.assertNotEqual(conversion_rates[1],None)
 
-    def test_get_usable_crypto(self,data=crypto_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
+    def test_get_usable_crypto(self,data=crypto_btc_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
         self.assertNotEqual(getAddress(data,"etc"),None)
         self.assertNotEqual(getBalance(data,"etc"),None)
         self.assertNotEqual(getNoTx(data,"etc"),None)
@@ -209,7 +209,7 @@ class CryptoWraperTestCase(TestCase):
         self.assertEqual(crypto_data,{})
         self.assertIsInstance(crypto_data,dict)
 
-    def test_get_alternate_crypto_data_with_wallet_linked(self,data=crypto_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
+    def test_get_alternate_crypto_data_with_wallet_linked(self,data=crypto_btc_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
         save_wallet_address(self.user, "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")
         crypto_data = getAlternateCryptoData(self.user,"address",data)
         self.assertNotEqual(crypto_data,None)
@@ -230,32 +230,32 @@ class CryptoWraperTestCase(TestCase):
         self.assertEqual(toBase(100,"btc"),1e-06)
         self.assertEqual(toBase(100,"eth"),1e-16)
 
-    def test_alternate_crypto_command_address(self, data=crypto_example_data):
+    def test_alternate_crypto_command_address(self, data=crypto_btc_example_data):
         value = data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("address")
         returned = getAlternateCryptoData(self.user, "address", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("address")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_balance(self, data=crypto_example_data):
+    def test_alternate_crypto_command_balance(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("balance")
         returned = getAlternateCryptoData(self.user, "balance", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("balance")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_n_tx(self, data=crypto_example_data):
+    def test_alternate_crypto_command_n_tx(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("n_tx")
         returned = getAlternateCryptoData(self.user, "notx", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("n_tx")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_total_received(self, data=crypto_example_data):
+    def test_alternate_crypto_command_total_received(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("total_received")
         returned = getAlternateCryptoData(self.user, "received", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("total_received")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_total_sent(self, data=crypto_example_data):
+    def test_alternate_crypto_command_total_sent(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("total_sent")
         returned = getAlternateCryptoData(self.user, "sent", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("total_sent")
         self.assertEqual(returned, value)
 
-    def test_alternate_crypto_command_txs(self, data=crypto_example_data):
+    def test_alternate_crypto_command_txs(self, data=crypto_btc_example_data):
         value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("txs")
         returned = getAlternateCryptoData(self.user, "txs", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("txs")
         self.assertEqual(returned, value)
