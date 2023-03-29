@@ -34,9 +34,10 @@ class Command(BaseCommand):
             wrapper.save_access_token(user, ['transactions'])
 
             #bitcoin
-            save_wallet_address(user,"bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v")
-            #euthereum
-            save_wallet_address(user,"0x9696f59e4d72e237be84ffd425dcad154bf96976")
+            save_wallet_address(user,"1ECHiGyhvCifeuhdNQJZGD3QeiizGAJCcb")
+            save_wallet_address(user, "1FSTG2YrasjVdiaNqYK4p3TCHyT4G7fXYU")
+            #ethereum
+            save_wallet_address(user,"0x088368A0C31DaEbcE569CBfB9Fe60d883bE1fc1c")
 
 
         else:
