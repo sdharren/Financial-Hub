@@ -18,10 +18,11 @@ ChartJS.register(
     Legend,
     Colors
 )
-function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
+function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions, currency}) {
     const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
     useHandleError(error);
-
+    console.log(currency)
+    console.log("here")
     // if a user selects a different option from select dropdown - tell parent to update this graph
     let handleSelectionUpdate = async(nextParam) => {
         updateGraph({
@@ -41,7 +42,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         labels: pie_labels,
         datasets: [
             {
-                label: '£',
+                label: currency ? currency : '£',
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels
