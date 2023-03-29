@@ -157,3 +157,14 @@ class CryptoWraperTestCase(TestCase):
         crypto_data = getAllCryptoData(self.user)
         self.assertEqual(crypto_data,{})
         self.assertIsInstance(crypto_data,dict)
+
+    def test_get_alternate_crypto_data_with_wallet_linked(self,data=crypto_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
+        crypto_data = getAlternateCryptoData(self.user,"address",data)
+        save_wallet_address(self.user, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa ")
+        self.assertNotEqual(crypto_data,None)
+        self.assertIsInstance(crypto_data,dict)
+
+    def test_get_alternate_crypto_data_with_no_wallet_linked(self,data={}):
+        crypto_data = getAlternateCryptoData(self.user,"address",data)
+        self.assertEqual(crypto_data,{})
+        self.assertIsInstance(crypto_data,dict)
