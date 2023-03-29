@@ -137,3 +137,23 @@ class CryptoWraperTestCase(TestCase):
         self.assertEqual(2,len(conversion_rates))
         self.assertNotEqual(conversion_rates[0],None)
         self.assertNotEqual(conversion_rates[1],None)
+
+    def test_get_usable_crypto(self,data=crypto_example_data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0]):
+        crypto_wrapper = getUsableCrypto()
+        self.assertNotEqual(crypto_wrapper.getAddress(data,"etc"),None)
+        self.assertNotEqual(crypto_wrapper.getBalance(data,"etc"),None)
+        self.assertNotEqual(crypto_wrapper.getNoTx(data,"etc"),None)
+        self.assertNotEqual(crypto_wrapper.getTotalReceived(data,"etc"),None)
+        self.assertNotEqual(crypto_wrapper.getTotalSent(data,"etc"),None)
+        self.assertNotEqual(crypto_wrapper.getTxs(data,"etc"),None)
+
+    def test_get_all_crypto_data_with_wallet_linked(self):
+        crypto_data = getAllCryptoData(self.user)
+        save_wallet_address(self.user, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa ")
+        self.assertNotEqual(crypto_data,None)
+        self.assertIsInstance(crypto_data,dict)
+
+    def test_get_all_crypto_data_with_no_wallet_linked(self):
+        crypto_data = getAllCryptoData(self.user)
+        self.assertEqual(crypto_data,{})
+        self.assertIsInstance(crypto_data,dict)
