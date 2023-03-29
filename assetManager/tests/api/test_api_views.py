@@ -444,10 +444,10 @@ class APIViewsTestCase(TestCase):
         settings.PLAID_DEVELOPMENT = False
 
     def test_link_crypto_wallet_works(self):
-        response = self.client.get('/api/link_crypto_wallet/?param=0x312')
+        response = self.client.get('/api/link_crypto_wallet/?param=0x6090a6e47849629b7245dfa1ca21d94cd15878ef')
         self.assertEqual(response.status_code, 200)
         account = AccountType.objects.get(user=self.user)
-        self.assertEqual(account.access_token, '0x312')
+        self.assertEqual(account.access_token, '0x6090a6e47849629b7245dfa1ca21d94cd15878ef')
         self.assertEqual(account.account_asset_type, 'CRYPTO')
         self.assertEqual(account.account_institution_name, 'eth')
 
@@ -455,19 +455,18 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/link_crypto_wallet/')
         self.assertEqual(response.status_code, 400)
 
-    def test_all_crypto_wallets_work_with_user_without_wallets(self):
+    def test_all_crypto_wallets_redirects_with_user_without_wallets(self):
         response = self.client.get('/api/all_crypto_wallets/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(response.status_code, 303)
 
     def test_all_crypto_wallets_works(self):
-        self.client.get('/api/link_crypto_wallet/?param=0x312')
-        self.client.get('/api/link_crypto_wallet/?param=0adfs21')
+        self.client.get('/api/link_crypto_wallet/?param=0x6090a6e47849629b7245dfa1ca21d94cd15878ef')
+        self.client.get('/api/link_crypto_wallet/?param=34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo')
         response = self.client.get('/api/all_crypto_wallets/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        self.assertTrue('0x312' in response.data)
-        self.assertTrue('0adfs21' in response.data)
+        self.assertTrue('0x6090a6e47849629b7245dfa1ca21d94cd15878ef' in response.data)
+        self.assertTrue('34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo' in response.data)
 
     def test_investment_category_names_works(self):
         response = self.client.get('/api/investment_category_names/')

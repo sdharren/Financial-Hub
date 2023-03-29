@@ -11,7 +11,6 @@ from rest_framework.test import force_authenticate
 from rest_framework.exceptions import ErrorDetail
 from assetManager.api.views import crypto_all_data, crypto_select_data
 from assetManager.api.views_helpers import *
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from django.conf import settings
@@ -21,6 +20,10 @@ from assetManager.tests.helpers import LogInTester
 
 
 class CacheTransactionsViewTestCase(TestCase, LogInTester):
+    fixtures = [
+        'assetManager/tests/fixtures/users.json',
+    ]
+
     """Tests of the views for transactions bar graph."""
     def create_public_token(self):
         plaid_wrapper = SandboxWrapper()
@@ -32,19 +35,7 @@ class CacheTransactionsViewTestCase(TestCase, LogInTester):
     def setUp(self):
         settings.PLAID_DEVELOPMENT = False
         self.factory = RequestFactory()
-        User = get_user_model()
-        users = User.objects.all()
-        self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'email': 'janedoe@example.org',
-            'password': 'Password123',
-            'password_confirmation':
-            'Password123'
-        }
-        self.url = reverse('sign_up')
-        self.client.post(self.url, self.form_input, follow=True)
-        self.user = User.objects.get(email='janedoe@example.org')
+        self.user = User.objects.get(email='johndoe@example.org')
 
 
     def generate_then_cache_crypto(self):
