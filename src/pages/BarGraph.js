@@ -21,9 +21,9 @@ ChartJS.register(
 );
 
 function BarGraph({endpoint, endpoint_parameter, loadNext}) {
-  
+  console.log(endpoint_parameter)
   const [barChartData, error] = usePlaid({endpoint, endpoint_parameter, loadNext});
-
+    
   let bar_data = [];
   let bar_labels = [];
   for (let key in barChartData) {

@@ -25,7 +25,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
 
         self.assertEqual(before_user_count + 1, after_user_count)
-        self.assertEqual(before_account_types_count + 6, after_account_types_count)
+        self.assertEqual(before_account_types_count + 7, after_account_types_count)
 
         user_john = User.objects.get(email = 'johnnydoe@example.org')
 
@@ -34,7 +34,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         crypto_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.CRYPTO)
 
         for bank in bank_assets:
-            self.assertTrue(bank.account_institution_name == 'Vanguard' or bank.account_institution_name == 'Fidelity')
+            self.assertTrue(bank.account_institution_name == 'Vanguard' or bank.account_institution_name == 'Fidelity' or bank.account_institution_name == 'Royal Bank of Scotland - Current Accounts')
 
         for investment in investment_assets:
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
@@ -62,7 +62,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
 
         self.assertEqual(before_user_count + 1, after_user_count)
-        self.assertEqual(before_account_types_count + 6, after_account_types_count)
+        self.assertEqual(before_account_types_count + 7, after_account_types_count)
 
         user_john = User.objects.get(email = 'johnnydoe@example.org')
 
@@ -71,7 +71,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         crypto_assets = AccountType.objects.filter(user = user_john, account_asset_type = AccountTypeEnum.CRYPTO)
 
         for bank in bank_assets:
-            self.assertTrue(bank.account_institution_name == 'Vanguard' or bank.account_institution_name == 'Fidelity')
+            self.assertTrue(bank.account_institution_name == 'Vanguard' or bank.account_institution_name == 'Fidelity' or bank.account_institution_name == 'Royal Bank of Scotland - Current Accounts')
 
         for investment in investment_assets:
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
@@ -88,7 +88,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_account_types_count = AccountType.objects.count()
         after_user_count = User.objects.count()
         self.assertEqual(after_user_count, before_user_count - 1)
-        self.assertEqual(after_account_types_count, before_account_types_count - 6)
+        self.assertEqual(after_account_types_count, before_account_types_count - 7)
 
         accounttypes = AccountType.objects.all()
         users = User.objects.all()

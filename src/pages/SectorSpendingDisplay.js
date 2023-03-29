@@ -1,8 +1,14 @@
 import { useState } from "react";
 import BarGraph from "../dahsboard_components/BarGraph";
+import DropDown from "./DropDown";
 
 function BarChartDisplay() {
-    const [graph, setGraph] = useState(<BarGraph endpoint={"sector_spending"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(
+        <div>
+            <BarGraph endpoint={"sector_spending"} endpoint_parameter={'fda'} loadNext={handleLoadNext}/>
+            <DropDown endpoint={"sector_sending"} endpoint_parameter={'fda'} loadNext={handleOnChange}/>
+        </div>
+    );
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
@@ -14,21 +20,35 @@ function BarChartDisplay() {
     function handleLoadNext(event) {
         console.log(nextRoute[event.current]);
         setGraph(
-                <BarGraph endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                <div>
+                    <BarGraph endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                </div>
         );
     }
 
     function handleLoadPrevious(event){
         setGraph(
-            <BarGraph endpoint='sector_spending' endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+            <div>
+                <BarGraph endpoint='sector_spending' endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                <DropDown endpoint={"sector_spending"} endpoint_parameter={'fda'} loadNext={handleOnChange}/>
+            </div>
+        );
+    }
+
+    function handleOnChange(event) {
+        setGraph(
+            <div>
+                <BarGraph endpoint={"sector_spending"} endpoint_parameter={event['name']} loadNext={handleLoadNext}/>
+                <DropDown className='' endpoint={event['endpoint']} endpoint_parameter={event['param']} loadNext={handleOnChange}/>
+            </div>
         );
     }
 
 
     return (
-        <div className='w-full'>
+        <div className='w-full text-white'>
             <button onClick={handleLoadPrevious}>
-                Go Back
+                Go Backk
             </button>
             {graph}
         </div>

@@ -40,7 +40,7 @@ function Link() {
     
     return (
         <div style={{margin: 'auto'}} onLoad={open()}>
-            <h2>Taking you to Plaid. Hold on!</h2>
+            <h2 className='text-white'>Taking you to Plaid. Hold on!</h2>
         </div>
     );
 }

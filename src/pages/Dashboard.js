@@ -68,6 +68,7 @@ function Dashboard() {
       { name: 'Recent Transactions', content: <RecentTransactions /> },
       { name: 'Currency Breakdown', content: <CurrencyDisplay /> },
       { name: 'Spending Habits', content: <BarChart /> },
+      { name: 'Sector Spending', content: <BarChartDisplay /> }
     ],
     Crypto: [
       { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
