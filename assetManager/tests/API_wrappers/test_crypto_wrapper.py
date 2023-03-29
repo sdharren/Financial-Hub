@@ -177,3 +177,33 @@ class CryptoWraperTestCase(TestCase):
     def test_to_base(self):
         self.assertEqual(toBase(100,"btc"),1e-06)
         self.assertEqual(toBase(100,"eth"),1e-16)
+
+    def test_alternate_crypto_command_address(self, data=crypto_example_data):
+        value = data.get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("address")
+        returned = getAlternateCryptoData(self.user, "address", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("address")
+        self.assertEqual(returned, value)
+
+    def test_alternate_crypto_command_balance(self, data=crypto_example_data):
+        value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("balance")
+        returned = getAlternateCryptoData(self.user, "balance", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("balance")
+        self.assertEqual(returned, value)
+
+    def test_alternate_crypto_command_n_tx(self, data=crypto_example_data):
+        value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("n_tx")
+        returned = getAlternateCryptoData(self.user, "notx", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("n_tx")
+        self.assertEqual(returned, value)
+
+    def test_alternate_crypto_command_total_received(self, data=crypto_example_data):
+        value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("total_received")
+        returned = getAlternateCryptoData(self.user, "received", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("total_received")
+        self.assertEqual(returned, value)
+    
+    def test_alternate_crypto_command_total_sent(self, data=crypto_example_data):
+        value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("total_sent")
+        returned = getAlternateCryptoData(self.user, "sent", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("total_sent")
+        self.assertEqual(returned, value)
+
+    def test_alternate_crypto_command_txs(self, data=crypto_example_data):
+        value = data["1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD"][0].get("txs")
+        returned = getAlternateCryptoData(self.user, "txs", data).get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD")[0].get("txs")
+        self.assertEqual(returned, value)
