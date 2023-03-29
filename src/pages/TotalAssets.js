@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PieChart from "../dahsboard_components/PieChart";
+import PieChart from "../dashboard_components/PieChart";
 
 function TotalAssetsDisplay({handleClicked}) {
     const [graph, setGraph] = useState(<PieChart endpoint={"total_assets"} loadNext={handleClicked}/>);

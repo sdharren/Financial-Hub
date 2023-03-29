@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { render, screen} from "@testing-library/react";
 import userEvent from '@testing-library/user-event'
-import Login from "../pages/Login";
-import {customRenderNoUser} from "./test-utils";
+import Login from "../../pages/Login";
+import {customRenderNoUser} from "../test-utils";
 
 describe("Login component", () => {
 
@@ -45,7 +45,7 @@ describe("Login component", () => {
     })
 
     it("calls click event", () => {
-        const testfn = jest.fn()
+        const testfn = jest.fn(e => e.preventDefault())
         customRenderNoUser(<Login submit = {testfn}/>)
 
         const submit_button = screen.getByText('Login')

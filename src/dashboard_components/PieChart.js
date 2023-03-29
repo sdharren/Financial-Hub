@@ -18,7 +18,7 @@ ChartJS.register(
     Legend,
     Colors
 )
-function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
+function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions, currency }) {
     const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
     useHandleError(error);
 
@@ -41,7 +41,11 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         labels: pie_labels,
         datasets: [
             {
+<<<<<<< HEAD:src/pages/PieChart.js
                 label: '%',
+=======
+                label: currency ? currency : '£',
+>>>>>>> main:src/dashboard_components/PieChart.js
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels

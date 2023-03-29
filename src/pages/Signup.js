@@ -91,7 +91,7 @@ const Signup = ({submit}) => {
                 <div className='-space-y-px'>
                     {
                         fields.map(field =>
-                            <div>
+                            <div key = {field.key}>
                                 <Input 
                                     key = {field.id}
                                     handleChange = {null}
@@ -103,7 +103,7 @@ const Signup = ({submit}) => {
                                     isRequired = {field.isRequired}
                                     placeholder = {field.placeholder}
                                 />
-                                <p class = {"error " + field.name + "-error"}></p>
+                                <p className = {"error " + field.name + "-error"}></p>
 
                             </div>
                         )

@@ -29,7 +29,7 @@ const Login = ({submit}) => {
             <div className = "-space-y-px">
                 {
                     fields.map(field=>
-                        <div>
+                        <div key = {field.key}>
                             <Input
                                 key={field.id}
                                 handleChange={null}

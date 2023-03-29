@@ -1,8 +1,8 @@
 import React from 'react';
 import { getAllByTitle, getByLabelText, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom'; 
-import Navbar from '../components/Navbar';
-import { customRenderUser, customRenderNoUser } from './test-utils'
+import Navbar from '../../components/Navbar';
+import { customRenderUser, customRenderNoUser } from '../test-utils'
 
 describe('Navbar with user', () => {
     it("renders without crashing", () => {

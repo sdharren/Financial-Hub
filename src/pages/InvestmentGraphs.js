@@ -1,13 +1,13 @@
-import PieChart from "../dahsboard_components/PieChart";
-import LineGraph from "../dahsboard_components/LineGraph";
+import PieChart from "../dashboard_components/PieChart";
+import LineGraph from "../dashboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
-import LineIndexComparisonChart from "./LineIndexComparisonChart";
+import LineIndexComparisonChart from "../dashboard_components/LineIndexComparisonChart";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
-    const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext} />);
+    const [graph, setGraph] = useState(<PieChart endpoint={"investment_categories"} loadNext={handleLoadNext} currency={'$'} />);
     let {authTokens, logoutUser} = useContext(AuthContext);
 
     // options for each graph tab so user can select asset to show in graph
@@ -105,6 +105,7 @@ function InvestmentGraphs() {
                             endpoint_parameter={endpoint_parameter}
                             loadNext={handleLoadNext}
                             updateGraph={handleGraphUpdate}
+                            currency={'$'}
                         />
                     </div>
                 );
@@ -126,6 +127,7 @@ function InvestmentGraphs() {
                             loadNext={handleLoadNext} 
                             updateGraph={handleGraphUpdate} 
                             selectOptions={ categoryOptions.length === 0 ? options['categories'] : categoryOptions}
+                            currency={'$'}
                         />
                     </div>
                 );
@@ -146,6 +148,7 @@ function InvestmentGraphs() {
                                 updateGraph={handleGraphUpdate} 
                                 endpoint_parameter={endpoint_parameter} 
                                 selectOptions={ options['investments'] } 
+                                currency={'$'}
                             />
                             </div>
                     );

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import Signup from "../pages/Signup";
-import { customRenderNoUser } from "./test-utils";
+import Signup from "../../pages/Signup";
+import { customRenderNoUser } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 
 describe("Signup component", () => {
@@ -75,7 +75,7 @@ describe("Signup component", () => {
     })
 
     it("register button calls function on click", () => {
-        const testfn = jest.fn()
+        const testfn = jest.fn(e => e.preventDefault())
         customRenderNoUser(
             <Signup submit={testfn}/>
         )

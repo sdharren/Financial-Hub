@@ -71,6 +71,9 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
             showAlways: true,
             tickAmount: 6,
             labels: {
+                formatter: function (value) {
+                    return '$' + value;
+                },
                 show: true,
                 align: 'right',
                 minWidth: 0,
@@ -116,7 +119,7 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
             ? null
             : <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter}/>
         }
-        <Chart height = "420vh" options={options} series={series} />
+        <Chart height = "420vh" options={options} series={series ? series : {}} />
     </div>
     )
 }

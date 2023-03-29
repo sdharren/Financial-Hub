@@ -21,9 +21,9 @@ ChartJS.register(
 );
 
 function BarGraph({endpoint, endpoint_parameter, loadNext}) {
-  console.log(endpoint_parameter)
+  
   const [barChartData, error] = usePlaid({endpoint, endpoint_parameter, loadNext});
-    
+
   let bar_data = [];
   let bar_labels = [];
   for (let key in barChartData) {
@@ -89,8 +89,8 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
   return (
     <div className='inline-block w-full max-h-[55vh]'>
       <Bar
-      data = {data}
-      options = {options}
+      data = {data ? data : {}}
+      options = {options ? options : {}}
       onClick = {onClick}
       ref = {chartRef}></Bar>
     </div>
