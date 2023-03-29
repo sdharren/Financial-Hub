@@ -20,7 +20,8 @@ Below is a list of all the documentations used by the team to build the back-end
 
 - [ForexPython DOCUMENTATION](https://pypi.org/project/forex-python/) -> used to gather the most recent exchange rates to ensure all data is uniquely quantified using GBP '£'
 
-# URL LOCATION
+# URL LOCATION on Heroku
+financial-hub.herokuapp.com
 
 # Currency Client Requirement
 - [Name of project] supports these currencies GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH
