@@ -2,6 +2,7 @@ import React from 'react';
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { customRenderUser, customRenderNoUser} from '../test-utils'
 import LinkAssets from "../../pages/LinkAssets";
+import { Link } from 'react-router-dom';
 
 describe("LinkAssets component", () => {
   it("should render correctly for a logged-in user", () => {
@@ -42,10 +43,77 @@ describe("LinkAssets component", () => {
     expect(backgroundImg3['src']).toEqual("http://localhost/asset-background.png");
   });
 
-  it("should navigate to the crypto addresses page when clicking on the crypto wallet button", async () => {
-    customRenderUser(<LinkAssets />);
-    const linkButton = screen.getAllByText("Link")[2];
-    fireEvent.click(linkButton);
-    expect(screen.getByText("Link your crypto wallet"));
-  });
+  
+   
+    const mockNavigate = jest.fn();
+  
+    const renderLinkAssets = () => {
+      customRenderUser(<LinkAssets />)
+    };
+  
+    it('renders LinkAssets component',  () => {
+      renderLinkAssets();
+      const linkAssetsComponent = screen.getByTestId('linkassetstest');
+      expect(linkAssetsComponent).toBeInTheDocument();
+    });
+  
+    it('calls get_link_token function with transactions product when Link button on credit/debit card asset is clicked', async () => {
+      const mockGetLinkToken = jest.fn();
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          json: () =>
+            Promise.resolve({
+              link_token: 'testLinkToken',
+            }),
+          status: 200,
+        })
+      );
+      
+      customRenderUser(<LinkAssets />);
+
+      const links = await screen.queryByTestId('linktransactions');
+      fireEvent.click(links);
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith(
+          '/plaid_link',
+          expect.objectContaining({
+            state: expect.objectContaining({ link_token: 'mockToken' }),
+          })
+        );
+
+        });
+
+
+    });
+  
+    it('calls get_link_token function with investments product when Link button on brokerage account asset is clicked', async () => {
+      const mockGetLinkToken = jest.fn();
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          json: () =>
+            Promise.resolve({
+              link_token: 'testLinkToken',
+            }),
+          status: 200,
+        })
+      );
+  
+      customRenderUser(<LinkAssets />);
+  
+      const linkButton = screen.getByText('Link', { exact: false });
+      fireEvent.click(linkButton);
+  
+      await expect(mockGetLinkToken).toHaveBeenCalledWith('investments');
+    });
+  
+    it('navigates to /crypto_addresses when Link button on crypto wallet asset is clicked', () => {
+      customRenderUser(<LinkAssets />);
+  
+      const linkButton = screen.getByText('Link', { exact: false });
+      fireEvent.click(linkButton);
+  
+      expect(mockNavigate).toHaveBeenCalledWith('/crypto_addresses', { replace: true });
+    });
+  
 });

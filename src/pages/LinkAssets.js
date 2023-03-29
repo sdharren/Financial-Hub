@@ -50,7 +50,7 @@ export default function LinkAssets() {
                     <div className="asset__content">
                         <img className="debit__card__image" src={debitCard} alt="debit__card__image"></img>
                         <p className="debit-middle-text">Link your credit or debit card</p>
-                        <button className="link-button" onClick={async () => {await get_link_token("transactions");} }>Link</button>
+                        <button data-testid = 'linktransactions' className="link-button" onClick={async () => {await get_link_token("transactions");} }>Link</button>
                     </div>
                 </div>
             </div>

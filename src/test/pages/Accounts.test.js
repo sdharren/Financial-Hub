@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { render, screen,fireEvent, waitFor } from '@testing-library/react';
+import { render, screen,fireEvent, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Accounts from '../../pages/Accounts';
 import { act } from "react-dom/test-utils";
@@ -9,7 +9,8 @@ import {customRenderUser} from "../test-utils";
 
 
 describe('Accounts component', () => {
-  
+
+
     test('renders the component', () => {
     customRenderUser(
         <Accounts />
@@ -75,20 +76,21 @@ describe('Accounts component', () => {
 
   // it('should remove brokerage from the list when remove button is clicked', async () => {
   //   global.fetch = jest.fn();
-  //   fetch.mockImplementation((url) => {
-  //     if (url.includes('linked_brokerages')) {
+  //   fetch.mockImplementation((urls) => {
+  //     if (urls.includes('linked_brokerage')) {
   //       return Promise.resolve({
   //         ok: true,
   //         json: () => Promise.resolve(['Vanguard', 'Fidelity'])
   //       });
 
-  //     } else if (url.includes('delete_linked_brokerage')) {
+  //     } else if (urls.includes('delete_linked_brokerage')) {
   //       return Promise.resolve({ok : true });
   //     }
       
   //   });
 
   //   customRenderUser(<Accounts />);
+
   //   await screen.findByText('Vanguard');
 
   //   const removeBrokerage = screen.getAllByTestId('remove-brokerage');
