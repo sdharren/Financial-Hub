@@ -6,7 +6,6 @@ import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
-import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 import PrivateRoutes from './utils/PrivateRoute';
@@ -16,8 +15,6 @@ import Link from './pages/Link';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
-
-// ask matthew about how margins are lined
 
 function App() {
   return (
@@ -29,7 +26,6 @@ function App() {
 
             <Routes>
               <Route element={<PrivateRoutes/>}>
-                <Route element={<HomePage/>} path = "/homepage" exact />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/plaid_link" element={<Link linkToken="link-development-6625c6ff-c671-4997-8923-550a7a26ed41"/>}/>
                 <Route path="/link_assets" element={<LinkAssets />} />

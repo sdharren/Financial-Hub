@@ -10,6 +10,7 @@ import { customRenderUser } from '../test-utils'
 
 import BarGraph from '../../dashboard_components/BarGraph';
 import LineGraph from '../../dashboard_components/LineGraph';
+import LineIndexComparisonChart from '../../dashboard_components/LineIndexComparisonChart';
 
 describe("Balances Display", () => {
     it("renders without crashing", () => {
@@ -58,3 +59,9 @@ describe("Line graph", () => {
         customRenderUser(<LineGraph />)
     })
 })
+
+// describe("Line index comparison", () => {
+//     it("renders without creashing", () => {
+//         customRenderUser(<LineIndexComparisonChart />)
+//     })
+// })
