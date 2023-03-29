@@ -8,6 +8,7 @@ import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
 
 import CPie from './CryptoGraphs/PieChart';
+import CScatter from './CryptoGraphs/ScatterGraph';
 import CRecentTransactionsDisplay from './CryptoGraphs/RecentTransactionsDisplay';
 import CAdditional from './CryptoGraphs/AdditionalData'
 
@@ -49,6 +50,7 @@ function Dashboard() {
     ],
     Crypto: [
       { name: 'Pie Chart', content: <CPie /> },
+      { name: 'Scatter Graph', content: <CScatter /> },
       { name: 'Wallet Data', content: <CAdditional /> },
       { name: 'Transactions Table', content: <CRecentTransactionsDisplay /> },
     ]
