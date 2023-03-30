@@ -98,7 +98,7 @@ class APIViewsTestCase(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(cache.has_key('investments'+self.user.email))
+        self.assertFalse(cache.has_key('investments'+user.email))
 
     def test_put_cache_assets_returns_okay_other_with_no_linked_transactions(self):
         client = APIClient()
