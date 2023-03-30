@@ -1,3 +1,6 @@
+/**
+ * Contains the form fields for the login page and the sign up page.
+ */
 const loginFields = [
     {
         key : 1,

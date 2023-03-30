@@ -41,8 +41,6 @@ describe('App component', () => {
         </AuthProvider>
       );
   
-  
-  
     test('renders Dashboard component when URL path is /dashboard',  () => {
       render(
         <MemoryRouter initialEntries={[Dashboard]}>

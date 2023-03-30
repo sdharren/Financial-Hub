@@ -1,12 +1,13 @@
+/**
+ * The AuthContext component that handles the authentication of the user. The
+ * authentication uses the react-Context object so that auth information can be
+ * passed to all child components.
+ */
 import {createContext, useState, useEffect} from 'react';
 import jwt_decode from 'jwt-decode';
 import {useNavigate} from 'react-router-dom';
 
 const AuthContext = createContext();
-
-// you cannot type links because everytime you type a link, the app "refreshes"
-// and calls updateToken(), which then calls logoutUser() and redirects to
-// "login/"
 
 export const AuthProvider = ({ children }) => {
 
@@ -38,6 +39,8 @@ export const AuthProvider = ({ children }) => {
             body:JSON.stringify({'email':e.target.email_address.value, 'password':e.target.password.value})
         })
         let data = await response.json()
+        
+        // store user in local cache if credentials are authenticated
         if (response.status === 200) {
             setAuthTokens(data)
             setUser(jwt_decode(data.access))
@@ -46,6 +49,7 @@ export const AuthProvider = ({ children }) => {
             await cache_assets('PUT', data)
             .then(navigate('/dashboard'));
         }
+        // show alert if credentials do not match
         else {
             alert(data["detail"])
             setError(data["detail"])
@@ -61,6 +65,8 @@ export const AuthProvider = ({ children }) => {
         navigate("/login")
     }
 
+    // update function that will get called by useEffect to refresh the 
+    // authentication token
     let updateToken = async () => {
         console.log("update token called")
         let response = await fetch('api/token/refresh/', {

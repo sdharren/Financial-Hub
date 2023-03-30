@@ -1,3 +1,8 @@
+/**
+ * The form action button for the login/register button on the login and signup
+ * page.
+ */
+
 export default function FormAction({
     handleSubmit,
     type = 'Button',

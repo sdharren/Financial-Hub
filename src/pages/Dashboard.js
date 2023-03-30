@@ -1,3 +1,8 @@
+/**
+ * Creates the main dashboard component. Dashboard contains the category tabs
+ * and renders the graph names and the graphs for each category of Overall, 
+ * Stocks, Banks and Crypto
+ */
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
 import BalancesDisplay from './BalancesDisplay';
@@ -6,18 +11,26 @@ import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
-
 import CPie from './CryptoGraphs/PieChart';
 import CScatter from './CryptoGraphs/ScatterGraph';
 import CRecentTransactionsDisplay from './CryptoGraphs/RecentTransactionsDisplay';
 import CAdditional from './CryptoGraphs/AdditionalData'
+import { backgroundBox, dashboardGraphContainer } from '../static/styling';
 
 
 function Dashboard() {
+  console.log(backgroundBox)
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
 
   const [activeGraphPie, setActiveGraphPie] = useState('Total Asset Breakdown');
+
+  const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
+
+  // tailwind.css styling for tabs, highlight tab and graph tab styling
+  const tabStyling = ' text-white text-center text-lg w-full cursor-pointer border-b-2 pb-2 '
+  const highlightedTabStyling = 'active bg-gradient-to-t from-violet-500 to-transparent'
+  const graphtabStyling = 'text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center'
 
   function handleClicked(event){
     console.log(event.next)
@@ -83,20 +96,20 @@ function Dashboard() {
                 ))}
             </div>
             {activeTabPie === 'Stocks' ? <InvestmentGraphs /> : 
-            (<div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
-                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40'>
+            (<div className={'graph-container ' + dashboardGraphContainer}>
+                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40 justify-start'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
                         hidden={stocksActive}
                         key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
+                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
                         onClick={() => handlePieGraphClick(graph.name)}
                       >
                         {graph.name}
                       </div>
                     ))}
                 </div>
-                <div className='graph ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-10'>
+                <div className={'graph ml-2 w-full p-10 ' + backgroundBox}>
                     {tabGraphData[activeTabPie].map((graph) => (
                       activeGraphPie === graph.name && <div key={graph.name} className=''>{graph.content}</div>
                     ))}
@@ -109,5 +122,4 @@ function Dashboard() {
     return page2
 }
 
-// keep the main dashboard element the same size, calculate the rem, make the table scroll, make eveyr other graph fit in
 export default Dashboard;

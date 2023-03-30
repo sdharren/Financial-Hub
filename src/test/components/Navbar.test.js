@@ -12,7 +12,7 @@ describe('Navbar with user', () => {
     it("renders site title", () => {
         customRenderUser(<Navbar />)
 
-        const siteTitle = screen.getByRole('link', {name : 'DASH.'})
+        const siteTitle = screen.getByRole('img', {name : 'logo'})
         expect(siteTitle).toBeInTheDocument()
     })
 
@@ -44,7 +44,7 @@ describe('Navbar with no user', () => {
     it("renders site title", () => {
         customRenderNoUser(<Navbar />)
 
-        const siteTitle = screen.getByRole('link', {name : 'DASH.'})
+        const siteTitle = screen.getByRole('img', {name : 'logo'})
         expect(siteTitle).toBeInTheDocument()
     })
 
