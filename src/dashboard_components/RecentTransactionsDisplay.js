@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import useHandleError from '../custom_hooks/useHandleError';
 import usePlaid from '../custom_hooks/usePlaid';
-import { Typography, Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel, TableContainer } from '@mui/material';
+import { Typography, Table, TableBody, TableHead, TableRow, TableCell, TableContainer } from '@mui/material';
 
 function RecentTransactions() {
   const endpoint = 'recent_transactions';
