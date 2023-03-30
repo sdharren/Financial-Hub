@@ -10,10 +10,9 @@ import { customRenderUser } from '../test-utils'
 
 import BarGraph from '../../dashboard_components/BarGraph';
 import LineGraph from '../../dashboard_components/LineGraph';
-import CPie from '../../pages/CryptoGraphs/PieChart'
-import CAdditional from '../../pages/CryptoGraphs/AdditionalData';
-import CScatter from '../../pages/CryptoGraphs/ScatterGraph';
-import CRecentTransactionsDisplay from '../../pages/CryptoGraphs/RecentTransactionsDisplay';
+import CPie from '../../dashboard_components/CryptoPieChart';
+import CAdditional from '../../dashboard_components/AdditionalData';
+import CRecentTransactionsDisplay from '../../dashboard_components/CryptoRecentTransactionsDisplay';
 
 describe("Balances Display", () => {
     it("renders without crashing", () => {
