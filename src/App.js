@@ -17,8 +17,6 @@ import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
 
-// ask matthew about how margins are lined
-
 function App() {
   return (
     <div className = "bg-[url('./images/background-image.png')]">
