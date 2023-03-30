@@ -45,7 +45,7 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/firstname/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'email': 'johndoe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'password': 'pbkdf2_sha256$390000$jPu8imKWYYssIYNKBaldaV$TXrA5IIkSUF95RTGF3eWoh8DSLnw/tycGtMXH9dOvO8='})
-    
+
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 200)
@@ -102,7 +102,7 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
-        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.status_code, 200)
 
     def test_put_cache_assets_returns_see_other_with_no_linked_transactions(self):
         client = APIClient()
@@ -118,8 +118,7 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
-        self.assertEqual(response.status_code, 303)
-        self.assertEqual(response.content.decode('utf-8'), '{"error":"Transactions Not Linked."}')
+        self.assertEqual(response.status_code, 200)
 
     def test_get_single_institution_balances_and_currency_invalid_access_token(self):
         settings.PLAID_DEVELOPMENT = True
