@@ -84,31 +84,75 @@ describe('Accounts component', () => {
     });
   });
 
-  // test('should remove brokerage from the list when remove button is clicked', async () => {
-  //   global.fetch = jest.fn();
-  //   fetch.mockImplementation((url) => {
-  //     if (url.includes('linked_brokerage')) {
-  //       return Promise.resolve({
-  //         ok: true,
-  //         json: () => Promise.resolve(['Brokerage A', 'Brokerage B'])
-  //       });
-  //     } else if (url.includes('delete_linked_brokerage')) {
-  //       return Promise.resolve({ ok: true });
-  //     }
-  //   });
+  test('should remove brokerage from the list when remove button is clicked', async () => {
+    global.fetch = jest.fn();
+    fetch.mockImplementation((url) => {
   
-  //   customRenderUser(<Accounts />);
+      if (url.includes('get_linked_banks')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(['Bank A', 'Bank B'])
+        });
+      } else if (url.includes('delete_linked_brokerage')) {
+        return Promise.resolve({ ok: true });
+      } else if (url.includes('linked_brokerage')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(['Brokerage A', 'Brokerage B'])
+        });
+      }
+    });
   
-  //   await screen.findByText('Brokerage A');
+    customRenderUser(<Accounts />);
   
-  //   const removeButtons = screen.getAllByTestId('remove-brokerage');
-  //   const firstRemoveButton = removeButtons[0];
-  //   fireEvent.click(firstRemoveButton);
+    await screen.findByText('Brokerage A');
   
-  //   await waitFor(() => {
-  //     expect(screen.queryByText('Brokerage A')).not.toBeInTheDocument();
-  //   });
-  // });
+    const removeButtons = screen.getAllByTestId('remove-brokerage');
+    const firstRemoveButton = removeButtons[0];
+    fireEvent.click(firstRemoveButton);
+  
+    await waitFor(() => {
+      expect(screen.queryByText('Brokerage A')).not.toBeInTheDocument();
+    });
+  });
+
+  test('should remove crypto from the list when remove button is clicked', async () => {
+    global.fetch = jest.fn();
+    fetch.mockImplementation((url) => {
+  
+      if (url.includes('get_linked_banks')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(['Bank A', 'Bank B'])
+        });
+      } else if (url.includes('linked_brokerage') ) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(['Brokerage A', 'Brokerage B'])
+        });
+      } 
+      else if (url.includes('delete_linked_crypto')) {
+        return Promise.resolve({ ok: true });
+      } else if (url.includes('linked_crypto')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(['Crypto A', 'Crypto B'])
+        });
+      }
+    });
+  
+    customRenderUser(<Accounts />);
+  
+    await screen.findByText('Crypto A');
+  
+    const removeButtons = screen.getAllByTestId('remove-crypto');
+    const firstRemoveButton = removeButtons[0];
+    fireEvent.click(firstRemoveButton);
+  
+    await waitFor(() => {
+      expect(screen.queryByText('Crypto A')).not.toBeInTheDocument();
+    });
+  });
 
 
 });

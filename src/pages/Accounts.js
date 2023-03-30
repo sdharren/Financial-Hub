@@ -48,7 +48,7 @@ function Accounts() {
         setCryptos(cryptodata);
 
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     }
 
@@ -63,7 +63,7 @@ function Accounts() {
     const handleRemoveBank = async (institution) => {
       try {
         
-        const delstockurl = `http://127.0.0.1:8000/api/delete_linked_banks/${institution}/`
+        const delstockurl = `api/delete_linked_banks/${institution}/`
         const response = await fetch(delstockurl, {
           method: 'DELETE',
           headers: {
@@ -77,7 +77,7 @@ function Accounts() {
         // Remove bank from list of linked banks
         setBanks(banks.filter(bank => bank !== institution));
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
 
@@ -86,7 +86,7 @@ function Accounts() {
   const handleRemoveBrokerage = async (brokerage) => {
     
     try {
-      const delbrokerageurl = `http://127.0.0.1:8000/api/delete_linked_brokerage/${brokerage}/`
+      const delbrokerageurl = `api/delete_linked_brokerage/${brokerage}/`
       const response = await fetch(delbrokerageurl, {
         method: 'DELETE',
         headers: {
@@ -101,7 +101,7 @@ function Accounts() {
       setBrokerages(brokerages.filter(b => b !== brokerage));
   
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -110,7 +110,7 @@ function Accounts() {
   const handleRemoveCrypto = async (crypto) => {
     try {
       // Send DELETE request to unlink crypto account
-      const response = await fetch(`/api/delete_linked_crypto/${crypto}/`, {
+      const response = await fetch(`api/delete_linked_crypto/${crypto}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ function Accounts() {
       // Remove bank from list of linked banks
       setCryptos(cryptos.filter(c => c !== crypto));
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -162,7 +162,7 @@ function Accounts() {
             <td className='text-left py-3 px-4 text-white'>{crypto}</td>
             <td className='text-left py-3 px-4'>Crypto</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button onClick={() => handleRemoveCrypto(crypto)}>Remove</button>
+              <button data-testid="remove-crypto"onClick={() => handleRemoveCrypto(crypto)}>Remove</button>
             </td>
           </tr>
         ))}
