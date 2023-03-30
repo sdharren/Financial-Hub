@@ -1,3 +1,4 @@
+# Represents a single transactions
 class Transaction:
     def __init__(self, transaction_json, ticker):
         self.type = transaction_json['type']
