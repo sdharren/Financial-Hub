@@ -41,6 +41,11 @@ class APIViewsTestCase(TestCase):
         cache.delete('transactionsjohndoe@example.org')
         cache.delete('currencyjohndoe@example.org')
 
+    def test_first_name(self):
+        response = self.client.get('/api/firstname/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'email': 'johndoe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'password': 'pbkdf2_sha256$390000$jPu8imKWYYssIYNKBaldaV$TXrA5IIkSUF95RTGF3eWoh8DSLnw/tycGtMXH9dOvO8='})
+    
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 200)
@@ -89,7 +94,7 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/cache_assets/')
         self.assertEqual(response.status_code, 401)
 
-    def test_put_cache_assets_returns_ok_with_no_linked_investments(self):
+    def test_put_cache_assets_returns_see_other_with_no_linked_investments(self):
         client = APIClient()
         user = User.objects.get(email='lillydoe@example.org')
         client.login(email=user.email, password='Password123')
@@ -97,10 +102,9 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(cache.has_key('investments'+user.email))
+        self.assertEqual(response.status_code, 303)
 
-    def test_put_cache_assets_returns_okay_other_with_no_linked_transactions(self):
+    def test_put_cache_assets_returns_see_other_with_no_linked_transactions(self):
         client = APIClient()
         user = User.objects.get(email='lillydoe@example.org')
 
@@ -114,8 +118,8 @@ class APIViewsTestCase(TestCase):
         jwt = str(response.data['access'])
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(cache.has_key('transactions'+self.user.email))
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.content.decode('utf-8'), '{"error":"Transactions Not Linked."}')
 
     def test_get_single_institution_balances_and_currency_invalid_access_token(self):
         settings.PLAID_DEVELOPMENT = True
