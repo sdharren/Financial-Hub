@@ -22,7 +22,7 @@ Below is a list of all the documentations used by the team to build the back-end
 
 - [ForexPython DOCUMENTATION](https://pypi.org/project/forex-python/) -> used to gather the most recent exchange rates to ensure all data is uniquely quantified using GBP '£'
 
-- [CoinGecko DOCUMENTATION](https://www.coingecko.com/en/api/documentation) -> used to gather the most recent exchange rates for Bitcoin and Ethereum to GBL '£'
+- [CoinGecko DOCUMENTATION](https://www.coingecko.com/en/api/documentation) -> used to gather the most recent exchange rates for Bitcoin and Ethereum to GBP '£'
 
 # URL LOCATION FOR FINSCOPE ON HEROKU
 [FinScope](https://financial-hub.herokuapp.com)
