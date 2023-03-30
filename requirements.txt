@@ -39,12 +39,12 @@ webencodings==0.5.1
 yfinance==0.2.12
 # /\ /\ /\ /\
 
-# heroku stuff
-# dj-database-url==1.2.0 
-# django-heroku==0.3.1 
-# psycopg2==2.9.5 
-# whitenoise==6.4.0
-# gunicorn==20.1.0
+# heroku stuff NEED FOR DEPLOYMENT
+dj-database-url==1.2.0 
+django-heroku==0.3.1 
+psycopg2==2.9.5 
+whitenoise==6.4.0
+gunicorn==20.1.0
 
 #crypto
 bitcoin==1.1.39

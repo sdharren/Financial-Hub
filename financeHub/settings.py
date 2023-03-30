@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 # NOTE: LEAVE BELOW IMPORTS - THEY ARE NEEDED FOR DELOPYMENT!!!
-#import django_heroku
-#import dotenv
-#import dj_database_url
+import django_heroku
+import dotenv
+import dj_database_url
 import os
 from pathlib import Path
 
@@ -204,15 +204,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'assetManager.User'
 
 # NOTE: THIS IS NEEDED FOR DEPLOYMENT
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
 
 
-# dotenv_file = os.path.join(BASE_DIR, ".env")
-# if os.path.isfile(dotenv_file):
-#     dotenv.load_dotenv(dotenv_file)
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
 
-# DATABASES = {}
-# DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-# options = DATABASES['default'].get('OPTIONS', {})
-# options.pop('sslmode', None)
+options = DATABASES['default'].get('OPTIONS', {})
+options.pop('sslmode', None)
