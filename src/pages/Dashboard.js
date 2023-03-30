@@ -15,6 +15,7 @@ import CPie from './CryptoGraphs/PieChart';
 import CScatter from './CryptoGraphs/ScatterGraph';
 import CRecentTransactionsDisplay from './CryptoGraphs/RecentTransactionsDisplay';
 import CAdditional from './CryptoGraphs/AdditionalData'
+import { backgroundBox, dashboardGraphContainer } from '../static/styling';
 
 
 function Dashboard() {
