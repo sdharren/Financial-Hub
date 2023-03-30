@@ -297,9 +297,11 @@ def exchange_public_token(request):
 
     if('transactions' in products_selected):
         #update balances cache if it exists
-        token = wrapper.get_access_token()
         set_single_institution_balances_and_currency(token,wrapper,request.user)
         set_single_institution_transactions(token,wrapper,request.user)
+
+    if 'investments' in products_selected:
+        cache_investments(request.user)
 
     return Response(status=200)
 
@@ -319,7 +321,6 @@ If the request is a DELETE, the function deletes all cached data related to the 
 """
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-@handle_plaid_errors
 def cache_assets(request):
     if request.method == 'PUT':
         user = request.user
@@ -328,16 +329,19 @@ def cache_assets(request):
         else:
             wrapper = SandboxWrapper()
 
-        if not cache_investments(user): #try to cache investments
-            return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
+        cache_investments(user)
 
-        #caching of bank related investement
-        cryptoData = getAllCryptoData(user)
-        cache.set("crypto" + user.email, cryptoData)
-        account_balances = get_institutions_balances(wrapper,request.user)
-        cache.set('balances' + user.email, account_balances, 86400)
-        cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)), 86400)
-        cache.set('transactions'+user.email,transaction_data_getter(request.user), 86400) #test this
+        #caching of bank related investements
+        try:
+            cryptoData = getAllCryptoData(user)
+            cache.set("crypto" + user.email, cryptoData)
+            account_balances = get_institutions_balances(wrapper,request.user)
+            cache.set('balances' + user.email, account_balances, 86400)
+            cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)), 86400)
+            cache.set('transactions'+user.email,transaction_data_getter(request.user), 86400) #test this
+        except TransactionsNotLinkedException:
+            pass
+
         #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':

@@ -61,7 +61,7 @@ class CryptoDataViewsTestCase(TestCase, LogInTester):
         self.assertEqual(cache.get('crypto'+self.user.email),response.data)
 
     def test_crypto_all_data_without_cached_data(self):
-        self.create_public_token()
+        save_wallet_address(self.user, "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo")
         request = self.factory.get('/dashboard')
         force_authenticate(request, user=self.user)
         response = crypto_all_data(request)
@@ -70,8 +70,11 @@ class CryptoDataViewsTestCase(TestCase, LogInTester):
         self.assertEqual(cache.get('crypto'+self.user.email),response.data)
 
     def test_crypto_all_data_redirects_with_no_crypto_linked(self):
-        response = self.factory.get('/crypto_all_data')
-        self.assertEqual(response, 303)
+        request = self.factory.get('/crypto_all_data')
+        force_authenticate(request, user=self.user)
+        response = crypto_all_data(request)
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.data,{'error': 'Crypto not linked.'})
 
     def test_crypto_select_data_with_cached_data(self):
         self.create_public_token()
@@ -82,6 +85,7 @@ class CryptoDataViewsTestCase(TestCase, LogInTester):
         self.assertEqual(response.data,cache.get('crypto'+self.user.email))
 
     def test_crypto_select_data_without_cached_data(self):
+        save_wallet_address(self.user, "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo")
         self.create_public_token()
         request = self.factory.get('/dashboard?param="address"')
         force_authenticate(request, user=self.user)

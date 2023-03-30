@@ -1,6 +1,6 @@
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
-from assetManager.assets.debit_card import DebitCard, format_accounts_data,bankDataEmpty
+from assetManager.assets.debit_card import DebitCard, format_accounts_data,bankDataEmpty,filter_non_supported_account_currencies,filter_non_supported_transaction_currencies
 from django.test import TestCase
 from assetManager.models import User, AccountType, AccountTypeEnum
 from datetime import date
@@ -47,6 +47,214 @@ class DebitCardSandBoxWrapperTestCase(TestCase):
 
         debit_card_lilly = DebitCard(plaid_wrapper, user_lilly)
         return debit_card_lilly
+
+    def test_get_single_transaction_with_not_supported_currency(self):
+        transaction_response = [{'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
+        'account_owner': None,
+        'amount': 896.65,
+        'authorized_date': datetime.date(2022, 12, 16),
+        'authorized_datetime': None,
+        'category': ['Transfer', 'Debit'],
+        'category_id': '21006000',
+        'check_number': None,
+        'date': datetime.date(2022, 12, 17),
+        'datetime': None,
+        'iso_currency_code': 'AED',
+        'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+        'merchant_name': None,
+        'name': 'DEBIT CRD AUTOPAY 98712 000000000028791 KIUYPWRSGTKF UXYOTLLKJHA C',
+        'payment_channel': 'in store',
+        'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+        'pending': False,
+        'pending_transaction_id': None,
+        'personal_finance_category': None,
+        'transaction_code': None,
+        'transaction_id': 'PaJgwMn4y9fbPzjdPbl5hg9zN8kg1pSXyWRn6',
+        'transaction_type': 'special',
+        'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
+        'account_owner': None,
+        'amount': 398.34,
+        'authorized_date': datetime.date(2022, 12, 16),
+        'authorized_datetime': None,
+        'category': ['Transfer', 'Debit'],
+        'category_id': '21006000',
+        'check_number': None,
+        'date': datetime.date(2022, 12, 17),
+        'datetime': None,
+        'iso_currency_code': 'USD',
+        'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+        'merchant_name': None,
+        'name': 'DEBIT CRD AUTOPAY 98712 000000000098712 WRSGTKIUYPKF KJHAUXYOTLL A',
+        'payment_channel': 'in store',
+        'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+        'pending': False,
+        'pending_transaction_id': None,
+        'personal_finance_category': None,
+        'transaction_code': None,
+        'transaction_id': '4e1XPQq43Bs5L4m6L5pEFGgjMA5GQvUlRAPKp',
+        'transaction_type': 'special',
+        'unofficial_currency_code': None}, {'account_id': 'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk',
+        'account_owner': None,
+        'amount': 1708.12,
+        'authorized_date': datetime.date(2022, 12, 16),
+        'authorized_datetime': None,
+        'category': ['Food and Drink', 'Restaurants'],
+        'category_id': '13005000',
+        'check_number': None,
+        'date': datetime.date(2022, 12, 16),
+        'datetime': None,
+        'iso_currency_code': 'USD',
+        'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+        'merchant_name': None,
+        'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 CRGKFKKSPABG UXZYOTAYLDA D',
+        'payment_channel': 'in store',
+        'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+        'pending': False,
+        'pending_transaction_id': None,
+        'personal_finance_category': None,
+        'transaction_code': None,
+        'transaction_id': 'NxJp9Qkdemcw4X7L4wW5cwqryvjwepTXA5wzp',
+        'transaction_type': 'place',
+        'unofficial_currency_code': None}, {'account_id': 'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv',
+        'account_owner': None,
+        'amount': 1109.01,
+        'authorized_date': datetime.date(2022, 12, 16),
+        'authorized_datetime': None,
+        'category': ['Transfer', 'Debit'],
+        'category_id': '21006000',
+        'check_number': None,
+        'date': datetime.date(2022, 12, 16),
+        'datetime': None,
+        'iso_currency_code': 'AED',
+        'location': {'address': None,
+                  'city': None,
+                  'country': None,
+                  'lat': None,
+                  'lon': None,
+                  'postal_code': None,
+                  'region': None,
+                  'store_number': None},
+        'merchant_name': None,
+        'name': 'CREDIT CRD AUTOPAY 29812 000000000098123 KABCRGKSPKFG YOTALDUXZYA B',
+        'payment_channel': 'in store',
+        'payment_meta': {'by_order_of': None,
+                      'payee': None,
+                      'payer': None,
+                      'payment_method': None,
+                      'payment_processor': None,
+                      'ppd_id': None,
+                      'reason': None,
+                      'reference_number': None},
+        'pending': False,
+        'pending_transaction_id': None,
+        'personal_finance_category': None,
+        'transaction_code': None,
+        'transaction_id': 'aWQwlaxAE4tKn1bEnKAvimBLNpMm7DtkKQMvK',
+        'transaction_type': 'special',
+        'unofficial_currency_code': None}]
+
+        filtered_transactions = filter_non_supported_transaction_currencies(transaction_response)
+        self.assertEqual(len(filtered_transactions),2)
+        self.assertEqual(filtered_transactions[0]['account_id'],'PaJgwMn4y9fbPzjdPbl5hg9qkab8awCXyWRnv')
+        self.assertEqual(filtered_transactions[1]['account_id'],'JrJZmPgzGACD3naN3DP5sP9W4d8mdxCQegPGk')
+        self.assertEqual(filtered_transactions[0]['amount'],398.34)
+        self.assertEqual(filtered_transactions[1]['amount'],1708.12)
+
+
+    def test_get_single_account_balances_with_not_supported_currency(self):
+        account_balances = [{
+         "account_id": "blgvvBlXw3cq5GMPwqB6s6q4dLKB9WcVqGDGo",
+         "balances": {
+           "available": 100,
+           "current": 110,
+           "iso_currency_code": "AED",
+           "limit": None,
+           "unofficial_currency_code": None
+         },
+         "mask": "0000",
+         "name": "Plaid Checking",
+         "official_name": "Plaid Gold Standard 0% Interest Checking",
+         "persistent_account_id": "8cfb8beb89b774ee43b090625f0d61d0814322b43bff984eaf60386e",
+         "subtype": "checking",
+         "type": "depository"
+        },
+        {
+         "account_id": "6PdjjRP6LmugpBy5NgQvUqpRXMWxzktg3rwrk",
+         "balances": {
+           "available": None,
+           "current": 23631.9805,
+           "iso_currency_code": "USD",
+           "limit": None,
+           "unofficial_currency_code": None
+         },
+         "mask": "6666",
+         "name": "Plaid 401k",
+         "official_name": None,
+         "subtype": "401k",
+         "type": "investment"
+        },
+        {
+         "account_id": "XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58",
+         "balances": {
+           "available": None,
+           "current": 65262,
+           "iso_currency_code": "AED",
+           "limit": None,
+           "unofficial_currency_code": None
+         },
+         "mask": "7777",
+         "name": "Plaid Student Loan",
+         "official_name": None,
+         "subtype": "student",
+         "type": "loan"
+        }]
+        accounts = filter_non_supported_account_currencies(account_balances)
+        self.assertEqual(len(accounts),1)
+        self.assertEqual(accounts[0]['account_id'],'6PdjjRP6LmugpBy5NgQvUqpRXMWxzktg3rwrk')
+        self.assertEqual(accounts[0]['balances']['iso_currency_code'],'USD')
+        self.assertEqual(accounts[0]['balances']['current'],23631.9805)
 
     def test_debit_card_set_up_correctly(self):
         self.assertTrue(self.debit_card.plaid_wrapper.ACCESS_TOKEN is not None)
