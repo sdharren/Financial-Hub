@@ -1,3 +1,9 @@
+/**
+ * Creates the <Navbar /> component. Contains the main application logo that
+ * redirects to the home page (dashboard if logged in).
+ * Contains about, signup and login if user is not logged in.
+ * Contains link assets, manage assets and my-account if user is logged in.
+ */
 import React, {useContext, useEffect, useState} from 'react';
 import { Link } from "react-router-dom"
 import AuthContext from '../context/AuthContext';
@@ -12,6 +18,7 @@ export default function Navbar() {
         getFirstName()
     })
 
+    // returns the first name of the user logged in.
     let getFirstName = async() => {
         let response = await fetch('/api/firstname/', {
             method:'GET',
@@ -31,6 +38,7 @@ export default function Navbar() {
         }
     }
 
+    // default form when user is not logged in
     let defaultForm = (
         <ul className='flex w-full justify-end gap-10 items-center'>
             <li>
@@ -45,29 +53,7 @@ export default function Navbar() {
         </ul>
     );
 
-    // let loggedInForm = (
-    //     <ul>
-    //         <li>
-    //             {user && <p>Hello, {firstName}</p>}
-    //         </li>
-    //         <li>
-    //             <Link to = "/balances">Bank accounts</Link>
-    //         </li>
-    //         <li>
-    //             <Link to = "/currency">Currencies</Link>
-    //         </li>
-    //         <li>
-    //             <Link to = "/list">Transactions</Link>
-    //         </li>
-    //         <li>
-    //             <Link to = "/bar_graph_display">Bar graph</Link>
-    //         </li>
-    //         <li>
-    //             <p className="nav-logout" onClick = {logoutUser}>Logout</p>
-    //         </li>
-    //     </ul>
-    // );
-
+    // form when user is logged in
     let loggedInForm = (
         <ul className='flex w-full justify-end gap-10 items-center'>
             <li>
@@ -104,5 +90,4 @@ export default function Navbar() {
             </div>
         </nav>
     )
-    // decide on size for the main application window
 }

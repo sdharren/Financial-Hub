@@ -1,3 +1,8 @@
+/**
+ * Creates the Signup component. Provides the user with a form to enter details
+ * to register user. Performs checks on email and passwords before sending api
+ * request to server.
+ */
 import React, {useContext} from 'react';
 import AuthContext from '../context/AuthContext';
 import { signupFields } from '../components/formFields';
@@ -6,8 +11,6 @@ import FormAction from '../components/formAction';
 import Header from '../components/header';
 import { backgroundBox } from '../static/styling';
 import '../static/errors.css';
-
-// need to add confirmation that passwords match
 
 const Signup = ({submit}) => {
 
@@ -49,19 +52,7 @@ const Signup = ({submit}) => {
         if (response.status === 200) {
             loginUser(e)
         }
-        // else if (response.status === 400) {
         else {
-            // for (var key in data) {
-            //     if (key === "email") {
-            //         document.querySelector(".email-error").innerHTML = data[key];
-            //         document.querySelector(".email_error").style.display = "block";
-            //     }
-            //     if (key === "password") {
-            //         document.querySelector(".password-error").innerHTML = data[key];
-            //         document.querySelector(".password_error").style.display = "block";
-            //     }
-            // }
-            // alert(data["email"])
             alert(Object.values(data).join("\n"))
         }
     }

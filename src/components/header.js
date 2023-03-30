@@ -1,3 +1,7 @@
+/**
+ * Header component that goes above each form component for the login page and
+ * the sign up page.
+ */
 import {Link} from 'react-router-dom';
 
 export default function Header({

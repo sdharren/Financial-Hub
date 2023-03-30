@@ -1,3 +1,8 @@
+/**
+ * Creates the main dashboard component. Dashboard contains the category tabs
+ * and renders the graph names and the graphs for each category of Overall, 
+ * Stocks, Banks and Crypto
+ */
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
 import BalancesDisplay from './BalancesDisplay';
@@ -44,6 +49,7 @@ function Dashboard() {
 
   const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
 
+  // tailwind.css styling for tabs, highlight tab and graph tab styling
   const tabStyling = ' text-white text-center text-lg w-full cursor-pointer border-b-2 pb-2 '
   const highlightedTabStyling = 'active bg-gradient-to-t from-violet-500 to-transparent'
   const graphtabStyling = 'text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center'
@@ -97,10 +103,6 @@ function Dashboard() {
     setActiveGraphPie(graphName);
   };
 
-  const handlePieAccountChange = (event) => {
-    setSelectedPieAccount(event.target.value);
-  };
-
     let page2 = (
         <div className='dashboard-container my-10px py-10 px-5'>
             <div data-testid='graph-tabs' className='dashboard-catagories flex flex-row justify-between mb-10'>
@@ -141,5 +143,4 @@ function Dashboard() {
     return page2
 }
 
-// keep the main dashboard element the same size, calculate the rem, make the table scroll, make eveyr other graph fit in
 export default Dashboard;

@@ -1,3 +1,7 @@
+/**
+ * Creates the login component for logging in users. Uses AuthContext(loginUser)
+ * to authenticate users.
+ */
 import React, {useContext} from 'react';
 import AuthContext from '../context/AuthContext';
 import Header from '../components/header';
@@ -6,8 +10,6 @@ import Input from '../components/input';
 import FormAction from '../components/formAction';
 import { backgroundBox } from '../static/styling';
 import '../static/errors.css';
-
-// add remember me functionality
 
 const fields = loginFields;
 let fieldState = {};
