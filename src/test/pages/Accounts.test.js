@@ -44,7 +44,17 @@ describe('Accounts component', () => {
     expect(await screen.findAllByRole('cell', { name: /^Brokerage/ })).toHaveLength(2);
   });
 
-  it('should remove bank from the list when remove button is clicked', async () => {
+  test('renders crypto accounts', async () => {
+    const cryptos = ['Crypto A', 'Crypto B'];
+    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      json: async () => cryptos,
+    });
+    customRenderUser(<Accounts />);
+    expect(await screen.findAllByRole('cell', { name: /^Crypto/ })).toHaveLength(2);
+  });
+
+
+  test('should remove bank from the list when remove button is clicked', async () => {
 
     global.fetch = jest.fn();
     fetch.mockImplementation((url) => {
@@ -74,32 +84,31 @@ describe('Accounts component', () => {
     });
   });
 
-  // it('should remove brokerage from the list when remove button is clicked', async () => {
+  // test('should remove brokerage from the list when remove button is clicked', async () => {
   //   global.fetch = jest.fn();
-  //   fetch.mockImplementation((urls) => {
-  //     if (urls.includes('linked_brokerage')) {
+  //   fetch.mockImplementation((url) => {
+  //     if (url.includes('linked_brokerage')) {
   //       return Promise.resolve({
   //         ok: true,
-  //         json: () => Promise.resolve(['Vanguard', 'Fidelity'])
+  //         json: () => Promise.resolve(['Brokerage A', 'Brokerage B'])
   //       });
-
-  //     } else if (urls.includes('delete_linked_brokerage')) {
-  //       return Promise.resolve({ok : true });
+  //     } else if (url.includes('delete_linked_brokerage')) {
+  //       return Promise.resolve({ ok: true });
   //     }
-      
   //   });
-
+  
   //   customRenderUser(<Accounts />);
-
-  //   await screen.findByText('Vanguard');
-
-  //   const removeBrokerage = screen.getAllByTestId('remove-brokerage');
-  //   const getRemoveButton = removeBrokerage[0];
-  //   fireEvent.click(getRemoveButton);
-
+  
+  //   await screen.findByText('Brokerage A');
+  
+  //   const removeButtons = screen.getAllByTestId('remove-brokerage');
+  //   const firstRemoveButton = removeButtons[0];
+  //   fireEvent.click(firstRemoveButton);
+  
   //   await waitFor(() => {
-  //     expect(screen.getByText('Vanguard')).toBeInTheDocument();
+  //     expect(screen.queryByText('Brokerage A')).not.toBeInTheDocument();
   //   });
-  // })
+  // });
+
 
 });
