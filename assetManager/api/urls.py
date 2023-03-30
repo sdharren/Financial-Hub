@@ -29,7 +29,6 @@ urlpatterns = [
     path('yearly_graphs/', views.yearlyGraph, name='yearlyGraph'),
     path('monthly_graphs/', views.monthlyGraph, name='monthlyGraph'),
     path('weekly_graphs/', views.weeklyGraph, name='weeklyGraph'),
-    path('sandbox_investments/', views.sandbox_investments, name='sandbox_investments'),
     path('get_balances_data/', views.get_balances_data, name='get_balances_data'),
     path('select_account/', views.select_account, name='select_account'),
     path('select_bank_account/', views.select_bank_account, name='select_bank_account'),
@@ -42,6 +41,8 @@ urlpatterns = [
     path('delete_linked_brokerage/<str:brokerage>/', views.delete_linked_brokerage, name='delete_linked_brokerage'),
     path('link_crypto_wallet/', views.link_crypto_wallet, name='link_crypto_wallet'),
     path('all_crypto_wallets/', views.all_crypto_wallets, name='all_crypto_wallets'),
+    path('crypto_select_data/', views.crypto_select_data, name='crypto_select_data'),
+    path('crypto_all_data/', views.crypto_all_data, name='crypto_all_data'),
     path('linked_crypto/', views.linked_crypto, name='linked_crypto'),
     path('delete_linked_crypto/<str:crypto>/', views.delete_linked_crypto, name='delete_linked_crypto'),
 ]

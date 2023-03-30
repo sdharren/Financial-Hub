@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { render, screen} from "@testing-library/react";
+import { render, screen, act, fireEvent} from "@testing-library/react";
 import userEvent from '@testing-library/user-event'
 import Login from "../../pages/Login";
 import {customRenderNoUser} from "../test-utils";
@@ -53,4 +53,26 @@ describe("Login component", () => {
 
         expect(testfn).toBeCalled()
     }) 
+
+    it('should update the email state when the user types in the email input', () => {
+        customRenderNoUser(<Login />);
+        const email_field = screen.getByLabelText(/Email address/i)
+    
+        act(() => {
+          fireEvent.change(email_field, { target: { value: 'test@test.com' } });
+        });
+    
+        expect(email_field.value).toBe('test@test.com');
+      });
+    
+      it('should update the password state when the user types in the password input', () => {
+        customRenderNoUser(<Login />);
+        const password_field = screen.getByLabelText(/Password/i)
+    
+        act(() => {
+          fireEvent.change(password_field, { target: { value: 'testpassword' } });
+        });
+    
+        expect(password_field.value).toBe('testpassword');
+      });
 })

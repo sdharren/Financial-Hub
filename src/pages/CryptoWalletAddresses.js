@@ -27,7 +27,7 @@ function CryptoWalletAddresses() {
     const allAddresses = [...addresses];
 
     for(let i = 0; i < allAddresses.length; i++) {
-        if(/^0x[a-fA-F0-9]{40}$/.test(allAddresses[i].address) || /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(allAddresses[i].address)) {  // Test regex matches eth or btc format
+        if(/(\b0x[a-f0-9]{40}\b)$/.test(allAddresses[i].address) || /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(allAddresses[i].address)) {  // Test regex matches eth or btc format
             let saveUrl = 'api/link_crypto_wallet/?param=' + allAddresses[i].address;
             fetch(saveUrl, {
                 method:'GET',
@@ -49,6 +49,7 @@ function CryptoWalletAddresses() {
             Address {index + 1}:
             <input
               type="text"
+              pattern=  "(\b0x[a-f0-9]{40}\b)|(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)"
               value={address.address}
               onChange={(event) => handleAddressChange(index, 'address', event.target.value)}
             />
