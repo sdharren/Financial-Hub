@@ -10,7 +10,6 @@ function Link() {
     const navigate = useNavigate();
 
     async function onSuccess(public_token, metadata) {
-        // exchange public token
         let response = await fetch('api/exchange_public_token/', {
             method: 'POST',
             headers: {
@@ -19,16 +18,14 @@ function Link() {
             },
             body: JSON.stringify({'public_token': public_token})
         });
-        
-        if (response.status === 200) {
+
+        if (response.ok) {
             navigate('/dashboard');
         }
         else {
             alert('Something went wrong. Please try linking the asset again.');
             navigate('/link_assets');
         }
-        // at this point the token is exchanged and the access token is saved
-        // need to now redirect/ tell parent component to render next thing
     }
 
     const config = {

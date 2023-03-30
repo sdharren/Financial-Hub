@@ -271,6 +271,8 @@ def exchange_public_token(request):
     wrapper.save_access_token(request.user, products_selected)
     token = wrapper.get_access_token()
 
+    delete_cached('total_assets', request.user)
+
     if('transactions' in products_selected):
         #update balances cache if it exists
         set_single_institution_balances_and_currency(token,wrapper,request.user)
