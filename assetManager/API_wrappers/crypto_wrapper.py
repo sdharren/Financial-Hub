@@ -12,10 +12,6 @@ from assetManager.helpers import make_aware_date
 from datetime import datetime
 from django.db import IntegrityError
 
-# KEY is BTC/ETH and Value is List of addresses
-ADDRESSES = {"btc" : ["34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"],
-             "eth" : ["0x6090a6e47849629b7245dfa1ca21d94cd15878ef", "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263"]}
-
 """
 @params: None
 
@@ -141,7 +137,7 @@ def getAllCryptoData(user):
             addr = account.access_token
 
             value = ETH_all(addr)
-            
+
             amount = value["balance"]
             try:
                 value["balance"] = (amount) * rate[1]
@@ -176,7 +172,6 @@ def getAlternateCryptoData(user, command, data):
             addr = account.access_token
             if(addr in list(data.keys())):
                 value = data.get(addr)[0]
-
                 if command == "address":
                     value = getAddress(value, "btc")
                 elif command == "balance":
@@ -197,29 +192,25 @@ def getAlternateCryptoData(user, command, data):
     if(len(ethAddresses) != 0):
         for account in ethAddresses:
             addr = account.access_token
-
             if(addr in list(data.keys())):
-
                 value = data.get(addr)[0]
+                if command == "address":
+                    value = getAddress(value, "eth")
+                elif command == "balance":
+                    value = getBalance(value, "eth")
+                elif command == "notx":
+                    value = getNoTx(value, "eth")
+                elif command == "received":
+                    value = getTotalReceived(value, "eth")
+                elif command == "sent":
+                    value = getTotalSent(value, "eth")
+                elif command == "txs":
+                    value = getTxs(value, "eth")
 
-            if command == "address":
-                
-                value = getAddress(value, "eth")
-            elif command == "balance":
-                value = getBalance(value, "eth")
-            elif command == "notx":
-                value = getNoTx(value, "eth")
-            elif command == "received":
-                value = getTotalReceived(value, "eth")
-            elif command == "sent":
-                value = getTotalSent(value, "eth")
-            elif command == "txs":
-                value = getTxs(value, "eth")
+                arrVal = [value, "eth"]
 
-            arrVal = [value, "eth"]
 
-            
-            data[addr] = arrVal
+                data[addr] = arrVal
 
     return data
 """

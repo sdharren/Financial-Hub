@@ -67,7 +67,6 @@ def total_assets(request):
         except Exception:
             bank_assets = 0
         investment_assets = sum_investment_balance(user)
-        # crypto_assets = 100.0
         crypto_assets = sum_crypto_balances(user)
         data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
         cache.set('total_assets'+user.email, data, 86400)
@@ -342,7 +341,6 @@ def cache_assets(request):
         except TransactionsNotLinkedException:
             pass
 
-        #cacheBankTransactionData(request.user) #transactions
 
     elif request.method == 'DELETE':
         user = request.user
@@ -353,21 +351,6 @@ def cache_assets(request):
         delete_cached('balances', user)
         delete_cached('total_assets',user) #test this
 
-    return Response(status=200)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def sandbox_investments(request):
-    user = request.user
-    if cache.has_key('investments' + user.email):
-        return Response(status=201)
-    wrapper = SandboxWrapper()
-    public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
-    wrapper.exchange_public_token(public_token)
-    wrapper.save_access_token(user, products_chosen=['investments'])
-    stock_getter = StocksGetter(wrapper)
-    stock_getter.query_investments(user)
-    cache.set('investments' + user.email, stock_getter.investments, 86400)
     return Response(status=200)
 
 """
@@ -503,7 +486,7 @@ def weeklyGraph(request):
         date = request.GET.get('param')
     else:
         return Response(status=400)
-        # should return bad request
+
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
 
