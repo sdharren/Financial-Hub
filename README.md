@@ -9,7 +9,7 @@
 - SERGEI MINAKOV - K21040139
 - GUILHERME (Gui) NATARIO RIO-TINTO - K21087441
 - DHARREN SANTHALINGAM - K21097488
-- PAVAN RANA -K21059898
+- PAVAN RANA - K21059898
 - MATHEW TRAN - K21074020
 
 # Reference List
@@ -26,7 +26,7 @@ Below is a list of all the documentations used by the team to build the back-end
 [FinScope](https://financial-hub.herokuapp.com)
 
 # Currency Client Requirement
-- FinScope supports these currencies GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH
+- FinScope supports 33 currencies and if linked accounts or transactions are made in currencies that are not supported they are filtered out of the application. If a client only has the unsupported currencies for accounts and transactions then nothing will be displayed to the user
 - Stocks data is to represented in USD
 - Transactions are to be represented in GBP
 - Currency pie chart for banks formats a proportioned pie chart for all different currencies present in all linked accounts using GBP as the uniform currency for conversion and proportioning
