@@ -12,10 +12,11 @@ from rest_framework.permissions import IsAuthenticated
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from .serializers import UserSerializer
 from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
-from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
-from assetManager.API_wrappers.crypto_wrapper import save_wallet_address, get_wallets
+from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
+from assetManager.API_wrappers.crypto_wrapper import getAllCryptoData, getAlternateCryptoData, save_wallet_address, get_wallets
+from assetManager.API_wrappers.plaid_wrapper import InvalidPublicToken, LinkTokenNotCreated
 from .views_helpers import *
-from django.http import HttpResponseBadRequest, HttpResponse,HttpRequest
+from django.http import HttpResponseBadRequest, HttpResponse
 from assetManager.models import AccountType, AccountTypeEnum
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -66,8 +67,7 @@ def total_assets(request):
         except Exception:
             bank_assets = 0
         investment_assets = sum_investment_balance(user)
-        crypto_assets = 100.0
-        # crypto_assets = sum_crypto_balances(user)
+        crypto_assets = sum_crypto_balances(user)
         data = {"Bank Assets": bank_assets, "Investment Assets": investment_assets, "Crypto Assets": crypto_assets}
         cache.set('total_assets'+user.email, data, 86400)
     else:
@@ -221,7 +221,17 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
+"""
+@params: request: HTTP request object containing information about the user and the GET parameters.
 
+@Description: This function is responsible for linking a user's cryptocurrency wallet address to their account.
+It retrieves the user object from the request, checks if the 'param' parameter is present in the GET request,
+and saves the wallet address to the user's account using the save_wallet_address() function.
+It then retrieves all of the user's cryptocurrency data using getAllCryptoData(), caches it using the cache.set() function, and returns a HTTP 200 response.
+
+@return: Response object: A HTTP response object with a status code of 200 if the wallet address is successfully linked,
+or a status code of 400 with an error message if the 'param' parameter is not present in the GET request.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def link_crypto_wallet(request):
@@ -233,14 +243,27 @@ def link_crypto_wallet(request):
 
     save_wallet_address(user, address)
 
+    data = getAllCryptoData(user)
+    cache.set("crypto" + user.email, data)
+
     return Response(status=200)
 
+"""
+@params: request: an HTTP request object
 
+@Description: This function takes an HTTP request object and returns a JSON response containing all the crypto wallets associated with the user making the request.
+It calls the "get_wallets" function with the user object extracted from the request to retrieve all the wallets. The JSON response is returned with a status code of 200.
+
+@return: Response: a JSON response containing all the crypto wallets associated with the user making the request.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def all_crypto_wallets(request):
     user = request.user
     allWallets = get_wallets(user)
+
+    if (not allWallets):
+        return Response({'error': 'Crypto not linked.'}, status=303, content_type='application/json')
 
     return Response(allWallets, content_type='application/json', status=200)
 
@@ -311,38 +334,25 @@ def cache_assets(request):
 
         #caching of bank related investements
         try:
+            cryptoData = getAllCryptoData(user)
+            cache.set("crypto" + user.email, cryptoData)
             account_balances = get_institutions_balances(wrapper,request.user)
             cache.set('balances' + user.email, account_balances, 86400)
             cache.set('currency' + user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(account_balances)), 86400)
             cache.set('transactions'+user.email,transaction_data_getter(request.user), 86400) #test this
         except TransactionsNotLinkedException:
             pass
-        
-        #cacheBankTransactionData(request.user) #transactions
+
 
     elif request.method == 'DELETE':
         user = request.user
+        delete_cached("crypto", user)
         delete_cached('investments', user)
         delete_cached('transactions', user)
         delete_cached('currency', user)
         delete_cached('balances', user)
         delete_cached('total_assets',user) #test this
 
-    return Response(status=200)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def sandbox_investments(request):
-    user = request.user
-    if cache.has_key('investments' + user.email):
-        return Response(status=201)
-    wrapper = SandboxWrapper()
-    public_token = wrapper.create_public_token(bank_id='ins_115616', products_chosen=['investments'])
-    wrapper.exchange_public_token(public_token)
-    wrapper.save_access_token(user, products_chosen=['investments'])
-    stock_getter = StocksGetter(wrapper)
-    stock_getter.query_investments(user)
-    cache.set('investments' + user.email, stock_getter.investments, 86400)
     return Response(status=200)
 
 """
@@ -378,6 +388,55 @@ def sector_spending(request):
     transactions = BankGraphData(getCachedInstitutionCachedData(request.user))
     graphData = transactions.orderedCategorisedSpending()
     return Response(graphData, content_type='application/json')
+
+"""
+@params: request: HTTP request object
+
+@Description: This function retrieves cryptocurrency data for a user. It first checks if the data is already cached for the user, and if so, retrieves it from the cache.
+Otherwise, it calls the getAllCryptoData function to fetch the data and stores it in the cache for future use. The function returns the cryptocurrency data as a JSON response.
+
+@return: Response object containing the cryptocurrency data in JSON format
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_all_data(request):    #test
+    if(cache.has_key("crypto" + request.user.email)):
+        data = cache.get("crypto" + request.user.email)
+    else:
+        data = getAllCryptoData(request.user)
+        if not data:
+            return Response({'error': 'Crypto not linked.'}, status=303, content_type='application/json')
+        cache.set("crypto" + request.user.email, data)
+    return Response(data, content_type='application/json')
+
+
+"""
+@params: request - Django HttpRequest object containing the request parameters.
+
+@Description: This function is used to fetch cryptocurrency data based on the user's input. The function takes a GET request from the user and checks for a 'param' parameter.
+If it exists, the function first checks if the requested data is already stored in the cache. If not, it fetches the data by calling the getAllCryptoData() function and stores
+it in the cache. It then calls the getAlternateCryptoData() function to fetch the requested data. If the data is already present in the cache,
+it directly fetches the data using cache.get(). If the 'param' parameter is not present, it raises an exception.
+
+@return: The function returns a Django Response object containing the requested cryptocurrency data in JSON format.
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def crypto_select_data(request):
+    if request.GET.get('param'):
+        if(cache.has_key("crypto" + request.user.email) is False):
+            storedData = getAllCryptoData(user=request.user)
+            if not storedData:
+                return Response({'error': 'Crypto not linked.'}, status=303, content_type='application/json')
+            cache.set("crypto" + request.user.email, storedData)
+            data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data = storedData)
+        else:
+            storedData = cache.get("crypto" + request.user.email)
+            data = getAlternateCryptoData(user=request.user, command=(request.GET.get('param')), data=storedData)
+    else:
+        raise Response({'Bad request. Param not specified.'}, status=400, content_type='application/json')
+    return Response(data, content_type='application/json')
+
 
 """
 @params: an HTTP request object containing user authentication information
@@ -429,7 +488,7 @@ def weeklyGraph(request):
         date = request.GET.get('param')
     else:
         return Response(status=400)
-        # should return bad request
+
     graphData = transactions.weeklySpendingInYear(date)
     return Response(graphData, content_type='application/json')
 
@@ -490,7 +549,6 @@ def get_currency_data(request):
         return Response(cache.get('currency' + user.email), content_type='application/json', status = 200)
 
     account_balances = get_institutions_balances(plaid_wrapper,user)
-
     currency = reformat_balances_into_currency(account_balances)
     proportion_currencies = calculate_perentage_proportions_of_currency_data(currency)
     cache.set('currency' + user.email, proportion_currencies, 86400)
@@ -549,22 +607,22 @@ An error Response object if the institution name is not valid or if the balance 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_account(request):
-    if request.GET.get('param'):
-        institution_name = request.GET.get('param')
-        if cache.has_key('balances' + request.user.email) is False:
-            return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+        if request.GET.get('param'):
+            institution_name = request.GET.get('param')
+            if cache.has_key('balances' + request.user.email) is False:
+                return Response({'error': 'Balances not queried.'}, content_type='application/json', status=303)
+            else:
+                account_balances = cache.get('balances' + request.user.email)
+
+            if institution_name not in list(account_balances.keys()):
+                return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
+
+            accounts = reformatAccountBalancesData(account_balances,institution_name)
+
+            return Response(accounts, content_type='application/json',status = 200)
+
         else:
-            account_balances = cache.get('balances' + request.user.email)
-
-        if institution_name not in list(account_balances.keys()):
-            return Response({'error': 'Invalid Insitution ID.'}, content_type='application/json', status=303)
-
-        accounts = reformatAccountBalancesData(account_balances,institution_name)
-
-        return Response(accounts, content_type='application/json',status = 200)
-
-    else:
-        return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
+            return Response({'error': 'No param field supplied.'}, content_type='application/json', status=303)
 
 """
 @param:
@@ -780,9 +838,9 @@ def delete_linked_crypto(request, crypto):
 
     if(cache.has_key("crypto" + request.user.email)):
         delete_cached('crypto', request.user)
-        cryptoData = getAllCryptoData(user)
-        cache.set("crypto" + user.email, cryptoData)
+        cryptoData = getAllCryptoData(request.user)
+        cache.set("crypto" + request.user.email, cryptoData)
+
 
     delete_cached('total_assets', request.user)
-
     return HttpResponse(status=204)

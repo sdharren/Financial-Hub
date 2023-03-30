@@ -18,6 +18,7 @@
                 }
                 else if (errorMessage === 'Transactions Not Linked.') {
                     redirectToLink('transactions');
+
                 }
             }
         }

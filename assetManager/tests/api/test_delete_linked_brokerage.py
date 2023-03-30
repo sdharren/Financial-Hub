@@ -11,6 +11,8 @@ from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import AccountTypeEnum,AccountType
 from assetManager.assets.debit_card import DebitCard
+from django.core.cache import cache
+
 
 class DeleteLinkedBrokerageViewTestCase(TestCase):
     """Tests for the delete_linked_brokerage view function."""
@@ -35,6 +37,8 @@ class DeleteLinkedBrokerageViewTestCase(TestCase):
             access_token='access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349971',
             account_institution_name=self.brokerage,
         )
+    def tearDown(self):
+        cache.clear()
 
     def test_delete_linked_brokerage_with_valid_institution(self):
         

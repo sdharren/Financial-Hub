@@ -7,32 +7,10 @@ import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
 
-
-const tabGraphData = {
-  Overall: [
-    { name: 'Graph 1', content: `Content for Graph 1 in Overall tab goes here.` },
-    { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
-    { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
-    { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
-  ],
-  Banks: [
-    { name: 'Balance', content: <BalancesDisplay /> },
-    { name: 'Recent Transactions', content: <RecentTransactions /> },
-    { name: 'Currency', content: <CurrencyDisplay /> },
-    { name: 'Bar Chart', content: <BarChart /> },
-    { name: 'Sector Spending', content: <BarChartDisplay /> }
-  ],
-  Stocks: [
-    { name: 'Graph 1', content: <InvestmentGraphs/>}
-  ],
-  
-  Crypto: [
-    { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-    { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-    { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
-  ],
-};
-
+import CPie from './CryptoGraphs/PieChart';
+import CScatter from './CryptoGraphs/ScatterGraph';
+import CRecentTransactionsDisplay from './CryptoGraphs/RecentTransactionsDisplay';
+import CAdditional from './CryptoGraphs/AdditionalData'
 
 
 function Dashboard() {
@@ -69,10 +47,11 @@ function Dashboard() {
       { name: 'Sector Spending', content: <BarChartDisplay /> }
     ],
     Crypto: [
-      { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-      { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-      { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
-    ],
+      { name: 'Pie Chart', content: <CPie /> },
+      { name: 'Scatter Graph', content: <CScatter /> },
+      { name: 'Wallet Data', content: <CAdditional /> },
+      { name: 'Transactions Table', content: <CRecentTransactionsDisplay /> },
+    ]
   };
 
   const handlePieTabClick = (tabName) => {
