@@ -6,7 +6,7 @@ import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
-import { backgroundBox } from '../static/styling'
+import { backgroundBox, dashboardGraphContainer } from '../static/styling'
 
 const tabGraphData = {
   Overall: [
@@ -115,7 +115,7 @@ function Dashboard() {
                 ))}
             </div>
             {activeTabPie === 'Stocks' ? <InvestmentGraphs /> : 
-            (<div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
+            (<div className={'graph-container ' + dashboardGraphContainer}>
                 <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40 justify-start'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div

@@ -4,7 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
 import LineIndexComparisonChart from "../dashboard_components/LineIndexComparisonChart";
-import { backgroundBox } from "../static/styling";
+import { backgroundBox, dashboardGraphContainer } from "../static/styling";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
@@ -263,7 +263,7 @@ function InvestmentGraphs() {
 
 
     return (
-        <div className="investment-graphs flex flex-row min-h-[70vh] max-h-[70vh]">
+        <div className={"investment-graphs " + dashboardGraphContainer}>
             <div data-testid='graph-names' className="tab graph-names flex flex-col mr-2 w-40 justify-start">
                 <button className={'border-b-2 ' + tabStyling + (overviewActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
