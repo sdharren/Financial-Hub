@@ -8,6 +8,7 @@ from assetManager.API_wrappers.development_wrapper import DevelopmentWrapper
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.investments.stocks import StocksGetter, InvestmentsNotLinked
 from assetManager.assets.debit_card import DebitCard
+from assetManager.API_wrappers.crypto_wrapper import getAlternateCryptoData, get_wallets, getAllCryptoData
 from functools import wraps
 from assetManager.API_wrappers.plaid_wrapper import PublicTokenNotExchanged
 from rest_framework.response import Response
@@ -183,6 +184,7 @@ This function creates a `DebitCard` object for making transactions using the pro
 If there are no access tokens in the database for the user or no institutions linked by the user, the `DebitCard` object creation will fail and the function raises a custom `TransactionsNotLinkedException`.
 If the `DebitCard` object is successfully created, the function returns the `DebitCard` object.
 
+
 @return:
 A `DebitCard` object created using the provided `plaid_wrapper` and `user`.
 """
@@ -259,7 +261,10 @@ An integer that is the overall balance across all investments
 def sum_investment_balance(user):
     try:
         stock_getter = retrieve_stock_getter(user)
-        return stock_getter.get_total_investment_sum()
+        currency_rates = create_forex_rates(datetime.date.today(), base='GBP')
+        sum_in_usd = stock_getter.get_total_investment_sum()
+        sum_in_gbp = sum_in_usd / currency_rates['USD']
+        return sum_in_gbp
     except Exception:
         return 0
 
@@ -486,3 +491,25 @@ def transaction_data_getter(user):
         return debitCards.get_insight_data()
     except Exception:
         raise PlaidQueryException('Something went wrong querying PLAID.')
+
+"""
+@params:
+- user: models.User
+  The user making the query
+
+@description:
+This function retrieves all wallets of a user then iteratively sums all the wallet balances
+
+@return:
+An integer that is the overall balance across all wallets
+"""
+def sum_crypto_balances(user):
+    total = 0
+    if not cache.has_key("crypto" + user.email):
+        cache.set("crypto" + user.email,getAllCryptoData(user))
+    data = cache.get("crypto" + user.email)
+    data = getAlternateCryptoData(user, "balance", data)
+
+    for key in data.keys():
+        total = total + data[key][0]
+    return total

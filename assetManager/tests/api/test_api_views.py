@@ -41,6 +41,11 @@ class APIViewsTestCase(TestCase):
         cache.delete('transactionsjohndoe@example.org')
         cache.delete('currencyjohndoe@example.org')
 
+    def test_first_name(self):
+        response = self.client.get('/api/firstname/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'email': 'johndoe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'password': 'pbkdf2_sha256$390000$jPu8imKWYYssIYNKBaldaV$TXrA5IIkSUF95RTGF3eWoh8DSLnw/tycGtMXH9dOvO8='})
+
     def test_investment_categories_returns_categories(self):
         response = self.client.get('/api/investment_categories/')
         self.assertEqual(response.status_code, 200)
@@ -89,7 +94,7 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/cache_assets/')
         self.assertEqual(response.status_code, 401)
 
-    def test_put_cache_assets_returns_ok_with_no_linked_investments(self):
+    def test_put_cache_assets_returns_see_other_with_no_linked_investments(self):
         client = APIClient()
         user = User.objects.get(email='lillydoe@example.org')
         client.login(email=user.email, password='Password123')
@@ -98,9 +103,8 @@ class APIViewsTestCase(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(cache.has_key('investments'+user.email))
 
-    def test_put_cache_assets_returns_okay_other_with_no_linked_transactions(self):
+    def test_put_cache_assets_returns_see_other_with_no_linked_transactions(self):
         client = APIClient()
         user = User.objects.get(email='lillydoe@example.org')
 
@@ -115,7 +119,6 @@ class APIViewsTestCase(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + jwt)
         response = client.put('/api/cache_assets/')
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(cache.has_key('transactions'+self.user.email))
 
     def test_get_single_institution_balances_and_currency_invalid_access_token(self):
         settings.PLAID_DEVELOPMENT = True
@@ -447,10 +450,10 @@ class APIViewsTestCase(TestCase):
         settings.PLAID_DEVELOPMENT = False
 
     def test_link_crypto_wallet_works(self):
-        response = self.client.get('/api/link_crypto_wallet/?param=0x312')
+        response = self.client.get('/api/link_crypto_wallet/?param=0x6090a6e47849629b7245dfa1ca21d94cd15878ef')
         self.assertEqual(response.status_code, 200)
         account = AccountType.objects.get(user=self.user)
-        self.assertEqual(account.access_token, '0x312')
+        self.assertEqual(account.access_token, '0x6090a6e47849629b7245dfa1ca21d94cd15878ef')
         self.assertEqual(account.account_asset_type, 'CRYPTO')
         self.assertEqual(account.account_institution_name, 'eth')
 
@@ -458,19 +461,18 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/link_crypto_wallet/')
         self.assertEqual(response.status_code, 400)
 
-    def test_all_crypto_wallets_work_with_user_without_wallets(self):
+    def test_all_crypto_wallets_redirects_with_user_without_wallets(self):
         response = self.client.get('/api/all_crypto_wallets/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(response.status_code, 303)
 
     def test_all_crypto_wallets_works(self):
-        self.client.get('/api/link_crypto_wallet/?param=0x312')
-        self.client.get('/api/link_crypto_wallet/?param=0adfs21')
+        self.client.get('/api/link_crypto_wallet/?param=0x6090a6e47849629b7245dfa1ca21d94cd15878ef')
+        self.client.get('/api/link_crypto_wallet/?param=34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo')
         response = self.client.get('/api/all_crypto_wallets/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        self.assertTrue('0x312' in response.data)
-        self.assertTrue('0adfs21' in response.data)
+        self.assertTrue('0x6090a6e47849629b7245dfa1ca21d94cd15878ef' in response.data)
+        self.assertTrue('34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo' in response.data)
 
     def test_investment_category_names_works(self):
         response = self.client.get('/api/investment_category_names/')

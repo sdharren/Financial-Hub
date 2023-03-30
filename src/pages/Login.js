@@ -48,7 +48,7 @@ const Login = ({submit}) => {
                     )  
                 }
             </div>
-            <FormAction handleSubmit={loginUser} text = "Login" />
+            <FormAction data-testid='login-form'handleSubmit={loginUser} text = "Login" />
         </form>
        </div>
   )

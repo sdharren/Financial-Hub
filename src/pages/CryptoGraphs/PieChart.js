@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Pie, getElementsAtEvent } from 'react-chartjs-2';
-import GraphSelect from '../components/GraphSelect';
-import usePlaid from '../custom_hooks/usePlaid';
-import useHandleError from '../custom_hooks/useHandleError';
+import AuthContext from '../../context/AuthContext';
+import {useNavigate} from 'react-router-dom';
+
 import {
     Chart as ChartJS,
     ArcElement,
     Tooltip,
     Legend,
     Colors
-} from 'chart.js';
+} from 'chart.js'
+
+import { Pie, getElementsAtEvent } from 'react-chartjs-2';
 
 
 ChartJS.register(
@@ -18,9 +19,33 @@ ChartJS.register(
     Legend,
     Colors
 )
-function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions, currency }) {
-    const [pieChartData, error] = usePlaid({ endpoint, endpoint_parameter });
-    useHandleError(error);
+function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOptions}) {
+    let {authTokens, logoutUser} = useContext(AuthContext);
+    const [pieChartData, setPieChartData] = useState(null);
+    const navigate = useNavigate()
+
+    let get_data = async() =>  {
+        let url = 'http://127.0.0.1:8000/api/crypto_select_data/?param=balance'
+        let response = await fetch(url, {
+            method:'GET',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization':'Bearer ' + String(authTokens.access)
+            }
+        });
+        let data = await response.json();
+        if (response.status === 200) {
+            setPieChartData(data);
+        }
+        else if (response.status === 303) {
+            if (data['error'] === 'Investments not linked.') {
+                navigate('/crypto_wallets')
+            }
+        }
+        else if (response.status == 429) {
+            console.log("429 - Blockcypher token call limit reached")
+        }
+    }
 
     // if a user selects a different option from select dropdown - tell parent to update this graph
     let handleSelectionUpdate = async(nextParam) => {
@@ -30,18 +55,24 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         });
     }
 
+    useEffect(() => {
+        get_data();
+    }, [endpoint, endpoint_parameter]);
+
     let pie_data = new Array();
     let pie_labels = new Array();
     for (let key in pieChartData) {
-        pie_labels.push(key);
-        pie_data.push(pieChartData[key]);
+        let pieLabel = key + ' - ' + pieChartData[key][1]; 
+        pie_labels.push(pieLabel);
+        var currVal = pieChartData[key][0];
+        pie_data.push(currVal);
     }
 
     const data = {
         labels: pie_labels,
         datasets: [
             {
-                label: currency ? currency : '£',
+                label: '£',
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels
@@ -80,20 +111,11 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
 
     return (
         <div className='inline-block min-h-[60vh] w-full max-h-[60vh]'>
-            {
-                selectOptions !== undefined
-                ? <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
-                : null
-            }
-            {
-                pieChartData === null ?
-                <p className='text-white'>Loading...</p> :
-                <Pie className='investment-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
-            }
+            <Pie className='crypto-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
         </div>
-
-    )
-
+        
+    ) 
+    
 }
 
-export default PieChart;
+export default CPie;

@@ -56,21 +56,7 @@ const Signup = ({submit}) => {
             alert(Object.values(data).join("\n"))
         }
     }
-    
-    let form1 = (
-        <div class="super-signup-container">
-        <div class="signup-container">
-            <form onSubmit={signupUser}>
-            <input type = "text" name = "email" placeholder='Enter email:' />
-            <input type = "text" name = "first_name" placeholder='Enter first name:' />
-            <input type = "text" name = "last_name" placeholder='Enter last name:' />
-            <input type = "password" name='password' placeholder='Enter password'/>
-            <input type = "submit"/>
-            </form>
-        </div>
-        </div>
-    )
-    
+     
     let form2 = (
         <div className={"signup-container my-10 mx-20 p-10 " + backgroundBox}>
             <Header 
