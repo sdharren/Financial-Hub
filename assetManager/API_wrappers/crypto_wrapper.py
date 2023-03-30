@@ -127,7 +127,11 @@ def getAllCryptoData(user):
 
             value = BTC_all(addr)
             amount = value["final_balance"]
-            value["final_balance"] = (amount) * rate[0]
+            try:
+                value["balance"] = ((amount) * rate[0])
+            except:
+                value["balance"] = 0
+
             arrVal = [value, "btc"]
 
             data[addr] = arrVal
@@ -140,7 +144,7 @@ def getAllCryptoData(user):
 
             amount = value["balance"]
             try:
-                value["balance"] = (amount) * rate[1]
+                value["balance"] = ((amount) * rate[1])
             except:
                 value["balance"] = 0
 
