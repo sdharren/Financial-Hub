@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from "react";
 import Chart from "react-apexcharts";
 import GraphSelect from "../components/GraphSelect";
 import usePlaid from "../custom_hooks/usePlaid";
 import useHandleError from "../custom_hooks/useHandleError";
+import { lineGraphSizing } from "../static/styling";
 
 function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions, updateGraph }) {
 
@@ -113,7 +113,7 @@ function LineIndexComparisonChart ({ endpoint, endpoint_parameter, selectOptions
     };
 
     return (
-        <div className='flex flex-col w-full max-h-[30vh]'>
+        <div className={lineGraphSizing}>
         {
             selectOptions === undefined || selectOptions === null
             ? null
