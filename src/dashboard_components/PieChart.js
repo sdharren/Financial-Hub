@@ -41,11 +41,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         labels: pie_labels,
         datasets: [
             {
-<<<<<<< HEAD:src/pages/PieChart.js
-                label: '%',
-=======
                 label: currency ? currency : '£',
->>>>>>> main:src/dashboard_components/PieChart.js
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels
@@ -85,19 +81,19 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
     return (
         <div className='inline-block min-h-[60vh] w-full max-h-[60vh]'>
             {
-                selectOptions !== undefined 
+                selectOptions !== undefined
                 ? <GraphSelect options={selectOptions} handleSelectionUpdate={handleSelectionUpdate} selectedOption={endpoint_parameter} />
                 : null
             }
             {
-                pieChartData === null ? 
-                <p className='text-white'>Loading...</p> :  
+                pieChartData === null ?
+                <p className='text-white'>Loading...</p> :
                 <Pie className='investment-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
             }
         </div>
-        
-    ) 
-    
+
+    )
+
 }
 
 export default PieChart;
