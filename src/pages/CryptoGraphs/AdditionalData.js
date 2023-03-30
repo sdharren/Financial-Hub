@@ -2,35 +2,19 @@ import React, { useContext, useState } from "react";
 import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import usePlaid from '../custom_hooks/usePlaid';
+import useHandleError from "../../custom_hooks/useHandleError";
+import { Typography, Table, TableBody, TableHead, TableRow, TableCell, TableSortLabel, TableContainer } from '@mui/material';
 
 const CAdditional = () => {
-    let {authTokens, logoutUser} = useContext(AuthContext);
-    const [AdditionalData, setAdditionalData] = useState([]);
-    const navigate = useNavigate()    
-    
-    let get_data = async() =>  {
-        let url = 'http://127.0.0.1:8000/api/crypto_all_data/'
-        let response = await fetch(url, {
-            method:'GET',
-            headers:{
-                'Content-Type':'application/json',
-                'Authorization':'Bearer ' + String(authTokens.access)
-            }
-        });
-        let respData = await response.json();
-        if (response.status === 200) {
-            setAdditionalData(respData);
-        }
-        else if (response.status === 303) {
-            if (respData['error'] === 'Investments not linked.') {
-                navigate('/crypto_wallets')
-            }
-        }
-    }
+    const endpoint = "crypto_all_data";
+    const [additionalData, error] = usePlaid({endpoint});
+    const [data, setData] = useState(null);
+    useHandleError(error);
   
     useEffect(() => {
-      get_data();
-      }, []);
+      setData(additionalData);
+      }, [additionalData]);
 
 
     return (

@@ -853,7 +853,7 @@ def delete_linked_banks(request, institution):
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.DEBIT, account_institution_name=institution).first()
 
     if not account_type:
-        return HttpResponseBadRequest('Linked bank account not found')
+        return HttpResponseBadRequest('Transactions Not Linked.')
 
     account_type.delete()
 
@@ -904,7 +904,7 @@ def delete_linked_brokerage(request, brokerage):
     account_type = AccountType.objects.filter(user=request.user, account_asset_type=AccountTypeEnum.STOCK, account_institution_name=brokerage).first()
 
     if not account_type:
-     return HttpResponseBadRequest('Linked brokerage account not found')
+     return HttpResponseBadRequest('Investments not linked.')
 
     account_type.delete()
 
@@ -929,7 +929,7 @@ def delete_linked_crypto(request, crypto):
     account_type = AccountType.objects.filter(user=request.user, access_token = crypto).first()
 
     if not account_type:
-     return HttpResponseBadRequest('Linked brokerage account not found')
+     return HttpResponseBadRequest('Crypto not linked.')
 
     account_type.delete()
 

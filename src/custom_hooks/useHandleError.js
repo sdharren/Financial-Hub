@@ -20,6 +20,10 @@
                     redirectToLink('transactions');
 
                 }
+                else if (errorMessage === 'Crypto not linked.') {
+                    navigate('/crypto_wallets');
+
+                }
             }
         }
 
