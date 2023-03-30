@@ -22,10 +22,11 @@ function Link() {
         if (response.ok) {
             navigate('/dashboard');
         }
-        else {
+        else if (response.status === 400){
             alert('Something went wrong. Please try linking the asset again.');
             navigate('/link_assets');
         }
+        navigate('/dashboard');
     }
 
     const config = {
