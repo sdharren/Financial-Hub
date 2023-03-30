@@ -69,10 +69,10 @@ export default function Navbar() {
                 <div className='nb_dropdown'>
                     <button className='nb_dropbtn'>My account</button>
                     <div className='nb_dropcontent'>
-                        <div>
+                        {/* <div>
                             <a href='#'>Settings</a>
                         </div>
-                        <hr className='hrbreak'></hr>
+                        <hr className='hrbreak'></hr> */}
                         <p className="nav-logout" onClick = {logoutUser}>Logout</p>
                     </div>
                 </div>
@@ -84,7 +84,7 @@ export default function Navbar() {
         <nav className="nav border-white border-b-2" data-testid="navbar">
             <div className='navbarContents text-white flex pt-5 pb-3 px-2'>
                 <Link to = {user ? "/dashboard" : "/"} className="site-title text-4xl font-bold">
-                    <img className='aspect-auto max-h-[6vh]' src={logo}/>
+                    <img className='aspect-auto max-h-[6vh]' src={logo} alt='logo'/>
                 </Link>
                 {user ? loggedInForm : defaultForm}
             </div>
