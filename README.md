@@ -1,4 +1,6 @@
-# 🏦Financial-Hub - [Project Name]
+![FINSC (1200 × 630 px)](https://user-images.githubusercontent.com/123044814/228573703-d980d2af-e1b6-4050-a5ef-d86d30937d63.png)
+# 🏦Financial-Hub - FinScope 
+
 ## 5CCS2SEG Major Group Project - Software Savant's repository for a financial hub to track personal financial assets
 
 ## Contributors
@@ -20,11 +22,11 @@ Below is a list of all the documentations used by the team to build the back-end
 
 - [ForexPython DOCUMENTATION](https://pypi.org/project/forex-python/) -> used to gather the most recent exchange rates to ensure all data is uniquely quantified using GBP '£'
 
-# URL LOCATION on Heroku
+# URL LOCATION FOR FINSCOPE ON HEROKU
 [FinScope](https://financial-hub.herokuapp.com)
 
 # Currency Client Requirement
-- [Name of project] supports these currencies GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH
+- FinScope supports these currencies GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH
 - Stocks data is to represented in USD
 - Transactions are to be represented in GBP
 - Currency pie chart for banks formats a proportioned pie chart for all different currencies present in all linked accounts using GBP as the uniform currency for conversion and proportioning

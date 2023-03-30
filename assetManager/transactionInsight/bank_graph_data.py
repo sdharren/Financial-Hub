@@ -28,17 +28,17 @@ If an error occurs during the retrieval process, default rates are returned inst
 def create_forex_rates(input_date, base='GBP'):
     warnings.filterwarnings('ignore')
     try:
-        url = "https://theforexapi.com/api/{date}?base={base}&symbols=GBP,USD,JPY,EUR,INR,NOK,AUD,CAD,CHF,CNH&rtype=fpy".format(date = input_date.strftime('%Y-%m-%d'), base=base)
-        response = requests.get(url,verify=False)
+        url = "https://theforexapi.com/api/{date}/?base={base}".format(date=input_date.strftime('%Y-%m-%d'),base=base)
+        response = requests.get(url, verify=False)
     except Exception:
         if base == 'GBP':
-            error_rates = {'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1}
+            error_rates = {'EUR': 1.1371648206691076, 'USD': 1.2328003820873799, 'JPY': 161.12488344060586, 'BGN': 2.224066956264641, 'CZK': 26.914416975596442, 'DKK': 8.470968182128317, 'HUF': 435.4772680752348, 'PLN': 5.323637107962427, 'RON': 5.631581341399622, 'SEK': 12.758420705497054, 'CHF': 1.1311378471195614, 'ISK': 168.41410994109484, 'NOK': 12.877254429256975, 'TRY': 23.556710409606765, 'AUD': 1.8443676226432257, 'BRL': 6.377220314312356, 'CAD': 1.68334508403648, 'CNY': 8.478018604016466, 'HKD': 9.677272623894106, 'IDR': 18596.511178330187, 'INR': 101.2804475880734, 'KRW': 1601.0598376128635, 'MXN': 22.56009916077236, 'MYR': 5.426209374786781, 'NZD': 1.976619891287043, 'PHP': 67.03700334326457, 'SGD': 1.6368350428711136, 'THB': 42.24794741749869, 'ZAR': 22.40544474516136, 'GBP': 1}
         elif base == 'USD':
-            error_rates = {'GBP': 0.81, 'EUR': 0.92, 'JPY': 131.94, 'CHF': 0.92, 'NOK': 10.4, 'AUD': 1.5, 'CAD': 1.36, 'INR': 82.29, 'USD': 1}
+            error_rates = {'EUR': 0.9224241306152569, 'JPY': 130.69827506687574, 'BGN': 1.8040771146573193, 'CZK': 21.8319343234019, 'DKK': 6.871321833779172, 'GBP': 0.8111613319804446, 'HUF': 353.2423208191126, 'PLN': 4.318328567475325, 'RON': 4.568121022045936, 'SEK': 10.349137533437874, 'CHF': 0.917535282722996, 'ISK': 136.61101374411953, 'NOK': 10.445530855087169, 'TRY': 19.10829259293423, 'AUD': 1.496079697444885, 'BRL': 5.17295452449036, 'CAD': 1.3654644405497647, 'CNY': 6.877040863388986, 'HKD': 7.849829351535836, 'IDR': 15084.77077760354, 'INR': 82.15478276911723, 'KRW': 1298.7178304584447, 'MXN': 18.29988008486302, 'MYR': 4.401531224056821, 'NZD': 1.6033576238354394, 'PHP': 54.37782492390001, 'SGD': 1.3277372936076006, 'THB': 34.269901300618024, 'ZAR': 18.174430403099343, 'USD': 1}
         return error_rates
 
     rates = json.loads(response.content.decode('utf-8'))['rates']
-    
+
     if base not in rates.keys():
         rates[base] = 1
 

@@ -159,10 +159,10 @@ function Accounts() {
         ))}
         {cryptos.map(crypto => (
           <tr key={crypto} className='w-full table table-fixed'>
-            <td className='text-left py-3 px-4 text-white'>{crypto}</td>
+            <td className='text-left py-3 px-4 text-white'>{crypto.slice(0, 10) + "..."}</td>
             <td className='text-left py-3 px-4'>Crypto</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button data-testid="remove-crypto"onClick={() => handleRemoveCrypto(crypto)}>Remove</button>
+              <button data-testid="remove-crypto"onClick={() => handleRemoveCrypto(crypto)}>Delete</button>
             </td>
           </tr>
         ))}

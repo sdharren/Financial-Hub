@@ -90,7 +90,7 @@ class CreateBankGraphDataTestCase(TestCase):
         input_date = get_currency_converter()
         self.assertEqual(input_date,datetime.date(2014, 5, 23))
         rates = create_forex_rates(input_date)
-        self.assertEqual(len(list(rates.keys())),9)
+        self.assertEqual(len(list(rates.keys())),33)
         self.assertTrue('EUR' in list(rates.keys()))
         self.assertTrue('USD' in list(rates.keys()))
         self.assertTrue('JPY' in list(rates.keys()))
@@ -114,12 +114,12 @@ class CreateBankGraphDataTestCase(TestCase):
         old_input_date = get_currency_converter()
         self.assertEqual(old_input_date,datetime.date(2014, 5, 23))
         old_rates = create_forex_rates(old_input_date)
-        self.assertEqual(len(list(old_rates.keys())),9)
+        self.assertEqual(len(list(old_rates.keys())),33)
         settings.PLAID_DEVELOPMENT = True
         input_date = get_currency_converter()
         self.assertEqual(input_date,date.today())
         rates = create_forex_rates(input_date)
-        self.assertEqual(len(list(rates.keys())),9)
+        self.assertEqual(len(list(rates.keys())),30)
         self.assertTrue('EUR' in list(rates.keys()))
         self.assertTrue('USD' in list(rates.keys()))
         self.assertTrue('JPY' in list(rates.keys()))
@@ -142,5 +142,5 @@ class CreateBankGraphDataTestCase(TestCase):
 
     def test_create_forex_rates_force_exception(self):
         rates = create_forex_rates('incorrect_date')
-        self.assertEqual(len(list(rates.keys())),9)
-        self.assertEqual(rates,{'EUR': 1.137138958380714, 'USD': 1.2218558107800774, 'JPY': 159.02888332954288, 'CHF': 1.1228110075051172, 'NOK': 12.857061632931545, 'AUD': 1.840914259722538, 'CAD': 1.684785080736866, 'INR': 100.71071184898796, 'GBP': 1})
+        self.assertEqual(len(list(rates.keys())),30)
+        self.assertEqual(rates,{'EUR': 1.1371648206691076, 'USD': 1.2328003820873799, 'JPY': 161.12488344060586, 'BGN': 2.224066956264641, 'CZK': 26.914416975596442, 'DKK': 8.470968182128317, 'HUF': 435.4772680752348, 'PLN': 5.323637107962427, 'RON': 5.631581341399622, 'SEK': 12.758420705497054, 'CHF': 1.1311378471195614, 'ISK': 168.41410994109484, 'NOK': 12.877254429256975, 'TRY': 23.556710409606765, 'AUD': 1.8443676226432257, 'BRL': 6.377220314312356, 'CAD': 1.68334508403648, 'CNY': 8.478018604016466, 'HKD': 9.677272623894106, 'IDR': 18596.511178330187, 'INR': 101.2804475880734, 'KRW': 1601.0598376128635, 'MXN': 22.56009916077236, 'MYR': 5.426209374786781, 'NZD': 1.976619891287043, 'PHP': 67.03700334326457, 'SGD': 1.6368350428711136, 'THB': 42.24794741749869, 'ZAR': 22.40544474516136, 'GBP': 1})

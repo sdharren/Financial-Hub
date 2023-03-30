@@ -3,7 +3,7 @@ import LineGraph from "../dashboard_components/LineGraph";
 import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
-import LineIndexComparisonChart from "./LineIndexComparisonChart";
+import LineIndexComparisonChart from "../dashboard_components/LineIndexComparisonChart";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
