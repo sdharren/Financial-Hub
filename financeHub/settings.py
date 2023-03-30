@@ -30,7 +30,7 @@ SECRET_KEY = '@dg8+*g#1p%854*36rgr!=l4x$-l3&j7$p%!km10#dk37$a=d%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-PLAID_DEVELOPMENT = True
+PLAID_DEVELOPMENT = False
 
 ALLOWED_HOSTS = [
     'localhost',

@@ -489,7 +489,7 @@ class APIViewsTestCase(TestCase):
         response = self.client.get('/api/supported_investments/')
         self.assertEqual(response.status_code, 200)
         investments = response.data['investments']
-        self.assertEqual(investments, {'Matthews Pacific Tiger Fund Insti Class', 'Achillion Pharmaceuticals Inc.', 'Nflx Feb 0118 355 Call', 'Southside Bancshares Inc.', 'NH PORTFOLIO 1055 (FIDELITY INDEX)', 'iShares Inc MSCI Brazil', 'Bitcoin'})
+        self.assertEqual(investments, {'Matthews Pacific Tiger Fund Insti Class', 'Achillion Pharmaceuticals Inc.', 'Southside Bancshares Inc.', 'iShares Inc MSCI Brazil'})
 
     def test_supported_investments_redirects_with_no_linked_investments(self):
         cache.clear()

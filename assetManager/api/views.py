@@ -333,6 +333,7 @@ def link_crypto_wallet(request):
 
     data = getAllCryptoData(user)
     cache.set("crypto" + user.email, data)
+    delete_cached('total_assets', request.user)
 
     return Response(status=200)
 
