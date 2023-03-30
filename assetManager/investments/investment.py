@@ -1,3 +1,4 @@
+# Represents a single investment
 class Investment():
     def __init__(self, holding, security):
         self.name = security['name']
