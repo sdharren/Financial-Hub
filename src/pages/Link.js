@@ -19,7 +19,7 @@ function Link() {
             },
             body: JSON.stringify({'public_token': public_token})
         });
-
+        
         if (response.status === 200) {
             navigate('/dashboard');
         }

@@ -722,6 +722,8 @@ def delete_linked_banks(request, institution):
             cache.set('balances' + request.user.email,balances)
             cache.set('currency' + request.user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(balances)))
 
+    delete_cached('total_assets', request.user)
+
     return HttpResponse(status=204)
 
 
@@ -750,6 +752,7 @@ def delete_linked_brokerage(request, brokerage):
     account_type.delete()
 
     delete_cached('investments', request.user)
+    delete_cached('total_assets', request.user)
 
     return HttpResponse(status=204)
 
@@ -778,5 +781,6 @@ def delete_linked_crypto(request, crypto):
         cryptoData = getAllCryptoData(user)
         cache.set("crypto" + user.email, cryptoData)
 
+    delete_cached('total_assets', request.user)
 
     return HttpResponse(status=204)
