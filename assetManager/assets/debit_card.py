@@ -25,6 +25,30 @@ class bankDataEmpty(Exception):
 
 @return: accounts, custom dictionary keys:(name,available_amount,current_amount,type,currency), values: all strings except for available and current amount which are floats
 """
+
+def filter_non_supported_account_currencies(accounts):
+    filtered_accounts = []
+    input_date = get_currency_converter()
+    rates = create_forex_rates(input_date)
+
+    for account in accounts:
+        if account['balances']['iso_currency_code'] in rates.keys():
+            filtered_accounts.append(account)
+
+    return filtered_accounts
+
+def filter_non_supported_transaction_currencies(transaction_response):
+    input_date = get_currency_converter()
+    rates = create_forex_rates(input_date)
+
+    new_transactions = []
+    for transaction in transaction_response:
+        if(transaction['iso_currency_code'] in rates.keys()):
+            new_transactions.append(transaction)
+
+    return new_transactions
+
+
 def format_accounts_data(request_accounts):
     accounts = {}
     for account in request_accounts:
@@ -105,20 +129,12 @@ class DebitCard():
 
 
     def get_single_account_balances(self,token):
-        input_date = get_currency_converter()
-        rates = create_forex_rates(input_date)
         request_accounts = self.plaid_wrapper.get_accounts(token)
-        accounts = format_accounts_data(request_accounts)
-        for account in accounts:
-            if accounts[account]['currency'] not in rates.keys():
-                del accounts[account]
-
-        return accounts
+        accounts = filter_non_supported_account_currencies(request_accounts)
+        formatted_accounts = format_accounts_data(accounts)
+        return formatted_accounts
 
     def get_single_transaction(self,start_date_input,end_date_input,token):
-        input_date = get_currency_converter()
-        rates = create_forex_rates(input_date)
-
         self.refresh_api(token)
         transaction_request = TransactionsGetRequest(
             access_token=token,
@@ -152,18 +168,10 @@ class DebitCard():
     @return: transactions, list containing TransactionsGetRequest return objects composed of list of transactions linked to corresponding account_id
     """
     def get_transactions_by_date(self,start_date_input,end_date_input):
-        input_date = get_currency_converter()
-        rates = create_forex_rates(input_date)
-
         transactions = []
         for token in self.access_tokens:
             transaction_response = self.get_single_transaction(start_date_input,end_date_input,token)
-
-            new_transactions = []
-            for transaction in transaction_response:
-                if(transaction['iso_currency_code'] in rates.keys()):
-                    new_transactions.append(transaction)
-
+            new_transactions = filter_non_supported_transaction_currencies(transaction_response)
             transactions.append(new_transactions)
 
         return transactions
