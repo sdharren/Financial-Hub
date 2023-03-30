@@ -1,9 +1,12 @@
 from django.core.management import call_command
 from django.test import TestCase
 from assetManager.models import User,AccountType,AccountTypeEnum
+from django.conf import settings
 
 """Tests for the seed and unseed commands for SANDBOX LOCAL ENVIRONMENT"""
 class SeedAndUnseedCommandTestCase(TestCase):
+    def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
 
     def test_seed_command_twice(self):
         accounttypes = AccountType.objects.all()
