@@ -265,16 +265,16 @@ function InvestmentGraphs() {
     return (
         <div className={"investment-graphs " + dashboardGraphContainer}>
             <div data-testid='graph-names' className="tab graph-names flex flex-col mr-2 w-40 justify-start">
-                <button className={'border-b-2 ' + tabStyling + (overviewActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_categories')}>
+                <button className={'tablinks border-b-2 ' + tabStyling + (overviewActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
                 </button>
-                <button className={'border-b-2 ' + tabStyling + (categoryActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
+                <button className={'tablinks border-b-2 ' + tabStyling + (categoryActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
                     Category
                     </button>
-                <button className={'border-b-2 ' + tabStyling + (stocksActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('stock_history')}>
+                <button className={'tablinks border-b-2 ' + tabStyling + (stocksActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('stock_history')}>
                     Stock Breakdown
                 </button>
-                <button className={tabStyling + (comparisonActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('portfolio_comparison')}>
+                <button className={'tablinks ' + tabStyling + (comparisonActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('portfolio_comparison')}>
                     Portfolio Comparison
                 </button>
             </div>
