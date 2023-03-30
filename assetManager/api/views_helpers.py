@@ -261,7 +261,10 @@ An integer that is the overall balance across all investments
 def sum_investment_balance(user):
     try:
         stock_getter = retrieve_stock_getter(user)
-        return stock_getter.get_total_investment_sum()
+        currency_rates = create_forex_rates(datetime.date.today(), base='GBP')
+        sum_in_usd = stock_getter.get_total_investment_sum()
+        sum_in_gbp = sum_in_usd / currency_rates['USD']
+        return sum_in_gbp
     except Exception:
         return 0
 

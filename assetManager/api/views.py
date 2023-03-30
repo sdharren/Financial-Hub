@@ -294,6 +294,8 @@ def exchange_public_token(request):
     wrapper.save_access_token(request.user, products_selected)
     token = wrapper.get_access_token()
 
+    delete_cached('total_assets', request.user)
+
     if('transactions' in products_selected):
         #update balances cache if it exists
         set_single_institution_balances_and_currency(token,wrapper,request.user)
@@ -780,6 +782,8 @@ def delete_linked_banks(request, institution):
             cache.set('balances' + request.user.email,balances)
             cache.set('currency' + request.user.email,calculate_perentage_proportions_of_currency_data(reformat_balances_into_currency(balances)))
 
+    delete_cached('total_assets', request.user)
+
     return HttpResponse(status=204)
 
 
@@ -808,6 +812,7 @@ def delete_linked_brokerage(request, brokerage):
     account_type.delete()
 
     delete_cached('investments', request.user)
+    delete_cached('total_assets', request.user)
 
     return HttpResponse(status=204)
 
@@ -836,4 +841,6 @@ def delete_linked_crypto(request, crypto):
         cryptoData = getAllCryptoData(request.user)
         cache.set("crypto" + request.user.email, cryptoData)
 
+
+    delete_cached('total_assets', request.user)
     return HttpResponse(status=204)

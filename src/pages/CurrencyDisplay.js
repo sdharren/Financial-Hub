@@ -2,7 +2,7 @@ import PieChart from "../dashboard_components/PieChart";
 import { useState } from "react";
 
 function CurrencyDisplay() {
-    const [graph, setGraph] = useState(<PieChart endpoint={"currency_data"} loadNext={handleLoadNext}/>);
+    const [graph, setGraph] = useState(<PieChart endpoint={"currency_data"} loadNext={handleLoadNext} currency={'%'} />);
 
     // JSON to know which API endpoint to query next
     const nextRoute = {
@@ -13,7 +13,7 @@ function CurrencyDisplay() {
     function handleLoadNext(event) {
         console.log(nextRoute[event.current]);
         setGraph(
-                <PieChart endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext}/>
+                <PieChart endpoint={nextRoute[event.current]} endpoint_parameter={event.next} loadNext={handleLoadNext} currency={'%'} />
         );
     }
 

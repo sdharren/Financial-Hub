@@ -19,8 +19,6 @@ function Dashboard() {
 
   const [activeGraphPie, setActiveGraphPie] = useState('Total Asset Breakdown');
 
-  const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
-
   function handleClicked(event){
     console.log(event.next)
     if (event.next==="Bank Assets"){
@@ -70,77 +68,6 @@ function Dashboard() {
   const handlePieGraphClick = (graphName) => {
     setActiveGraphPie(graphName);
   };
-
-  
-
-
-
-  const handlePieAccountChange = (event) => {
-    setSelectedPieAccount(event.target.value);
-  };
-
-    let page1 = (
-        <div data-testid = 'dashboardtest'>
-          
-          <div className="dashboard-container">
-            <div className="piechart-box">
-              <div className ="piechart-section">
-                <div className="piechart-tabs">
-                  {Object.keys(tabGraphData).map((tabName) => (
-                    <div
-                      key={tabName}
-                      className={`piechart-tab ${activeTabPie === tabName ? 'active' : ''}`}
-                      onClick={() => handlePieTabClick(tabName)}
-                    >
-                      {tabName}
-                    </div>
-                  ))}
-                </div>
-                <div className="piechart-container">
-                  <div className="piechart-graphs">
-                    {tabGraphData[activeTabPie].map((graph) => (
-                      <div
-                        hidden={stocksActive}
-                        key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active' : ''}`}
-                        onClick={() => handlePieGraphClick(graph.name)}
-                      >
-                        {graph.name}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
-                    {tabGraphData[activeTabPie].map((graph) => (
-                      activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
-                    ))}
-                  </div>
-    
-                  <div className="right-menu" hidden={stocksActive}>
-                    <select value={selectedPieAccount} onChange={handlePieAccountChange}>
-                      <option value="All Accounts">All Accounts</option>
-                      <option value="Account 1">Account 1</option>
-                    </select>
-                  </div>
-    
-                </div>
-              </div>
-              
-              <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
-                {tabGraphData[activeTabPie].map((graph) => (
-                  activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
-                ))}
-              </div>
-
-              
-
-            </div>
-          </div>
-        
-    
-        </div>
-        
-      );
 
     let page2 = (
         <div className='dashboard-container my-10px py-10 px-5'>
