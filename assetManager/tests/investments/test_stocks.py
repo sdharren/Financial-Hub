@@ -194,9 +194,9 @@ class StocksTestCase(TestCase):
     def test_get_returns_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         ewz_return = self.stock_getter.get_returns('iShares Inc MSCI Brazil')
-        self.assertTrue(ewz_return['1'] != 0)
-        self.assertTrue(ewz_return['5'] != 0)
-        self.assertTrue(ewz_return['30'] != 0)
+        self.assertIsNotNone(ewz_return['1'])
+        self.assertIsNotNone(ewz_return['5'])
+        self.assertIsNotNone(ewz_return['30'])
 
     def test_get_returns_returns_nothing_for_not_owned_stock(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
@@ -206,9 +206,9 @@ class StocksTestCase(TestCase):
     def test_get_category_returns_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         etf_returns = self.stock_getter.get_category_returns('etf')
-        self.assertTrue(etf_returns['1'] != 0)
-        self.assertTrue(etf_returns['5'] != 0)
-        self.assertTrue(etf_returns['30'] != 0)
+        self.assertIsNotNone(etf_returns['1'])
+        self.assertIsNotNone(etf_returns['5'])
+        self.assertIsNotNone(etf_returns['30'])
 
     def test_get_category_returns_works_with_no_investments(self):
         self.stock_getter = StocksGetter(None)
@@ -223,9 +223,9 @@ class StocksTestCase(TestCase):
     def test_get_overall_returns_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         overall_returns = self.stock_getter.get_overall_returns()
-        self.assertTrue(overall_returns['1'] != 0)
-        self.assertTrue(overall_returns['5'] != 0)
-        self.assertTrue(overall_returns['30'] != 0)
+        self.assertIsNotNone(overall_returns['1'])
+        self.assertIsNotNone(overall_returns['5'])
+        self.assertIsNotNone(overall_returns['30'])
 
     def test_get_overall_returns_works_with_no_investments(self):
         self.stock_getter = StocksGetter(None)

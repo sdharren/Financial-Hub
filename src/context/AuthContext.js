@@ -68,7 +68,6 @@ export const AuthProvider = ({ children }) => {
     // update function that will get called by useEffect to refresh the 
     // authentication token
     let updateToken = async () => {
-        console.log("update token called")
         let response = await fetch('api/token/refresh/', {
             method : 'POST',
             headers : {
