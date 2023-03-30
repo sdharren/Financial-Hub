@@ -3,8 +3,6 @@ from assetManager.API_wrappers.crypto_wrapper import *
 from assetManager.models import User, AccountType
 from django.db import IntegrityError, transaction
 import re
-from assetManager.tests.API_wrappers.etheureum import eth
-from assetManager.tests.API_wrappers.bitcoin import bitcoin
 
 
 class CryptoWraperTestCase(TestCase):
@@ -19,7 +17,7 @@ class CryptoWraperTestCase(TestCase):
         self.user = User.objects.get(email='johndoe@example.org')
         self.btc_address = '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo'
         self.eth_address = '0x6090a6e47849629b7245dfa1ca21d94cd15878ef'
-    
+
     def test_save_wallet_address_works_with_eth(self):
         count_before = AccountType.objects.all().count()
         save_wallet_address(self.user, self.eth_address)
