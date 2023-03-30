@@ -25,7 +25,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
 
         self.assertEqual(before_user_count + 1, after_user_count)
-        self.assertEqual(before_account_types_count + 8, after_account_types_count)
+        self.assertEqual(before_account_types_count + 7, after_account_types_count)
 
         user_john = User.objects.get(email = 'johnnydoe@example.org')
 
@@ -40,7 +40,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
 
         for crypto in crypto_assets:
-            self.assertTrue(crypto.access_token == "bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v" or crypto.access_token == "0x9696f59e4d72e237be84ffd425dcad154bf96976" or crypto.access_token == "1FSTG2YrasjVdiaNqYK4p3TCHyT4G7fXYU")
+            self.assertTrue(crypto.access_token == "1AV4KGCsvtPZ9tG7hvwgb85wJyFd9xdpFv" or crypto.access_token == "0x6B17141D06d70B50AA4e8C263C0B4BA598c4b8a0")
             self.assertTrue(crypto.account_institution_name == "btc" or crypto.account_institution_name == "eth")
 
     def test_seed_command(self):
@@ -62,7 +62,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_user_count = User.objects.count()
 
         self.assertEqual(before_user_count + 1, after_user_count)
-        self.assertEqual(before_account_types_count + 8, after_account_types_count)
+        self.assertEqual(before_account_types_count + 7, after_account_types_count)
 
         user_john = User.objects.get(email = 'johnnydoe@example.org')
 
@@ -77,7 +77,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
 
         for crypto in crypto_assets:
-            self.assertTrue(crypto.access_token == "bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v" or crypto.access_token == "0x9696f59e4d72e237be84ffd425dcad154bf96976" or crypto.access_token == "1FSTG2YrasjVdiaNqYK4p3TCHyT4G7fXYU")
+            self.assertTrue(crypto.access_token == "1AV4KGCsvtPZ9tG7hvwgb85wJyFd9xdpFv" or crypto.access_token == "0x6B17141D06d70B50AA4e8C263C0B4BA598c4b8a0")
             self.assertTrue(crypto.account_institution_name == "btc" or crypto.account_institution_name == "eth")
 
     def test_unseed_command(self):
@@ -88,7 +88,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
         after_account_types_count = AccountType.objects.count()
         after_user_count = User.objects.count()
         self.assertEqual(after_user_count, before_user_count - 1)
-        self.assertEqual(after_account_types_count, before_account_types_count - 8)
+        self.assertEqual(after_account_types_count, before_account_types_count - 7)
 
         accounttypes = AccountType.objects.all()
         users = User.objects.all()
