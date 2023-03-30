@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import usePlaid from '../custom_hooks/usePlaid';
 import useHandleError from "../custom_hooks/useHandleError";
@@ -30,37 +30,7 @@ const CAdditional = () => {
         },
       };
     
-      const categories = ['Wallet', 'Balance', 'Number of Transactions', 'Total Received', 'Total Sent'];
-
-    // return (
-    //   <div className='overflow-hidden rounded border-gray-200'>
-    //   <table className="transaction-table w-full h-[60vh] bg-transparent">
-    //   <thead className='bg-gray-800 flex-[0_0_auto] text-white'>
-    //     <tr>
-    //       <th>Wallet</th>
-    //       <th>Balance</th>
-    //       <th>Number of Transactions</th>
-    //       <th>Total Received</th>
-    //       <th>Total Sent</th>
-    //       <th className="pr-2">Coin Type</th>
-    //     </tr>
-    //   </thead>
-    //   <tbody className='text-violet-300 overflow-y-scroll'>
-    //     {Object.keys(AdditionalData).map((wallet, index) => (
-          
-    //       <tr key={index}>
-    //         <td className="text-center">{wallet}</td>
-    //         <td className="text-center">{AdditionalData[wallet][1] == "btc" ? "£" + (AdditionalData[wallet][0].final_balance/1e8).toLocaleString() : "£" + (AdditionalData[wallet][0].final_balance/1e18).toLocaleString()}</td>
-    //         <td className="text-center">{AdditionalData[wallet][0].n_tx}</td>
-    //         <td className="text-center">{AdditionalData[wallet][1] == "btc" ? (AdditionalData[wallet][0].total_received/1e8).toLocaleString() : (AdditionalData[wallet][0].total_received/1e18).toLocaleString()}</td>
-    //         <td className="text-center">{AdditionalData[wallet][1] == "btc" ? (AdditionalData[wallet][0].total_sent/1e8).toLocaleString() : (AdditionalData[wallet][0].total_sent/1e18).toLocaleString()}</td>
-    //         <td className="text-center">{AdditionalData[wallet][1]}</td>
-    //       </tr>
-    //     ))}
-    //   </tbody>
-    // </table>
-    // </div>
-    // );
+      const categories = ['Wallet', 'Balance', 'Number of Transactions', 'Total Received', 'Total Sent', 'Type'];
 
     return (
       <div styles={styles.container}>
@@ -70,7 +40,7 @@ const CAdditional = () => {
         ) : (
         <TableContainer styles={styles.container} style = {{ maxHeight: '57vh'}}>
         <Typography variant="h6" style={styles.title}>
-          Recent Transactions
+          Wallet Data
         </Typography>
         <Table>
         <TableHead>
@@ -86,9 +56,9 @@ const CAdditional = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {Object.entries(data).map((wallet, index) => (
+          {Object.keys(data).map((wallet, index) => (
               <TableRow key={`${wallet}-${index}`}>
-                <TableCell style={{color: 'white'}}>{wallet}</TableCell>
+                <TableCell style={{color: 'white'}}>{wallet.slice(0,10) + '...'}</TableCell>
                 <TableCell style={{color: 'white'}}>{data[wallet][1] == "btc" ? "£" + (data[wallet][0].final_balance/1e8).toLocaleString() : "£" + (data[wallet][0].final_balance/1e18).toLocaleString()}</TableCell>
                 <TableCell style={{color: 'white'}}>{data[wallet][0].n_tx}</TableCell>
                 <TableCell style={{color: 'white'}}>{data[wallet][1] == "btc" ? (data[wallet][0].total_received/1e8).toLocaleString() : (data[wallet][0].total_received/1e18).toLocaleString()}</TableCell>

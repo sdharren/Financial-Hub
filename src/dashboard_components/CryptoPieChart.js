@@ -10,6 +10,7 @@ import {
 } from 'chart.js'
 
 import { Pie } from 'react-chartjs-2';
+import useHandleError from '../custom_hooks/useHandleError';
 
 
 ChartJS.register(
@@ -22,6 +23,7 @@ function CPie({updateGraph}) {
     const endpoint = "crypto_select_data";
     const endpoint_parameter = "balance";
     const [pieChartData, error] = usePlaid({endpoint, endpoint_parameter});
+    useHandleError(error);
 
     // if a user selects a different option from select dropdown - tell parent to update this graph
     let handleSelectionUpdate = async(nextParam) => {
@@ -34,7 +36,7 @@ function CPie({updateGraph}) {
     let pie_data = new Array();
     let pie_labels = new Array();
     for (let key in pieChartData) {
-        let pieLabel = key + ' - ' + pieChartData[key][1]; 
+        let pieLabel = key.slice(0,10) + "..." + ' - ' + pieChartData[key][1]; 
         pie_labels.push(pieLabel);
         var currVal = pieChartData[key][0];
         pie_data.push(currVal);

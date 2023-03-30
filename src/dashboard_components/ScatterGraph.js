@@ -7,7 +7,6 @@ const CScatter = () => {
   const endpoint = "crypto_select_data";
   const endpoint_parameter = "txs";
   const [walletData, error] = usePlaid({endpoint, endpoint_parameter})
-
   useHandleError(error);
 
   const options = {
@@ -41,6 +40,9 @@ const CScatter = () => {
         }
       },
       labels: {
+        formatter: function (value) {
+          return value.toFixed(2);
+      },
         style: {
           colors: '#fff'
         }
