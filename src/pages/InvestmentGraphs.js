@@ -260,17 +260,17 @@ function InvestmentGraphs() {
 
     return (
         <div className="investment-graphs flex flex-row min-h-[70vh] max-h-[70vh]">
-            <div data-testid='graph-names' className="tab graph-names flex flex-col mr-2 w-40">
-                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (overviewActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_categories')}>
+            <div data-testid='graph-names' className="tab graph-names flex flex-col mr-2 w-40 justify-start">
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center border-b-2" + (overviewActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
                 </button>
-                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (categoryActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center border-b-2" + (categoryActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
                     Category
                     </button>
-                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center border-b-2" + (stocksActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('stock_history')}>
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center border-b-2" + (stocksActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('stock_history')}>
                     Stock Breakdown
                 </button>
-                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center" + (comparisonActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('portfolio_comparison')}>
+                <button className={"tablinks text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center" + (comparisonActive ? " active bg-gradient-to-l from-violet-500 to-transparent" : "") } onClick={() => handleTabClick('portfolio_comparison')}>
                     Portfolio Comparison
                 </button>
             </div>

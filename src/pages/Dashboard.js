@@ -178,12 +178,12 @@ function Dashboard() {
             </div>
             {activeTabPie === 'Stocks' ? <InvestmentGraphs /> : 
             (<div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
-                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40'>
+                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40 justify-start'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
                         hidden={stocksActive}
                         key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
+                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
                         onClick={() => handlePieGraphClick(graph.name)}
                       >
                         {graph.name}
