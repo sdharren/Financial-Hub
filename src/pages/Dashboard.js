@@ -6,7 +6,7 @@ import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
-
+import { backgroundBox } from '../static/styling'
 
 const tabGraphData = {
   Overall: [
@@ -36,6 +36,7 @@ const tabGraphData = {
 
 
 function Dashboard() {
+  console.log(backgroundBox)
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
 
@@ -127,7 +128,7 @@ function Dashboard() {
                       </div>
                     ))}
                 </div>
-                <div className='graph ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-10'>
+                <div className={'graph ml-2 w-full p-10 ' + backgroundBox}>
                     {tabGraphData[activeTabPie].map((graph) => (
                       activeGraphPie === graph.name && <div key={graph.name} className=''>{graph.content}</div>
                     ))}

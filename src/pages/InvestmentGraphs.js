@@ -4,6 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import AuthContext from '../context/AuthContext';
 import ReturnDisplay from "../components/ReturnDisplay";
 import LineIndexComparisonChart from "../dashboard_components/LineIndexComparisonChart";
+import { backgroundBox } from "../static/styling";
 
 function InvestmentGraphs() {
     // first graph to display - investments overview
@@ -24,7 +25,7 @@ function InvestmentGraphs() {
     const [lastCategory, setLastCategory] = useState(null);
     const [lastStock, setLastStock] = useState(null);
 
-    const tabStyling = "text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center border-b-2"
+    const tabStyling = "text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center"
     const highlightedTabStyling = " active bg-gradient-to-l from-violet-500 to-transparent"
 
     // FOR DEVELOPMENT PURPOSES (use this if investments aren't linked - put onLoad={link_sandbox()} in the top div at the very bottom)
@@ -264,13 +265,13 @@ function InvestmentGraphs() {
     return (
         <div className="investment-graphs flex flex-row min-h-[70vh] max-h-[70vh]">
             <div data-testid='graph-names' className="tab graph-names flex flex-col mr-2 w-40 justify-start">
-                <button className={tabStyling + (overviewActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_categories')}>
+                <button className={'border-b-2 ' + tabStyling + (overviewActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_categories')}>
                     Overview
                 </button>
-                <button className={tabStyling + (categoryActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
+                <button className={'border-b-2 ' + tabStyling + (categoryActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('investment_category_breakdown')}>
                     Category
                     </button>
-                <button className={tabStyling + (stocksActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('stock_history')}>
+                <button className={'border-b-2 ' + tabStyling + (stocksActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('stock_history')}>
                     Stock Breakdown
                 </button>
                 <button className={tabStyling + (comparisonActive ? highlightedTabStyling : "") } onClick={() => handleTabClick('portfolio_comparison')}>
@@ -278,7 +279,7 @@ function InvestmentGraphs() {
                 </button>
             </div>
 
-            <div className="tabcontent ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-4">
+            <div className={"tabcontent ml-2 w-full p-4 " + backgroundBox}>
                 {graph}
             </div>
         </div>

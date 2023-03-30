@@ -4,6 +4,7 @@ import { signupFields } from '../components/formFields';
 import Input from '../components/input'
 import FormAction from '../components/formAction';
 import Header from '../components/header';
+import { backgroundBox } from '../static/styling';
 import '../static/errors.css';
 
 // need to add confirmation that passwords match
@@ -80,7 +81,7 @@ const Signup = ({submit}) => {
     )
     
     let form2 = (
-        <div className="signup-container my-10 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
+        <div className={"signup-container my-10 mx-20 p-10 " + backgroundBox}>
             <Header 
                 heading = "Register your account"
                 paragraph = "Already have an account? "
