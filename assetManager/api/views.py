@@ -304,9 +304,8 @@ def cache_assets(request):
         else:
             wrapper = SandboxWrapper()
 
-        if not cache_investments(user): #try to cache investments
-            return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
-
+        cache_investments(user)
+        
         #caching of bank related investements
         #Balances ##SERGY THESE ARE THE ONES TO MOVE
         account_balances = get_institutions_balances(wrapper,request.user)

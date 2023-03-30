@@ -17,12 +17,13 @@ export const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate()
 
-    async function cache_assets(method) {
+    async function cache_assets(method, tokens) {
+        console.log("cache with " + method);
         await fetch('api/cache_assets/', {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization':'Bearer ' + String(authTokens.access)
+                    'Authorization':'Bearer ' + String(tokens.access)
                 }
         });
     }
@@ -42,9 +43,8 @@ export const AuthProvider = ({ children }) => {
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
 
-            await cache_assets('PUT');
-
-            navigate('/dashboard')
+            await cache_assets('PUT', data)
+            .then(navigate('/dashboard'));
         }
         else {
             alert(data["detail"])
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     let logoutUser = () => {
-        cache_assets('DELETE');
+        cache_assets('DELETE', authTokens);
 
         setAuthTokens(null)
         setUser(null)
