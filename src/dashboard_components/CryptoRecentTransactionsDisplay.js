@@ -1,39 +1,41 @@
 import React from 'react';
-import '../../table.css';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useContext } from 'react';
-import AuthContext from '../../context/AuthContext';
+import AuthContext from '../context/AuthContext';
+import usePlaid from '../custom_hooks/usePlaid';
+import useHandleError from '../custom_hooks/useHandleError';
 
 
 const CRecentTransactionsDisplay = () => {
-  const [transactions, setTransactions] = useState([]);
-  let {authTokens, logoutUser} = useContext(AuthContext);
+
+  const [transactions, error] = usePlaid();
+  useHandleError(error);
 
 
-  let getTransactions = async () => {
-    let transactionURL = 'http://127.0.0.1:8000/api/crypto_select_data/?param=txs';
-    let response = await fetch(transactionURL, {
-      method: 'GET',
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-    });
-    let data = await response.json();
-    if (response.status === 200) {
-        setTransactions(data);
-    }
-    else {
-      console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);
-    }
+  // let getTransactions = async () => {
+  //   let transactionURL = 'http://127.0.0.1:8000/api/crypto_select_data/?param=txs';
+  //   let response = await fetch(transactionURL, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type':'application/json',
+  //       'Authorization':'Bearer ' + String(authTokens.access)
+  //     },
+  //   });
+  //   let data = await response.json();
+  //   if (response.status === 200) {
+  //       setTransactions(data);
+  //   }
+  //   else {
+  //     console.error(`Failed to fetch recent transactions: ${response.status} ${response.statusText}`);
+  //   }
 
-    }
+  //   }
 
 
-  useEffect(() => {
-    getTransactions();
-  }, []);
+  // useEffect(() => {
+  //   getTransactions();
+  // }, []);
 
   return (
     <div className='overflow-hidden rounded border-gray-200'>

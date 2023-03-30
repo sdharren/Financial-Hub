@@ -11,10 +11,10 @@ import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
-import CPie from './CryptoGraphs/PieChart';
-import CScatter from './CryptoGraphs/ScatterGraph';
-import CRecentTransactionsDisplay from './CryptoGraphs/RecentTransactionsDisplay';
-import CAdditional from './CryptoGraphs/AdditionalData'
+import CPie from '../dashboard_components/CryptoPieChart';
+import CScatter from '../dashboard_components/ScatterGraph';
+import CRecentTransactionsDisplay from '../dashboard_components/CryptoRecentTransactionsDisplay';
+import CAdditional from '../dashboard_components/AdditionalData';
 import { backgroundBox, dashboardGraphContainer } from '../static/styling';
 
 
