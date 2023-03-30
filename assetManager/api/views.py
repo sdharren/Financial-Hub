@@ -81,6 +81,21 @@ class SignupView(APIView):
         serializer.save()
         return Response(serializer.data)
 
+"""
+@params:
+request: An HTTP request object.
+
+@description:
+This function is a view function that returns a list of investment categories for the authenticated user. It first retrieves
+a stock_getter object, which is responsible for retrieving the user's investment data, using the retrieve_stock_getter()
+method. If the user's investments are not linked, an error message is returned. Otherwise, the get_investment_categories()
+method of the stock_getter object is called to retrieve the list of investment categories, which is returned in the
+HTTP response.
+
+@return:
+An HTTP response containing a list of investment categories for the authenticated user, or an error message if the user's
+investments are not linked.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_categories(request):
@@ -91,6 +106,16 @@ def investment_categories(request):
     categories = stock_getter.get_investment_categories()
     return Response(categories, content_type='application/json', status=200)
 
+"""
+@params:
+request: Django request object
+
+@description:
+This API view method is used to retrieve investment category breakdown for the authenticated user. The category is passed in as a request parameter.
+
+@return:
+A Django Response object containing the investment category breakdown data for the specified category.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_category_breakdown(request):
@@ -105,6 +130,15 @@ def investment_category_breakdown(request):
     data = stock_getter.get_investment_category(category)
     return Response(data, content_type='application/json', status=200)
 
+"""
+@params:
+    request: Django request object
+@description:
+    This API view returns a list of all available investment categories.
+@returns:
+    Returns a JSON object with the list of categories under the 'categories' key and a status code of 200.
+    If the user's investments are not linked, returns an error JSON object with the 'error' key and a status code of 303.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def investment_category_names(request):
@@ -113,10 +147,17 @@ def investment_category_names(request):
     except InvestmentsNotLinked:
         return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     categories = stock_getter.get_categories()
-    # TODO: handle no categories
     data = {'categories': categories}
     return Response(data, content_type='application/json', status=200)
 
+"""
+@params:
+    request: the HTTP request object containing the user session information
+@description:
+    Given an authenticated user session, retrieves the stock history data for a particular stock by name and returns it in JSON format.
+@returns:
+    A Response object containing the stock history data in JSON format, or an error message if there was an issue with the request.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def stock_history(request):
@@ -132,6 +173,14 @@ def stock_history(request):
     data = stock_getter.get_stock_history(stock_ticker)
     return Response(data, content_type='application/json', status=200)
 
+"""
+@params:
+    request (HttpRequest): The request object containing information about the current request.
+@description:
+    View function that handles GET requests for comparing the user's portfolio with a given stock ticker over a given period.
+@returns:
+    A JSON response containing the portfolio comparison data and an HTTP status code.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def portfolio_comparison(request):
@@ -149,6 +198,14 @@ def portfolio_comparison(request):
 
     return Response(comparison, content_type='application/json', status=200)
 
+"""
+@params:
+    request: HttpRequest object
+@description:
+    This view returns a list of all supported investments (e.g. stocks, mutual funds) that can be queried in the API.
+@returns:
+    Returns a JSON response containing a list of supported investments.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def supported_investments(request):
@@ -157,10 +214,17 @@ def supported_investments(request):
     except InvestmentsNotLinked:
         return Response({'error': 'Investments not linked.'}, content_type='application/json', status=303)
     stocks = stock_getter.get_supported_investments()
-    #TODO: handle no stocks
     data = {'investments': stocks}
     return Response(data, content_type='application/json', status=200)
 
+"""
+@params:
+    request: HttpRequest object
+@description:
+    Returns the returns data for a given stock investment.
+@returns:
+    A Response object containing the returns data in JSON format.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def returns(request):
@@ -176,6 +240,14 @@ def returns(request):
     returns = stock_getter.get_returns(stock_name)
     return Response(returns, status=200, content_type='application/json')
 
+"""
+@params:
+    request: HttpRequest object representing the incoming request
+@description:
+    This method fetches the returns of a specified investment category from the stock getter for a user.
+@returns:
+    Returns a HTTP Response object with the investment category returns in JSON format with a success status code of 200. If the investments are not linked for the user, returns a HTTP Response object with an error message in JSON format with a status code of 303. If the parameter is not specified in the request, returns a HTTP Response object with an error message in JSON format with a status code of 400.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def category_returns(request):
@@ -191,6 +263,14 @@ def category_returns(request):
     returns = stock_getter.get_category_returns(category)
     return Response(returns, status=200, content_type='application/json')
 
+"""
+@params:
+    request: Request object
+@description:
+    Retrieves the overall returns of all investments of the user.
+@returns:
+    Returns a Response object with the returns data in JSON format, with a 200 status code if successful, or an error message with a 303 status code if the user's investments are not linked.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def overall_returns(request):
@@ -202,6 +282,14 @@ def overall_returns(request):
     returns = stock_getter.get_overall_returns()
     return Response(returns, status=200, content_type='application/json')
 
+"""
+@params:
+    request: The HTTP request object
+@description:
+    Links an investment account by creating a link token for the user's desired product and storing it in the cache for a day.
+@returns:
+    A JSON response containing a link token.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def link_token(request):
@@ -221,7 +309,14 @@ def link_token(request):
     response_data = {'link_token': link_token}
     return Response(response_data, content_type='application/json', status=200)
 
-
+"""
+@params:
+    request: HTTP request object
+@description:
+    Link a cryptocurrency wallet to a user account.
+@returns:
+    HTTP Response object with status code 200.
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def link_crypto_wallet(request):
@@ -244,7 +339,16 @@ def all_crypto_wallets(request):
 
     return Response(allWallets, content_type='application/json', status=200)
 
+"""
+@params:
+    request: request object
 
+@description:
+    This method is responsible for exchanging a public token obtained from Plaid with an access token. It saves the access token and the selected products to the database. If 'transactions' are among the selected products, this method calls two other methods - set_single_institution_balances_and_currency and set_single_institution_transactions, to cache the balances and transactions for the user's accounts. If 'investments' is among the selected products, this method calls the cache_investments function.
+
+@returns:
+    A Response object with status 200 if the public token is exchanged successfully. Otherwise, it returns a Response object with an error message and status code indicating the cause of the failure.
+"""
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exchange_public_token(request):
