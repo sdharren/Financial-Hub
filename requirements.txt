@@ -49,5 +49,3 @@ gunicorn==20.1.0
 #crypto
 bitcoin==1.1.39
 blockcypher==1.0.93
-bitcoin==1.1.39
-blockcypher==1.0.93

@@ -92,6 +92,7 @@ function BarGraph({endpoint, endpoint_parameter, loadNext}) {
       data = {data ? data : {}}
       options = {options ? options : {}}
       onClick = {onClick}
+      width = '400vw'
       ref = {chartRef}></Bar>
     </div>
   );

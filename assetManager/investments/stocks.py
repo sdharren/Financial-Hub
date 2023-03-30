@@ -11,6 +11,7 @@ from assetManager.API_wrappers.yfinance_wrapper import YFinanceWrapper, TickerNo
 from operator import attrgetter
 from assetManager.transactionInsight.bank_graph_data import create_forex_rates
 
+
 class TransactionsNotDefined(Exception):
     pass
 
@@ -22,12 +23,26 @@ class InvestmentsNotLinked(Exception):
 
 class StocksGetter():
     def __init__(self, concrete_wrapper):
-        self.wrapper = concrete_wrapper
-        self.investments = []
-        self.transactions = []
-        self.yfinance_wrapper = YFinanceWrapper()
+        self.wrapper = concrete_wrapper # used to query plaid
+        self.investments = [] # holds user's investments
+        self.transactions = [] # holds user's transactions
+        self.yfinance_wrapper = YFinanceWrapper() # used to get stock info
 
-    # Sends API calls to plaid requesting investment info for each access token associated with user
+    """
+        @params:
+            user (assetManager.models.User): The ID of the user whose investments will be queried.
+
+        @description:
+            Queries investments for a given user using the Plaid API. This method retrieves the access tokens
+            for the user and then uses each token to make a request to retrieve the user's investment holdings.
+            The responses are appended to a list and then passed to another method for formatting.
+
+        @return:
+            None.
+
+        @raises:
+            InvestmentsNotLinked: If the user has not linked their investment accounts, and therefore no access tokens can be retrieved.
+    """
     def query_investments(self, user):
         unformatted_investments = []
         try:
@@ -40,8 +55,21 @@ class StocksGetter():
             unformatted_investments.append(response)
         self.format_investments(unformatted_investments)
 
+    """
+    @params:
+        user (str): The ID of the user whose transactions will be queried.
+        start_date (str): The start date of the date range for which transactions will be queried. Must be in YYYY-MM-DD format.
+        end_date (str): The end date of the date range for which transactions will be queried. Must be in YYYY-MM-DD format.
+
+    @description:
+        Queries transactions for a given user within a specified date range using the Plaid API. This method retrieves the access tokens
+        for the user and then uses each token to make a request to retrieve the user's investment transactions. The responses are then
+        passed to another method for formatting.
+
+    @return:
+        None.
+    """
     def query_transactions(self, user, start_date, end_date):
-        #TODO: error handling for no access tokens
         access_tokens = self.wrapper.retrieve_access_tokens(user, 'investments')
         for token in access_tokens:
             request = InvestmentsTransactionsGetRequest(
@@ -52,6 +80,18 @@ class StocksGetter():
             response = self.wrapper.client.investments_transactions_get(request)
             self.format_transactions(response)
 
+    """
+    @params:
+        unformatted_transactions (dict): A dictionary containing the unformatted transaction data returned from the Plaid API.
+
+    @description:
+        Formats and saves in self.transactions unformatted investment transactions returned from the Plaid API. This method loops through each transaction and
+        extracts the ticker symbol for the security involved in each 'buy' transaction. It then creates a new Transaction object
+        with the formatted data and appends it to a list of formatted transactions.
+
+    @return:
+        None.
+    """
     def format_transactions(self, unformatted_transactions):
         for transaction in unformatted_transactions['investment_transactions']:
             if str(transaction['type']) == 'buy':
@@ -61,6 +101,19 @@ class StocksGetter():
                         break
                 self.transactions.append(Transaction(transaction, ticker))
 
+    """
+    @params:
+        unformatted_investments (list): A list containing unformatted investment data returned from the Plaid API.
+
+    @description:
+        Formats unformatted investment data returned from the Plaid API. This method loops through each investment holding and
+        retrieves the security information for each holding. If the holding is not in USD, the institution value is converted to
+        USD using the latest forex rates. The method then creates a new Investment object with the formatted data and appends it
+        to a list of formatted investments.
+
+    @return:
+        None.
+    """
     def format_investments(self, unformatted_investments):
         rates = create_forex_rates(date.today(), base='USD')
         for current_investment in unformatted_investments:
@@ -73,7 +126,7 @@ class StocksGetter():
                         self.investments.append(self.set_investment_returns(Investment(holding, security)))
                         break
 
-    #Returns total investment sum within the account
+    # Returns total sum of all investements the user holds
     def get_total_investment_sum(self):
         total = 0
         for investment in self.investments:
@@ -120,9 +173,21 @@ class StocksGetter():
                     continue
         return returns
 
-    # Returns a dictionary - {ticker: total diff} where total diff is current total value - original total value
-    # Stocks with the same ticker share a return sum e.g. 2 shares AAPL @ $20 and 3 shares AAPL @ $10
-    # with current price $40 will have a shared return of $140
+    """
+    @params:
+        None.
+
+    @description:
+        Calculates the return on the user's current holdings. This method loops through each Investment object in the list of
+        investments and checks if it has a ticker symbol. If it does, the most recent stock price is retrieved for that ticker
+        symbol using the yfinance API. The method then calculates the difference between the current value of the holding and the
+        total price paid for the holding, and adds this difference to a running total for each ticker symbol. The method returns
+        a dictionary containing the returns for each ticker symbol.
+
+    @return:
+        A dictionary containing the returns for each ticker symbol.
+
+    """
     def get_return_on_current_holdings(self):
         if not bool(self.investments):
             raise InvestmentsNotDefined()
@@ -185,6 +250,21 @@ class StocksGetter():
     def get_index_history(self, ticker, period="6mo"):
         return self.yfinance_wrapper.getIndexValues(ticker, period)
 
+    """
+    @params:
+        ticker: A string representing the ticker symbol of the index to compare the portfolio against.
+        period: An integer representing the number of months of data to retrieve. Default is 6.
+
+    @description:
+        Compares the user's portfolio to the given stock market index. This method retrieves historical price data for both the
+        user's portfolio and the given index using the yfinance API, and compares the value of the user's portfolio to the
+        performance of the index over the specified period of time. The method returns a dictionary containing the value of the
+        user's portfolio and the value of the index for each date during the specified period.
+
+    @return:
+        A dictionary containing the value of the user's portfolio and the value of the given index for each date during the
+        specified period.
+    """
     def get_portfolio_comparison(self, ticker, period=6):
         index_history = self.get_index_history(ticker, str(period) + 'mo')
         portfolio_history = self.get_portfolio_history(period)
@@ -204,13 +284,15 @@ class StocksGetter():
                 }
         return comparison
     
+    # Returns user's investments that are supported by YFinance
     def get_supported_investments(self):
         stocks = set()
         for investment in self.investments:
-            if investment.get_ticker() and self.is_ticker_supported(investment.get_ticker()) is not None:
+            if investment.get_ticker() is not None and self.is_ticker_supported(investment.get_ticker()):
                 stocks.add(investment.get_name())
         return stocks
 
+    # Returns user's investment categories
     def get_categories(self):
         categories = set()
         for investment in self.investments:
@@ -220,6 +302,17 @@ class StocksGetter():
     def is_ticker_supported(self, ticker):
         return self.yfinance_wrapper.is_ticker_supported(ticker)
 
+    """
+    @params:
+        investment: An Investment object representing the investment to calculate returns for.
+    @description:
+        Calculates the returns for a given investment by retrieving the price history of the investment's ticker over the past day
+        using the yfinance API. The returns are calculated as the percentage difference between the investment's current price
+        and the price on the previous day, 5 days ago, and 30 days ago. The returns are stored in a dictionary and added to the
+        Investment object.
+    @return:
+        The Investment object with the returns dictionary added.
+    """
     def set_investment_returns(self, investment):
         ticker = investment.get_ticker()
         returns = {}
@@ -247,11 +340,17 @@ class StocksGetter():
     # Gets percentage returns of a given stock category for 1, 5 and 30 days
     def get_category_returns(self, category):
         returns = defaultdict(float)
+        total = 0.0
         for investment in self.investments:
             if investment.get_category() == category and investment.get_returns() != {}:
-                returns['1'] += investment.get_returns()['1']
-                returns['5'] += investment.get_returns()['5']
-                returns['30'] += investment.get_returns()['30']
+                total += investment.get_total_price()
+    
+        for investment in self.investments:
+            if investment.get_category() == category and investment.get_returns() != {}:
+                weight = investment.get_total_price() / total
+                returns['1'] += investment.get_returns()['1'] * weight
+                returns['5'] += investment.get_returns()['5'] * weight
+                returns['30'] += investment.get_returns()['30'] * weight
         if len(returns) > 0:
             returns['1'] = round(returns['1'], 1)
             returns['5'] = round(returns['5'], 1)
@@ -261,11 +360,17 @@ class StocksGetter():
     # Gets percentage returns of the whole portfolio for 1, 5 and 30 days
     def get_overall_returns(self):
         returns = defaultdict(float)
+        total = 0.0
         for investment in self.investments:
             if investment.get_returns() != {}:
-                returns['1'] += investment.get_returns()['1']
-                returns['5'] += investment.get_returns()['5']
-                returns['30'] += investment.get_returns()['30']
+                total += investment.get_total_price()
+
+        for investment in self.investments:
+            if investment.get_returns() != {}:
+                weight = investment.get_total_price() / total
+                returns['1'] += investment.get_returns()['1'] * weight
+                returns['5'] += investment.get_returns()['5'] * weight
+                returns['30'] += investment.get_returns()['30'] * weight
         if len(returns) > 0:
             returns['1'] = round(returns['1'], 1)
             returns['5'] = round(returns['5'], 1)

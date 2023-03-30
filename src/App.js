@@ -12,6 +12,8 @@ import PrivateRoutes from './utils/PrivateRoute';
 import OnlyPublicRoutes from './utils/OnlyPublicRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
+import RecentTransactions from './dashboard_components/RecentTransactionsDisplay';
+import SectorSpending from './pages/SectorSpendingDisplay';
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 import CryptoWalletAddresses from './pages/CryptoWalletAddresses';

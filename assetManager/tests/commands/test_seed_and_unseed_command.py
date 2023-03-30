@@ -1,9 +1,12 @@
 from django.core.management import call_command
 from django.test import TestCase
 from assetManager.models import User,AccountType,AccountTypeEnum
+from django.conf import settings
 
 """Tests for the seed and unseed commands for SANDBOX LOCAL ENVIRONMENT"""
 class SeedAndUnseedCommandTestCase(TestCase):
+    def setUp(self):
+        settings.PLAID_DEVELOPMENT = False
 
     def test_seed_command_twice(self):
         accounttypes = AccountType.objects.all()
@@ -40,7 +43,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
 
         for crypto in crypto_assets:
-            self.assertTrue(crypto.access_token == "bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v" or crypto.access_token == "0x9696f59e4d72e237be84ffd425dcad154bf96976")
+            self.assertTrue(crypto.access_token == "1AV4KGCsvtPZ9tG7hvwgb85wJyFd9xdpFv" or crypto.access_token == "0x6B17141D06d70B50AA4e8C263C0B4BA598c4b8a0")
             self.assertTrue(crypto.account_institution_name == "btc" or crypto.account_institution_name == "eth")
 
     def test_seed_command(self):
@@ -77,7 +80,7 @@ class SeedAndUnseedCommandTestCase(TestCase):
             self.assertTrue(investment.account_institution_name == 'Vanguard' or investment.account_institution_name == 'Fidelity')
 
         for crypto in crypto_assets:
-            self.assertTrue(crypto.access_token == "bc1qcw8ge4yr2xummxeey25y02g3v0nl4cdyhd095v" or crypto.access_token == "0x9696f59e4d72e237be84ffd425dcad154bf96976")
+            self.assertTrue(crypto.access_token == "1AV4KGCsvtPZ9tG7hvwgb85wJyFd9xdpFv" or crypto.access_token == "0x6B17141D06d70B50AA4e8C263C0B4BA598c4b8a0")
             self.assertTrue(crypto.account_institution_name == "btc" or crypto.account_institution_name == "eth")
 
     def test_unseed_command(self):

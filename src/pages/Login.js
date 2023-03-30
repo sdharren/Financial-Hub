@@ -1,13 +1,15 @@
+/**
+ * Creates the login component for logging in users. Uses AuthContext(loginUser)
+ * to authenticate users.
+ */
 import React, {useContext} from 'react';
 import AuthContext from '../context/AuthContext';
 import Header from '../components/header';
 import { loginFields } from '../components/formFields';
 import Input from '../components/input';
 import FormAction from '../components/formAction';
-import FormExtra from '../components/formExtra';
+import { backgroundBox } from '../static/styling';
 import '../static/errors.css';
-
-// add remember me functionality
 
 const fields = loginFields;
 let fieldState = {};
@@ -18,7 +20,7 @@ const Login = ({submit}) => {
   let {loginUser, error} = useContext(AuthContext);
 
   let form2 = (
-    <div className="login-container mt-20 mb-20 mx-20 p-10 rounded-3xl shadow-lg bg-gradient-to-r from-violet-500 to-violet-600">
+    <div className={"login-container mt-20 mb-20 mx-20 p-10 " + backgroundBox}>
         <Header
             heading = "Login to your account"
             paragraph= "Don't have an account yet? "
@@ -46,7 +48,7 @@ const Login = ({submit}) => {
                     )  
                 }
             </div>
-            <FormAction handleSubmit={loginUser} text = "Login" />
+            <FormAction data-testid='login-form'handleSubmit={loginUser} text = "Login" />
         </form>
        </div>
   )

@@ -12,6 +12,7 @@ from django.conf import settings
 from assetManager.API_wrappers.sandbox_wrapper import SandboxWrapper
 from assetManager.models import AccountTypeEnum,AccountType
 from assetManager.assets.debit_card import DebitCard
+from django.core.cache import cache
 
 class GetLinkedCryptoViewsTestCase(TestCase):
     """Tests of the log in view."""
@@ -28,6 +29,9 @@ class GetLinkedCryptoViewsTestCase(TestCase):
         response = self.client.post('/api/token/', {'email': self.user.email, 'password': 'Password123'}, format='json')
         jwt = str(response.data['access'])
         self.client.credentials(HTTP_AUTHORIZATION='Bearer '+ jwt)
+
+    def tearDown(self):
+        cache.clear()
 
     def test_link_banks_transactions_url(self):
         self.assertEqual(self.url,'/api/linked_crypto/')

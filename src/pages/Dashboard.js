@@ -1,3 +1,8 @@
+/**
+ * Creates the main dashboard component. Dashboard contains the category tabs
+ * and renders the graph names and the graphs for each category of Overall, 
+ * Stocks, Banks and Crypto
+ */
 import React, { useState } from 'react';
 import InvestmentGraphs from './InvestmentGraphs';
 import BalancesDisplay from './BalancesDisplay';
@@ -6,33 +11,11 @@ import CurrencyDisplay from './CurrencyDisplay';
 import BarChart from './TransactionDisplay';
 import BarChartDisplay from './SectorSpendingDisplay';
 import TotalAssetsDisplay from './TotalAssets';
-
-
-const tabGraphData = {
-  Overall: [
-    { name: 'Graph 1', content: `Content for Graph 1 in Overall tab goes here.` },
-    { name: 'Graph 2', content: `Content for Graph 2 in Overall tab goes here.` },
-    { name: 'Graph 3', content: `Content for Graph 3 in Overall tab goes here.` },
-    { name: 'Graph 4', content: `Content for Graph 4 in Overall tab goes here.` },
-  ],
-  Banks: [
-    { name: 'Balance', content: <BalancesDisplay /> },
-    { name: 'Recent Transactions', content: <RecentTransactions /> },
-    { name: 'Currency', content: <CurrencyDisplay /> },
-    { name: 'Bar Chart', content: <BarChart /> },
-    { name: 'Sector Spending', content: <BarChartDisplay /> }
-  ],
-  Stocks: [
-    { name: 'Graph 1', content: <InvestmentGraphs/>}
-  ],
-  
-  Crypto: [
-    { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-    { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-    { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
-  ],
-};
-
+import CPie from '../dashboard_components/CryptoPieChart';
+import CScatter from '../dashboard_components/ScatterGraph';
+import CRecentTransactionsDisplay from '../dashboard_components/CryptoRecentTransactionsDisplay';
+import CAdditional from '../dashboard_components/AdditionalData';
+import { backgroundBox, dashboardGraphContainer } from '../static/styling';
 
 
 function Dashboard() {
@@ -42,6 +25,11 @@ function Dashboard() {
   const [activeGraphPie, setActiveGraphPie] = useState('Total Asset Breakdown');
 
   const [selectedPieAccount, setSelectedPieAccount] = useState("All Accounts");
+
+  // tailwind.css styling for tabs, highlight tab and graph tab styling
+  const tabStyling = ' text-white text-center text-lg w-full cursor-pointer border-b-2 pb-2 '
+  const highlightedTabStyling = 'active bg-gradient-to-t from-violet-500 to-transparent'
+  const graphtabStyling = 'text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center'
 
   function handleClicked(event){
     console.log(event.next)
@@ -71,10 +59,11 @@ function Dashboard() {
       { name: 'Sector Spending', content: <BarChartDisplay /> }
     ],
     Crypto: [
-      { name: 'Graph 1', content: `Content for crypto 1 in Crypto tab goes here.` },
-      { name: 'Graph 2', content: `Content for crypto 2 in Crypto tab goes here.` },
-      { name: 'Graph 3', content: `Content for crypto 3 in Crypto tab goes here.` },
-    ],
+      { name: 'Pie Chart', content: <CPie /> },
+      { name: 'Scatter Graph', content: <CScatter /> },
+      { name: 'Wallet Data', content: <CAdditional /> },
+      { name: 'Transactions Table', content: <CRecentTransactionsDisplay /> },
+    ]
   };
 
   const handlePieTabClick = (tabName) => {
@@ -92,77 +81,6 @@ function Dashboard() {
     setActiveGraphPie(graphName);
   };
 
-  
-
-
-
-  const handlePieAccountChange = (event) => {
-    setSelectedPieAccount(event.target.value);
-  };
-
-    let page1 = (
-        <div data-testid = 'dashboardtest'>
-          
-          <div className="dashboard-container">
-            <div className="piechart-box">
-              <div className ="piechart-section">
-                <div className="piechart-tabs">
-                  {Object.keys(tabGraphData).map((tabName) => (
-                    <div
-                      key={tabName}
-                      className={`piechart-tab ${activeTabPie === tabName ? 'active' : ''}`}
-                      onClick={() => handlePieTabClick(tabName)}
-                    >
-                      {tabName}
-                    </div>
-                  ))}
-                </div>
-                <div className="piechart-container">
-                  <div className="piechart-graphs">
-                    {tabGraphData[activeTabPie].map((graph) => (
-                      <div
-                        hidden={stocksActive}
-                        key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active' : ''}`}
-                        onClick={() => handlePieGraphClick(graph.name)}
-                      >
-                        {graph.name}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
-                    {tabGraphData[activeTabPie].map((graph) => (
-                      activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
-                    ))}
-                  </div>
-    
-                  <div className="right-menu" hidden={stocksActive}>
-                    <select value={selectedPieAccount} onChange={handlePieAccountChange}>
-                      <option value="All Accounts">All Accounts</option>
-                      <option value="Account 1">Account 1</option>
-                    </select>
-                  </div>
-    
-                </div>
-              </div>
-              
-              <div className="piegraph-content" style={stocksActive ? {border:'0px solid white'} : {}}>
-                {tabGraphData[activeTabPie].map((graph) => (
-                  activeGraphPie === graph.name && <p key={graph.name}>{graph.content}</p>
-                ))}
-              </div>
-
-              
-
-            </div>
-          </div>
-        
-    
-        </div>
-        
-      );
-
     let page2 = (
         <div className='dashboard-container my-10px py-10 px-5'>
             <div data-testid='graph-tabs' className='dashboard-catagories flex flex-row justify-between mb-10'>
@@ -177,20 +95,20 @@ function Dashboard() {
                 ))}
             </div>
             {activeTabPie === 'Stocks' ? <InvestmentGraphs /> : 
-            (<div className='graph-container flex flex-row min-h-[70vh] max-h-[70vh]'>
-                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40'>
+            (<div className={'graph-container ' + dashboardGraphContainer}>
+                <div data-testid = 'graph-names' className='graph-names flex flex-col mr-2 w-40 justify-start'>
                     {tabGraphData[activeTabPie].map((graph) => (
                       <div
                         hidden={stocksActive}
                         key={graph.name}
-                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[2rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
+                        className={`piechart-graph ${activeGraphPie === graph.name ? 'active bg-gradient-to-l from-violet-500 to-transparent' : ''} text-white text-center text-base cursor-pointer border-r-2 px-3 py-[1.5rem] align-center ${graph == tabGraphData[activeTabPie][tabGraphData[activeTabPie].length - 1] ? '' : 'border-b-2'}`}
                         onClick={() => handlePieGraphClick(graph.name)}
                       >
                         {graph.name}
                       </div>
                     ))}
                 </div>
-                <div className='graph ml-2 w-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-3xl shadow-lg p-10'>
+                <div className={'graph ml-2 w-full p-10 ' + backgroundBox}>
                     {tabGraphData[activeTabPie].map((graph) => (
                       activeGraphPie === graph.name && <div key={graph.name} className=''>{graph.content}</div>
                     ))}
@@ -203,5 +121,4 @@ function Dashboard() {
     return page2
 }
 
-// keep the main dashboard element the same size, calculate the rem, make the table scroll, make eveyr other graph fit in
 export default Dashboard;

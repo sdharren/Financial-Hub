@@ -4,6 +4,7 @@ import usePlaid from '../custom_hooks/usePlaid';
 import 'chart.js/auto';
 import GraphSelect from '../components/GraphSelect';
 import useHandleError from '../custom_hooks/useHandleError';
+import { lineGraphSizing } from '../static/styling';
 
 function LineGraph({ endpoint, endpoint_parameter, updateGraph, selectOptions, currency}) {
     const [lineChartData, error] = usePlaid({endpoint, endpoint_parameter})
@@ -113,7 +114,7 @@ function LineGraph({ endpoint, endpoint_parameter, updateGraph, selectOptions, c
 
 
       return (
-        <div className='flex flex-col w-full max-h-[30vh]'>
+        <div className={lineGraphSizing}>
             {
                 selectOptions === undefined || selectOptions === null
                 ? null

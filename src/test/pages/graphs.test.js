@@ -10,7 +10,9 @@ import { customRenderUser } from '../test-utils'
 
 import BarGraph from '../../dashboard_components/BarGraph';
 import LineGraph from '../../dashboard_components/LineGraph';
-import LineIndexComparisonChart from '../../dashboard_components/LineIndexComparisonChart';
+import CPie from '../../dashboard_components/CryptoPieChart';
+import CAdditional from '../../dashboard_components/AdditionalData';
+import CRecentTransactionsDisplay from '../../dashboard_components/CryptoRecentTransactionsDisplay';
 
 describe("Balances Display", () => {
     it("renders without crashing", () => {
@@ -49,19 +51,31 @@ describe("Investment graphs display", () => {
 })
 
 describe("Bar graph", () => {
-    it("renders without creashing", () => {
+    it("renders without crashing", () => {
         customRenderUser(<BarGraph />)
     })
 })
 
 describe("Line graph", () => {
-    it("renders without creashing", () => {
+    it("renders without crashing", () => {
         customRenderUser(<LineGraph />)
     })
 })
 
-// describe("Line index comparison", () => {
-//     it("renders without creashing", () => {
-//         customRenderUser(<LineIndexComparisonChart />)
-//     })
-// })
+describe("Crypto pie chart", () => {
+    it("renders without crashing", () => {
+        customRenderUser(<CPie />)
+    })
+})
+
+describe("Crypto additional data table", () => {
+    it("renders without crashing", () => {
+        customRenderUser(<CAdditional />)
+    })
+})
+
+describe("Crypto recent transactions table", () => {
+    it("renders without crashing", () => {
+        customRenderUser(<CRecentTransactionsDisplay />)
+    })
+})

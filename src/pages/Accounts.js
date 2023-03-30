@@ -6,9 +6,9 @@ function Accounts() {
     const [brokerages, setBrokerages] = useState([]);
     let {authTokens, logoutUser} = useContext(AuthContext) || {};
     
-    //Function sends two GET request to the server. One to get the bank accounts the user has linked, and the one to get the linked brokerage accounts.
+    //Function sends three GET request to the server. One to get the bank accounts the user has linked, and the one to get the linked brokerage accounts.
     //The response is then parsed as JSON. 
-    //If the response is successful (HTTP status code 200), the component sets the banks and brokerages constants to the response  
+    //If the response is successful (HTTP status code 200), the component sets the banks, brokerages and crypto constants to the response  
     const [cryptos, setCryptos] = useState([]);
 
     let getAccounts = async () => {
@@ -48,7 +48,7 @@ function Accounts() {
         setCryptos(cryptodata);
 
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     }
 
@@ -77,11 +77,11 @@ function Accounts() {
         // Remove bank from list of linked banks
         setBanks(banks.filter(bank => bank !== institution));
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
 
-  //This defines a function handleRemoveBank that sends a DELETE request to an API endpoint to unlink a bank account
+  //This defines a function handleRemoveBrokerage that sends a DELETE request to an API endpoint to unlink a brokerage account
   //Updates the brokerage state variable by removing the specified institution.
   const handleRemoveBrokerage = async (brokerage) => {
     
@@ -95,20 +95,22 @@ function Accounts() {
         }
       });
       if (!response.ok) {
-        throw new Error(`Failed to remove bank: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to remove brokerage: ${response.status} ${response.statusText}`);
       }
-      // Remove bank from list of linked banks
+      // Remove brokerage from list of linked brokerages
       setBrokerages(brokerages.filter(b => b !== brokerage));
   
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
+  //This defines a function handleRemoveCrypto that sends a DELETE request to an API endpoint to unlink a crypto account
+  //Updates the crypto state variable by removing the specified wallet.
   const handleRemoveCrypto = async (crypto) => {
     try {
       // Send DELETE request to unlink crypto account
-      const response = await fetch(`/api/delete_linked_crypto/${crypto}/`, {
+      const response = await fetch(`api/delete_linked_crypto/${crypto}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +123,7 @@ function Accounts() {
       // Remove bank from list of linked banks
       setCryptos(cryptos.filter(c => c !== crypto));
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -160,7 +162,7 @@ function Accounts() {
             <td className='text-left py-3 px-4 text-white'>{crypto.slice(0, 10) + "..."}</td>
             <td className='text-left py-3 px-4'>Crypto</td>
             <td className='text-left py-3 px-4 text-white'>
-              <button onClick={() => handleRemoveCrypto(crypto)}>Delete</button>
+              <button data-testid="remove-crypto"onClick={() => handleRemoveCrypto(crypto)}>Delete</button>
             </td>
           </tr>
         ))}
