@@ -42,8 +42,8 @@ export const AuthProvider = ({ children }) => {
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
 
-            cache_assets('PUT');
-            
+            await cache_assets('PUT');
+
             navigate('/dashboard')
         }
         else {

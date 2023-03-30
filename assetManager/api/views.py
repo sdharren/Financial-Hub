@@ -146,7 +146,7 @@ def portfolio_comparison(request):
         return Response({'error': 'Bad request. Param not specified.'}, status=400)
 
     comparison = stock_getter.get_portfolio_comparison(ticker, period=6)
-    
+
     return Response(comparison, content_type='application/json', status=200)
 
 @api_view(['GET'])

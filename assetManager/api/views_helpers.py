@@ -320,7 +320,7 @@ def set_single_institution_transactions(token,wrapper,user):
 
     try:
         transaction_list = []
-        account_transactions = debit_card.get_single_transaction(datetime.date(2000,12,16),datetime.date(2050,12,17),token)['transactions']
+        account_transactions = debit_card.get_single_transaction(datetime.date(2000,12,16),datetime.date(2050,12,17),token)
         transaction_list.append(account_transactions)
         debit_card.make_bank_graph_data_dict(token,transaction_list,0)
         formatted_transactions = debit_card.get_insight_data()
