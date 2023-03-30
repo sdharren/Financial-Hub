@@ -35,7 +35,7 @@ Below is a list of all the documentations used by the team to build the back-end
 
 ## Known bugs and limitations
 One known limitation is that on the deployed version of the application entering the url directly in the web browser or refreshing the application (Control + R) will cause an error, this does not happen on the locally deployed version, for this reason avoid typing urls directly use the application as is.
-Limitation - upon linking the very first account (bank or brokerage), the application takes about 1 minute 30 seconds before the user is redirected to the dashboard. This is because the back-end has to query all the data from Plaid and cache it. This limitation is not present in any other situation.
+Limitation - upon linking the very first account (bank or brokerage), the application takes up to a minute before the user is redirected to the dashboard. This is because the back-end has to query all the data from Plaid and cache it. This limitation is not present in any other situation.
 
 # 👋Welcome to Financial-Hub
 Our application is designed to provide users with a comprehensive overview of their financial status, including investments, general spending, and cryptocurrency assets such as Bitcoin and Ethereum. We have integrated several APIs, including Plaid, BlockCypher, ForexPython, and YFinance, to enable users to link a range of financial institutions and crypto wallets, view their financial data in various types of charts, and gain valuable insights into their finances.
