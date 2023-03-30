@@ -18,9 +18,11 @@ Below is a list of all the documentations used by the team to build the back-end
 
 - [YFinance DOCUMENTATION](https://github.com/ranaroussi/yfinance) -> used for gathering investement data along with PLAID
 
-- [BlockCypher DOCUMENTATION](https://www.blockcypher.com/dev/bitcoin/#introduction) -> used to query crypto currency data for BitCoin and Ethereum
+- [BlockCypher DOCUMENTATION](https://www.blockcypher.com/dev/bitcoin/#introduction) -> used to query crypto currency data for Bitcoin and Ethereum
 
 - [ForexPython DOCUMENTATION](https://pypi.org/project/forex-python/) -> used to gather the most recent exchange rates to ensure all data is uniquely quantified using GBP '£'
+
+- [CoinGecko DOCUMENTATION] (https://www.coingecko.com/en/api/documentation) -> used to gather the most recent exchange rates for Bitcoin and Ethereum to GBL '£'
 
 # URL LOCATION FOR FINSCOPE ON HEROKU
 [FinScope](https://financial-hub.herokuapp.com)
