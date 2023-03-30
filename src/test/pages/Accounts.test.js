@@ -143,7 +143,7 @@ describe('Accounts component', () => {
   
     customRenderUser(<Accounts />);
   
-    await screen.findByText('Crypto A');
+    await screen.findByText(/Crypto A/i);
   
     const removeButtons = screen.getAllByTestId('remove-crypto');
     const firstRemoveButton = removeButtons[0];

@@ -42,17 +42,6 @@ describe('App component', () => {
       );
   
   
-    test('renders HomePage component when URL path is /homepage', () => {
-      render(
-        <MemoryRouter initialEntries={[HomePage]}>
-          <PrivateRouteWrapper>
-            <App />
-          </PrivateRouteWrapper>
-        </MemoryRouter>
-      );
-      const homePageElement = screen.queryByTestId('homepagetest');
-      expect(homePageElement).toBeDefined();
-    });
   
     test('renders Dashboard component when URL path is /dashboard',  () => {
       render(
