@@ -1,5 +1,5 @@
 ![FINSC (1200 × 630 px)](https://user-images.githubusercontent.com/123044814/228573703-d980d2af-e1b6-4050-a5ef-d86d30937d63.png)
-# 🏦Financial-Hub - FinScope 
+# 🏦Financial-Hub - FinScope
 
 ## 5CCS2SEG Major Group Project - Software Savant's repository for a financial hub to track personal financial assets
 
@@ -32,9 +32,6 @@ Below is a list of all the documentations used by the team to build the back-end
 - Stocks data is to represented in USD
 - Transactions are to be represented in GBP
 - Currency pie chart for banks formats a proportioned pie chart for all different currencies present in all linked accounts using GBP as the uniform currency for conversion and proportioning
-
-## Known Limitations
-Sometimes in the stock breakdown graph some tickers are not supported but are still offered as a selection to the user, A error message is displayed to the user stating that something went wrong with PLAID, therefore they should select another one.
 
 # 👋Welcome to Financial-Hub
 Our application is designed to provide users with a comprehensive overview of their financial status, including investments, general spending, and cryptocurrency assets such as Bitcoin and Ethereum. We have integrated several APIs, including Plaid, BlockCypher, ForexPython, and YFinance, to enable users to link a range of financial institutions and crypto wallets, view their financial data in various types of charts, and gain valuable insights into their finances.
