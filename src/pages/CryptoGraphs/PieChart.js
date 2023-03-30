@@ -111,7 +111,11 @@ function CPie({endpoint, endpoint_parameter, loadNext, updateGraph, selectOption
 
     return (
         <div className='inline-block min-h-[60vh] w-full max-h-[60vh]'>
-            <Pie className='crypto-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+            {
+                pieChartData === null ?
+                <p className='text-white'>Loading...</p> :
+                <Pie className='crypto-pie' height = "50vh" width = "50vh" data = {data} options = {options} ref = {chartRef} onClick = {onClick}></Pie>
+            }
         </div>
         
     ) 

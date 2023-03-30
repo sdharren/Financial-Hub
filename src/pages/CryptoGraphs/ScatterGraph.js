@@ -93,7 +93,11 @@ const CScatter = () => {
 
   return (
     <div id="chart" className='flex flex-col w-full max-h-[30vh]'>
-      <ApexCharts options={options} series={series} type="scatter" height= '450vh' />
+        {
+            walletData === null ?
+            <p className='text-white'>Loading...</p> :
+            <ApexCharts options={options} series={series} type="scatter" height= '450vh' />
+        }
     </div>
   );
 };
