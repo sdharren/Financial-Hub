@@ -1,10 +1,17 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Signup from "../../pages/Signup";
 import { customRenderNoUser } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 
 describe("Signup component", () => {
+    let mockLoginUser;
+    let mockSignupUser;
+
+  beforeEach(() => {
+    mockLoginUser = jest.fn();
+    mockSignupUser = jest.fn();
+  });
     it("renders without crashing", () => {
         customRenderNoUser(
             <Signup />
@@ -84,4 +91,5 @@ describe("Signup component", () => {
         userEvent.click(registerButton)
         expect(testfn).toBeCalled()
     })
+
 })

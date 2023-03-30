@@ -34,8 +34,6 @@ describe("LinkAssets component", () => {
   })
 
   
-   
-    const mockNavigate = jest.fn();
   
     const renderLinkAssets = () => {
       customRenderUser(<LinkAssets />)
@@ -53,7 +51,6 @@ describe("LinkAssets component", () => {
       const linkDebitButton = screen.getByTestId('linktransaction');
       fireEvent.click(linkDebitButton);
     
-      // Wait for the navigation to complete
       await screen.findByTestId('linktransaction');
     
       expect(window.location.pathname).toBe('/');
@@ -65,7 +62,6 @@ describe("LinkAssets component", () => {
       const linkInvestmentButton = screen.getByTestId('linkinvestments');
       fireEvent.click(linkInvestmentButton);
     
-      // Wait for the navigation to complete
       await screen.findByTestId('linkinvestments');
     
       expect(window.location.pathname).toBe('/');
@@ -77,7 +73,6 @@ describe("LinkAssets component", () => {
       const linkCryptoButton = screen.getByTestId('linkcrypto');
       fireEvent.click(linkCryptoButton);
     
-      // Wait for the navigation to complete
       await screen.findByTestId('linkcrypto');
     
       expect(window.location.pathname).toBe('/crypto_addresses');
