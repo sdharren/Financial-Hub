@@ -41,11 +41,7 @@ function PieChart({endpoint, endpoint_parameter, loadNext, updateGraph, selectOp
         labels: pie_labels,
         datasets: [
             {
-<<<<<<< HEAD:src/pages/PieChart.js
-                label: '%',
-=======
                 label: currency ? currency : '£',
->>>>>>> main:src/dashboard_components/PieChart.js
                 data: pie_data,
                 borderColor: 'black',
                 link: pie_labels

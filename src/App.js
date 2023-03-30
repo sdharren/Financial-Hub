@@ -12,15 +12,6 @@ import PrivateRoutes from './utils/PrivateRoute';
 import OnlyPublicRoutes from './utils/OnlyPublicRoute';
 import { AuthProvider } from './context/AuthContext';
 import Link from './pages/Link';
-<<<<<<< HEAD
-import Currency from './pages/Currency';
-import RecentTransactions from './dahsboard_components/RecentTransactionsDisplay';
-import LineIndexComparisonChart from './pages/LineIndexComparisonChart';
-import CurrencyDisplay from './pages/CurrencyDisplay';
-import LineGraph from './dahsboard_components/LineGraph';
-import SectorSpending from './pages/SectorSpendingDisplay';
-=======
->>>>>>> main
 import LinkAssets from './pages/LinkAssets';
 import Accounts from './pages/Accounts';
 import CryptoWalletAddresses from './pages/CryptoWalletAddresses';
