@@ -28,9 +28,9 @@ from datetime import timedelta
 SECRET_KEY = '@dg8+*g#1p%854*36rgr!=l4x$-l3&j7$p%!km10#dk37$a=d%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-PLAID_DEVELOPMENT = False
+PLAID_DEVELOPMENT = True
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -112,7 +112,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware', 
     # NEED FOR DELOPLOYMENT
-    #'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'financeHub.urls'
@@ -186,7 +186,7 @@ STATIC_URL = 'static/'
 #MEDIA_URL = 'media/'
 
 # LEAVE FOR DEPLOYMENT
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'build', 'static')
