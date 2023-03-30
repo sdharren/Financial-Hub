@@ -67,7 +67,8 @@ class YFinanceWrapper():
 
     def is_ticker_supported(self, ticker):
         try:
-            self.get_most_recent_stock_price(ticker)
+            history = self.get_stock_history(ticker)
         except TickerNotSupported:
             return False
-        return True
+        
+        return len(history) > 0
