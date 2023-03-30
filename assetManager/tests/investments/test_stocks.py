@@ -235,7 +235,7 @@ class StocksTestCase(TestCase):
     def test_get_supported_investments_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
         supported_investments = self.stock_getter.get_supported_investments()
-        self.assertEqual(supported_investments, {, 'iShares Inc MSCI Brazil', 'Matthews Pacific Tiger Fund Insti Class', 'Achillion Pharmaceuticals Inc.', 'Southside Bancshares Inc.'})
+        self.assertEqual(supported_investments, {'iShares Inc MSCI Brazil', 'Matthews Pacific Tiger Fund Insti Class', 'Achillion Pharmaceuticals Inc.', 'Southside Bancshares Inc.'})
 
     def test_get_categories_works(self):
         self.stock_getter = _create_stock_getter_with_fake_data()
