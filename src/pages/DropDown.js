@@ -52,12 +52,12 @@ function DropDown({endpoint, endpoint_parameter, loadNext}) {
   }
 
   const options = data.map((item, index) => (
-    <option key={item.id} value={item.id}>{item.name}</option>
+    <option className='bg-transparent' key={item.id} value={item.id}>{item.name}</option>
   ));
 
   return (
     <div className="dropdown-content">
-      <select className='bg-transparent text-white' onChange={handleMenuClick}>
+      <select className='bg-transparent text-black' onChange={handleMenuClick}>
         {options}
       </select>
     </div>

@@ -19,7 +19,6 @@ import { backgroundBox, dashboardGraphContainer } from '../static/styling';
 
 
 function Dashboard() {
-  console.log(backgroundBox)
   const [activeTabPie, setActiveTabPie] = useState('Overall');
   const [stocksActive, setStocksActive] = useState(false);
 
