@@ -8,7 +8,7 @@ from plaid.exceptions import ApiException
 from assetManager.API_wrappers.plaid_wrapper import AccessTokenInvalid
 from assetManager.transactionInsight.bank_graph_data import BankGraphData
 from django.core.exceptions import ObjectDoesNotExist
-
+from assetManager.transactionInsight.bank_graph_data import create_forex_rates,get_currency_converter
 
 """
 Custom Exception Thrown In the case that the passed list of transactions is empty
@@ -25,6 +25,30 @@ class bankDataEmpty(Exception):
 
 @return: accounts, custom dictionary keys:(name,available_amount,current_amount,type,currency), values: all strings except for available and current amount which are floats
 """
+
+def filter_non_supported_account_currencies(accounts):
+    filtered_accounts = []
+    input_date = get_currency_converter()
+    rates = create_forex_rates(input_date)
+
+    for account in accounts:
+        if account['balances']['iso_currency_code'] in rates.keys():
+            filtered_accounts.append(account)
+
+    return filtered_accounts
+
+def filter_non_supported_transaction_currencies(transaction_response):
+    input_date = get_currency_converter()
+    rates = create_forex_rates(input_date)
+
+    new_transactions = []
+    for transaction in transaction_response:
+        if(transaction['iso_currency_code'] in rates.keys()):
+            new_transactions.append(transaction)
+
+    return new_transactions
+
+
 def format_accounts_data(request_accounts):
     accounts = {}
     for account in request_accounts:
@@ -106,8 +130,9 @@ class DebitCard():
 
     def get_single_account_balances(self,token):
         request_accounts = self.plaid_wrapper.get_accounts(token)
-        accounts = format_accounts_data(request_accounts)
-        return accounts
+        accounts = filter_non_supported_account_currencies(request_accounts)
+        formatted_accounts = format_accounts_data(accounts)
+        return formatted_accounts
 
     def get_single_transaction(self,start_date_input,end_date_input,token):
         self.refresh_api(token)
@@ -118,7 +143,7 @@ class DebitCard():
         )
 
         transaction_response = self.plaid_wrapper.client.transactions_get(transaction_request)
-        return transaction_response
+        return transaction_response['transactions']
 
     """
     @params:
@@ -146,7 +171,8 @@ class DebitCard():
         transactions = []
         for token in self.access_tokens:
             transaction_response = self.get_single_transaction(start_date_input,end_date_input,token)
-            transactions.append(transaction_response['transactions'])
+            new_transactions = filter_non_supported_transaction_currencies(transaction_response)
+            transactions.append(new_transactions)
 
         return transactions
 
